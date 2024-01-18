@@ -5,6 +5,8 @@ import '@quasar/extras/material-icons-outlined/material-icons-outlined.css';
 // Import Quasar css
 import 'quasar/dist/quasar.css';
 
+import '@/assets/scss/main.scss';
+
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
