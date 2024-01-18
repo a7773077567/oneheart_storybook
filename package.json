@@ -13,7 +13,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@quasar/extras": "^1.16.9",
     "pinia": "^2.1.7",
+    "quasar": "^2.14.2",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"
   },
@@ -21,6 +23,7 @@
     "@antfu/eslint-config": "^2.6.3",
     "@commitlint/cli": "^18.4.4",
     "@commitlint/config-angular": "^18.4.4",
+    "@quasar/vite-plugin": "^1.6.0",
     "@tsconfig/node18": "^18.2.2",
     "@types/node": "^18.19.3",
     "@vitejs/plugin-vue": "^4.5.2",

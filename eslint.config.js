@@ -12,11 +12,13 @@ export default antfu({
     'no-console': 'warn',
     'curly': 'off',
     'no-else-return': ['error', { allowElseIf: false }],
+    'array-element-newline': ['error', 'consistent'],
+
     // Vue Related
-    // 'vue/component-name-in-template-casing': [
-    //   'error',
-    //   'PascalCase',
-    //   { registeredComponentsOnly: false },
-    // ],
+    'vue/component-name-in-template-casing': [
+      'error',
+      'PascalCase',
+      { registeredComponentsOnly: false },
+    ],
   },
 });
