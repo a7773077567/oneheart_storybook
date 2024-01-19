@@ -9,6 +9,7 @@ export default antfu({
   },
 }, {
   rules: {
+    'prefer-const': 'off',
     'no-console': 'warn',
     'curly': 'off',
     'no-else-return': ['error', { allowElseIf: false }],
