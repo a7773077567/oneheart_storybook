@@ -7,6 +7,11 @@ export default antfu({
   formatters: {
     css: true,
   },
+  // typescript: {
+  //   overrides: {
+  //     'ts/consistent-type-definitions': 'off',
+  //   },
+  // },
 }, {
   rules: {
     'prefer-const': 'off',
@@ -21,5 +26,6 @@ export default antfu({
       'PascalCase',
       { registeredComponentsOnly: false },
     ],
+
   },
 });
