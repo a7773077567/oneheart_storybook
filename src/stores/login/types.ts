@@ -10,4 +10,5 @@ export interface LoginRes {
 export interface UserInfoRes {
   id: string;
   username: string;
+  email: string;
 };

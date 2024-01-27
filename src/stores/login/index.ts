@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import type { LoginData, LoginRes, UserInfoRes } from './types';
 import { api } from '@/utils/api';
+import { setCookie } from '@/utils/helpers';
 
 export const useLoginStore = defineStore('LoginStore', {
   state() {
@@ -13,12 +14,13 @@ export const useLoginStore = defineStore('LoginStore', {
   },
   actions: {
     async login(payload: LoginData) {
-      const { data } = await api.post<LoginRes>('user/login', payload);
-      console.log(data.token);
+      const { data } = await api.post<LoginRes, LoginData>('user/login', payload);
+      setCookie('token', data.token);
     },
     async getUserInfo() {
       const { data } = await api.get<UserInfoRes>('user/info');
-      console.log(data.id);
+      this.userInfo = data;
+      return data;
     },
   },
 });

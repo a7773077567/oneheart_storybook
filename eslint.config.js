@@ -4,14 +4,10 @@ export default antfu({
   stylistic: {
     semi: true,
   },
+  // For CSS Formatting with Plugin
   formatters: {
     css: true,
   },
-  // typescript: {
-  //   overrides: {
-  //     'ts/consistent-type-definitions': 'off',
-  //   },
-  // },
 }, {
   rules: {
     'prefer-const': 'off',
@@ -27,5 +23,7 @@ export default antfu({
       { registeredComponentsOnly: false },
     ],
 
+    // Eslint-Plugin-Eslint-Comment
+    'eslint-comments/no-unlimited-disable': 'off',
   },
 });

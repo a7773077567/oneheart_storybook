@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Notify } from 'quasar';
 import type { QNotifyCreateOptions } from 'quasar';
-import { getCookie } from './cookies';
+import { getCookie } from '@/utils/helpers';
 
 // ========== Types ==========
 interface APIResponse<T, D = any> {
@@ -13,7 +13,7 @@ type StatusPair = [number, string];
 
 // ========== Interceptors ==========
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 instance.interceptors.request.use(
   requestInterceptor,
@@ -26,30 +26,30 @@ instance.interceptors.response.use(
 
 // ========== Request Methods ==========
 export const api = {
-  get<T, D = any>(
+  get<DataRes, MetaRes = any>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<APIResponse<T, D>> {
+  ): Promise<APIResponse<DataRes, MetaRes>> {
     return instance.get(url, config);
   },
-  post<T>(
+  post<DataRes, DataPayload = any>(
     url: string,
-    data?: any,
+    data?: DataPayload,
     config?: AxiosRequestConfig,
-  ): Promise<APIResponse<T>> {
+  ): Promise<APIResponse<DataRes>> {
     return instance.post(url, data, config);
   },
-  put<T>(
+  put<DataRes, DataPayload = any>(
     url: string,
-    data?: any,
+    data?: DataPayload,
     config?: AxiosRequestConfig,
-  ): Promise<APIResponse<T>> {
+  ): Promise<APIResponse<DataRes>> {
     return instance.put(url, data, config);
   },
-  delete<T>(
+  delete<DataRes>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<APIResponse<T>> {
+  ): Promise<APIResponse<DataRes>> {
     return instance.delete(url, config);
   },
 };
