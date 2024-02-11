@@ -13,13 +13,16 @@ import 'quasar/dist/quasar.css';
 // MSW
 import { enableMocking } from '@/mocks/browser';
 
-const app = createApp(App);
-app.use(createPinia()).use(router).use(Quasar);
+// Zod
+import Zod from '@/plugins/zod';
 
-// ========== Close Intercepting ==========
+const app = createApp(App);
+app.use(createPinia()).use(router).use(Quasar).use(Zod);
+
+// ========== disable mocking ==========
 app.mount('#app');
 
-// ========== Open Intercepting ==========
+// ========== enable mocking ==========
 // enableMocking()?.then(() => {
 //   app.mount('#app');
 // });

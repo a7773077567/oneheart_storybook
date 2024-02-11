@@ -13,13 +13,17 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@anatine/zod-mock": "^3.13.3",
     "@quasar/extras": "^1.16.9",
+    "@vee-validate/zod": "^4.12.5",
     "axios": "^1.6.5",
     "dayjs": "^1.11.10",
     "pinia": "^2.1.7",
     "quasar": "^2.14.2",
+    "vee-validate": "^4.12.5",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.3",

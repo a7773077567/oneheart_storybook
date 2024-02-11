@@ -7,6 +7,5 @@ export function enableMocking() {
   if (import.meta.env.MODE !== 'development') {
     return;
   }
-
   return worker.start();
 }
