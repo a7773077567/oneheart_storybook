@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>Login</main>
+  <main>Gym</main>
 </template>
 
 <style lang="scss" scoped>

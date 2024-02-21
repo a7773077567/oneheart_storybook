@@ -1,4 +1,5 @@
 import { Cookies } from 'quasar';
+import type { RouteLocationMatched } from 'vue-router';
 
 interface AllCookies {
   token: string;

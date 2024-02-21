@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>Login</main>
+  <main>HistoryQuery</main>
 </template>
 
 <style lang="scss" scoped>
