@@ -19,7 +19,11 @@ const { value, errorMessage } = useField<string>(() => props.name, props.customR
     v-model="value"
     :error="!!errorMessage"
     :error-message="errorMessage"
-  />
+  >
+    <template #append>
+      <slot name="append" />
+    </template>
+  </QInput>
 </template>
 
 <style lang="scss" scoped>
