@@ -16,8 +16,11 @@ import { enableMocking } from '@/mocks/browser';
 // Zod
 import Zod from '@/plugins/zod';
 
+// Components
+import Components from '@/plugins/components';
+
 const app = createApp(App);
-app.use(createPinia()).use(router).use(Quasar).use(Zod);
+app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components);
 
 // ========== disable mocking ==========
 app.mount('#app');
