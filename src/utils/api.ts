@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { Notify } from 'quasar';
+import { Dialog, Notify } from 'quasar';
 import type { QNotifyCreateOptions } from 'quasar';
 import { getCookie } from '@/utils/helpers';
 
@@ -9,7 +9,7 @@ interface APIResponse<T, D = any> {
   data: T;
   meta?: D;
 };
-type StatusPair = [number, string];
+type StatusPair<T> = [number, T];
 
 // ========== Interceptors ==========
 const instance = axios.create({
@@ -74,10 +74,11 @@ function responseInterceptor(response: AxiosResponse) {
 }
 
 function responseInterceptorCatch(error: AxiosError) {
-  const status = error.response?.status;
+  const { status } = error.response!;
   const notifyMessage = getNotifyMessage(status);
   const notifyOptions = getNotifyOptions(notifyMessage, error.message);
   Notify.create(notifyOptions);
+  getCatchHandler(error)?.();
 
   return Promise.reject(error);
 }
@@ -87,7 +88,7 @@ function getNotifyMessage(status?: number) {
     return 'No Internet or Unknown Error';
   }
 
-  const STATUS_PAIRS: StatusPair[] = [
+  const STATUS_PAIRS: StatusPair<string>[] = [
     [401, '401 - Unauthorized'],
     [403, '403 - Forbidden'],
     [404, '404 - Not Found'],
@@ -114,4 +115,24 @@ function getNotifyOptions(
     progress: true,
   };
   return options;
+}
+
+function getCatchHandler(error: AxiosError) {
+  const { url: endpoint } = error.config!;
+  const { status } = error.response!;
+  const STATUS_PAIRS: StatusPair<() => void>[] = [
+    [401, handler401],
+  ];
+  const handlerMap = new Map(STATUS_PAIRS);
+
+  return handlerMap.get(status);
+
+  function handler401() {
+    if (endpoint?.endsWith('login')) {
+      Dialog.create({
+        title: '錯誤',
+        message: '帳號或密碼錯誤',
+      });
+    }
+  }
 }

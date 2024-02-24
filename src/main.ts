@@ -20,12 +20,12 @@ import Zod from '@/plugins/zod';
 import Components from '@/plugins/components';
 
 const app = createApp(App);
-app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components);
 
 // ========== disable mocking ==========
-app.mount('#app');
+// app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components);
+// app.mount('#app');
 
 // ========== enable mocking ==========
-// enableMocking()?.then(() => {
-//   app.mount('#app');
-// });
+enableMocking()?.then(() => {
+  app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components).mount('#app');
+});

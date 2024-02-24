@@ -10,13 +10,29 @@ export interface UserInfoRes {
   email: string;
 };
 
-export const LoginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-type LoginData = z.infer<typeof LoginSchema>;
+export interface LoginRes {
+  token: string;
+};
 
-export async function login(payload: LoginData) {
-  const { data } = await api.post<LoginRes, LoginData>('user/login', payload);
+export interface UserInfoRes {
+  id: string;
+  username: string;
+  email: string;
+};
+
+export type LoginReq = z.infer<typeof loginSchema>;
+
+export const loginSchema = z.object({
+  account: z.string().email('請輸入正確格式的email'),
+  password: z.string().min(6),
+});
+
+export async function login(payload: LoginReq) {
+  const { data } = await api.post<LoginRes, LoginReq>('user/login', payload);
   return data.token;
+}
+
+export async function getUserInfo() {
+  const { data } = await api.get<UserInfoRes>('user/info');
+  return data;
 }

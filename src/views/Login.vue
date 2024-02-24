@@ -1,5 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useRouter } from 'vue-router';
+import { loginSchema } from '@/api/user';
+import { useUserStore } from '@/stores';
+
+const userStore = useUserStore();
+const router = useRouter();
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(loginSchema),
+});
+const onSubmit = handleSubmit(async (values) => {
+  await userStore.login(values);
+  return router.push({ name: 'home' });
+});
 
 const isPwd = ref(true);
 </script>
@@ -7,8 +23,8 @@ const isPwd = ref(true);
 <template>
   <div class="login">
     <div class="login__container">
-      <OInput name="account" label="帳號" outlined />
-      <OInput name="password" label="密碼" :type="isPwd ? 'password' : 'text'" outlined>
+      <OInput name="account" label="帳號" outlined class="gutter--sm" />
+      <OInput name="password" label="密碼" :type="isPwd ? 'password' : 'text'" outlined class="gutter--sm">
         <template #append>
           <QIcon
             :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -18,7 +34,7 @@ const isPwd = ref(true);
         </template>
       </OInput>
       <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" />
-      <QBtn label="登入" unelevated color="black" class="gutter" />
+      <QBtn label="登入" unelevated color="black" class="gutter" @click="onSubmit" />
       <p class="separator gutter">
         或使用以下登入
       </p>
@@ -31,7 +47,9 @@ const isPwd = ref(true);
 
 <style lang="scss" scoped>
 .login {
+  max-width: 1440px;
   height: 100vh;
+  margin: 0 auto;
   padding: 65px;
   display: flex;
   justify-content: flex-end;
@@ -60,5 +78,10 @@ const isPwd = ref(true);
 
 .gutter {
   margin-bottom: 20px;
+  &--sm {
+    margin-bottom: 10px;
+  }
 }
 </style>
+@/api/login
+@/api/user
