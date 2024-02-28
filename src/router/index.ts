@@ -1,10 +1,15 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores';
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
     component: () => import('@/views/Login.vue'),
+    beforeEnter: loginGuard,
+    meta: {
+      requiredAuth: false,
+    },
   },
   {
     path: '/',
@@ -18,6 +23,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/Home.vue'),
         meta: {
           label: '首頁',
+          requiredAuth: true,
         },
       },
       {
@@ -26,6 +32,7 @@ export const routes: RouteRecordRaw[] = [
         redirect: { name: 'appointmentList' },
         meta: {
           label: '客戶預約',
+          requiredAuth: true,
         },
         children: [
           {
@@ -34,6 +41,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/appointment/List.vue'),
             meta: {
               label: '預約列表',
+              requiredAuth: true,
             },
           },
           {
@@ -42,6 +50,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/appointment/Booking.vue'),
             meta: {
               label: '預約',
+              requiredAuth: true,
             },
           },
           {
@@ -50,6 +59,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/appointment/CurrentQuery.vue'),
             meta: {
               label: '查詢預約',
+              requiredAuth: true,
             },
           },
           {
@@ -58,6 +68,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/appointment/HistoryQuery.vue'),
             meta: {
               label: '查詢紀錄',
+              requiredAuth: true,
             },
           },
         ],
@@ -68,6 +79,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/client/Client.vue'),
         meta: {
           label: '客戶管理',
+          requiredAuth: true,
         },
       },
       {
@@ -76,6 +88,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/store/Store.vue'),
         meta: {
           label: '商城',
+          requiredAuth: true,
         },
       },
       {
@@ -84,6 +97,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/order/Order.vue'),
         meta: {
           label: '訂單與付款',
+          requiredAuth: true,
         },
       },
       {
@@ -92,6 +106,7 @@ export const routes: RouteRecordRaw[] = [
         redirect: { name: 'scheduleList' },
         meta: {
           label: '排班',
+          requiredAuth: true,
         },
         children: [
           {
@@ -100,6 +115,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/schedule/List.vue'),
             meta: {
               label: '班表列表 ',
+              requiredAuth: true,
             },
           },
           {
@@ -108,6 +124,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/schedule/Shift.vue'),
             meta: {
               label: '新增班別',
+              requiredAuth: true,
             },
           },
           {
@@ -116,6 +133,7 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/schedule/Query.vue'),
             meta: {
               label: '查詢班表',
+              requiredAuth: true,
             },
           },
         ],
@@ -126,6 +144,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/staff/Staff.vue'),
         meta: {
           label: '人員設定',
+          requiredAuth: true,
         },
       },
       {
@@ -134,6 +153,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/gym/Gym.vue'),
         meta: {
           label: '場館管理',
+          requiredAuth: true,
         },
       },
 
@@ -146,5 +166,36 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(async (to) => {
+  // Delegate guard to login beforeEnter
+  if (to.name === 'login') {
+    return;
+  }
+
+  const isAuthenticated = await checkAuth();
+  const needAuth = to.meta.requiredAuth;
+  if (needAuth && !isAuthenticated) {
+    return { name: 'login' };
+  }
+});
+
+async function checkAuth() {
+  const userStore = useUserStore();
+  try {
+    await userStore.getUserInfo();
+    return true;
+  }
+  catch {
+    return false;
+  }
+}
+
+async function loginGuard() {
+  const isAuthenticated = await checkAuth();
+  if (isAuthenticated) {
+    return { name: 'home' };
+  }
+}
 
 export default router;

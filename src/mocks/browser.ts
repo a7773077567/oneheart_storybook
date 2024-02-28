@@ -1,11 +1,13 @@
 import { setupWorker } from 'msw/browser';
-import { handlers } from './handlers';
+import userHandlers from './handlers/user';
 
-export const worker = setupWorker(...handlers);
+export const worker = setupWorker(...userHandlers);
 
 export function enableMocking() {
   if (import.meta.env.MODE !== 'development') {
     return;
   }
-  return worker.start();
+  return worker.start({
+    onUnhandledRequest: 'bypass',
+  });
 }
