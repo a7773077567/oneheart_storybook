@@ -1,7 +1,7 @@
 import { type HttpHandler, HttpResponse, type HttpResponseInit, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
-import type { BasicLoginReq, GoogleLoginReq, UserInfoRes } from '@/api/user';
+import type { BasicLoginReq, GoogleLoginReq, MicrosoftLoginReq, UserInfoRes } from '@/api/user';
 
 export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
   const { account, password } = await request.json() as BasicLoginReq;
@@ -32,6 +32,14 @@ export const googleLoginHandler = http.post(getUrl('user/google-login'), async (
   return getTokenRes();
 });
 
+export const microsoftLoginHandler = http.post(getUrl('user/microsoft-login'), async ({ request }) => {
+  const { idToken } = await request.json() as MicrosoftLoginReq;
+  if (!idToken) {
+    return getErrorRes(401);
+  }
+  return getTokenRes();
+});
+
 function getErrorRes(status: number) {
   const errorTexts = new Map([
     [401, 'Unauthorized'],
@@ -47,4 +55,4 @@ function getTokenRes() {
   return HttpResponse.json({ data: { token: faker.string.uuid() } });
 }
 
-export default [basicLoginHandler, googleLoginHandler, userInfoHandler];
+export default [basicLoginHandler, googleLoginHandler, userInfoHandler, microsoftLoginHandler];

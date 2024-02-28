@@ -13,6 +13,9 @@ export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export interface GoogleLoginReq {
   code: string;
 }
+export interface MicrosoftLoginReq {
+  idToken: string;
+}
 
 export const basicLoginSchema = z.object({
   account: z.string().email('請輸入正確格式的email'),
@@ -21,7 +24,7 @@ export const basicLoginSchema = z.object({
 
 export async function basicLogin(payload: BasicLoginReq) {
   const { data } = await api.post<LoginRes, BasicLoginReq>('user/basic-login', payload);
-  return data.token;
+  return data;
 }
 
 export async function getUserInfo() {
@@ -31,5 +34,10 @@ export async function getUserInfo() {
 
 export async function googleLogin(payload: GoogleLoginReq) {
   const { data } = await api.post<LoginRes, GoogleLoginReq>('user/google-login', payload);
+  return data;
+}
+
+export async function microsoftLogin(payload: MicrosoftLoginReq) {
+  const { data } = await api.post<LoginRes, MicrosoftLoginReq>('user/microsoft-login', payload);
   return data;
 }
