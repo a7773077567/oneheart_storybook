@@ -1,7 +1,7 @@
 import { setupWorker } from 'msw/browser';
-import { loginHandler, userInfoHandler } from './handlers/user';
+import userHandlers from './handlers/user';
 
-export const worker = setupWorker(loginHandler, userInfoHandler);
+export const worker = setupWorker(...userHandlers);
 
 export function enableMocking() {
   if (import.meta.env.MODE !== 'development') {

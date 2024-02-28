@@ -1,21 +1,20 @@
-import type { HttpHandler } from 'msw';
-import { HttpResponse, http } from 'msw';
+import { type HttpHandler, HttpResponse, type HttpResponseInit, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
-import type { LoginReq, UserInfoRes } from '@/api/user';
+import type { BasicLoginReq, GoogleLoginReq, UserInfoRes } from '@/api/user';
 
-export const loginHandler = http.post(getUrl('user/login'), async ({ request }) => {
-  const { account, password } = await request.json() as LoginReq;
+export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
+  const { account, password } = await request.json() as BasicLoginReq;
   if (password !== '123456' || account !== '123@gmail.com') {
-    return new HttpResponse(null, { status: 401, statusText: 'Unauthorized' });
+    return getErrorRes(401);
   }
-  return HttpResponse.json({ data: { token: faker.string.uuid() } });
+  return getTokenRes();
 });
 
-export const userInfoHandler: HttpHandler = http.get(getUrl('user/info'), ({ request }) => {
+export const userInfoHandler = http.get(getUrl('user/info'), ({ request }) => {
   const hasToken = request.headers.get('authorization');
   if (!hasToken) {
-    return new HttpResponse(null, { status: 401, statusText: 'Unauthorized' });
+    return getErrorRes(401);
   }
   const username = faker.internet.userName();
   return HttpResponse.json({ data: {
@@ -24,3 +23,28 @@ export const userInfoHandler: HttpHandler = http.get(getUrl('user/info'), ({ req
     username,
   } satisfies UserInfoRes });
 });
+
+export const googleLoginHandler = http.post(getUrl('user/google-login'), async ({ request }) => {
+  const { code } = await request.json() as GoogleLoginReq;
+  if (!code) {
+    return getErrorRes(401);
+  }
+  return getTokenRes();
+});
+
+function getErrorRes(status: number) {
+  const errorTexts = new Map([
+    [401, 'Unauthorized'],
+  ]);
+  const httpOptions: HttpResponseInit = {
+    status,
+    statusText: errorTexts.get(status),
+  };
+  return new HttpResponse(null, httpOptions);
+}
+
+function getTokenRes() {
+  return HttpResponse.json({ data: { token: faker.string.uuid() } });
+}
+
+export default [basicLoginHandler, googleLoginHandler, userInfoHandler];

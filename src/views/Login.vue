@@ -3,21 +3,30 @@ import { ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useRouter } from 'vue-router';
-import { loginSchema } from '@/api/user';
-import { useUserStore } from '@/stores';
+import { googleAuthCodeLogin } from 'vue3-google-login';
+import { basicLogin, basicLoginSchema, googleLogin } from '@/api/user';
+import { setCookie } from '@/utils/helpers';
 
-const userStore = useUserStore();
 const router = useRouter();
+const isPwd = ref(true);
 
 const { handleSubmit } = useForm({
-  validationSchema: toTypedSchema(loginSchema),
+  validationSchema: toTypedSchema(basicLoginSchema),
 });
-const onSubmit = handleSubmit(async (values) => {
-  await userStore.login(values);
-  return router.push({ name: 'home' });
+const onBasicLogin = handleSubmit(async (values) => {
+  goHome(() => basicLogin(values));
 });
 
-const isPwd = ref(true);
+async function onGoogleLogin() {
+  const { code } = await googleAuthCodeLogin();
+  goHome(() => googleLogin({ code }));
+}
+
+async function goHome(loginFunc: Function) {
+  const token = await loginFunc();
+  setCookie('token', token);
+  return router.push({ name: 'home' });
+}
 </script>
 
 <template>
@@ -34,13 +43,13 @@ const isPwd = ref(true);
         </template>
       </OInput>
       <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" />
-      <QBtn label="登入" unelevated color="black" class="gutter" @click="onSubmit" />
+      <QBtn label="登入" unelevated color="black" class="gutter" @click="onBasicLogin" />
       <p class="separator gutter">
         或使用以下登入
       </p>
       <!-- icon-right prop is necessary for centering the text label  -->
       <QBtn label="使用Microsoft登入" icon="img:/images/microsoft.png" icon-right="" align="between" color="grey-7" outline class="gutter" />
-      <QBtn label="使用Google登入" icon="img:/images/google.png" icon-right="" align="between" color="grey-7" outline />
+      <QBtn label="使用Google登入" icon="img:/images/google.png" icon-right="" align="between" color="grey-7" outline @click="onGoogleLogin" />
     </div>
   </div>
 </template>
@@ -83,5 +92,3 @@ const isPwd = ref(true);
   }
 }
 </style>
-@/api/login
-@/api/user

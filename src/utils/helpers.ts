@@ -1,5 +1,4 @@
 import { Cookies } from 'quasar';
-import type { RouteLocationMatched } from 'vue-router';
 
 interface AllCookies {
   token: string;
@@ -10,7 +9,7 @@ export function getCookie(key: keyof AllCookies) {
 }
 
 export function setCookie(key: keyof AllCookies, value: any) {
-  Cookies.set(key, value);
+  Cookies.set(key, value, { path: '/' });
 }
 
 export function getUrl(path: string) {
