@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
-import { Breadcrumbs, Drawer } from '@/components/layout';
+import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
 
 const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
@@ -21,18 +21,7 @@ function toggleDrawer() {
           <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
         </QAvatar>
         <QSpace />
-        <QAvatar id="avatar" class="cursor-pointer">
-          <img src="https://cdn.quasar.dev/img/avatar.png">
-          <QMenu>
-            <QList style="min-width: 150px;">
-              <QItem clickable>
-                <QItemSection>
-                  item-1
-                </QItemSection>
-              </QItem>
-            </QList>
-          </QMenu>
-        </QAvatar>
+        <Avatar />
       </QToolbar>
       <QTabs>
         <QRouteTab

@@ -4,10 +4,18 @@ import { api } from '@/utils/api';
 export interface LoginRes {
   token: string;
 };
+
+export interface Location {
+  id: number;
+  type: 'clinic' | 'gym';
+  name: string;
+}
 export interface UserInfoRes {
   id: string;
   username: string;
   email: string;
+  avatar: string;
+  locations: Location[];
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export interface GoogleLoginReq {

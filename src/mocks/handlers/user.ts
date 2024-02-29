@@ -1,7 +1,7 @@
 import { type HttpHandler, HttpResponse, type HttpResponseInit, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
-import type { BasicLoginReq, GoogleLoginReq, MicrosoftLoginReq, UserInfoRes } from '@/api/user';
+import type { BasicLoginReq, GoogleLoginReq, Location, MicrosoftLoginReq, UserInfoRes } from '@/api/user';
 
 export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
   const { account, password } = await request.json() as BasicLoginReq;
@@ -17,10 +17,19 @@ export const userInfoHandler = http.get(getUrl('user/info'), ({ request }) => {
     return getErrorRes(401);
   }
   const username = faker.internet.userName();
+  const locations: Location[] = [
+    { id: 1, name: '桃園館', type: 'clinic' },
+    { id: 2, name: '台北館', type: 'clinic' },
+    { id: 3, name: '新竹館', type: 'clinic' },
+    { id: 4, name: '台北館', type: 'gym' },
+    { id: 5, name: '桃園館', type: 'gym' },
+  ];
   return HttpResponse.json({ data: {
     id: faker.string.nanoid(),
-    email: faker.internet.email({ firstName: username }),
     username,
+    email: faker.internet.email({ firstName: username }),
+    avatar: faker.image.avatar(),
+    locations: faker.helpers.arrayElements(locations, { min: 1, max: locations.length }),
   } satisfies UserInfoRes });
 });
 

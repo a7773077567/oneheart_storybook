@@ -20,11 +20,32 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/home',
         name: 'home',
-        component: () => import('@/views/Home.vue'),
+        redirect: { name: 'dashboard' },
         meta: {
           label: '首頁',
           requiredAuth: true,
         },
+        children: [
+          {
+            path: 'dashboard',
+            name: 'dashboard',
+            component: () => import('@/views/home/Dashboard.vue'),
+            meta: {
+              label: '儀表板',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'user-settings',
+            component: () => import('@/views/home/UserSettings.vue'),
+            name: 'userSettings',
+            meta: {
+              label: '個人設定',
+              requiredAuth: true,
+
+            },
+          },
+        ],
       },
       {
         path: '/appointment',
