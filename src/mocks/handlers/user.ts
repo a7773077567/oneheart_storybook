@@ -1,7 +1,7 @@
 import { type HttpHandler, HttpResponse, type HttpResponseInit, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
-import type { BasicLoginReq, GoogleLoginReq, Location, MicrosoftLoginReq, UserInfoRes } from '@/api/user';
+import type { BasicLoginReq, ForgetReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, UserInfoRes } from '@/api/user';
 
 export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
   const { account, password } = await request.json() as BasicLoginReq;
@@ -49,13 +49,31 @@ export const microsoftLoginHandler = http.post(getUrl('user/microsoft-login'), a
   return getTokenRes();
 });
 
-function getErrorRes(status: number) {
+export const forgetPasswordHandler = http.post(getUrl('user/forget'), async ({ request }) => {
+  const { account } = await request.json() as ForgetReq;
+  const emails = ['123@gmail.com'];
+  if (!emails.includes(account)) {
+    return getErrorRes(422);
+  }
+  return HttpResponse.json({ data: { state: 'Successful' } });
+});
+
+export const setNewPasswordHandler = http.post(getUrl('user/new-password'), async ({ request }) => {
+  const { password, confirm } = await request.json() as NewPasswordReq;
+  if (password !== confirm) {
+    return getErrorRes(422, 'Password and confirm should be the same');
+  }
+  return getSuccessRes();
+});
+
+function getErrorRes(status: number, customText?: string) {
   const errorTexts = new Map([
     [401, 'Unauthorized'],
+    [422, 'In valid Payload'],
   ]);
   const httpOptions: HttpResponseInit = {
     status,
-    statusText: errorTexts.get(status),
+    statusText: customText || errorTexts.get(status),
   };
   return new HttpResponse(null, httpOptions);
 }
@@ -64,4 +82,8 @@ function getTokenRes() {
   return HttpResponse.json({ data: { token: faker.string.uuid() } });
 }
 
-export default [basicLoginHandler, googleLoginHandler, userInfoHandler, microsoftLoginHandler];
+function getSuccessRes() {
+  return HttpResponse.json({ data: { state: 'success' } });
+}
+
+export default [basicLoginHandler, googleLoginHandler, userInfoHandler, microsoftLoginHandler, forgetPasswordHandler, setNewPasswordHandler];

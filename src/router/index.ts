@@ -5,17 +5,45 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/Login.vue'),
+    component: () => import('@/views/login/Login.vue'),
     beforeEnter: loginGuard,
     meta: {
       requiredAuth: false,
     },
   },
   {
+    path: '/forget',
+    name: 'forget',
+    component: () => import('@/views/login/Forget.vue'),
+    redirect: { name: 'email' },
+    children: [
+      {
+        path: 'email',
+        name: 'email',
+        component: () => import('@/views/login/Email.vue'),
+        meta: {
+          requireAuth: false,
+        },
+      },
+      {
+        path: 'confirm',
+        name: 'confirm',
+        component: () => import('@/views/login/Confirm.vue'),
+        meta: {
+          requireAuth: false,
+        },
+        props: route => ({ userId: route.query.id }),
+      },
+    ],
+  },
+  {
     path: '/',
     name: 'layout',
     component: () => import('@/views/Layout.vue'),
     redirect: { name: 'home' },
+    meta: {
+      requiredAuth: true,
+    },
     children: [
       {
         path: '/home',
@@ -189,14 +217,12 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  // Delegate guard to login beforeEnter
-  if (to.name === 'login') {
+  const needAuth = to.meta.requiredAuth;
+  if (!needAuth) {
     return;
   }
-
   const isAuthenticated = await checkAuth();
-  const needAuth = to.meta.requiredAuth;
-  if (needAuth && !isAuthenticated) {
+  if (!isAuthenticated) {
     return { name: 'login' };
   }
 });

@@ -1,9 +1,17 @@
 import type { App } from 'vue';
-import { OInput, OSelect } from '@/components/shared';
+
+const modules = import.meta.glob<true, string, any>(['@/components/shared/**/*', '!@/components/shared/index.ts'], { eager: true });
 
 export default {
   install(app: App) {
-    app.component('OInput', OInput);
-    app.component('OSelect', OSelect);
+    Object.entries(modules).forEach(([key, module]) => {
+      const name = extractName(key);
+      const component = module.default;
+      app.component(name, component);
+    });
   },
 };
+
+function extractName(key: string) {
+  return key.split('/').at(-1)?.split('.')[0] as string;
+}
