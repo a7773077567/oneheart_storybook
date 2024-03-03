@@ -16,6 +16,7 @@ export const routes: RouteRecordRaw[] = [
     name: 'forget',
     component: () => import('@/views/login/Forget.vue'),
     redirect: { name: 'email' },
+    beforeEnter: loginGuard,
     children: [
       {
         path: 'email',
