@@ -4,7 +4,7 @@ const msalConfig: Configuration = {
   auth: {
     clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
     authority: `https://login.microsoftonline.com/${import.meta.env.VITE_MICROSOFT_TENANT_ID}`,
-    redirectUri: 'http://localhost:5173',
+    redirectUri: import.meta.env.VITE_DOMAIN,
   },
 };
 const MSAL = new PublicClientApplication(msalConfig);
