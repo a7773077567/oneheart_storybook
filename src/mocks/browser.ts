@@ -4,9 +4,9 @@ import userHandlers from './handlers/user';
 export const worker = setupWorker(...userHandlers);
 
 export function enableMocking() {
-  if (import.meta.env.MODE !== 'development') {
-    return;
-  }
+  // if (import.meta.env.MODE !== 'development') {
+  //   return;
+  // }
   return worker.start({
     onUnhandledRequest: 'bypass',
   });
