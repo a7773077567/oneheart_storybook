@@ -1,0 +1,37 @@
+name: ONEHEART-CRS-FRONTEND-STAGING-CI-CD
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - '**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for checkout
+    steps:
+      - name: set up node env
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Installing project dependencies
+        run: npm install && npm install sass --save-dev
+      - name: add env file
+        run: echo "${{ secrets.STAGING_ENV_FILE_CONTENT }}" > .env
+      - name: Build the project
+        run: npm run build
+      - name: GCP authentication
+        uses: google-github-actions/auth@v0.8.1
+        with:
+          workload_identity_provider: '${{secrets.WORKLOAD_IDENTITY_PROVIDER}}'
+          service_account: '${{secrets.SERVICE_ACCOUNT}}'
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+      - name: Upload file to Cloud Storage
+        run: |
+          gsutil -m cp -r -c -z html,js,css dist/** ${{ secrets.STAGING_STORAGE_PATH }} && \
+          gsutil setmeta -h "Cache-Control:no-cache, no-store, max-age=0, must-revalidate" ${{ secrets.STAGING_STORAGE_PATH }}/index.html
