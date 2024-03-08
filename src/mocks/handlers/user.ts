@@ -1,6 +1,7 @@
-import { type HttpHandler, HttpResponse, type HttpResponseInit, http } from 'msw';
+import { type HttpHandler, HttpResponse, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
+import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
 import type { BasicLoginReq, ForgetReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, UserInfoRes } from '@/api/user';
 
 export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
@@ -66,24 +67,8 @@ export const setNewPasswordHandler = http.post(getUrl('user/new-password'), asyn
   return getSuccessRes();
 });
 
-function getErrorRes(status: number, customText?: string) {
-  const errorTexts = new Map([
-    [401, 'Unauthorized'],
-    [422, 'In valid Payload'],
-  ]);
-  const httpOptions: HttpResponseInit = {
-    status,
-    statusText: customText || errorTexts.get(status),
-  };
-  return new HttpResponse(null, httpOptions);
-}
-
 function getTokenRes() {
   return HttpResponse.json({ data: { token: faker.string.uuid() } });
-}
-
-function getSuccessRes() {
-  return HttpResponse.json({ data: { state: 'success' } });
 }
 
 export default [basicLoginHandler, googleLoginHandler, userInfoHandler, microsoftLoginHandler, forgetPasswordHandler, setNewPasswordHandler];

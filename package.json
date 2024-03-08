@@ -13,7 +13,6 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@anatine/zod-mock": "^3.13.3",
     "@azure/msal-browser": "^3.10.0",
     "@quasar/extras": "^1.16.9",
     "@vee-validate/zod": "^4.12.5",
