@@ -32,3 +32,11 @@ export function getSequenceOptions(num: number): SelectOption[] {
     value: num,
   }));
 }
+
+export function omit(keys: string[], obj: Record<string, any>) {
+  if (!keys.length) {
+    return obj;
+  }
+  const { [keys.pop() as string]: _, ...rest } = obj;
+  return omit(keys, rest);
+}

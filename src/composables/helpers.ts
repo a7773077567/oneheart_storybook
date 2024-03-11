@@ -13,7 +13,7 @@ export function useConvert(keys: string[]) {
     return object;
   }
 
-  function toArray(duration: Record<string, any>) {
+  function toArray(duration: Record<string, number>) {
     const array = keys.map((key) => {
       return duration[key];
     });

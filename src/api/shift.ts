@@ -13,14 +13,10 @@ export enum ShiftTypes {
   Group = '團課',
 }
 
-export interface Duration {
-  startHr: number;
-  startMin: number;
-  endHr: number;
-  endMin: number;
-};
 export const ShiftColors = ['#88F2D8', '#91D0C1', '#F8C9CB', '#E86969', '#A5D6F1', '#45B1ED'] as const;
+
 export const shiftSchema = z.object({
+  id: z.number().optional(),
   type: z.number(),
   name: z.string(),
   duration: z.number().array(),
@@ -28,12 +24,26 @@ export const shiftSchema = z.object({
   color: z.enum(ShiftColors),
 });
 export type ShiftSchema = z.infer<typeof shiftSchema>;
+
 export interface ShiftReq {
+  id?: number;
   type: number;
   name: string;
-  duration: Partial<Duration>;
-  unavailable: Partial<Duration>[];
+  duration: Record<string, number>;
+  unavailable: Record<string, number>[];
   color: (typeof ShiftColors)[number];
+}
+
+export type ShiftRes = Required<ShiftReq>;
+
+export async function getShiftList() {
+  const { data } = await api.get<ShiftRes[]>('shift');
+  return data;
+}
+
+export async function getShift(shiftId: number) {
+  const { data } = await api.get<ShiftRes>(`shift/${shiftId}`);
+  return data;
 }
 
 export async function createShift(payload: ShiftReq) {
@@ -41,12 +51,12 @@ export async function createShift(payload: ShiftReq) {
   return data;
 }
 
-export async function getShift(shiftId: number) {
-  const { data } = await api.get<ShiftReq>(`shift/${shiftId}`);
+export async function updateShift(shiftId: number, payload: ShiftReq) {
+  const { data } = await api.put<PostRes>(`shift/${shiftId}`, payload);
   return data;
 }
 
-export async function updateShift(shiftId: number, payload: ShiftReq) {
-  const { data } = await api.put<PostRes>(`shift/${shiftId}`, payload);
+export async function deleteShift(shiftId: number) {
+  const { data } = await api.delete<PostRes>(`shift/${shiftId}`);
   return data;
 }

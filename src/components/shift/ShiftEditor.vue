@@ -1,39 +1,63 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { ShiftColors, type ShiftSchema, ShiftTypes, shiftSchema } from '@/api/shift';
+import { ShiftColors, type ShiftReq, type ShiftRes, type ShiftSchema, ShiftTypes, shiftSchema } from '@/api/shift';
 import { DurationItems } from '@/const/shift';
+import { useConvert } from '@/composables/helpers';
 
 interface Props {
-  data?: ShiftSchema;
+  data?: ShiftRes;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
   cancel: [state: boolean];
-  confirm: [values: ShiftSchema];
+  confirm: [values: ShiftReq];
 }>();
 
-const typeOptions = Object.values(ShiftTypes).map((value, index) => ({
-  label: value,
-  value: index,
-}));
+const { toArray, toObject } = useConvert(['startHr', 'startMin', 'endHr', 'endMin']);
+const typeOptions = getTypeOptions();
 
-const initialValues: ShiftSchema = {
-  type: typeOptions[0].value,
-  name: '',
-  duration: [0, 0, 0, 0],
-  unavailable: [[0, 0, 0, 0]],
-  color: ShiftColors[0],
-};
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(shiftSchema),
-  initialValues: props.data || initialValues,
+  initialValues: getInitialValues(),
 });
+
 const { fields, push, remove } = useFieldArray('unavailable');
 
 const onSubmit = handleSubmit((values) => {
-  emit('confirm', values);
+  const { duration, unavailable } = values;
+  const payload = {
+    ...values,
+    duration: toObject(duration),
+    unavailable: unavailable.map(toObject),
+  };
+  emit('confirm', payload);
 });
+
+function getTypeOptions() {
+  return Object.values(ShiftTypes).map((value, index) => ({
+    label: value,
+    value: index,
+  }));
+}
+
+function getInitialValues(): ShiftSchema {
+  if (!props.data) {
+    return {
+      type: typeOptions[0].value,
+      name: '',
+      duration: [0, 0, 0, 0],
+      unavailable: [[0, 0, 0, 0]],
+      color: ShiftColors[0],
+    };
+  }
+  const { duration, unavailable } = props.data;
+  return {
+    ...props.data,
+    duration: toArray(duration),
+    unavailable: unavailable.map(toArray),
+  };
+}
 </script>
 
 <template>
