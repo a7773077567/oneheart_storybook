@@ -17,16 +17,13 @@ import { enableMocking } from '@/mocks/browser';
 // Zod
 import Zod from '@/plugins/zod';
 
-// Google Login
-
 // Components
 import Components from '@/plugins/components';
 
 const app = createApp(App);
 
 // ========== disable mocking ==========
-// app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components);
-// app.mount('#app');
+// app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components).mount('#app');
 
 // ========== enable mocking ==========
 enableMocking()?.then(() => {

@@ -151,9 +151,9 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: '/schedule',
-        name: 'schedule',
-        redirect: { name: 'scheduleList' },
+        path: '/shift',
+        name: 'shift',
+        redirect: { name: 'shiftList' },
         meta: {
           label: '排班',
           requiredAuth: true,
@@ -161,8 +161,8 @@ export const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'list',
-            name: 'scheduleList',
-            component: () => import('@/views/schedule/List.vue'),
+            name: 'shiftList',
+            component: () => import('@/views/shift/List.vue'),
             meta: {
               label: '班表列表 ',
               requiredAuth: true,
@@ -170,8 +170,8 @@ export const routes: RouteRecordRaw[] = [
           },
           {
             path: 'shift',
-            name: 'scheduleShift',
-            component: () => import('@/views/schedule/Shift.vue'),
+            name: 'shiftShift',
+            component: () => import('@/views/shift/Shift.vue'),
             meta: {
               label: '新增班別',
               requiredAuth: true,
@@ -179,8 +179,8 @@ export const routes: RouteRecordRaw[] = [
           },
           {
             path: 'query',
-            name: 'scheduleQuery',
-            component: () => import('@/views/schedule/Query.vue'),
+            name: 'shiftQuery',
+            component: () => import('@/views/shift/Query.vue'),
             meta: {
               label: '查詢班表',
               requiredAuth: true,

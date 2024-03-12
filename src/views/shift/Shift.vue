@@ -2,33 +2,34 @@
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { ShiftCard, ShiftEditor } from '@/components/shift';
-import { type ShiftReq, type ShiftRes, createShift, deleteShift, getShift, getShiftList, updateShift } from '@/api/shift';
+import { type ShiftReq, type ShiftRes, createShift, deleteShift, fetchShift, fetchShifts, updateShift } from '@/api/shift';
 
 const $q = useQuasar();
 const creatingShift = ref(false);
 const updatingShift = ref(false);
-const shiftList = ref<ShiftRes[]>();
+const shifts = ref<ShiftRes[]>();
 const targetShift = ref<ShiftRes>();
 
-getAllShifts();
+getShifts();
 
-async function getAllShifts() {
-  shiftList.value = await getShiftList();
+async function getShifts() {
+  shifts.value = await fetchShifts();
 }
 
 async function onCreateShift(values: ShiftReq) {
   await createShift(values);
+  getShifts();
   creatingShift.value = false;
 }
 
 async function openShift(shiftId: number) {
-  targetShift.value = await getShift(shiftId);
+  targetShift.value = await fetchShift(shiftId);
   updatingShift.value = true;
 }
 
 async function onUpdateShift(values: ShiftReq) {
   await updateShift(values.id!, values);
-  await getAllShifts();
+  await getShifts();
   updatingShift.value = false;
 }
 
@@ -38,7 +39,7 @@ async function onDeleteShift(shiftId: number) {
     message: '是否要刪除此筆班別?',
   }).onOk(async () => {
     await deleteShift(shiftId);
-    getAllShifts();
+    getShifts();
   });
 }
 </script>
@@ -59,7 +60,7 @@ async function onDeleteShift(shiftId: number) {
     </div>
     <div class="shift__body column q-gutter-sm">
       <ShiftCard
-        v-for="shift in shiftList"
+        v-for="shift in shifts"
         :key="shift.id"
         :shift="shift"
         flat

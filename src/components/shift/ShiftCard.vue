@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import type { ShiftRes } from '@/api/shift';
+import { getDurationLabel } from '@/utils/date';
 
 interface Props {
   shift: ShiftRes;
@@ -10,20 +10,6 @@ defineEmits<{
   edit: [id: number];
   delete: [id: number];
 }>();
-
-function getLabel(duration: Record<string, any>, isUnavailable?: boolean) {
-  const { startHr, startMin, endHr, endMin } = duration;
-  const startTime = dayjs().set('h', startHr).set('m', startMin);
-  const endTime = dayjs().set('h', endHr).set('m', endMin);
-  if (!isUnavailable) {
-    return `${amOrPm(startHr)}${startTime.format('hh:mm')}-${amOrPm(endHr)}${endTime.format('hh:mm')}`;
-  }
-  return `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
-
-  function amOrPm(hr: number) {
-    return hr >= 12 ? '下午' : '上午';
-  }
-}
 </script>
 
 <template>
@@ -36,10 +22,10 @@ function getLabel(duration: Record<string, any>, isUnavailable?: boolean) {
     <QCardSection horizontal class="justify-between items-center q-px-sm">
       <QCardSection horizontal class="items-center q-gutter-md">
         <div class="text-body1 text-weight-medium">
-          {{ getLabel(shift.duration) }}
+          {{ getDurationLabel(shift.duration) }}
         </div>
         <QBadge v-for="(item, index) in shift.unavailable" :key="index" color="grey-4" text-color="black" class="text-body2 ">
-          {{ `不可預約時間${getLabel(item, true)}` }}
+          {{ `不可預約時間${getDurationLabel(item, true)}` }}
         </QBadge>
       </QCardSection>
       <QCardActions class="q-pa-none">

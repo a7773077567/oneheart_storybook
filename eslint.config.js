@@ -8,6 +8,7 @@ export default antfu({
   formatters: {
     css: true,
   },
+
 }, {
   rules: {
     'prefer-const': 'off',
@@ -15,6 +16,7 @@ export default antfu({
     'curly': 'off',
     'no-else-return': ['error', { allowElseIf: false }],
     'array-element-newline': ['error', 'consistent'],
+    'import/order': 'off',
 
     // Vue Related
     'vue/component-name-in-template-casing': [

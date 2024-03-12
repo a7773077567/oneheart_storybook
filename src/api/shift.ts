@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { api } from '@/utils/api';
 import type { PostRes } from '@/composables/helpers';
 
+// ========== Types ==========
 export enum ShiftTypes {
   PhysicalConsultation = '物理諮詢門診',
   PhysicalTherapy = '物理治療門診',
@@ -35,13 +36,31 @@ export interface ShiftReq {
 }
 
 export type ShiftRes = Required<ShiftReq>;
+export interface EmployeeShiftRes {
+  id: number;
+  date: string | Date;
+  employeeId: number;
+  shift: ShiftReq;
+}
 
-export async function getShiftList() {
+export interface Employee {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+export interface createEmployeeShiftssReq {
+  date: string;
+  shiftIds: number[];
+}
+
+// ========== Requests ==========
+export async function fetchShifts() {
   const { data } = await api.get<ShiftRes[]>('shift');
   return data;
 }
 
-export async function getShift(shiftId: number) {
+export async function fetchShift(shiftId: number) {
   const { data } = await api.get<ShiftRes>(`shift/${shiftId}`);
   return data;
 }
@@ -58,5 +77,25 @@ export async function updateShift(shiftId: number, payload: ShiftReq) {
 
 export async function deleteShift(shiftId: number) {
   const { data } = await api.delete<PostRes>(`shift/${shiftId}`);
+  return data;
+}
+
+export async function fetchEmployees() {
+  const { data } = await api.get<Employee[]>('employee');
+  return data;
+}
+
+export async function fetchEmployeeShifts() {
+  const { data } = await api.get<EmployeeShiftRes[]>('employee/shift', { params: { month: 2 } });
+  return data;
+}
+
+export async function createEmployeeShifts(employeeId: number, payload: createEmployeeShiftssReq) {
+  const { data } = await api.post<PostRes, createEmployeeShiftssReq>(`shift/${employeeId}`, payload);
+  return data;
+}
+
+export async function deleteEmployeeShift(employeeShiftId: number) {
+  const { data } = await api.delete<PostRes>(`employee/shift/${employeeShiftId}`);
   return data;
 }
