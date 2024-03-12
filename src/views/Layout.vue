@@ -34,8 +34,8 @@ function toggleDrawer() {
     </QHeader>
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
-      <QPage padding>
-        <Breadcrumbs class="q-mb-lg" />
+      <QPage class="q-py-md q-px-lg">
+        <Breadcrumbs class="gutter--sm" />
         <RouterView />
       </QPage>
     </QPageContainer>

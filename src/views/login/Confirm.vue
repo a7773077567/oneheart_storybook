@@ -68,11 +68,4 @@ const onSubmit = handleSubmit(async (values) => {
   text-align: center;
   font-size: 17px;
 }
-
-.gutter {
-  margin-bottom: 20px;
-  &--sm {
-    margin-bottom: 10px;
-  }
-}
 </style>

@@ -4,6 +4,11 @@ interface AllCookies {
   token: string;
 };
 
+interface SelectOption {
+  label: number;
+  value: number;
+}
+
 export function getCookie(key: keyof AllCookies) {
   return Cookies.get(key);
 }
@@ -18,4 +23,20 @@ export function removeCookie(key: keyof AllCookies) {
 
 export function getUrl(path: string) {
   return new URL(path, import.meta.env.VITE_API_BASE_URL).toString();
+}
+
+export function getSequenceOptions(num: number): SelectOption[] {
+  const numArray = [...Array(num).keys()];
+  return numArray.map(num => ({
+    label: num,
+    value: num,
+  }));
+}
+
+export function omit(keys: string[], obj: Record<string, any>) {
+  if (!keys.length) {
+    return obj;
+  }
+  const { [keys.pop() as string]: _, ...rest } = obj;
+  return omit(keys, rest);
 }

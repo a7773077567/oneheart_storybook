@@ -104,11 +104,4 @@ async function goHome(loginFunc: () => Promise<LoginRes>) {
   text-align: center;
   font-size: 17px;
 }
-
-.gutter {
-  margin-bottom: 20px;
-  &--sm {
-    margin-bottom: 10px;
-  }
-}
 </style>
