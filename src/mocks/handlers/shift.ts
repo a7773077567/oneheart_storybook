@@ -8,7 +8,7 @@ import { useConvert } from '@/composables/helpers';
 const { toObject } = useConvert(['startHr', 'startMin', 'endHr', 'endMin']);
 const shiftsData: [number, ShiftRes][] = getArray(5).map(idx => [idx, getMockShift(idx)]);
 const shifts = new Map(shiftsData);
-const employeeShiftsData: [number, EmployeeShiftRes][] = getArray(20).map(idx => [idx, getMockEmployeeShifts(idx)]);
+const employeeShiftsData: [number, EmployeeShiftRes][] = getArray(80).map(idx => [idx, getMockEmployeeShifts(idx)]);
 const employeeShifts = new Map(employeeShiftsData);
 
 // ========== Handlers ==========
@@ -116,7 +116,7 @@ export function getMockEmployeeShifts(id: number): EmployeeShiftRes {
   return {
     id,
     shift: shifts.get(faker.number.int({ max: shifts.size - 1 }))!,
-    date: faker.date.between({ from: '2024-03-10T00:08:00Z', to: '2024-03-16T00:00:00Z' }),
+    date: faker.date.between({ from: '2024-03-01T00:08:00Z', to: '2024-03-31T00:00:00Z' }),
     employeeId: faker.number.int({ min: 0, max: 4 }),
   };
 }

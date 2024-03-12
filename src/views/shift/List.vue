@@ -88,6 +88,8 @@ async function removeEmployeeShift(employeeShiftId: number) {
         map-options
         dense
         outlined
+        hide-bottom-space
+        style="width: 164px;"
       />
       <div class="column items-center q-gutter-md">
         <div class="date-picker">
@@ -204,14 +206,6 @@ async function removeEmployeeShift(employeeShiftId: number) {
   overflow-y: scroll;
   > * {
     flex-shrink: 0;
-  }
-}
-
-:deep(.q-field) {
-  width: 164px;
-  padding-bottom: 0;
-  .q-field__bottom {
-    display: none;
   }
 }
 
