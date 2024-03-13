@@ -4,3 +4,4 @@ export { default as ShiftChip } from './ShiftChip.vue';
 export { default as CalendarNav } from './CalendarNav.vue';
 export { default as ShiftItem } from './ShiftItem.vue';
 export { default as ShiftSelector } from './ShiftSelector.vue';
+export { default as DurationPicker } from './DurationPicker.vue';

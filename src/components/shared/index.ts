@@ -4,3 +4,6 @@ export { default as BasicLayout } from './BasicLayout.vue';
 export { default as InputBox } from './InputBox.vue';
 export { default as MultiNumSelect } from './MultiNumSelect.vue';
 export { default as ColorPicker } from './ColorPicker.vue';
+export { default as DatePicker } from './DatePicker.vue';
+export { default as Calendar } from './Calendar.vue';
+export { default as CalendarNav } from './CalendarNav.vue';
