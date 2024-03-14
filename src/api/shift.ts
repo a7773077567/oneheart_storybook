@@ -3,16 +3,6 @@ import { api } from '@/utils/api';
 import type { PostRes } from '@/composables/helpers';
 
 // ========== Types ==========
-export enum ShiftTypes {
-  PhysicalConsultation = '物理諮詢門診',
-  PhysicalTherapy = '物理治療門診',
-  FootPressure = '足壓門診',
-  Nutrition = '營養門診',
-  Sleep = '睡眠門診',
-  Sports = '運科門診',
-  OneOnOne = '一對一教練課',
-  Group = '團課',
-}
 
 export const ShiftColors = ['#88F2D8', '#91D0C1', '#F8C9CB', '#E86969', '#A5D6F1', '#45B1ED'] as const;
 
@@ -49,7 +39,7 @@ export interface Employee {
   avatar: string;
 }
 
-export interface createEmployeeShiftssReq {
+export interface createEmployeeShiftsReq {
   date: string;
   shiftIds: number[];
 }
@@ -90,8 +80,8 @@ export async function fetchEmployeeShifts() {
   return data;
 }
 
-export async function createEmployeeShifts(employeeId: number, payload: createEmployeeShiftssReq) {
-  const { data } = await api.post<PostRes, createEmployeeShiftssReq>(`shift/${employeeId}`, payload);
+export async function createEmployeeShifts(employeeId: number, payload: createEmployeeShiftsReq) {
+  const { data } = await api.post<PostRes, createEmployeeShiftsReq>(`shift/${employeeId}`, payload);
   return data;
 }
 

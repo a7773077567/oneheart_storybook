@@ -39,7 +39,7 @@ async function resentEmail() {
       <p class="email__title">
         請輸入註冊之電子郵件
       </p>
-      <OInput name="account" label="Email" outlined class="q-mb-md" />
+      <OInput name="account" label="Email" class="q-mb-md" />
       <QBtn label="確認" unelevated color="black" @click="onSubmit" />
     </template>
     <template v-else>

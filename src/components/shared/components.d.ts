@@ -1,12 +1,16 @@
 // This type file is for type-checking of global components 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    OSelect: typeof import('@/components/shared')['OSelect']
     OInput: typeof import('@/components/shared')['OInput']
-    InputBox: typeof import('@/components/shared')['InputBox']
+    OSelect: typeof import('@/components/shared')['OSelect']
     BasicLayout: typeof import('@/components/shared')['BasicLayout']
-    DurationSelect: typeof import('@/components/shared')['DurationSelect']
-    ColorPicker: typeof import('@/components/shared')['DurationSelect']
+    InputBox: typeof import('@/components/shared')['InputBox']
+    ColorPicker: typeof import('@/components/shared')['ColorPicker']
+    MultiNumSelect: typeof import('@/components/shared')['MultiNumSelect']
+    DatePicker: typeof import('@/components/shared')['DatePicker']
+    Calendar: typeof import('@/components/shared')['Calendar']
+    CalendarNav: typeof import('@/components/shared')['CalendarNav']
+    OTime: typeof import('@/components/shared')['OTime']
   }
 }
 

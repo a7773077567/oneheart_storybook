@@ -45,8 +45,8 @@ async function goHome(loginFunc: () => Promise<LoginRes>) {
     <p class="title gutter">
       登入
     </p>
-    <OInput name="account" label="帳號" outlined class="gutter--sm" />
-    <OInput name="password" label="密碼" :type="isPwd ? 'password' : 'text'" outlined class="gutter--sm">
+    <OInput name="account" label="帳號" class="gutter--sm" />
+    <OInput name="password" label="密碼" :type="isPwd ? 'password' : 'text'" class="gutter--sm">
       <template #append>
         <QIcon
           :name="isPwd ? 'visibility_off' : 'visibility'"

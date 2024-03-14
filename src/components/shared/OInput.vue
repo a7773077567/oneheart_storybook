@@ -4,12 +4,12 @@ import type { QInputProps } from 'quasar';
 import type { Optional } from '@/types/utilities';
 
 interface Props extends /* @vue-ignore */ Optional<QInputProps, 'modelValue'> {
-  name: string;
+  name?: string;
   customRule?: any;
 }
 const props = defineProps<Props>();
 
-const { value, errorMessage } = useField<string>(() => props.name, props.customRule, {
+const { value, errorMessage } = useField<string>(() => props.name || '', props.customRule, {
   syncVModel: true, // Skipping update:modelValue emission definition by setting this config
 });
 </script>
@@ -19,6 +19,8 @@ const { value, errorMessage } = useField<string>(() => props.name, props.customR
     v-model="value"
     :error="!!errorMessage"
     :error-message="errorMessage"
+    dense
+    outlined
   >
     <template #append>
       <slot name="append" />

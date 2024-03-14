@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type EmployeeShiftRes, ShiftTypes } from '@/api/shift';
+import type { EmployeeShiftRes } from '@/api/shift';
 import { getWeekDay } from '@/utils/date';
 import dayjs from 'dayjs';
+import { TherapyTypes } from '@/const/general';
 
 interface Props {
   data: EmployeeShiftRes;
@@ -20,7 +21,7 @@ const date = computed(() => {
 });
 
 const duration = computed(() => toDurationLabel(props.data.shift.duration));
-const type = computed(() => [...Object.values(ShiftTypes)][props.data.shift.type]);
+const type = computed(() => [...Object.values(TherapyTypes)][props.data.shift.type]);
 const unavailable = computed(() => props.data.shift.unavailable.map(item => toDurationLabel(item, true)));
 const bgc = computed(() => props.data.shift.color);
 

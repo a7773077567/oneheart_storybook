@@ -16,3 +16,7 @@ export function getErrorRes(status: number, customText?: string) {
   };
   return new HttpResponse(null, httpOptions);
 }
+
+export function getResponse(body: any) {
+  return HttpResponse.json({ data: body });
+}

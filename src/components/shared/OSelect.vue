@@ -16,10 +16,13 @@ const { value, errorMessage } = useField<string>(() => props.name, props.customR
 
 <template>
   <QSelect
-    v-bind="props"
     v-model="value"
     :error="!!errorMessage"
     :error-message="errorMessage"
+    dense
+    emit-value
+    map-options
+    outlined
   />
 </template>
 

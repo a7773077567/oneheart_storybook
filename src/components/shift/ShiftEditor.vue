@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { ShiftColors, type ShiftReq, type ShiftRes, type ShiftSchema, ShiftTypes, shiftSchema } from '@/api/shift';
+import { ShiftColors, type ShiftReq, type ShiftRes, type ShiftSchema, shiftSchema } from '@/api/shift';
 import { DurationItems } from '@/const/shift';
 import { useConvert } from '@/composables/helpers';
+import { TherapyTypes } from '@/const/general';
 
 interface Props {
   data?: ShiftRes;
@@ -22,7 +23,7 @@ const { handleSubmit } = useForm({
   initialValues: getInitialValues(),
 });
 
-const { fields, push, remove } = useFieldArray('unavailable');
+const { fields, push, remove } = useFieldArray<number[]>('unavailable');
 
 const onSubmit = handleSubmit((values) => {
   const { duration, unavailable } = values;
@@ -35,7 +36,7 @@ const onSubmit = handleSubmit((values) => {
 });
 
 function getTypeOptions() {
-  return Object.values(ShiftTypes).map((value, index) => ({
+  return Object.values(TherapyTypes).map((value, index) => ({
     label: value,
     value: index,
   }));
@@ -72,7 +73,7 @@ function getInitialValues(): ShiftSchema {
     <QCardSection>
       <OSelect name="type" :options="typeOptions" label="班別類別" emit-value map-options outlined dense style="width: 230px;" />
       <InputBox label="班別名稱">
-        <OInput name="name" outlined dense style="flex: 1 1 0" />
+        <OInput name="name" style="flex: 1 1 0" />
       </InputBox>
       <InputBox label="時間" class="gutter">
         <MultiNumSelect :items="DurationItems" name="duration" style="flex: 1 1 0" />

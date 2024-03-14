@@ -1,9 +1,10 @@
 import { type HttpHandler, HttpResponse, http } from 'msw';
 import { faker } from '@faker-js/faker';
-import { getUrl } from '@/utils/helpers';
+import { getArray, getUrl } from '@/utils/helpers';
 import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
-import { type Employee, type EmployeeShiftRes, ShiftColors, type ShiftReq, type ShiftRes, ShiftTypes, type createEmployeeShiftssReq } from '@/api/shift';
+import { type Employee, type EmployeeShiftRes, ShiftColors, type ShiftReq, type ShiftRes, type createEmployeeShiftsReq } from '@/api/shift';
 import { useConvert } from '@/composables/helpers';
+import { TherapyTypes } from '@/const/general';
 
 const { toObject } = useConvert(['startHr', 'startMin', 'endHr', 'endMin']);
 const shiftsData: [number, ShiftRes][] = getArray(5).map(idx => [idx, getMockShift(idx)]);
@@ -75,7 +76,7 @@ const fetchEmployeeShiftsHandler = http.get(getUrl('employee/shift'), () => {
 
 const createEmployeeShiftsHandler = http.post(getUrl('shift/:employeeId'), async ({ request, params }) => {
   const { employeeId } = params;
-  const { date, shiftIds } = await request.json() as createEmployeeShiftssReq;
+  const { date, shiftIds } = await request.json() as createEmployeeShiftsReq;
   shiftIds.forEach((shiftId) => {
     const employeeShift: EmployeeShiftRes = {
       id: employeeShifts.size,
@@ -99,7 +100,7 @@ const deleteEmployeeShiftHandler = http.delete(getUrl('employee/shift/:employeeS
 
 // ========== Utils ==========
 export function getMockShift(id: number): ShiftRes {
-  const shiftTypes = Object.values(ShiftTypes);
+  const shiftTypes = Object.values(TherapyTypes);
   const mockShiftNames = ['花花班', '班班有石斑', '宇智波班', '終極一班', '不想上班'];
 
   return {
@@ -128,9 +129,6 @@ export function getUnavailable(count: number): number[][] {
   return getArray(count).map(getDuration);
 }
 
-export function getArray(count: number) {
-  return [...Array(count).keys()];
-}
 export default [
   fetchShiftHandler,
   createShiftHandler,

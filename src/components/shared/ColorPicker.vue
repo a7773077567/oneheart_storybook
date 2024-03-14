@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
+import type { ShiftColors } from '@/api/shift';
 
 interface Props {
-  colors: string[];
+  colors: string[] | typeof ShiftColors ;
   modelValue?: string;
   name?: string;
 }

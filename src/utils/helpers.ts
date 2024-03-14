@@ -40,3 +40,7 @@ export function omit(keys: string[], obj: Record<string, any>) {
   const { [keys.pop() as string]: _, ...rest } = obj;
   return omit(keys, rest);
 }
+
+export function getArray(count: number) {
+  return [...Array(count).keys()];
+}

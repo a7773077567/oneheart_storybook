@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
-import '@/assets/scss/main.scss';
 
 // Quasar
 import GoogleLogin from './plugins/googleLogin';
@@ -10,6 +9,7 @@ import Quasar from '@/plugins/quasar';
 import '@quasar/extras/material-icons/material-icons.css';
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css';
 import 'quasar/dist/quasar.css';
+import '@/assets/scss/main.scss';
 
 // MSW
 import { enableMocking } from '@/mocks/browser';

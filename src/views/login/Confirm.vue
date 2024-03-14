@@ -40,7 +40,7 @@ const onSubmit = handleSubmit(async (values) => {
   <p class="title gutter">
     密碼修改
   </p>
-  <OInput name="password" label="輸入新密碼" :type="showPwd ? 'text' : 'password'" outlined class="gutter--sm">
+  <OInput name="password" label="輸入新密碼" :type="showPwd ? 'text' : 'password'" class="gutter--sm">
     <template #append>
       <QIcon
         :name="showPwd ? 'visibility_off' : 'visibility'"
@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
       />
     </template>
   </OInput>
-  <OInput name="confirm" label="確認密碼" :type="showConfirm ? 'text' : 'password'" outlined class="gutter--sm">
+  <OInput name="confirm" label="確認密碼" :type="showConfirm ? 'text' : 'password'" class="gutter--sm">
     <template #append>
       <QIcon
         :name="showConfirm ? 'visibility_off' : 'visibility'"

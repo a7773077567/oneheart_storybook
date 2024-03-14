@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { QCalendarScheduler, today } from '@quasar/quasar-ui-qcalendar';
+import { QCalendarScheduler } from '@quasar/quasar-ui-qcalendar';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarScheduler.sass';
@@ -13,7 +13,7 @@ interface Props {
   simpleMode?: boolean;
   view: string;
   maxDays?: number | string;
-  cellWidth: string;
+  cellWidth?: string;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
