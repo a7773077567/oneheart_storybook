@@ -2,6 +2,7 @@ import { api } from '@/utils/api';
 import { z } from 'zod';
 import type { TherapyTypes } from '@/const/general';
 import dayjs from 'dayjs';
+import type { Employee } from './shift';
 
 export const bookingSchema = z.object({
   therapyType: z.number({ required_error: '必填' }).nullable(),
@@ -24,9 +25,19 @@ export interface Therapist {
   id: number;
   type: number;
   name: string;
+  avatar: string;
 }
 export interface TherapistsRes {
   therapists: Therapist[];
+}
+
+export interface BookingItem {
+  id: number;
+  date: string;
+  time: string;
+  isBooked: boolean;
+  available: boolean;
+  employee: Employee;
 }
 
 export async function fetchTherapyTypes() {

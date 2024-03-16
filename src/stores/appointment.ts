@@ -1,23 +1,28 @@
 import { defineStore } from 'pinia';
 import { type BookingSchema, type Therapist, type TherapyType, fetchTherapists, fetchTherapyTypes } from '@/api/appointment';
+import { type Employee, fetchEmployees } from '@/api/shift';
 
 interface State {
   therapyTypes: TherapyType[];
   therapists: Therapist[];
-  booking: BookingSchema;
+  bookingQuery: BookingSchema;
+  querySent: boolean;
+  employees: Employee[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
   state: (): State => ({
     therapyTypes: [],
     therapists: [],
-    booking: {
+    bookingQuery: {
       therapyType: null,
       date: null,
       endTime: null,
       startTime: null,
       therapist: null,
     },
+    querySent: true,
+    employees: [],
   }),
   getters: {
     therapyTypeOptions(state) {

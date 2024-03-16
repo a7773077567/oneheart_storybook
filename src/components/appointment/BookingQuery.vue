@@ -6,7 +6,7 @@ import { useAppointmentStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
 const appointmentStore = useAppointmentStore();
-const { therapyTypeOptions, therapistOptions } = storeToRefs(appointmentStore);
+const { therapyTypeOptions, therapistOptions, querySent, bookingQuery } = storeToRefs(appointmentStore);
 const { getTherapyTypes, getTherapists } = appointmentStore;
 
 getTherapyTypes();
@@ -17,7 +17,8 @@ const { handleSubmit } = useForm({
 });
 
 const onSubmit = handleSubmit((values) => {
-  appointmentStore.booking = values;
+  bookingQuery.value = values;
+  querySent.value = true;
 });
 </script>
 

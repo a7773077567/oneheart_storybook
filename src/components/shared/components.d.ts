@@ -1,4 +1,4 @@
-// This type file is for type-checking of global components 
+// This file is for type-checking of global components 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     OInput: typeof import('@/components/shared')['OInput']
@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
     Calendar: typeof import('@/components/shared')['Calendar']
     CalendarNav: typeof import('@/components/shared')['CalendarNav']
     OTime: typeof import('@/components/shared')['OTime']
+    ResourceCalendar: typeof import('@/components/shared')['ResourceCalendar']
   }
 }
 

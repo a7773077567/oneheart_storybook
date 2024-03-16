@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import { QCalendarScheduler } from '@quasar/quasar-ui-qcalendar';
+import { QCalendarResource } from '@quasar/quasar-ui-qcalendar';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
-import '@quasar/quasar-ui-qcalendar/src/QCalendarScheduler.sass';
+import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
 import { computed, ref } from 'vue';
-import { getWeekDay } from '@/utils/date';
 import type { Employee } from '@/api/shift';
 
 interface Props {
   modelValue: string;
   modelResources: Employee[];
-  simpleMode?: boolean;
-  view: string;
-  maxDays?: number | string;
-  cellWidth?: string;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
@@ -22,14 +17,16 @@ const emit = defineEmits<{
 }>();
 const model = computed({
   get: () => props.modelValue,
-  set: val => emit('update:modelValue', val),
+  set: (val) => {
+    emit('update:modelValue', val);
+  },
 });
 const resources = computed({
   get: () => props.modelResources,
   set: val => emit('update:modelResources', val),
 });
 
-const calendar = ref<QCalendarScheduler | null>(null);
+const calendar = ref<QCalendarResource | null>(null);
 const options = computed(() => resources.value.map(({ id, name }) => ({
   label: name,
   value: id,
@@ -38,7 +35,12 @@ const selected = ref(options.value.map(option => option.value));
 const selectedResources = computed(() => {
   return resources.value.filter(item => selected.value.includes(item.id));
 });
-const isEditing = ref(false);
+
+function getCalendarStyle() {
+  return {
+    '--calendar-border': '1px solid #B2B2B2',
+  };
+}
 </script>
 
 <template>
@@ -56,7 +58,7 @@ const isEditing = ref(false);
         hide-bottom-space
         style="width: 164px;"
       />
-      <div v-if="!simpleMode" class="column items-center q-gutter-md">
+      <div class="column items-center q-gutter-md">
         <DatePicker v-model="model" />
         <CalendarNav
           @prev="calendar?.prev"
@@ -64,39 +66,24 @@ const isEditing = ref(false);
           @next="calendar?.next"
         />
       </div>
-
-      <QBtn
-        v-if="!simpleMode"
-        :label="isEditing ? '取消編輯' : '編輯'"
-        outline
-        style="width: 113px;"
-        @click="isEditing = !isEditing"
-      />
-      <slot v-else name="nav-right" />
+      <div class="pad" style="width: 164px;" />
     </div>
-    <QCalendarScheduler
+    <QCalendarResource
       ref="calendar"
       v-model="model"
       v-model:model-resources="selectedResources"
-      :view="view"
-      :max-days="maxDays"
-      :cell-width="cellWidth"
       resource-key="id"
       resource-label="name"
-      :resource-height="105"
+      :interval-start="9"
+      :interval-count="9"
+      :cell-width="125"
       animated
       bordered
-      :style="{ '--calendar-border': '1px solid #B2B2B2' }"
+      :style="getCalendarStyle()"
     >
       <template #head-resources>
         <div class="row flex-center full-width">
           <span class="text-weight-bold">人員</span>
-        </div>
-      </template>
-      <template #head-day="{ scope: { timestamp } }">
-        <div class="row flex-center ">
-          <span class="text-weight-bold">{{ timestamp.day }}</span>
-          <span class="text-weight-bold">{{ getWeekDay(timestamp.weekday) }}</span>
         </div>
       </template>
       <template #resource-label="{ scope: { resource } }">
@@ -112,15 +99,16 @@ const isEditing = ref(false);
           </QChip>
         </div>
       </template>
-      <template #day="{ scope }">
-        <slot name="day" :scope="{ ...scope, isEditing }" />
+      <template #resource-intervals="{ scope }">
+        <slot name="intervals" :scope="scope" />
       </template>
-    </QCalendarScheduler>
+    </QCalendarResource>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .calendar {
+  max-width: 1225px;
   &__nav {
     display: flex;
     justify-content: space-between;
@@ -133,5 +121,12 @@ const isEditing = ref(false);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+:deep(.q-calendar-resource__head--interval) {
+  font-size: 14px;
+  font-weight: 500;
+}
+:deep(.q-calendar-resource__resource--interval) {
+  min-height: 116px !important;
 }
 </style>
