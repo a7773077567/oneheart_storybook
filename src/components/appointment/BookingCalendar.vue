@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { BookingAdder } from '@/components/appointment';
+import { BookingAdder, BookingBox } from '@/components/appointment';
 import { getBookingItems } from '@/mocks/handlers/appointment';
 import { useAppointmentStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 const { therapists } = storeToRefs(appointmentStore);
 const { getTherapists } = appointmentStore;
@@ -13,6 +15,7 @@ await getTherapists(1);
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const BookingItems = getBookingItems();
+const stateOfBookingDialog = ref(false);
 
 function getStyle(event: any) {
   return {
@@ -32,22 +35,39 @@ function getBookings(scope: any) {
     canBook: item.available && !item.isBooked,
   }));
 }
+
+function OpenBookingDialog() {
+  stateOfBookingDialog.value = true;
+}
+
+function book() {
+  stateOfBookingDialog.value = false;
+  $q.dialog({
+    message: '預約成功',
+  });
+}
 </script>
 
 <template>
-  <ResourceCalendar
-    v-model="selectedDate"
-    v-model:model-resources="therapists"
-  >
-    <template #intervals="{ scope }">
-      <BookingAdder
-        v-for="(item, idx) in getBookings(scope)"
-        :key="idx"
-        :disable="!item.canBook"
-        :style="getStyle(item)"
-      />
-    </template>
-  </ResourceCalendar>
+  <div class="booking-calendar">
+    <ResourceCalendar
+      v-model="selectedDate"
+      v-model:model-resources="therapists"
+    >
+      <template #intervals="{ scope }">
+        <BookingAdder
+          v-for="(item, idx) in getBookings(scope)"
+          :key="idx"
+          :disable="!item.canBook"
+          :style="getStyle(item)"
+          @add="OpenBookingDialog"
+        />
+      </template>
+    </ResourceCalendar>
+    <QDialog v-model="stateOfBookingDialog" persistent>
+      <BookingBox @book="book" />
+    </QDialog>
+  </div>
 </template>
 
 <style lang="scss" scoped>

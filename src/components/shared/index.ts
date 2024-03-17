@@ -9,3 +9,5 @@ export { default as Calendar } from './Calendar.vue';
 export { default as CalendarNav } from './CalendarNav.vue';
 export { default as OTime } from './OTime.vue';
 export { default as ResourceCalendar } from './ResourceCalendar.vue';
+export { default as OTable } from './OTable.vue';
+export { default as OCheckbox } from './OCheckbox.vue';

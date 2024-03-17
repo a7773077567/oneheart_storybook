@@ -10,7 +10,7 @@ defineEmits<{
 
 <template>
   <div class="booking-adder" :class="{ 'bg-grey-4': disable }">
-    <QBtn v-if="!disable" icon="add" size="14px" dense flat round class="cursor-pointer q-pa-sm" />
+    <QBtn v-if="!disable" icon="add" size="14px" dense flat round class="cursor-pointer q-pa-sm" @click="$emit('add')" />
   </div>
 </template>
 

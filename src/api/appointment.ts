@@ -31,13 +31,30 @@ export interface TherapistsRes {
   therapists: Therapist[];
 }
 
+export interface Location {
+  id: number;
+  type: number;
+  name: string;
+  accommodation: number;
+}
+
 export interface BookingItem {
   id: number;
+  type: number;
   date: string;
   time: string;
   isBooked: boolean;
   available: boolean;
+  location: number;
   employee: Employee;
+}
+
+export interface Client {
+  id: number;
+  memberId: number;
+  name: string;
+  phone: string;
+  address: string;
 }
 
 export async function fetchTherapyTypes() {

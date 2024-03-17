@@ -3,7 +3,7 @@ import { getArray, getUrl } from '@/utils/helpers';
 import { getErrorRes, getResponse } from '@/mocks/utils/response';
 import { TherapyTypes } from '@/const/general';
 import { faker } from '@faker-js/faker';
-import type { BookingItem, Therapist } from '@/api/appointment';
+import type { BookingItem, Location, Therapist } from '@/api/appointment';
 
 const therapists = new Map(getTherapists());
 
@@ -44,6 +44,20 @@ function getTherapist(id: number, type: number): Therapist {
   };
 }
 
+export function getLocation(id: number): Location {
+  const locationNames = ['台北館', '桃園館', '新竹館', '台南館', '高雄館'];
+  const types = ['物理治療所', '運動場館'];
+  const type = faker.number.int({ max: types.length - 1 });
+  const location = faker.number.int({ max: locationNames.length - 1 });
+
+  return {
+    id,
+    type,
+    name: `${types[type]} - ${locationNames[location]}`,
+    accommodation: faker.number.int({ min: 3, max: 10 }),
+  };
+}
+
 export function getBookingItems() {
   const times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
   return getArray(45).map<BookingItem>((id) => {
@@ -54,10 +68,12 @@ export function getBookingItems() {
     faker.seed(employeeId);
     return {
       id,
+      type: 0,
       date: '2024-03-16',
       time: times[id % 9],
       available,
       isBooked,
+      location: 0,
       employee: {
         id: employeeId,
         avatar: faker.image.avatar(),
