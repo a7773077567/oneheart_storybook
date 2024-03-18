@@ -3,7 +3,8 @@ import { getArray, getUrl } from '@/utils/helpers';
 import { getErrorRes, getResponse } from '@/mocks/utils/response';
 import { TherapyTypes } from '@/const/general';
 import { faker } from '@faker-js/faker';
-import type { BookingItem, Location, Therapist } from '@/api/appointment';
+import type { BookingItem, Client, Location, Therapist } from '@/api/appointment';
+import type { Employee } from '@/api/shift';
 
 const therapists = new Map(getTherapists());
 
@@ -62,9 +63,13 @@ export function getBookingItems() {
   const times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
   return getArray(45).map<BookingItem>((id) => {
     faker.seed();
-    const available = faker.datatype.boolean({ probability: 0.8 });
+    const available = faker.datatype.boolean({ probability: 0.7 });
     const isBooked = available ? faker.datatype.boolean({ probability: 0.2 }) : false;
     const employeeId = Math.floor(id / 9);
+    const employee = getEmployee(employeeId);
+    const client = getClient(faker.number.int());
+    const isCheckout = faker.datatype.boolean();
+    const state = faker.number.int({ max: 3 });
     faker.seed(employeeId);
     return {
       id,
@@ -74,14 +79,31 @@ export function getBookingItems() {
       available,
       isBooked,
       location: 0,
-      employee: {
-        id: employeeId,
-        avatar: faker.image.avatar(),
-        name: faker.person.firstName(),
-      },
+      employee,
+      client,
+      isCheckout,
+      state,
     };
   },
   );
+}
+
+function getEmployee(id: number): Employee {
+  return {
+    id,
+    avatar: faker.image.avatar(),
+    name: faker.person.firstName(),
+  };
+}
+
+function getClient(id: number): Client {
+  return {
+    id,
+    memberId: faker.number.int(),
+    name: faker.person.firstName(),
+    phone: faker.phone.number(),
+    address: faker.location.streetAddress(),
+  };
 }
 
 export default [fetchTherapyTypesHandler, fetchTherapistsHandler];

@@ -1,9 +1,54 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useAppointmentStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import dayjs from 'dayjs';
+import { BookingCard } from '@/components/appointment';
+import { getBookingItems } from '@/mocks/handlers/appointment';
 
+const appointmentStore = useAppointmentStore();
+const { therapists } = storeToRefs(appointmentStore);
+const { getTherapists } = appointmentStore;
+await getTherapists(1);
+
+const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
+const bookingItems = getBookingItems();
+
+function getStyle(item: any) {
+  return {
+    position: 'absolute',
+    left: `${item.left}px`,
+    width: `${item.width - 1}px`,
+    top: `${item.top}px`,
+  };
+}
+
+function getBookings(scope: any) {
+  const employeeId = scope.resource.id;
+  const bookings = bookingItems.filter(item => item.employee.id === employeeId && !item.available);
+  return bookings.map(item => ({
+    ...item,
+    left: scope.timeStartPosX(item.time) + 10,
+    width: scope.timeDurationWidth(60),
+    top: 10,
+  }));
+}
 </script>
 
 <template>
-  <main>List</main>
+  <ResourceCalendar
+    v-model="selectedDate"
+    v-model:model-resources="therapists"
+  >
+    <template #intervals="{ scope }">
+      <BookingCard
+        v-for="(item, idx) in getBookings(scope)"
+        :key="idx"
+        :data="item"
+        :style="getStyle(item)"
+      />
+    </template>
+  </ResourceCalendar>
 </template>
 
 <style lang="scss" scoped>

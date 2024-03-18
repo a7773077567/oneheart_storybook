@@ -37,6 +37,13 @@ export interface Location {
   name: string;
   accommodation: number;
 }
+export interface Client {
+  id: number;
+  memberId: number;
+  name: string;
+  phone: string;
+  address: string;
+}
 
 export interface BookingItem {
   id: number;
@@ -46,15 +53,12 @@ export interface BookingItem {
   isBooked: boolean;
   available: boolean;
   location: number;
+  state: number;
+  isCheckout: boolean;
   employee: Employee;
-}
-
-export interface Client {
-  id: number;
-  memberId: number;
-  name: string;
-  phone: string;
-  address: string;
+  client: Client;
+  left?: number;
+  width?: number;
 }
 
 export async function fetchTherapyTypes() {
