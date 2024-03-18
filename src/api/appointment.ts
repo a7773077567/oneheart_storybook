@@ -1,6 +1,5 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { TherapyTypes } from '@/const/general';
 import dayjs from 'dayjs';
 import type { Employee } from './shift';
 
@@ -16,9 +15,8 @@ export const bookingInitialValues: Partial<BookingSchema> = {
   date: dayjs().format('YYYY-MM-DD'),
 };
 
-export type TherapyType = `${TherapyTypes}`;
 export interface TherapyTypesRes {
-  therapyTypes: TherapyType[];
+  therapyTypes: string[];
 }
 
 export interface Therapist {

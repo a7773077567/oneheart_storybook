@@ -13,7 +13,8 @@ const drawerOpen = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
 });
-const { currentRoute, currentMatched } = useLayoutRoute();
+const { currentMatched } = useLayoutRoute();
+
 const drawerItems = computed(() => currentMatched.value[0].children);
 </script>
 
@@ -26,7 +27,7 @@ const drawerItems = computed(() => currentMatched.value[0].children);
           :key="idx"
           v-ripple
           clickable
-          :active="currentRoute === item.name"
+          :active="currentMatched[1].name === item.name"
           active-class="drawer-item--active"
           class="drawer-item"
           @click="$router.push({ name: item.name })"

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
-import { type BookingSchema, type Therapist, type TherapyType, fetchTherapists, fetchTherapyTypes } from '@/api/appointment';
-import { type Employee, fetchEmployees } from '@/api/shift';
+import { type BookingSchema, type Therapist, fetchTherapists, fetchTherapyTypes } from '@/api/appointment';
+import type { Employee } from '@/api/shift';
 
 interface State {
-  therapyTypes: TherapyType[];
+  therapyTypes: string[];
   therapists: Therapist[];
   bookingQuery: BookingSchema;
   querySent: boolean;

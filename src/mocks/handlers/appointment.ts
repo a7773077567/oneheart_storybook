@@ -66,6 +66,7 @@ export function getBookingItems() {
     const available = faker.datatype.boolean({ probability: 0.7 });
     const isBooked = available ? faker.datatype.boolean({ probability: 0.2 }) : false;
     const employeeId = Math.floor(id / 9);
+    const type = faker.number.int({ max: 7 });
     const employee = getEmployee(employeeId);
     const client = getClient(faker.number.int());
     const isCheckout = faker.datatype.boolean();
@@ -73,7 +74,7 @@ export function getBookingItems() {
     faker.seed(employeeId);
     return {
       id,
-      type: 0,
+      type,
       date: '2024-03-16',
       time: times[id % 9],
       available,
