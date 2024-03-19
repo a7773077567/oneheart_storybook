@@ -59,6 +59,7 @@ function getRecordModules() {
   <QCard flat bordered class="info">
     <QTabPanels
       v-model="currentTab"
+      animated
     >
       <QTabPanel
         v-for="(tab, idx) in tabs"
