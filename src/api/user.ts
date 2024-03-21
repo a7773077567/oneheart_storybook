@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { api } from '@/utils/api';
 
 export interface LoginRes {
-  token: string;
+  accessToken: string;
 };
 export interface Location {
   id: number;
@@ -31,7 +31,7 @@ export interface MicrosoftLoginReq {
 }
 
 export const accountSchema = z.object({
-  account: z.string().email('請輸入正確格式的email'),
+  email: z.string().email('請輸入正確格式的email'),
 });
 
 export const basicLoginSchema = accountSchema.extend({
@@ -47,7 +47,7 @@ export const newPasswordSchema = z.object({
 });
 
 export async function basicLogin(payload: BasicLoginReq) {
-  const { data } = await api.post<LoginRes, BasicLoginReq>('user/basic-login', payload);
+  const { data } = await api.post<LoginRes, BasicLoginReq>('users/login', payload);
   return data;
 }
 

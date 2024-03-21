@@ -16,6 +16,8 @@ const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(basicLoginSchema),
 });
 const onBasicLogin = handleSubmit(async (values) => {
+  console.log('🚀  onBasicLogin  values:', values);
+
   goHome(() => basicLogin(values));
 });
 
@@ -34,8 +36,8 @@ function forgetPassword() {
 }
 
 async function goHome(loginFunc: () => Promise<LoginRes>) {
-  const { token } = await loginFunc();
-  setCookie('token', token);
+  const { accessToken } = await loginFunc();
+  setCookie('token', accessToken);
   return router.push({ name: 'home' });
 }
 </script>
@@ -45,7 +47,7 @@ async function goHome(loginFunc: () => Promise<LoginRes>) {
     <p class="title gutter">
       登入
     </p>
-    <OInput name="account" label="帳號" class="gutter--sm" />
+    <OInput name="email" label="帳號" class="gutter--sm" />
     <OInput name="password" label="密碼" :type="isPwd ? 'password' : 'text'" class="gutter--sm">
       <template #append>
         <QIcon

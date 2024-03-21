@@ -5,8 +5,8 @@ import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
 import type { BasicLoginReq, ForgetReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, UserInfoRes } from '@/api/user';
 
 export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
-  const { account, password } = await request.json() as BasicLoginReq;
-  if (password !== '123456' || account !== '123@gmail.com') {
+  const { email, password } = await request.json() as BasicLoginReq;
+  if (password !== '123456' || email !== '123@gmail.com') {
     return getErrorRes(401);
   }
   return getTokenRes();
@@ -51,9 +51,9 @@ export const microsoftLoginHandler = http.post(getUrl('user/microsoft-login'), a
 });
 
 export const forgetPasswordHandler = http.post(getUrl('user/forget'), async ({ request }) => {
-  const { account } = await request.json() as ForgetReq;
+  const { email } = await request.json() as ForgetReq;
   const emails = ['123@gmail.com'];
-  if (!emails.includes(account)) {
+  if (!emails.includes(email)) {
     return getErrorRes(422);
   }
   return HttpResponse.json({ data: { state: 'Successful' } });
@@ -71,4 +71,11 @@ function getTokenRes() {
   return HttpResponse.json({ data: { token: faker.string.uuid() } });
 }
 
-export default [basicLoginHandler, googleLoginHandler, userInfoHandler, microsoftLoginHandler, forgetPasswordHandler, setNewPasswordHandler];
+export default [
+  // basicLoginHandler,
+  googleLoginHandler,
+  userInfoHandler,
+  microsoftLoginHandler,
+  forgetPasswordHandler,
+  setNewPasswordHandler,
+];
