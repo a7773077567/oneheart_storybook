@@ -21,7 +21,7 @@ export const useAppointmentStore = defineStore('appointment', {
       startTime: null,
       therapist: null,
     },
-    querySent: true,
+    querySent: false,
     employees: [],
   }),
   getters: {

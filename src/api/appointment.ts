@@ -55,6 +55,7 @@ export interface BookingItem {
   isCheckout: boolean;
   employee: Employee;
   client: Client;
+  therapist: Therapist;
   left?: number;
   width?: number;
 }

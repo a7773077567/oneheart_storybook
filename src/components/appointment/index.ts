@@ -3,3 +3,4 @@ export { default as BookingCalendar } from './BookingCalendar.vue';
 export { default as BookingAdder } from './BookingAdder.vue';
 export { default as BookingBox } from './BookingBox.vue';
 export { default as BookingCard } from './BookingCard.vue';
+export { default as BookingQueryItem } from './BookingQueryItem.vue';

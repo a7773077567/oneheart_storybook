@@ -71,6 +71,7 @@ export function getBookingItems() {
     const client = getClient(faker.number.int());
     const isCheckout = faker.datatype.boolean();
     const state = faker.number.int({ max: 3 });
+    const therapist = getTherapist(faker.number.int(5), faker.number.int(7));
     faker.seed(employeeId);
     return {
       id,
@@ -84,6 +85,7 @@ export function getBookingItems() {
       client,
       isCheckout,
       state,
+      therapist,
     };
   },
   );
