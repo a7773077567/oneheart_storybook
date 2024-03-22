@@ -3,6 +3,20 @@ import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
+import { useUserStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+
+const userStore = useUserStore();
+const { userInfo } = storeToRefs(userStore);
+
+const locationOptions = userInfo.value?.spaces.map(({ name, id }) => {
+  return { label: name, value: id };
+});
+const currentLocation = ref(locationOptions?.[0].value);
+
+function optionDisable(option: any): boolean {
+  return option.value === currentLocation.value;
+}
 
 const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
@@ -21,7 +35,10 @@ function toggleDrawer() {
           <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
         </QAvatar>
         <QSpace />
-        <Avatar />
+        <div class="row q-gutter-lg items-center">
+          <QSelect v-model="currentLocation" :options="locationOptions" map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" />
+          <Avatar />
+        </div>
       </QToolbar>
       <QTabs>
         <QRouteTab
@@ -43,5 +60,13 @@ function toggleDrawer() {
 </template>
 
 <style lang="scss" scoped>
-
+:deep(.q-field__control) {
+  min-height: fit-content;
+}
+:deep(.q-field__native) {
+  min-height: fit-content;
+  padding: 4.5px 38px;
+  background-color: white;
+  border-radius: 15px 15px 0 0;
+}
 </style>

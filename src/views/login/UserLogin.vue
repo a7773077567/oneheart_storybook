@@ -4,11 +4,12 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useRouter } from 'vue-router';
 import { googleAuthCodeLogin } from 'vue3-google-login';
-import { type LoginRes, basicLogin, basicLoginSchema, googleLogin, microsoftLogin } from '@/api/user';
+import { type LoginRes, basicLogin, basicLoginSchema, googleLogin, microsoftLogin, spaceLogin } from '@/api/user';
 import { setCookie } from '@/utils/helpers';
 import { useMsal } from '@/composables/msal';
 
 const router = useRouter();
+
 const { loginPopup: mslLoginPopup } = useMsal();
 const isPwd = ref(true);
 
@@ -16,8 +17,6 @@ const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(basicLoginSchema),
 });
 const onBasicLogin = handleSubmit(async (values) => {
-  console.log('🚀  onBasicLogin  values:', values);
-
   goHome(() => basicLogin(values));
 });
 
@@ -31,14 +30,15 @@ async function onMicrosoftLogin() {
   goHome(() => microsoftLogin({ idToken }));
 }
 
-function forgetPassword() {
+function forgotPassword() {
   router.push({ name: 'forget' });
 }
 
 async function goHome(loginFunc: () => Promise<LoginRes>) {
-  const { accessToken } = await loginFunc();
-  setCookie('token', accessToken);
-  return router.push({ name: 'home' });
+  const { accessToken: firstToken } = await loginFunc();
+  setCookie('firstToken', firstToken);
+
+  router.push({ name: 'spaceLogin' });
 }
 </script>
 
@@ -57,7 +57,7 @@ async function goHome(loginFunc: () => Promise<LoginRes>) {
         />
       </template>
     </OInput>
-    <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" @click="forgetPassword" />
+    <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" @click="forgotPassword" />
     <QBtn label="登入" unelevated color="black" class="gutter" @click="onBasicLogin" />
     <p class="separator gutter">
       或使用以下登入

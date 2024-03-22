@@ -9,15 +9,22 @@ export interface Location {
   type: 'clinic' | 'gym';
   name: string;
 }
-export interface UserInfoRes {
+
+export interface Role {
+  id: number;
+  name: string;
+  type: number;
+}
+export interface UserInfo {
   id: string;
-  username: string;
+  name: string;
   email: string;
-  avatar: string;
-  locations: Location[];
+  role: Role;
+  spaces: Space[];
+  avatar?: string;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
-export type ForgetReq = z.infer<typeof accountSchema>;
+export type ForgotReq = z.infer<typeof emailSchema>;
 export interface NewPasswordReq {
   userId: string;
   password: string;
@@ -30,11 +37,15 @@ export interface MicrosoftLoginReq {
   idToken: string;
 }
 
-export const accountSchema = z.object({
+export interface SpaceLoginReq {
+  spaceId: number;
+}
+
+export const emailSchema = z.object({
   email: z.string().email('請輸入正確格式的email'),
 });
 
-export const basicLoginSchema = accountSchema.extend({
+export const basicLoginSchema = emailSchema.extend({
   password: z.string().min(6),
 });
 
@@ -46,13 +57,13 @@ export const newPasswordSchema = z.object({
   path: ['confirm'],
 });
 
-export async function basicLogin(payload: BasicLoginReq) {
-  const { data } = await api.post<LoginRes, BasicLoginReq>('users/login', payload);
-  return data;
+export interface Space {
+  id: number;
+  name: string;
 }
 
-export async function getUserInfo() {
-  const { data } = await api.get<UserInfoRes>('user/info');
+export async function basicLogin(payload: BasicLoginReq) {
+  const { data } = await api.post<LoginRes, BasicLoginReq>('users/login', payload);
   return data;
 }
 
@@ -66,12 +77,22 @@ export async function microsoftLogin(payload: MicrosoftLoginReq) {
   return data;
 }
 
-export async function forgetPassword(payload: ForgetReq) {
-  const { data } = await api.post<SuccessRes, ForgetReq>('user/forget', payload);
+export async function forgotPassword(payload: ForgotReq) {
+  const { data } = await api.post<SuccessRes, ForgotReq>('users/forgot-password', payload);
   return data;
 }
 
 export async function setNewPassword(payload: NewPasswordReq) {
   const { data } = await api.post<SuccessRes, NewPasswordReq>('user/new-password', payload);
+  return data;
+}
+
+export async function fetchUserInfo() {
+  const { data } = await api.get<UserInfo>('users/me');
+  return data;
+}
+
+export async function spaceLogin(payload: SpaceLoginReq) {
+  const { data } = await api.post<LoginRes, SpaceLoginReq>('spaces/login', payload);
   return data;
 }

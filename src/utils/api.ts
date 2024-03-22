@@ -54,14 +54,35 @@ export const api = {
   },
 };
 
+const noTokenList = [
+  'users/login',
+  'users/forgot-password',
+];
+
+const firstTokenList = [
+  'users',
+  'users/activate',
+  'users/update-password',
+  'users/me',
+  'spaces/login',
+];
+
 // ========== Functions ==========
 function requestInterceptor(config: InternalAxiosRequestConfig) {
-  const token = getCookie('token');
-  const isLogin = config.url === 'login';
-
-  if (!isLogin && token) {
-    config.headers!.Authorization = `Bearer ${token}`;
+  const { url } = config;
+  if (!url) {
+    return config;
   }
+
+  const needToken = !noTokenList.includes(url);
+  if (!needToken) {
+    return config;
+  }
+
+  const needFirstToken = firstTokenList.includes(url);
+  const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
+  config.headers!.Authorization = `Bearer ${token}`;
+
   return config;
 }
 

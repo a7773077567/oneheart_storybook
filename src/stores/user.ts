@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
-import { type UserInfoRes, getUserInfo } from '@/api/user';
+import { type UserInfo, fetchUserInfo } from '@/api/user';
 
 interface State {
-  userInfo: UserInfoRes | null;
+  userInfo: UserInfo | null;
 }
 
 export const useUserStore = defineStore('user', {
@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async getUserInfo() {
-      const userInfo = await getUserInfo();
+      const userInfo = await fetchUserInfo();
       this.userInfo = userInfo;
     },
   },

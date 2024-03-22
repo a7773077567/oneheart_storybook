@@ -1,7 +1,8 @@
 import { Cookies } from 'quasar';
 
 interface AllCookies {
-  token: string;
+  firstToken: string;
+  secondToken: string;
 };
 
 interface SelectOption {

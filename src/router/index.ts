@@ -5,11 +5,30 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/login/Login.vue'),
+    redirect: { name: 'userLogin' },
     beforeEnter: loginGuard,
     meta: {
       requiredAuth: false,
     },
+    children: [
+      {
+        path: 'user-login',
+        name: 'userLogin',
+        component: () => import('@/views/login/UserLogin.vue'),
+        beforeEnter: loginGuard,
+        meta: {
+          requiredAuth: false,
+        },
+      },
+      {
+        path: 'space-login',
+        name: 'spaceLogin',
+        component: () => import('@/views/login/SpaceLogin.vue'),
+        meta: {
+          requiredAuth: true,
+        },
+      },
+    ],
   },
   {
     path: '/forget',
@@ -245,6 +264,7 @@ router.beforeEach(async (to) => {
   if (!needAuth) {
     return;
   }
+
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) {
     return { name: 'login' };
