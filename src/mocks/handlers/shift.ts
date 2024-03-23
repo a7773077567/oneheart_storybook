@@ -13,9 +13,9 @@ const employeeShiftsData: [number, EmployeeShiftRes][] = getArray(80).map(idx =>
 const employeeShifts = new Map(employeeShiftsData);
 
 // ========== Handlers ==========
-const fetchShiftsHandler = http.get(getUrl('shift'), () => {
-  return HttpResponse.json({ data: [...shifts.values()] });
-});
+// const fetchShiftTemplatesHandler = http.get(getUrl('shift'), () => {
+//   return HttpResponse.json({ data: [...shifts.values()] });
+// });
 const fetchShiftHandler = http.get(getUrl('shift/:shiftId'), ({ params }) => {
   const { shiftId } = params;
   const shift = shifts.get(+shiftId);
@@ -25,18 +25,18 @@ const fetchShiftHandler = http.get(getUrl('shift/:shiftId'), ({ params }) => {
   return HttpResponse.json({ data: shift });
 });
 
-const createShiftHandler = http.post(getUrl('shift'), async ({ request }) => {
-  const payload = await request.json() as ShiftReq;
-  if (!payload) {
-    return getErrorRes(422);
-  }
-  const newShift = {
-    ...payload,
-    id: shifts.size,
-  };
-  shifts.set(shifts.size, newShift);
-  return getSuccessRes();
-});
+// const createShiftTemplateHandler = http.post(getUrl('shift'), async ({ request }) => {
+//   const payload = await request.json() as ShiftReq;
+//   if (!payload) {
+//     return getErrorRes(422);
+//   }
+//   const newShift = {
+//     ...payload,
+//     id: shifts.size,
+//   };
+//   shifts.set(shifts.size, newShift);
+//   return getSuccessRes();
+// });
 
 const updateShiftHandler = http.put(getUrl('shift/:shiftId'), async ({ params, request }) => {
   const { shiftId } = params;
@@ -131,9 +131,9 @@ export function getUnavailable(count: number): number[][] {
 
 export default [
   fetchShiftHandler,
-  createShiftHandler,
+  // createShiftTemplateHandler,
   updateShiftHandler,
-  fetchShiftsHandler,
+  // fetchShiftTemplatesHandler,
   deleteShiftHandler,
   fetchEmployeesHandler,
   fetchEmployeeShiftsHandler,

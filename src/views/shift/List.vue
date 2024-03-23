@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ShiftChip, ShiftSelector } from '@/components/shift';
-import { type Employee, type EmployeeShiftRes, type ShiftRes, createEmployeeShifts, deleteEmployeeShift, fetchEmployeeShifts, fetchEmployees, fetchShifts } from '@/api/shift';
+import { type Employee, type EmployeeShiftRes, type ShiftRes, createEmployeeShifts, deleteEmployeeShift, fetchEmployeeShifts, fetchEmployees, fetchShiftTemplates } from '@/api/shift';
 import dayjs from 'dayjs';
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
@@ -31,7 +31,7 @@ async function getEmployeeShifts() {
   employeeShifts.value = await fetchEmployeeShifts();
 }
 async function getShifts() {
-  shifts.value = await fetchShifts();
+  shifts.value = await fetchShiftTemplates();
 }
 
 function openShiftSelector(date: string, employeeId: number) {

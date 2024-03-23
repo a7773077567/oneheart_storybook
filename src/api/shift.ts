@@ -6,15 +6,48 @@ import type { PostRes } from '@/composables/helpers';
 
 export const ShiftColors = ['#88F2D8', '#91D0C1', '#F8C9CB', '#E86969', '#A5D6F1', '#45B1ED'] as const;
 
-export const shiftSchema = z.object({
-  id: z.number().optional(),
+export interface Duration {
+  startTime: string;
+  endTime: string;
+}
+export interface ShiftTemplate {
+  id: number;
+  spaceId: number;
+  type: number;
+  name: string;
+  startTime: string;
+  endTime: string;
+  notAvailableTimes: Duration[];
+  color: string;
+  maxClients: number | null;
+}
+
+export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
+
+export const shiftTemplateSchema = z.object({
+  // id: z.number().optional(),
+  // spaceId: z.number().optional(),
   type: z.number(),
-  name: z.string(),
+  name: z.string().trim().min(1, { message: '不可為空' }),
   duration: z.number().array(),
-  unavailable: z.number().array().array(),
-  color: z.enum(ShiftColors),
+  notAvailableTimes: z.number().array().array(),
+  color: z.string(),
+  maxClients: z.string().refine((val) => {
+    if (Number.isNaN(+val)) {
+      return false;
+    }
+    if (+val < 1) {
+      return false;
+    }
+    if (val === '') {
+      return false;
+    }
+    return true;
+  }, {
+    message: '必填並輸入大於1的數字',
+  }).optional(),
 });
-export type ShiftSchema = z.infer<typeof shiftSchema>;
+export type ShiftTemplateSchema = z.infer<typeof shiftTemplateSchema>;
 
 export interface ShiftReq {
   id?: number;
@@ -45,23 +78,23 @@ export interface createEmployeeShiftsReq {
 }
 
 // ========== Requests ==========
-export async function fetchShifts() {
-  const { data } = await api.get<ShiftRes[]>('shift');
+export async function fetchShiftTemplates() {
+  const { data } = await api.get<ShiftTemplate[]>('shiftTemplates');
   return data;
 }
 
-export async function fetchShift(shiftId: number) {
-  const { data } = await api.get<ShiftRes>(`shift/${shiftId}`);
+export async function fetchShiftTemplate(shiftTemplateId: number) {
+  const { data } = await api.get<ShiftTemplate>(`shift/${shiftTemplateId}`);
   return data;
 }
 
-export async function createShift(payload: ShiftReq) {
-  const { data } = await api.post<PostRes>('shift', payload);
+export async function createShiftTemplate(payload: ShiftTemplateReq) {
+  const { data } = await api.post('shiftTemplates', payload);
   return data;
 }
 
-export async function updateShift(shiftId: number, payload: ShiftReq) {
-  const { data } = await api.put<PostRes>(`shift/${shiftId}`, payload);
+export async function updateShift(shiftTemplateId: number, payload: ShiftTemplateReq) {
+  const { data } = await api.put<PostRes>(`shiftTemplates/${shiftTemplateId}`, payload);
   return data;
 }
 

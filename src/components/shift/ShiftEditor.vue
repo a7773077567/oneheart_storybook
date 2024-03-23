@@ -1,62 +1,90 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { ShiftColors, type ShiftReq, type ShiftRes, type ShiftSchema, shiftSchema } from '@/api/shift';
-import { DurationItems } from '@/const/shift';
-import { useConvert } from '@/composables/helpers';
+import { ShiftColors, shiftTemplateSchema } from '@/api/shift';
+import type { Duration, ShiftTemplate, ShiftTemplateReq, ShiftTemplateSchema } from '@/api/shift';
 import { TherapyTypes } from '@/const/general';
+import { DurationItems } from '@/const/shift';
+import dayjs from 'dayjs';
+import objectSupport from 'dayjs/plugin/objectSupport';
 
 interface Props {
-  data?: ShiftRes;
+  data?: ShiftTemplate | null;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
   cancel: [state: boolean];
-  confirm: [values: ShiftReq];
+  confirm: [values: ShiftTemplateReq];
 }>();
 
-const { toArray, toObject } = useConvert(['startHr', 'startMin', 'endHr', 'endMin']);
+dayjs.extend(objectSupport);
 const typeOptions = getTypeOptions();
 
-const { handleSubmit } = useForm({
-  validationSchema: toTypedSchema(shiftSchema),
+const { handleSubmit, values } = useForm({
+  validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
-
-const { fields, push, remove } = useFieldArray<number[]>('unavailable');
+const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 
 const onSubmit = handleSubmit((values) => {
-  const { duration, unavailable } = values;
+  console.log('🚀  onSubmit  values:', values);
+
+  const { duration, notAvailableTimes, maxClients, ...needed } = values;
+  console.log('🚀  onSubmit  maxClients:', maxClients);
+
   const payload = {
-    ...values,
-    duration: toObject(duration),
-    unavailable: unavailable.map(toObject),
+    ...needed,
+    ...splitTime(duration),
+    notAvailableTimes: notAvailableTimes.map(splitTime),
+    maxClients: maxClients ? +maxClients : null,
   };
+  console.log('🚀  onSubmit  payload:', payload);
   emit('confirm', payload);
 });
 
 function getTypeOptions() {
-  return Object.values(TherapyTypes).map((value, index) => ({
+  return Object.values(TherapyTypes).slice(0, 6).map((value, idx) => ({
     label: value,
-    value: index,
+    value: idx + 1,
   }));
 }
 
-function getInitialValues(): ShiftSchema {
-  if (!props.data) {
+function getInitialValues(): ShiftTemplateSchema {
+  return props.data ? createInitials(props.data) : createDefault();
+
+  function createDefault() {
     return {
       type: typeOptions[0].value,
       name: '',
       duration: [0, 0, 0, 0],
-      unavailable: [[0, 0, 0, 0]],
+      notAvailableTimes: [[0, 0, 0, 0]],
       color: ShiftColors[0],
+      maxClients: '',
     };
   }
-  const { duration, unavailable } = props.data;
+
+  function createInitials(data: ShiftTemplate) {
+    return {
+      ...data,
+      duration: combineTime(data),
+      notAvailableTimes: data.notAvailableTimes.map(combineTime),
+      maxClients: data.maxClients ? data.maxClients.toString() : '',
+    };
+  }
+}
+
+function combineTime(duration: Duration) {
+  const { startTime, endTime } = duration;
+  const timeArray = [...startTime.split(':'), ...endTime.split(':')];
+  return timeArray.map(time => +time);
+}
+
+function splitTime(duration: number[]): Duration {
+  const startTime = dayjs({ h: duration[0], m: duration[1] });
+  const endTime = dayjs({ h: duration[2], m: duration[3] });
   return {
-    ...props.data,
-    duration: toArray(duration),
-    unavailable: unavailable.map(toArray),
+    startTime: startTime.format('HH:mm'),
+    endTime: endTime.format('HH:mm'),
   };
 }
 </script>
@@ -88,8 +116,11 @@ function getInitialValues(): ShiftSchema {
         <QBtn icon="o_delete" flat round @click="remove(idx)" />
       </InputBox>
       <QBtn label="新增不可預約時間" icon="add" dense flat class="gutter" @click="push([0, 0, 0, 0])" />
-      <InputBox label="班別顏色">
+      <InputBox label="班別顏色" class="gutter">
         <ColorPicker :colors="ShiftColors" name="color" style="padding: 6px 14px;" />
+      </InputBox>
+      <InputBox v-if="values.type === 1" label="最多可預約人數">
+        <OInput name="maxClients" dense outlined style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>
     <QCardActions align="right">

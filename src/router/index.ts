@@ -211,9 +211,9 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'shift',
-            name: 'shiftShift',
-            component: () => import('@/views/shift/Shift.vue'),
+            path: 'template',
+            name: 'shiftTemplate',
+            component: () => import('@/views/shift/Template.vue'),
             meta: {
               label: '新增班別',
               requiredAuth: true,

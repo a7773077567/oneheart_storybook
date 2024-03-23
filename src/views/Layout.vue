@@ -36,7 +36,7 @@ function toggleDrawer() {
         </QAvatar>
         <QSpace />
         <div class="row q-gutter-lg items-center">
-          <QSelect v-model="currentLocation" :options="locationOptions" map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" />
+          <QSelect v-model="currentLocation" :options="locationOptions" map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
           <Avatar />
         </div>
       </QToolbar>
@@ -60,13 +60,15 @@ function toggleDrawer() {
 </template>
 
 <style lang="scss" scoped>
-:deep(.q-field__control) {
-  min-height: fit-content;
-}
-:deep(.q-field__native) {
-  min-height: fit-content;
-  padding: 4.5px 38px;
-  background-color: white;
-  border-radius: 15px 15px 0 0;
+:deep(.space-selector) {
+  .q-field__control {
+    min-height: fit-content;
+  }
+  .q-field__native {
+    min-height: fit-content;
+    padding: 4.5px 38px;
+    background-color: white;
+    border-radius: 15px 15px 0 0;
+  }
 }
 </style>
