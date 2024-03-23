@@ -30,7 +30,21 @@ export const shiftTemplateSchema = z.object({
   duration: z.number().array(),
   notAvailableTimes: z.number().array().array(),
   color: z.string(),
-  maxClients: z.string().refine(maxClientsRefinement, { message: '必填並輸入大於1的數字' }).optional(),
+  maxClients: z.string(),
+}).refine(({ maxClients, type }) => {
+  if (Number.isNaN(+maxClients)) {
+    return false;
+  }
+  if (maxClients !== '' && +maxClients < 1) {
+    return false;
+  }
+  if (maxClients === '' && type !== 2) {
+    return false;
+  }
+  return true;
+}, {
+  message: '必填並輸入大於1的數字',
+  path: ['maxClients'],
 });
 export type ShiftTemplateSchema = z.infer<typeof shiftTemplateSchema>;
 
@@ -106,18 +120,4 @@ export async function createEmployeeShifts(employeeId: number, payload: createEm
 export async function deleteEmployeeShift(employeeShiftId: number) {
   const { data } = await api.delete<PostRes>(`employee/shift/${employeeShiftId}`);
   return data;
-}
-
-// ========== Functions ==========
-function maxClientsRefinement(val: string) {
-  if (Number.isNaN(+val)) {
-    return false;
-  }
-  if (+val < 1) {
-    return false;
-  }
-  if (val === '') {
-    return false;
-  }
-  return true;
 }

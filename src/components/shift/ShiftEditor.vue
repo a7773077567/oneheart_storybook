@@ -115,7 +115,7 @@ function splitTime(duration: number[]): Duration {
       <InputBox label="班別顏色" class="gutter">
         <ColorPicker :colors="ShiftColors" name="color" style="padding: 6px 14px;" />
       </InputBox>
-      <InputBox v-if="values.type === 1" label="最多可預約人數">
+      <InputBox v-if="values.type !== 2" label="最多可預約人數">
         <OInput name="maxClients" dense outlined style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>
