@@ -16,14 +16,15 @@ const employeeShifts = new Map(employeeShiftsData);
 // const fetchShiftTemplatesHandler = http.get(getUrl('shift'), () => {
 //   return HttpResponse.json({ data: [...shifts.values()] });
 // });
-const fetchShiftHandler = http.get(getUrl('shift/:shiftId'), ({ params }) => {
-  const { shiftId } = params;
-  const shift = shifts.get(+shiftId);
-  if (!shift) {
-    return getErrorRes(403);
-  }
-  return HttpResponse.json({ data: shift });
-});
+
+// const fetchShiftTemplateHandler = http.get(getUrl('shift/:shiftId'), ({ params }) => {
+//   const { shiftId } = params;
+//   const shift = shifts.get(+shiftId);
+//   if (!shift) {
+//     return getErrorRes(403);
+//   }
+//   return HttpResponse.json({ data: shift });
+// });
 
 // const createShiftTemplateHandler = http.post(getUrl('shift'), async ({ request }) => {
 //   const payload = await request.json() as ShiftReq;
@@ -130,7 +131,7 @@ export function getUnavailable(count: number): number[][] {
 }
 
 export default [
-  fetchShiftHandler,
+  // fetchShiftTemplateHandler,
   // createShiftTemplateHandler,
   // updateShiftHandler,
   // fetchShiftTemplatesHandler,

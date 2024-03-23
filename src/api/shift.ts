@@ -69,7 +69,7 @@ export async function fetchShiftTemplates() {
 }
 
 export async function fetchShiftTemplate(shiftTemplateId: number) {
-  const { data } = await api.get<ShiftTemplate>(`shift/${shiftTemplateId}`);
+  const { data } = await api.get<ShiftTemplate>(`shiftTemplates/${shiftTemplateId}`);
   return data;
 }
 

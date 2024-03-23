@@ -22,8 +22,7 @@ async function onCreateShiftTemplate(values: ShiftTemplateReq) {
 }
 
 async function openShift(templateId: number) {
-  targetShiftTemplate.value = shiftTemplates.value.find(item => item.id === templateId)!;
-  // targetShiftTemplate.value = await fetchShiftTemplate(templateId);
+  targetShiftTemplate.value = await fetchShiftTemplate(templateId);
   isUpdatingShiftTemplate.value = true;
 }
 
