@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ShiftRes } from '@/api/shift';
+import type { ShiftTemplate } from '@/api/shift';
 import { getDurationLabel } from '@/utils/date';
 
 interface Props {
-  data: ShiftRes;
+  data: ShiftTemplate;
 }
 
 defineProps<Props>();
@@ -14,7 +14,7 @@ defineProps<Props>();
     class="shift-item"
   >
     <span class="shift-item__name">{{ data.name }}</span>
-    <span>{{ getDurationLabel(data.duration) }}</span>
+    <span>{{ getDurationLabel(data.startTime, data.endTime) }}</span>
   </div>
 </template>
 

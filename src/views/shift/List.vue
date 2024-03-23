@@ -3,6 +3,8 @@ import { ref } from 'vue';
 import { ShiftChip, ShiftSelector } from '@/components/shift';
 import { type Employee, type EmployeeShiftRes, type ShiftRes, createEmployeeShifts, deleteEmployeeShift, fetchEmployeeShifts, fetchEmployees, fetchShiftTemplates } from '@/api/shift';
 import dayjs from 'dayjs';
+import { useShiftStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const addingShift = ref(false);
@@ -10,10 +12,13 @@ const targetDate = ref<string | null >(null);
 const employees = ref<Employee[]>([]);
 const targetEmployeeId = ref<number | null>(null);
 const employeeShifts = ref<EmployeeShiftRes[]>();
-const shifts = ref<ShiftRes[]>([]);
+// const shifts = ref<ShiftRes[]>([]);
+
+const shiftStore = useShiftStore();
+const { shiftTemplates } = storeToRefs(shiftStore);
+const { getShiftTemplates } = shiftStore;
 
 getEmployeeShifts();
-getShifts();
 await getEmployees();
 
 function getDayShifts(date: string, employeeId: string) {
@@ -30,11 +35,12 @@ async function getEmployees() {
 async function getEmployeeShifts() {
   employeeShifts.value = await fetchEmployeeShifts();
 }
-async function getShifts() {
-  shifts.value = await fetchShiftTemplates();
-}
+// async function getShifts() {
+//   shifts.value = await fetchShiftTemplates();
+// }
 
-function openShiftSelector(date: string, employeeId: number) {
+async function openShiftSelector(date: string, employeeId: number) {
+  await getShiftTemplates();
   targetDate.value = date;
   targetEmployeeId.value = employeeId;
   addingShift.value = true;
@@ -78,7 +84,7 @@ async function removeEmployeeShift(employeeShiftId: number) {
       </template>
     </Calendar>
     <QDialog v-model="addingShift" persistent>
-      <ShiftSelector :data="shifts" @confirm="addEmployeeShift" />
+      <ShiftSelector :data="shiftTemplates" @confirm="addEmployeeShift" />
     </QDialog>
   </div>
 </template>

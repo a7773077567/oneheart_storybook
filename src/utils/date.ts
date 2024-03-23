@@ -5,16 +5,31 @@ export function getWeekDay(weekDay: number) {
   return weekDays[weekDay];
 }
 
-export function getDurationLabel(duration: Record<string, any>, isUnavailable?: boolean) {
-  const { startHr, startMin, endHr, endMin } = duration;
-  const startTime = dayjs().set('h', startHr).set('m', startMin);
-  const endTime = dayjs().set('h', endHr).set('m', endMin);
-  if (!isUnavailable) {
-    return `${amOrPm(startHr)}${startTime.format('hh:mm')}-${amOrPm(endHr)}${endTime.format('hh:mm')}`;
+export function getDurationLabel(startTime: string, endTime: string, isNotAvailableTime?: boolean) {
+  const [startHr] = startTime;
+  const [endHr] = endTime;
+
+  if (!isNotAvailableTime) {
+    return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;
   }
-  return `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
+
+  return `${startTime}-${endTime}`;
 
   function amOrPm(hr: number) {
     return hr >= 12 ? '下午' : '上午';
   }
 }
+
+// export function getDurationLabel(duration: Record<string, any>, isUnavailable?: boolean) {
+//   const { startHr, startMin, endHr, endMin } = duration;
+//   const startTime = dayjs().set('h', startHr).set('m', startMin);
+//   const endTime = dayjs().set('h', endHr).set('m', endMin);
+//   if (!isUnavailable) {
+//     return `${amOrPm(startHr)}${startTime.format('hh:mm')}-${amOrPm(endHr)}${endTime.format('hh:mm')}`;
+//   }
+//   return `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
+
+//   function amOrPm(hr: number) {
+//     return hr >= 12 ? '下午' : '上午';
+//   }
+// }

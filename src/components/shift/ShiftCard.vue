@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ShiftTemplate } from '@/api/shift';
+import { getDurationLabel } from '@/utils/date';
 
 interface Props {
   data: ShiftTemplate;
@@ -10,20 +11,20 @@ defineEmits<{
   delete: [id: number];
 }>();
 
-function getDurationLabel(startTime: string, endTime: string, isNotAvailableTime?: boolean) {
-  const [startHr] = startTime;
-  const [endHr] = endTime;
+// function getDurationLabel(startTime: string, endTime: string, isNotAvailableTime?: boolean) {
+//   const [startHr] = startTime;
+//   const [endHr] = endTime;
 
-  if (!isNotAvailableTime) {
-    return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;
-  }
+//   if (!isNotAvailableTime) {
+//     return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;
+//   }
 
-  return `${startTime}-${endTime}`;
+//   return `${startTime}-${endTime}`;
 
-  function amOrPm(hr: number) {
-    return hr >= 12 ? '下午' : '上午';
-  }
-}
+//   function amOrPm(hr: number) {
+//     return hr >= 12 ? '下午' : '上午';
+//   }
+// }
 </script>
 
 <template>

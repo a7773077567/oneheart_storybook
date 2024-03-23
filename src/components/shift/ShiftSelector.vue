@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ShiftRes } from '@/api/shift';
+import type { ShiftTemplate } from '@/api/shift';
 import { ShiftItem } from '@/components/shift';
 import { ref } from 'vue';
 
 interface Props {
-  data: ShiftRes[];
+  data: ShiftTemplate[];
 }
 
 defineProps<Props>();
@@ -29,7 +29,7 @@ function confirm() {
 </script>
 
 <template>
-  <QCard style="width: 336px;">
+  <QCard>
     <QCardSection class="row flex-center relative-position q-py-sm ">
       <div class="text-subtitle1 text-weight-bold">
         選擇班別

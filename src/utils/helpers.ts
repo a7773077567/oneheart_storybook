@@ -3,6 +3,7 @@ import { Cookies } from 'quasar';
 interface AllCookies {
   firstToken: string;
   secondToken: string;
+  lastSpaceId: number;
 };
 
 interface SelectOption {
