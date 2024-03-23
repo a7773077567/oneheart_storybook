@@ -25,27 +25,12 @@ export interface ShiftTemplate {
 export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
 
 export const shiftTemplateSchema = z.object({
-  // id: z.number().optional(),
-  // spaceId: z.number().optional(),
   type: z.number(),
   name: z.string().trim().min(1, { message: '不可為空' }),
   duration: z.number().array(),
   notAvailableTimes: z.number().array().array(),
   color: z.string(),
-  maxClients: z.string().refine((val) => {
-    if (Number.isNaN(+val)) {
-      return false;
-    }
-    if (+val < 1) {
-      return false;
-    }
-    if (val === '') {
-      return false;
-    }
-    return true;
-  }, {
-    message: '必填並輸入大於1的數字',
-  }).optional(),
+  maxClients: z.string().refine(maxClientsRefinement, { message: '必填並輸入大於1的數字' }).optional(),
 });
 export type ShiftTemplateSchema = z.infer<typeof shiftTemplateSchema>;
 
@@ -93,13 +78,13 @@ export async function createShiftTemplate(payload: ShiftTemplateReq) {
   return data;
 }
 
-export async function updateShift(shiftTemplateId: number, payload: ShiftTemplateReq) {
-  const { data } = await api.put<PostRes>(`shiftTemplates/${shiftTemplateId}`, payload);
+export async function updateShiftTemplate(shiftTemplateId: number, payload: ShiftTemplateReq) {
+  const { data } = await api.put(`shiftTemplates/${shiftTemplateId}`, payload);
   return data;
 }
 
-export async function deleteShift(shiftId: number) {
-  const { data } = await api.delete<PostRes>(`shift/${shiftId}`);
+export async function deleteShiftTemplate(shiftTemplateId: number) {
+  const { data } = await api.delete(`shiftTemplates/${shiftTemplateId}`);
   return data;
 }
 
@@ -121,4 +106,18 @@ export async function createEmployeeShifts(employeeId: number, payload: createEm
 export async function deleteEmployeeShift(employeeShiftId: number) {
   const { data } = await api.delete<PostRes>(`employee/shift/${employeeShiftId}`);
   return data;
+}
+
+// ========== Functions ==========
+function maxClientsRefinement(val: string) {
+  if (Number.isNaN(+val)) {
+    return false;
+  }
+  if (+val < 1) {
+    return false;
+  }
+  if (val === '') {
+    return false;
+  }
+  return true;
 }

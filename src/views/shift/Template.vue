@@ -2,44 +2,51 @@
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { ShiftCard, ShiftEditor } from '@/components/shift';
-import { type ShiftTemplateReq, createShiftTemplate, deleteShift, fetchShiftTemplate, updateShift } from '@/api/shift';
+import { type ShiftTemplateReq, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
 import { useShiftStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
 const shiftStore = useShiftStore();
-const { shiftTemplates, targetShift } = storeToRefs(shiftStore);
+const { shiftTemplates, targetShiftTemplate } = storeToRefs(shiftStore);
 const { getShiftTemplates } = shiftStore;
 const $q = useQuasar();
-const isCreatingShift = ref(false);
-const isUpdatingShift = ref(false);
+const isCreatingShiftTemplate = ref(false);
+const isUpdatingShiftTemplate = ref(false);
 
 getShiftTemplates();
 
 async function onCreateShiftTemplate(values: ShiftTemplateReq) {
   await createShiftTemplate(values);
   getShiftTemplates();
-  isCreatingShift.value = false;
+  isCreatingShiftTemplate.value = false;
 }
 
 async function openShift(templateId: number) {
-  targetShift.value = await fetchShiftTemplate(templateId);
-  isUpdatingShift.value = true;
+  targetShiftTemplate.value = shiftTemplates.value.find(item => item.id === templateId)!;
+  // targetShiftTemplate.value = await fetchShiftTemplate(templateId);
+  isUpdatingShiftTemplate.value = true;
 }
 
-async function onUpdateShift(values: ShiftTemplateReq) {
-  await updateShift(targetShift.value!.id, values);
+async function onUpdateShiftTemplate(values: ShiftTemplateReq) {
+  await updateShiftTemplate(targetShiftTemplate.value!.id, values);
   await getShiftTemplates();
-  isUpdatingShift.value = false;
+  targetShiftTemplate.value = null;
+  isUpdatingShiftTemplate.value = false;
 }
 
-async function onDeleteShift(shiftId: number) {
+async function onDeleteShift(shiftTemplateId: number) {
   $q.dialog({
     title: '確認刪除',
     message: '是否要刪除此筆班別?',
   }).onOk(async () => {
-    await deleteShift(shiftId);
+    await deleteShiftTemplate(shiftTemplateId);
     getShiftTemplates();
   });
+}
+
+function cancelUpdatingShiftTemplate() {
+  isUpdatingShiftTemplate.value = false;
+  targetShiftTemplate.value = null;
 }
 </script>
 
@@ -49,12 +56,12 @@ async function onDeleteShift(shiftId: number) {
       <h2 class="text-h6">
         新增班表
       </h2>
-      <QBtn label="新增" icon="add" outline @click="isCreatingShift = true" />
-      <QDialog v-model="isCreatingShift" persistent>
-        <ShiftEditor @cancel="isCreatingShift = false" @confirm="onCreateShiftTemplate" />
+      <QBtn label="新增" icon="add" outline @click="isCreatingShiftTemplate = true" />
+      <QDialog v-model="isCreatingShiftTemplate" persistent>
+        <ShiftEditor @cancel="isCreatingShiftTemplate = false" @confirm="onCreateShiftTemplate" />
       </QDialog>
-      <QDialog v-model="isUpdatingShift" persistent>
-        <ShiftEditor :data="targetShift" @cancel="isUpdatingShift = false" @confirm="(values) => onUpdateShift(values)" />
+      <QDialog v-model="isUpdatingShiftTemplate" persistent>
+        <ShiftEditor :data="targetShiftTemplate" @cancel="cancelUpdatingShiftTemplate" @confirm="(values) => onUpdateShiftTemplate(values)" />
       </QDialog>
     </div>
     <div class="shift__body column q-gutter-sm">

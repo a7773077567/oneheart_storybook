@@ -27,18 +27,14 @@ const { handleSubmit, values } = useForm({
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 
 const onSubmit = handleSubmit((values) => {
-  console.log('🚀  onSubmit  values:', values);
-
   const { duration, notAvailableTimes, maxClients, ...needed } = values;
-  console.log('🚀  onSubmit  maxClients:', maxClients);
-
   const payload = {
     ...needed,
     ...splitTime(duration),
     notAvailableTimes: notAvailableTimes.map(splitTime),
     maxClients: maxClients ? +maxClients : null,
   };
-  console.log('🚀  onSubmit  payload:', payload);
+
   emit('confirm', payload);
 });
 

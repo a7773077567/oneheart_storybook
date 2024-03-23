@@ -4,13 +4,13 @@ import { defineStore } from 'pinia';
 
 interface State {
   shiftTemplates: ShiftTemplate[];
-  targetShift: ShiftTemplate | null;
+  targetShiftTemplate: ShiftTemplate | null;
 }
 
 export const useShiftStore = defineStore('shift', {
   state: (): State => ({
     shiftTemplates: [],
-    targetShift: null,
+    targetShiftTemplate: null,
   }),
   getters: {
 
