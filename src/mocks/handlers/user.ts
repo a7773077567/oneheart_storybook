@@ -59,13 +59,13 @@ export const microsoftLoginHandler = http.post(getUrl('user/microsoft-login'), a
 //   return HttpResponse.json({ data: { state: 'Successful' } });
 // });
 
-export const setNewPasswordHandler = http.post(getUrl('user/new-password'), async ({ request }) => {
-  const { password, confirm } = await request.json() as NewPasswordReq;
-  if (password !== confirm) {
-    return getErrorRes(422, 'Password and confirm should be the same');
-  }
-  return getSuccessRes();
-});
+// export const resetPasswordHandler = http.post(getUrl('user/new-password'), async ({ request }) => {
+//   const { password, confirmPassword } = await request.json() as NewPasswordReq;
+//   if (password !== confirmPassword) {
+//     return getErrorRes(422, 'Password and confirm should be the same');
+//   }
+//   return getSuccessRes();
+// });
 
 function getTokenRes() {
   return HttpResponse.json({ data: { token: faker.string.uuid() } });
@@ -77,5 +77,5 @@ export default [
   microsoftLoginHandler,
   // userInfoHandler,
   // forgotPasswordHandler,
-  setNewPasswordHandler,
+  // resetPasswordHandler,
 ];

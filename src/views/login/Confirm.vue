@@ -4,10 +4,11 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import { newPasswordSchema, setNewPassword } from '@/api/user';
+import { newPasswordSchema, resetPassword } from '@/api/user';
+import { removeCookie, setCookie } from '@/utils/helpers';
 
 interface Props {
-  userId: string;
+  token: string;
 }
 const props = defineProps<Props>();
 
@@ -16,21 +17,22 @@ const $q = useQuasar();
 const showPwd = ref(false);
 const showConfirm = ref(false);
 
+setCookie('firstToken', props.token);
+removeCookie('secondToken');
+
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(newPasswordSchema),
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  const payload = {
-    ...values,
-    userId: props.userId,
-  };
-  const { state } = await setNewPassword(payload);
-  console.log('🚀  onSubmit  state:', state);
+  await resetPassword(values);
+
   $q.dialog({
     title: '密碼設定成功',
     message: '確認後重新登入',
   }).onOk(() => {
+    removeCookie('firstToken');
+    removeCookie('secondToken');
     router.push({ name: 'home' });
   });
 });
@@ -49,7 +51,7 @@ const onSubmit = handleSubmit(async (values) => {
       />
     </template>
   </OInput>
-  <OInput name="confirm" label="確認密碼" :type="showConfirm ? 'text' : 'password'" class="gutter--sm">
+  <OInput name="confirmPassword" label="確認密碼" :type="showConfirm ? 'text' : 'password'" class="gutter--sm">
     <template #append>
       <QIcon
         :name="showConfirm ? 'visibility_off' : 'visibility'"

@@ -72,7 +72,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           requireAuth: false,
         },
-        props: route => ({ userId: route.query.id }),
+        props: route => ({ token: route.query.token }),
       },
     ],
   },
@@ -280,6 +280,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  console.log('in beforeEach');
+
   const needAuth = to.meta.requiredAuth;
   if (!needAuth || to.name === 'activatePassword') {
     return;
@@ -303,6 +305,8 @@ async function checkAuth() {
 }
 
 async function loginGuard() {
+  console.log('in loginGuard');
+
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     return { name: 'home' };

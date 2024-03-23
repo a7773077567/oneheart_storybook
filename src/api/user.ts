@@ -56,6 +56,7 @@ export const newPasswordSchema = z.object({
 export interface Space {
   id: number;
   name: string;
+  type: number;
 }
 
 export async function basicLogin(payload: BasicLoginReq) {
@@ -74,12 +75,12 @@ export async function microsoftLogin(payload: MicrosoftLoginReq) {
 }
 
 export async function forgotPassword(payload: ForgotReq) {
-  const { data } = await api.post<SuccessRes, ForgotReq>('users/forgot-password', payload);
+  const { data } = await api.post<any, ForgotReq>('users/forgot-password', payload);
   return data;
 }
 
-export async function setNewPassword(payload: NewPasswordReq) {
-  const { data } = await api.post<SuccessRes, NewPasswordReq>('user/new-password', payload);
+export async function resetPassword(payload: NewPasswordReq) {
+  const { data } = await api.post<any, NewPasswordReq>('users/reset-password', payload);
   return data;
 }
 
