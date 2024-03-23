@@ -8,7 +8,7 @@ import { useCountdown } from '@/composables/timer';
 const emailSent = ref(false);
 let payload: ForgotReq;
 
-let {
+const {
   left: countdownLeft,
   done: countdownDone,
   start: countdownStart,

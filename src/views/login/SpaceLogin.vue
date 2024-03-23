@@ -17,7 +17,7 @@ router.push({ name: 'home' });
 </script>
 
 <template>
-  Space login
+  <div class="div" />
 </template>
 
 <style lang="scss" scoped>

@@ -56,12 +56,14 @@ export const api = {
 
 const noTokenList = [
   'users/login',
+  'users/user-login',
   'users/forgot-password',
 ];
 
 const firstTokenList = [
   'users',
   'users/activate',
+  'users/activate/email',
   'users/update-password',
   'users/me',
   'spaces/login',
@@ -79,7 +81,7 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
     return config;
   }
 
-  const needFirstToken = firstTokenList.includes(url);
+  const needFirstToken = firstTokenList.includes(url) || url.includes('resend-activation-email');
   const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
   config.headers!.Authorization = `Bearer ${token}`;
 

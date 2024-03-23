@@ -31,6 +31,26 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/activate',
+    name: 'activate',
+    component: () => import('@/views/login/Activate.vue'),
+    children: [
+      {
+        path: 'email',
+        name: 'activateEmail',
+        component: () => import('@/views/login/ActivateEmail.vue'),
+        meta: {
+          requiredAuth: true,
+        },
+      },
+      {
+        path: 'password',
+        name: 'activatePassword',
+        component: () => import('@/views/login/ActivatePassword.vue'),
+      },
+    ],
+  },
+  {
     path: '/forget',
     name: 'forget',
     component: () => import('@/views/login/Forget.vue'),
@@ -261,7 +281,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const needAuth = to.meta.requiredAuth;
-  if (!needAuth) {
+  if (!needAuth || to.name === 'activatePassword') {
     return;
   }
 

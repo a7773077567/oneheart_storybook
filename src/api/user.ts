@@ -25,11 +25,7 @@ export interface UserInfo {
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;
-export interface NewPasswordReq {
-  userId: string;
-  password: string;
-  confirm: string;
-}
+export type NewPasswordReq = z.infer<typeof newPasswordSchema>;
 export interface GoogleLoginReq {
   code: string;
 }
@@ -51,8 +47,8 @@ export const basicLoginSchema = emailSchema.extend({
 
 export const newPasswordSchema = z.object({
   password: z.string().min(6),
-  confirm: z.string().min(6),
-}).refine(data => data.confirm === data.password, {
+  confirmPassword: z.string().min(6),
+}).refine(data => data.confirmPassword === data.password, {
   message: '密碼須一致',
   path: ['confirm'],
 });
@@ -94,5 +90,15 @@ export async function fetchUserInfo() {
 
 export async function spaceLogin(payload: SpaceLoginReq) {
   const { data } = await api.post<LoginRes, SpaceLoginReq>('spaces/login', payload);
+  return data;
+}
+
+export async function activateUser(payload: NewPasswordReq) {
+  const { data } = await api.post<any, NewPasswordReq>('users/activate', payload);
+  return data;
+}
+
+export async function resendActivateEmail(userId: number) {
+  const { data } = await api.post(`users/${userId}/resend-activation-email`);
   return data;
 }
