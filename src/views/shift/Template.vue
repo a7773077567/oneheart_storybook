@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { ShiftCard, ShiftEditor } from '@/components/shift';
-import { type ShiftTemplateReq, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
+import { type ShiftTemplateReq, type UserShiftPatch, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
 import { useShiftStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
@@ -17,7 +17,7 @@ getShiftTemplates();
 
 async function onCreateShiftTemplate(values: ShiftTemplateReq) {
   await createShiftTemplate(values);
-  getShiftTemplates();
+  await getShiftTemplates();
   isCreatingShiftTemplate.value = false;
 }
 
@@ -60,7 +60,7 @@ function cancelUpdatingShiftTemplate() {
         <ShiftEditor @cancel="isCreatingShiftTemplate = false" @confirm="onCreateShiftTemplate" />
       </QDialog>
       <QDialog v-model="isUpdatingShiftTemplate" persistent>
-        <ShiftEditor :data="targetShiftTemplate" @cancel="cancelUpdatingShiftTemplate" @confirm="(values) => onUpdateShiftTemplate(values)" />
+        <ShiftEditor :data="targetShiftTemplate" @cancel="cancelUpdatingShiftTemplate" @confirm="onUpdateShiftTemplate" />
       </QDialog>
     </div>
     <div class="shift__body column q-gutter-sm">

@@ -1,34 +1,38 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { type Employee, type EmployeeShiftRes, fetchEmployeeShifts, fetchEmployees } from '@/api/shift';
+import { computed, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { DurationPicker, ShiftChip } from '@/components/shift';
+import { useShiftStore, useUserStore } from '@/stores';
 
-const startDate = ref<string>(dayjs().startOf('M').format('YYYY/MM/DD'));
-const endDate = ref<string>(dayjs().endOf('M').format('YYYY/MM/DD'));
-const duration = computed(() => `${startDate.value}-${endDate.value}`);
-const currentDate = computed(() => dayjs(startDate.value).format('YYYY-MM-DD'));
-const days = computed(() => dayjs(endDate.value).diff(startDate.value, 'day') + 1);
-const employees = ref<Employee[]>([]);
-const employeeShifts = ref<EmployeeShiftRes[]>();
+const shiftStore = useShiftStore();
+const userStore = useUserStore();
 
-getEmployeeShifts();
-await getEmployees();
+const duration = ref({
+  startDate: dayjs().startOf('M').format('YYYY/MM/DD'),
+  endDate: dayjs().endOf('M').format('YYYY/MM/DD'),
+});
+const currentDate = computed(() => dayjs(duration.value.startDate).format('YYYY-MM-DD'));
+const days = computed(() => dayjs(duration.value.endDate).diff(duration.value.startDate, 'day') + 1);
+const userIds = computed(() => shiftStore.users.map(user => user.id));
 
-async function getEmployees() {
-  employees.value = await fetchEmployees();
-}
+await shiftStore.getUsers([userStore.currentSpace!]);
+watch(duration, getUserShifts, { immediate: true });
 
 function getDayShifts(date: string, employeeId: string) {
   const currentDay = dayjs(date);
 
-  const items = employeeShifts.value?.filter(item =>
-    dayjs(item.date).isSame(currentDay, 'date') && +employeeId === item.employeeId,
+  const items = shiftStore.userShifts.filter(item =>
+    dayjs(item.date).isSame(currentDay, 'date') && +employeeId === item.userId,
   );
   return items;
 }
-async function getEmployeeShifts() {
-  employeeShifts.value = await fetchEmployeeShifts();
+
+function getUserShifts() {
+  shiftStore.getUserShifts({
+    startDate: duration.value.startDate.replace(/\//g, '-'),
+    endDate: duration.value.endDate.replace(/\//g, '-'),
+    userIds: userIds.value,
+  });
 }
 </script>
 
@@ -39,21 +43,20 @@ async function getEmployeeShifts() {
     </div>
     <div class="row justify-between items-center q-mb-lg">
       <DurationPicker
-        v-model:start-date="startDate"
-        v-model:end-date="endDate"
+        v-model="duration"
       />
-      <QBtn label="查詢班表" outline />
+      <!-- <QBtn label="查詢班表" outline /> -->
     </div>
     <Calendar
+      v-model:modelResources="shiftStore.users"
       v-model="currentDate"
-      v-model:modelResources="employees"
       simple-mode
       view="day"
       :max-days="days"
       cell-width="114px"
     >
       <template #nav-right>
-        <span class="text-h6">{{ duration }}</span>
+        <span class="text-h6">{{ `${duration.startDate}-${duration.endDate}` }}</span>
       </template>
       <template #day="{ scope: { resource, timestamp } }">
         <div class="day">

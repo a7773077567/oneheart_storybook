@@ -4,19 +4,14 @@ import { api } from '@/utils/api';
 export interface LoginRes {
   accessToken: string;
 };
-export interface Location {
-  id: number;
-  type: 'clinic' | 'gym';
-  name: string;
-}
 
 export interface Role {
   id: number;
   name: string;
   type: number;
 }
-export interface UserInfo {
-  id: string;
+export interface User {
+  id: number;
   name: string;
   email: string;
   role: Role;
@@ -59,6 +54,7 @@ export interface Space {
   type: number;
 }
 
+// ========== Requests ==========
 export async function basicLogin(payload: BasicLoginReq) {
   const { data } = await api.post<LoginRes, BasicLoginReq>('users/login', payload);
   return data;
@@ -84,8 +80,13 @@ export async function resetPassword(payload: NewPasswordReq) {
   return data;
 }
 
+export async function fetchUsers(spaceIds: number[]) {
+  const { data } = await api.get<User[]>('users', { params: { spaceIds } });
+  return data;
+}
+
 export async function fetchUserInfo() {
-  const { data } = await api.get<UserInfo>('users/me');
+  const { data } = await api.get<User>('users/me');
   return data;
 }
 

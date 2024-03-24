@@ -280,8 +280,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  console.log('in beforeEach');
-
   const needAuth = to.meta.requiredAuth;
   if (!needAuth || to.name === 'activatePassword') {
     return;

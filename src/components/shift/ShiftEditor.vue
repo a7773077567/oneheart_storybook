@@ -2,7 +2,7 @@
 import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ShiftColors, shiftTemplateSchema } from '@/api/shift';
-import type { Duration, ShiftTemplate, ShiftTemplateReq, ShiftTemplateSchema } from '@/api/shift';
+import type { Duration, ShiftTemplate, ShiftTemplateReq, ShiftTemplateSchema, UserShiftPatch } from '@/api/shift';
 import { TherapyTypes } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
@@ -10,17 +10,20 @@ import objectSupport from 'dayjs/plugin/objectSupport';
 
 interface Props {
   data?: ShiftTemplate | null;
+  userShiftMode?: boolean;
 }
+
 const props = defineProps<Props>();
 const emit = defineEmits<{
   cancel: [state: boolean];
-  confirm: [values: ShiftTemplateReq];
+  confirm: [values: ShiftTemplateReq ];
+  updateConfirm: [values: UserShiftPatch];
 }>();
 
 dayjs.extend(objectSupport);
 const typeOptions = getTypeOptions();
 
-const { handleSubmit, values } = useForm({
+const { handleSubmit, values, errors } = useForm({
   validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
@@ -28,14 +31,22 @@ const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 
 const onSubmit = handleSubmit((values) => {
   const { duration, notAvailableTimes, maxClients, ...needed } = values;
-  const payload = {
-    ...needed,
-    ...splitTime(duration),
-    notAvailableTimes: notAvailableTimes.map(splitTime),
-    maxClients: maxClients ? +maxClients : null,
-  };
+  if (!props.userShiftMode) {
+    const payload = {
+      ...needed,
+      ...splitTime(duration),
+      notAvailableTimes: notAvailableTimes.map(splitTime),
+      maxClients: maxClients ? +maxClients : null,
+    };
 
-  emit('confirm', payload);
+    emit('confirm', payload);
+  }
+  else {
+    const payload = {
+      notAvailableTimes: notAvailableTimes.map(splitTime),
+    };
+    emit('updateConfirm', payload);
+  }
 });
 
 function getTypeOptions() {
@@ -95,12 +106,12 @@ function splitTime(duration: number[]): Duration {
     </QCardSection>
     <QSeparator color="grey-6" />
     <QCardSection>
-      <OSelect name="type" :options="typeOptions" label="班別類別" emit-value map-options outlined dense style="width: 230px;" />
+      <OSelect name="type" :options="typeOptions" label="班別類別" emit-value map-options outlined dense :disable="userShiftMode" style="width: 230px;" />
       <InputBox label="班別名稱">
-        <OInput name="name" style="flex: 1 1 0" />
+        <OInput name="name" :disable="userShiftMode" style="flex: 1 1 0" />
       </InputBox>
       <InputBox label="時間" class="gutter">
-        <MultiNumSelect :items="DurationItems" name="duration" style="flex: 1 1 0" />
+        <MultiNumSelect :items="DurationItems" name="duration" :disable="userShiftMode" style="flex: 1 1 0" />
       </InputBox>
       <InputBox
         v-for="(field, idx) in fields"
@@ -113,10 +124,10 @@ function splitTime(duration: number[]): Duration {
       </InputBox>
       <QBtn label="新增不可預約時間" icon="add" dense flat class="gutter" @click="push([0, 0, 0, 0])" />
       <InputBox label="班別顏色" class="gutter">
-        <ColorPicker :colors="ShiftColors" name="color" style="padding: 6px 14px;" />
+        <ColorPicker :colors="ShiftColors" name="color" :disable="userShiftMode" style="padding: 6px 14px;" />
       </InputBox>
       <InputBox v-if="values.type !== 2" label="最多可預約人數">
-        <OInput name="maxClients" dense outlined style="flex: 0 1 100px" />
+        <OInput name="maxClients" dense outlined :disable="userShiftMode" style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>
     <QCardActions align="right">

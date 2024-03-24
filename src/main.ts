@@ -23,9 +23,9 @@ import Components from '@/plugins/components';
 const app = createApp(App);
 
 // ========== disable mocking ==========
-// app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components).mount('#app');
+app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components).mount('#app');
 
 // ========== enable mocking ==========
-enableMocking()?.then(() => {
-  app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components).use(GoogleLogin).mount('#app');
-});
+// enableMocking()?.then(() => {
+//   app.use(createPinia()).use(router).use(Quasar).use(Zod).use(Components).use(GoogleLogin).mount('#app');
+// });

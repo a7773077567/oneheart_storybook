@@ -13,6 +13,7 @@ interface Props {
   name?: string;
   modelValue?: number[];
   customRule?: any;
+  disable?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -41,6 +42,7 @@ function updateModel(idx: number, val: number) {
         emit-value
         outlined
         dense
+        :disable="disable"
         class="multiple-select__item"
         @update:model-value="val => updateModel(idx, val)"
       />

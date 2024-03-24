@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-interface Props {
+interface Duration {
   startDate: string;
   endDate: string;
+
+}
+interface Props {
+  modelValue: Duration;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'update:startDate': [model: string];
-  'update:endDate': [model: string];
+  'update:modelValue': [model: Duration];
 }>();
 
 const start = computed({
-  get: () => props.startDate,
-  set: val => emit('update:startDate', val),
+  get: () => props.modelValue.startDate,
+  set: val => emit('update:modelValue', { ...props.modelValue, startDate: val }),
 });
 const end = computed({
-  get: () => props.endDate,
-  set: val => emit('update:endDate', val),
+  get: () => props.modelValue.endDate,
+  set: val => emit('update:modelValue', { ...props.modelValue, endDate: val }),
 });
 </script>
 

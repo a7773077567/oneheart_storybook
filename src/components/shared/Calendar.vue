@@ -5,11 +5,17 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarScheduler.sass';
 import { computed, ref } from 'vue';
 import { getWeekDay } from '@/utils/date';
-import type { Employee } from '@/api/shift';
+import type { User } from '@/api/user';
+
+export interface ChangeParams {
+  start: string;
+  end: string;
+  days: Record<string, any>[];
+}
 
 interface Props {
   modelValue: string;
-  modelResources: Employee[];
+  modelResources: User[];
   simpleMode?: boolean;
   view: string;
   maxDays?: number | string;
@@ -19,6 +25,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'update:modelValue': [model: string];
   'update:modelResources': [model: any];
+  'change': [calendarDuration: ChangeParams];
 }>();
 const model = computed({
   get: () => props.modelValue,
@@ -39,6 +46,10 @@ const selectedResources = computed(() => {
   return resources.value.filter(item => selected.value.includes(item.id));
 });
 const isEditing = ref(false);
+
+function onChange(calendarDuration: ChangeParams) {
+  emit('change', calendarDuration);
+}
 </script>
 
 <template>
@@ -87,6 +98,7 @@ const isEditing = ref(false);
       animated
       bordered
       :style="{ '--calendar-border': '1px solid #B2B2B2' }"
+      @change="onChange"
     >
       <template #head-resources>
         <div class="row flex-center full-width">
@@ -102,9 +114,9 @@ const isEditing = ref(false);
       <template #resource-label="{ scope: { resource } }">
         <div class="col-12">
           <QChip>
-            <QAvatar>
+            <QAvatar v-if="resource.avatar">
               <img
-                v-if="resource.avatar"
+
                 :src="resource.avatar"
               >
             </QAvatar>

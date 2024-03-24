@@ -2,7 +2,7 @@ import { type HttpHandler, HttpResponse, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
 import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
-import type { BasicLoginReq, ForgotReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, UserInfo } from '@/api/user';
+import type { BasicLoginReq, ForgotReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, User } from '@/api/user';
 
 // export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
 //   const { email, password } = await request.json() as BasicLoginReq;
@@ -31,7 +31,7 @@ import type { BasicLoginReq, ForgotReq, GoogleLoginReq, Location, MicrosoftLogin
 //     email: faker.internet.email({ firstName: name }),
 //     avatar: faker.image.avatar(),
 //     spaces: faker.helpers.arrayElements(spaces, { min: 1, max: spaces.length }),
-//   } satisfies UserInfo });
+//   } satisfies User });
 // });
 
 export const googleLoginHandler = http.post(getUrl('user/google-login'), async ({ request }) => {

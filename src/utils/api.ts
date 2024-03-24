@@ -46,6 +46,13 @@ export const api = {
   ): Promise<APIResponse<DataRes>> {
     return instance.put(url, data, config);
   },
+  patch<DataRes, DataPayload = any>(
+    url: string,
+    data?: DataPayload,
+    config?: AxiosRequestConfig,
+  ): Promise<APIResponse<DataRes>> {
+    return instance.patch(url, data, config);
+  },
   delete<DataRes>(
     url: string,
     config?: AxiosRequestConfig,

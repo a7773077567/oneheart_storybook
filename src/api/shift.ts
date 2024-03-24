@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
-import type { PostRes } from '@/composables/helpers';
 import { omit } from 'radash';
 
 // ========== Types ==========
@@ -22,12 +21,27 @@ export interface ShiftTemplate {
   color: string;
   maxClients: number | null;
 }
-export interface UserShift extends Omit<ShiftTemplate, 'id'> {
+export interface UserShift {
+  id: number;
+  spaceId: number;
   userId: number;
+  type: number;
+  name: string;
   date: string;
+  startTime: string;
+  endTime: string;
+  notAvailableTimes: Duration[];
+  color: string;
+  maxClients: number | null;
 }
-export interface UserShiftReq extends Omit<UserShift, 'spaceId'> {}
+export interface UserShiftPost extends Omit<UserShift, 'id' | 'spaceId'> {}
+export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
 export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
+export interface UserShiftsGet {
+  userIds: number[];
+  startDate: string;
+  endDate: string;
+}
 
 export const shiftTemplateSchema = z.object({
   type: z.number(),
@@ -35,18 +49,15 @@ export const shiftTemplateSchema = z.object({
   duration: z.number().array(),
   notAvailableTimes: z.number().array().array(),
   color: z.string(),
-  maxClients: z.string(),
+  maxClients: z.string().optional(),
 }).refine(({ maxClients, type }) => {
-  if (Number.isNaN(+maxClients)) {
-    return false;
+  if (type === 2) {
+    return true;
   }
-  if (maxClients !== '' && +maxClients < 1) {
-    return false;
+  if (!!maxClients && +maxClients > 0) {
+    return true;
   }
-  if (maxClients === '' && type !== 2) {
-    return false;
-  }
-  return true;
+  return false;
 }, {
   message: '必填並輸入大於1的數字',
   path: ['maxClients'],
@@ -68,12 +79,6 @@ export interface EmployeeShiftRes {
   date: string | Date;
   employeeId: number;
   shift: ShiftReq;
-}
-
-export interface Employee {
-  id: number;
-  name: string;
-  avatar: string;
 }
 
 export interface createEmployeeShiftsReq {
@@ -107,29 +112,34 @@ export async function deleteShiftTemplate(shiftTemplateId: number) {
   return data;
 }
 
-export async function fetchEmployees() {
-  const { data } = await api.get<Employee[]>('employee');
+export async function fetchUserShifts(params: UserShiftsGet) {
+  const { data } = await api.get<UserShift[]>('userShifts', { params });
   return data;
 }
 
-export async function fetchEmployeeShifts() {
-  const { data } = await api.get<EmployeeShiftRes[]>('employee/shift', { params: { month: 2 } });
+export async function fetchUserShift(userShiftId: number) {
+  const { data } = await api.get<UserShift>(`userShifts/${userShiftId}`);
   return data;
 }
 
-export async function createUserShift(payload: UserShiftReq) {
-  const { data } = await api.post<any, UserShiftReq>(`userShifts`, payload);
+export async function createUserShift(payload: UserShiftPost) {
+  const { data } = await api.post<any, UserShiftPost>(`userShifts`, payload);
   return data;
 }
 
-export async function deleteEmployeeShift(employeeShiftId: number) {
-  const { data } = await api.delete<PostRes>(`employee/shift/${employeeShiftId}`);
+export async function updateUserShift(userShiftId: number, payload: UserShiftPatch) {
+  const { data } = await api.patch(`userShifts/${userShiftId}`, payload);
+  return data;
+}
+
+export async function deleteUserShift(userShiftId: number) {
+  const { data } = await api.delete(`userShifts/${userShiftId}`);
   return data;
 }
 
 // ========== Utils ==========
 
-export function toUserShiftReq(shiftTemplate: ShiftTemplate, userId: number, date: string): UserShiftReq {
+export function toUserShiftReq(shiftTemplate: ShiftTemplate, userId: number, date: string): UserShiftPost {
   return {
     ...omit(shiftTemplate, ['id', 'spaceId']),
     userId,

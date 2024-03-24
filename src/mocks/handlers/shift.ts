@@ -60,20 +60,20 @@ const employeeShifts = new Map(employeeShiftsData);
 //   return getSuccessRes();
 // });
 
-const fetchEmployeesHandler = http.get(getUrl('employee'), () => {
-  const employees: Employee[] = getArray(5).map((_, idx) => {
-    return {
-      id: idx,
-      name: faker.person.firstName(),
-      avatar: faker.image.avatar(),
-    };
-  });
-  return HttpResponse.json({ data: employees });
-});
+// const fetchEmployeesHandler = http.get(getUrl('employee'), () => {
+//   const employees: Employee[] = getArray(5).map((_, idx) => {
+//     return {
+//       id: idx,
+//       name: faker.person.firstName(),
+//       avatar: faker.image.avatar(),
+//     };
+//   });
+//   return HttpResponse.json({ data: employees });
+// });
 
-const fetchEmployeeShiftsHandler = http.get(getUrl('employee/shift'), () => {
-  return HttpResponse.json({ data: [...employeeShifts.values()] });
-});
+// const fetchEmployeeShiftsHandler = http.get(getUrl('employee/shift'), () => {
+//   return HttpResponse.json({ data: [...employeeShifts.values()] });
+// });
 
 // const createUserShiftsHandler = http.post(getUrl('shift/:employeeId'), async ({ request, params }) => {
 //   const { employeeId } = params;
@@ -136,8 +136,8 @@ export default [
   // updateShiftHandler,
   // fetchShiftTemplatesHandler,
   // deleteShiftHandler,
-  fetchEmployeesHandler,
-  fetchEmployeeShiftsHandler,
+  // fetchEmployeesHandler,
+  // fetchEmployeeShiftsHandler,
   // createUserShiftsHandler,
   deleteEmployeeShiftHandler,
 ];
