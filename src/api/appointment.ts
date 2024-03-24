@@ -1,19 +1,5 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import dayjs from 'dayjs';
-import type { Employee } from './shift';
-
-export const bookingSchema = z.object({
-  therapyType: z.number({ required_error: '必填' }).nullable(),
-  therapist: z.number().optional().nullable(),
-  date: z.string().nullable(),
-  startTime: z.string().optional().nullable(),
-  endTime: z.string().optional().nullable(),
-});
-export type BookingSchema = z.infer<typeof bookingSchema>;
-export const bookingInitialValues: Partial<BookingSchema> = {
-  date: dayjs().format('YYYY-MM-DD'),
-};
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -53,7 +39,7 @@ export interface BookingItem {
   location: number;
   state: number;
   isCheckout: boolean;
-  employee: Employee;
+  employee: any;
   client: Client;
   therapist: Therapist;
   left?: number;
@@ -69,3 +55,13 @@ export async function fetchTherapists(type: number) {
   const { data } = await api.get<TherapistsRes>(`appointment/therapists/${type}`);
   return data;
 }
+
+// ========== Schemas ==========
+export const bookingSchema = z.object({
+  therapyType: z.number({ required_error: '必填' }).nullable(),
+  therapist: z.number().optional().nullable(),
+  date: z.string(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+});
+export type BookingSchema = z.infer<typeof bookingSchema>;

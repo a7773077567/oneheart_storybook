@@ -2,16 +2,16 @@
 import { ref } from 'vue';
 import { BookingAdder, BookingBox } from '@/components/appointment';
 import { getBookingItems } from '@/mocks/handlers/appointment';
-import { useAppointmentStore } from '@/stores';
+import { useAppointmentStore, useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
-const { therapists } = storeToRefs(appointmentStore);
-const { getTherapists } = appointmentStore;
-await getTherapists(1);
+const userStore = useUserStore();
+
+await appointmentStore.getUsers([userStore.currentSpace!]);
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const BookingItems = getBookingItems();
@@ -52,7 +52,7 @@ function book() {
   <div class="booking-calendar">
     <ResourceCalendar
       v-model="selectedDate"
-      v-model:model-resources="therapists"
+      v-model:model-resources="appointmentStore.users"
     >
       <template #intervals="{ scope }">
         <BookingAdder

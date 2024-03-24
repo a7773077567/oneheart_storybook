@@ -4,11 +4,11 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
 import { computed, ref } from 'vue';
-import type { Employee } from '@/api/shift';
+import type { User } from '@/api/user';
 
 interface Props {
   modelValue: string;
-  modelResources: Employee[];
+  modelResources: User[];
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
-import type Module from 'node:module';
 
 interface Props {
   type: string;

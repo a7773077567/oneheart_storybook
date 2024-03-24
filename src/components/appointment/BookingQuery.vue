@@ -1,34 +1,41 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { bookingInitialValues, bookingSchema } from '@/api/appointment';
-import { useAppointmentStore } from '@/stores';
-import { storeToRefs } from 'pinia';
+import { useAppointmentStore, useUserStore } from '@/stores';
+import { TherapyTypes } from '@/const/general';
+import dayjs from 'dayjs';
+import { bookingSchema } from '@/api/appointment';
 
 const appointmentStore = useAppointmentStore();
-const { therapyTypeOptions, therapistOptions, querySent, bookingQuery } = storeToRefs(appointmentStore);
-const { getTherapyTypes, getTherapists } = appointmentStore;
-
-getTherapyTypes();
+const userStore = useUserStore();
+await appointmentStore.getUsers([userStore.currentSpace!]);
+const typeOptions = Object.values(TherapyTypes).map((item, idx) => ({
+  label: item,
+  value: idx + 1,
+}));
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(bookingSchema),
-  initialValues: bookingInitialValues,
+  initialValues: {
+    therapyType: typeOptions[0].value,
+    date: dayjs().format('YYYY-MM-DD'),
+  },
 });
 
 const onSubmit = handleSubmit((values) => {
-  bookingQuery.value = values;
-  querySent.value = true;
+  appointmentStore.bookingQuery = values;
+  appointmentStore.querySent = true;
 });
 </script>
 
 <template>
   <div class="booking">
     <InputBox label="選擇項目">
-      <OSelect name="therapyType" label="選擇項目" :options="therapyTypeOptions" @update:model-value="getTherapists" />
+      <OSelect name="therapyType" label="選擇項目" :options="typeOptions" />
+      <!-- @update:model-value="getTherapists" -->
     </InputBox>
     <InputBox label="選擇治療師">
-      <OSelect name="therapist" label="選擇治療師" :options="therapistOptions" />
+      <OSelect name="therapist" label="選擇治療師" :options="appointmentStore.userOptions" />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" />

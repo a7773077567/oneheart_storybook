@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useAppointmentStore } from '@/stores';
-import { storeToRefs } from 'pinia';
+import { useAppointmentStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { BookingCard } from '@/components/appointment';
 import { getBookingItems } from '@/mocks/handlers/appointment';
@@ -9,9 +8,8 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
-const { therapists } = storeToRefs(appointmentStore);
-const { getTherapists } = appointmentStore;
-await getTherapists(1);
+const userStore = useUserStore();
+await appointmentStore.getUsers([userStore.currentSpace!]);
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const bookingItems = getBookingItems();
@@ -40,7 +38,7 @@ function getBookings(scope: any) {
 <template>
   <ResourceCalendar
     v-model="selectedDate"
-    v-model:model-resources="therapists"
+    v-model:model-resources="appointmentStore.users"
   >
     <template #intervals="{ scope }">
       <BookingCard

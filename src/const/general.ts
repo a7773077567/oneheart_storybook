@@ -24,49 +24,49 @@ interface Type {
 
 export const Types: Record<TypeName, Type> = {
   physicalConsultation: {
-    identifier: 0,
+    identifier: 1,
     name: 'physicalConsultation',
     label: '物理諮詢門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
   },
   physicalTherapy: {
-    identifier: 1,
+    identifier: 2,
     name: 'physicalTherapy',
     label: '物理治療門診',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
   },
   footPressure: {
-    identifier: 2,
+    identifier: 3,
     name: 'footPressure',
     label: '足壓門診',
     tabs: ['clientInfo', 'footPressure', 'bodyAnalysis', 'memo'],
   },
   nutrition: {
-    identifier: 3,
+    identifier: 4,
     name: 'nutrition',
     label: '營養門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
   },
   sleep: {
-    identifier: 4,
+    identifier: 5,
     name: 'sleep',
     label: '睡眠門診',
     tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'memo'],
   },
   sports: {
-    identifier: 5,
+    identifier: 6,
     name: 'sports',
     label: '運科門診',
     tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
   },
   oneOnOne: {
-    identifier: 6,
+    identifier: 7,
     name: 'oneOnOne',
     label: '一對一教練課',
     tabs: ['clientInfo', 'trainingPlain', 'bodyAnalysis', 'memo'],
   },
   group: {
-    identifier: 7,
+    identifier: 8,
     name: 'group',
     label: '團課',
     tabs: ['clientInfo', 'groupClass'],

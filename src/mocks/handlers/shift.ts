@@ -2,7 +2,7 @@ import { type HttpHandler, HttpResponse, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getArray, getUrl } from '@/utils/helpers';
 import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
-import { type Employee, type EmployeeShiftRes, ShiftColors, type ShiftReq, type ShiftRes, type createEmployeeShiftsReq } from '@/api/shift';
+import { type EmployeeShiftRes, ShiftColors, type ShiftReq, type ShiftRes, type createEmployeeShiftsReq } from '@/api/shift';
 import { useConvert } from '@/composables/helpers';
 import { TherapyTypes } from '@/const/general';
 

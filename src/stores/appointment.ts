@@ -1,25 +1,25 @@
 import { defineStore } from 'pinia';
-import { type BookingSchema, type Therapist, fetchTherapists, fetchTherapyTypes } from '@/api/appointment';
-import type { Employee } from '@/api/shift';
+import { type BookingSchema, fetchTherapyTypes } from '@/api/appointment';
+import { type User, fetchUsers } from '@/api/user';
 
 interface State {
   therapyTypes: string[];
-  therapists: Therapist[];
+  users: User[];
   bookingQuery: BookingSchema;
   querySent: boolean;
-  employees: Employee[];
+  employees: any[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
   state: (): State => ({
     therapyTypes: [],
-    therapists: [],
+    users: [],
     bookingQuery: {
       therapyType: null,
-      date: null,
-      endTime: null,
-      startTime: null,
       therapist: null,
+      date: '',
+      endTime: '',
+      startTime: '',
     },
     querySent: false,
     employees: [],
@@ -32,9 +32,9 @@ export const useAppointmentStore = defineStore('appointment', {
         value: idx,
       }));
     },
-    therapistOptions(state) {
-      const { therapists } = state;
-      return therapists.map(({ name, id }) => ({
+    userOptions(state) {
+      const { users } = state;
+      return users.map(({ name, id }) => ({
         label: name,
         value: id,
       }));
@@ -45,9 +45,9 @@ export const useAppointmentStore = defineStore('appointment', {
       const { therapyTypes } = await fetchTherapyTypes();
       this.therapyTypes = therapyTypes;
     },
-    async getTherapists(typeId: number) {
-      const { therapists } = await fetchTherapists(typeId);
-      this.therapists = therapists;
+    async getUsers(spaceIds: number[]) {
+      const data = await fetchUsers(spaceIds);
+      this.users = data;
     },
   },
 });

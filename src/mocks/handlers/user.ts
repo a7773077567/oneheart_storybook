@@ -2,7 +2,7 @@ import { type HttpHandler, HttpResponse, http } from 'msw';
 import { faker } from '@faker-js/faker';
 import { getUrl } from '@/utils/helpers';
 import { getErrorRes, getSuccessRes } from '@/mocks/utils/response';
-import type { BasicLoginReq, ForgotReq, GoogleLoginReq, Location, MicrosoftLoginReq, NewPasswordReq, User } from '@/api/user';
+import type { BasicLoginReq, ForgotReq, GoogleLoginReq, MicrosoftLoginReq, NewPasswordReq, User } from '@/api/user';
 
 // export const basicLoginHandler = http.post(getUrl('user/basic-login'), async ({ request }) => {
 //   const { email, password } = await request.json() as BasicLoginReq;

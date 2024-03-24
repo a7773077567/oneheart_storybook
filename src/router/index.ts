@@ -303,8 +303,6 @@ async function checkAuth() {
 }
 
 async function loginGuard() {
-  console.log('in loginGuard');
-
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     return { name: 'home' };
