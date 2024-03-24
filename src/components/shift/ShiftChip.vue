@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type EmployeeShiftRes, ShiftTypes } from '@/api/shift';
+import type { UserShift } from '@/api/shift';
 import { getWeekDay } from '@/utils/date';
 import dayjs from 'dayjs';
+import { TherapyTypes } from '@/const/general';
 
 interface Props {
-  data: EmployeeShiftRes;
+  data: UserShift;
   editMode?: boolean;
 }
 const props = defineProps<Props>();
 defineEmits<{
+  update: [shiftId: number];
   delete: [shiftId: number];
 }>();
 
@@ -19,14 +21,13 @@ const date = computed(() => {
   return `${date.format('MM月DD')}${week}`;
 });
 
-const duration = computed(() => toDurationLabel(props.data.shift.duration));
-const type = computed(() => [...Object.values(ShiftTypes)][props.data.shift.type]);
-const unavailable = computed(() => props.data.shift.unavailable.map(item => toDurationLabel(item, true)));
-const bgc = computed(() => props.data.shift.color);
+const duration = computed(() => toDurationLabel(props.data.startTime, props.data.endTime));
+const type = computed(() => [...Object.values(TherapyTypes)][props.data.type]);
+const unavailable = computed(() => props.data.notAvailableTimes.map(item => toDurationLabel(item.startTime, item.endTime, true)));
+const bgc = computed(() => props.data.color);
 
-function toDurationLabel(duration: Record<string, number>, isUnavailable?: boolean) {
-  const { startHr, startMin, endHr, endMin } = duration;
-  const label = `${startHr}:${startMin}-${endHr}:${endMin}`;
+function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boolean) {
+  const label = `${startTime}:${endTime}`;
   return isUnavailable
     ? `${label}不可預約`
     : label;
@@ -39,7 +40,7 @@ function toDurationLabel(duration: Record<string, number>, isUnavailable?: boole
       {{ duration }}
     </div>
     <div class="shift-chip__item">
-      {{ data.shift.name }}
+      {{ data.name }}
     </div>
     <QPopupProxy anchor="top right">
       <QCard style="padding: 10px 0 20px 0">
@@ -47,7 +48,7 @@ function toDurationLabel(duration: Record<string, number>, isUnavailable?: boole
           <QIcon v-close-popup name="close" size="24px" class="cursor-pointer" />
         </QCardActions>
         <QCardSection class="column q-gutter-xs text-body1 q-mb-xs" style="padding: 0 30px;">
-          <div>{{ data.shift.name }}</div>
+          <div>{{ data.name }}</div>
           <div>{{ date }}</div>
           <div>{{ duration }}</div>
           <div>{{ type }}</div>
@@ -60,7 +61,7 @@ function toDurationLabel(duration: Record<string, number>, isUnavailable?: boole
         </QCardSection>
         <QCardActions v-if="editMode" style="padding: 0 30px;">
           <QBtn icon="o_delete" flat round dense @click="$emit('delete', data.id)" />
-          <QBtn icon="o_edit" flat round dense />
+          <QBtn icon="o_edit" flat round dense @click="$emit('update', data.id)" />
         </QCardActions>
       </QCard>
     </QPopupProxy>

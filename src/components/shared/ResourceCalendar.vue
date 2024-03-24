@@ -1,0 +1,132 @@
+<script setup lang="ts">
+import { QCalendarResource } from '@quasar/quasar-ui-qcalendar';
+import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
+import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
+import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
+import { computed, ref } from 'vue';
+import type { Employee } from '@/api/shift';
+
+interface Props {
+  modelValue: string;
+  modelResources: Employee[];
+}
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  'update:modelValue': [model: string];
+  'update:modelResources': [model: any];
+}>();
+const model = computed({
+  get: () => props.modelValue,
+  set: (val) => {
+    emit('update:modelValue', val);
+  },
+});
+const resources = computed({
+  get: () => props.modelResources,
+  set: val => emit('update:modelResources', val),
+});
+
+const calendar = ref<QCalendarResource | null>(null);
+const options = computed(() => resources.value.map(({ id, name }) => ({
+  label: name,
+  value: id,
+})));
+const selected = ref(options.value.map(option => option.value));
+const selectedResources = computed(() => {
+  return resources.value.filter(item => selected.value.includes(item.id));
+});
+
+function getCalendarStyle() {
+  return {
+    '--calendar-border': '1px solid #B2B2B2',
+  };
+}
+</script>
+
+<template>
+  <div class="calendar">
+    <div class="calendar__nav">
+      <OSelect
+        v-model="selected"
+        name="employee"
+        :options="options"
+        multiple
+        emit-value
+        map-options
+        dense
+        outlined
+        hide-bottom-space
+        style="width: 164px;"
+      />
+      <div class="column items-center q-gutter-md">
+        <DatePicker v-model="model" />
+        <CalendarNav
+          @prev="calendar?.prev"
+          @today="calendar?.moveToToday"
+          @next="calendar?.next"
+        />
+      </div>
+      <div class="pad" style="width: 164px;" />
+    </div>
+    <QCalendarResource
+      ref="calendar"
+      v-model="model"
+      v-model:model-resources="selectedResources"
+      resource-key="id"
+      resource-label="name"
+      :interval-start="9"
+      :interval-count="9"
+      :cell-width="125"
+      animated
+      bordered
+      :style="getCalendarStyle()"
+    >
+      <template #head-resources>
+        <div class="row flex-center full-width">
+          <span class="text-weight-bold">人員</span>
+        </div>
+      </template>
+      <template #resource-label="{ scope: { resource } }">
+        <div class="col-12">
+          <QChip>
+            <QAvatar>
+              <img
+                v-if="resource.avatar"
+                :src="resource.avatar"
+              >
+            </QAvatar>
+            {{ resource.name }}
+          </QChip>
+        </div>
+      </template>
+      <template #resource-intervals="{ scope }">
+        <slot name="intervals" :scope="scope" />
+      </template>
+    </QCalendarResource>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.calendar {
+  max-width: 1225px;
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 10px;
+  }
+}
+
+:deep(.q-field__native > span) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+:deep(.q-calendar-resource__head--interval) {
+  font-size: 14px;
+  font-weight: 500;
+}
+:deep(.q-calendar-resource__resource--interval) {
+  min-height: 116px !important;
+}
+</style>

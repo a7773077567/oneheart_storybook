@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
+import type { ShiftColors } from '@/api/shift';
 
 interface Props {
-  colors: string[];
+  colors: string[] | typeof ShiftColors ;
   modelValue?: string;
   name?: string;
+  disable?: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
@@ -14,19 +16,22 @@ const emit = defineEmits<{
 const { value: fieldValue, setValue } = useField<string>(() => props.name || 'field');
 
 function updateModel(color: string) {
+  if (props.disable) {
+    return;
+  }
   setValue(color);
   emit('update:modelValue', fieldValue.value);
 }
 </script>
 
 <template>
-  <div class="color-picker">
+  <div class="color-picker" :style="{ cursor: disable ? 'not-allowed' : 'pointer' }">
     <span
       v-for="(color, idx) in colors"
       :key="idx"
       class="color-picker__item"
       :class="{ 'color-picker__item--active': color === fieldValue }"
-      :style="{ background: color }"
+      :style="{ background: color, cursor: disable ? 'not-allowed' : 'pointer', opacity: disable ? '0.6' : '1' }"
       @click="() => updateModel(color)"
     />
   </div>

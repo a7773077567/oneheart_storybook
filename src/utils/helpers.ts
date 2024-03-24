@@ -1,7 +1,9 @@
 import { Cookies } from 'quasar';
 
 interface AllCookies {
-  token: string;
+  firstToken: string;
+  secondToken: string;
+  lastSpaceId: number;
 };
 
 interface SelectOption {
@@ -33,10 +35,10 @@ export function getSequenceOptions(num: number): SelectOption[] {
   }));
 }
 
-export function omit(keys: string[], obj: Record<string, any>) {
-  if (!keys.length) {
-    return obj;
-  }
-  const { [keys.pop() as string]: _, ...rest } = obj;
-  return omit(keys, rest);
+export function omit<T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]) {
+  return Object.fromEntries(Object.entries(obj).filter((e, idx) => e[0] !== keys[idx])) as Omit<T, K>;
+}
+
+export function getArray(count: number) {
+  return [...Array(count).keys()];
 }

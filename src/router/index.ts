@@ -5,11 +5,50 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/login/Login.vue'),
+    redirect: { name: 'userLogin' },
     beforeEnter: loginGuard,
     meta: {
       requiredAuth: false,
     },
+    children: [
+      {
+        path: 'user-login',
+        name: 'userLogin',
+        component: () => import('@/views/login/UserLogin.vue'),
+        beforeEnter: loginGuard,
+        meta: {
+          requiredAuth: false,
+        },
+      },
+      {
+        path: 'space-login',
+        name: 'spaceLogin',
+        component: () => import('@/views/login/SpaceLogin.vue'),
+        meta: {
+          requiredAuth: true,
+        },
+      },
+    ],
+  },
+  {
+    path: '/activate',
+    name: 'activate',
+    component: () => import('@/views/login/Activate.vue'),
+    children: [
+      {
+        path: 'email',
+        name: 'activateEmail',
+        component: () => import('@/views/login/ActivateEmail.vue'),
+        meta: {
+          requiredAuth: true,
+        },
+      },
+      {
+        path: 'password',
+        name: 'activatePassword',
+        component: () => import('@/views/login/ActivatePassword.vue'),
+      },
+    ],
   },
   {
     path: '/forget',
@@ -33,7 +72,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           requireAuth: false,
         },
-        props: route => ({ userId: route.query.id }),
+        props: route => ({ token: route.query.token }),
       },
     ],
   },
@@ -89,10 +128,33 @@ export const routes: RouteRecordRaw[] = [
             path: 'list',
             name: 'appointmentList',
             component: () => import('@/views/appointment/List.vue'),
+            redirect: { name: 'appointmentCalendar' },
             meta: {
               label: '預約列表',
               requiredAuth: true,
             },
+            children: [
+              {
+                path: 'calendar',
+                name: 'appointmentCalendar',
+                component: () => import('@/views/appointment/Calendar.vue'),
+                meta: {
+                  label: '列表',
+                  requiredAuth: true,
+                },
+              },
+              {
+                path: 'info/:type',
+                name: 'appointmentInfo',
+                component: () => import('@/views/appointment/Info.vue'),
+                meta: {
+                  label: '預約資料',
+                  requiredAuth: true,
+                },
+                props: true,
+              },
+
+            ],
           },
           {
             path: 'booking',
@@ -169,9 +231,9 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'shift',
-            name: 'shiftShift',
-            component: () => import('@/views/shift/Shift.vue'),
+            path: 'template',
+            name: 'shiftTemplate',
+            component: () => import('@/views/shift/Template.vue'),
             meta: {
               label: '新增班別',
               requiredAuth: true,
@@ -219,9 +281,10 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const needAuth = to.meta.requiredAuth;
-  if (!needAuth) {
+  if (!needAuth || to.name === 'activatePassword') {
     return;
   }
+
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) {
     return { name: 'login' };
@@ -240,6 +303,8 @@ async function checkAuth() {
 }
 
 async function loginGuard() {
+  console.log('in loginGuard');
+
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     return { name: 'home' };

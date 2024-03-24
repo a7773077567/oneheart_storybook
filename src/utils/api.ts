@@ -46,6 +46,13 @@ export const api = {
   ): Promise<APIResponse<DataRes>> {
     return instance.put(url, data, config);
   },
+  patch<DataRes, DataPayload = any>(
+    url: string,
+    data?: DataPayload,
+    config?: AxiosRequestConfig,
+  ): Promise<APIResponse<DataRes>> {
+    return instance.patch(url, data, config);
+  },
   delete<DataRes>(
     url: string,
     config?: AxiosRequestConfig,
@@ -54,14 +61,37 @@ export const api = {
   },
 };
 
+const noTokenList = [
+  'users/login',
+  'users/user-login',
+  'users/forgot-password',
+];
+
+const firstTokenList = [
+  'users',
+  'users/activate',
+  'users/activate/email',
+  'users/reset-password',
+  'users/me',
+  'spaces/login',
+];
+
 // ========== Functions ==========
 function requestInterceptor(config: InternalAxiosRequestConfig) {
-  const token = getCookie('token');
-  const isLogin = config.url === 'login';
-
-  if (!isLogin && token) {
-    config.headers!.Authorization = `Bearer ${token}`;
+  const { url } = config;
+  if (!url) {
+    return config;
   }
+
+  const needToken = !noTokenList.includes(url);
+  if (!needToken) {
+    return config;
+  }
+
+  const needFirstToken = firstTokenList.includes(url) || url.includes('resend-activation-email');
+  const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
+  config.headers!.Authorization = `Bearer ${token}`;
+
   return config;
 }
 
