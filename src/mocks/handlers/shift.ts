@@ -75,20 +75,20 @@ const fetchEmployeeShiftsHandler = http.get(getUrl('employee/shift'), () => {
   return HttpResponse.json({ data: [...employeeShifts.values()] });
 });
 
-const createEmployeeShiftsHandler = http.post(getUrl('shift/:employeeId'), async ({ request, params }) => {
-  const { employeeId } = params;
-  const { date, shiftIds } = await request.json() as createEmployeeShiftsReq;
-  shiftIds.forEach((shiftId) => {
-    const employeeShift: EmployeeShiftRes = {
-      id: employeeShifts.size,
-      date,
-      employeeId: +employeeId,
-      shift: shifts.get(shiftId)!,
-    };
-    employeeShifts.set(employeeShifts.size, employeeShift);
-  });
-  return getSuccessRes();
-});
+// const createUserShiftsHandler = http.post(getUrl('shift/:employeeId'), async ({ request, params }) => {
+//   const { employeeId } = params;
+//   const { date, shiftIds } = await request.json() as createEmployeeShiftsReq;
+//   shiftIds.forEach((shiftId) => {
+//     const employeeShift: EmployeeShiftRes = {
+//       id: employeeShifts.size,
+//       date,
+//       employeeId: +employeeId,
+//       shift: shifts.get(shiftId)!,
+//     };
+//     employeeShifts.set(employeeShifts.size, employeeShift);
+//   });
+//   return getSuccessRes();
+// });
 
 const deleteEmployeeShiftHandler = http.delete(getUrl('employee/shift/:employeeShiftId'), ({ params }) => {
   const { employeeShiftId } = params;
@@ -138,6 +138,6 @@ export default [
   // deleteShiftHandler,
   fetchEmployeesHandler,
   fetchEmployeeShiftsHandler,
-  createEmployeeShiftsHandler,
+  // createUserShiftsHandler,
   deleteEmployeeShiftHandler,
 ];

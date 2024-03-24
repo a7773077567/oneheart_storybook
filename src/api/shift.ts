@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
 import type { PostRes } from '@/composables/helpers';
+import { omit } from 'radash';
 
 // ========== Types ==========
 
@@ -21,7 +22,11 @@ export interface ShiftTemplate {
   color: string;
   maxClients: number | null;
 }
-
+export interface UserShift extends Omit<ShiftTemplate, 'id'> {
+  userId: number;
+  date: string;
+}
+export interface UserShiftReq extends Omit<UserShift, 'spaceId'> {}
 export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
 
 export const shiftTemplateSchema = z.object({
@@ -112,12 +117,22 @@ export async function fetchEmployeeShifts() {
   return data;
 }
 
-export async function createEmployeeShifts(employeeId: number, payload: createEmployeeShiftsReq) {
-  const { data } = await api.post<PostRes, createEmployeeShiftsReq>(`shift/${employeeId}`, payload);
+export async function createUserShift(payload: UserShiftReq) {
+  const { data } = await api.post<any, UserShiftReq>(`userShifts`, payload);
   return data;
 }
 
 export async function deleteEmployeeShift(employeeShiftId: number) {
   const { data } = await api.delete<PostRes>(`employee/shift/${employeeShiftId}`);
   return data;
+}
+
+// ========== Utils ==========
+
+export function toUserShiftReq(shiftTemplate: ShiftTemplate, userId: number, date: string): UserShiftReq {
+  return {
+    ...omit(shiftTemplate, ['id', 'spaceId']),
+    userId,
+    date,
+  };
 }

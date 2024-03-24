@@ -9,22 +9,17 @@ interface Props {
 
 defineProps<Props>();
 const emit = defineEmits<{
-  confirm: [shiftId: number[]];
+  confirm: [shiftTemplate: ShiftTemplate];
 }>();
 
-const selected = ref<Set<number>>(new Set());
+const selectedTemplate = ref<ShiftTemplate | null>(null);
 
-function selectShift(shiftId: number) {
-  const exist = selected.value.has(shiftId);
-  if (!exist) {
-    selected.value.add(shiftId);
-    return;
-  }
-  selected.value.delete(shiftId);
+function selectShift(shiftTemplate: ShiftTemplate) {
+  selectedTemplate.value = shiftTemplate;
 }
 
 function confirm() {
-  emit('confirm', [...selected.value]);
+  emit('confirm', selectedTemplate.value!);
 }
 </script>
 
@@ -38,11 +33,11 @@ function confirm() {
     </QCardSection>
     <QCardSection class="column q-gutter-md">
       <ShiftItem
-        v-for="(shift, idx) in data"
+        v-for="(item, idx) in data"
         :key="idx"
-        :data="shift"
-        :class="{ active: selected.has(shift.id) }"
-        @click="() => selectShift(shift.id)"
+        :data="item"
+        :class="{ active: selectedTemplate?.id === item.id }"
+        @click="() => selectShift(item)"
       />
       <QBtn label="新增" class="self-center" outline style="width: 126px" @click="confirm" />
     </QCardSection>
