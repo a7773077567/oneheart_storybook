@@ -23,7 +23,7 @@ const emit = defineEmits<{
 dayjs.extend(objectSupport);
 const typeOptions = getTypeOptions();
 
-const { handleSubmit, values, errors } = useForm({
+const { handleSubmit, values } = useForm({
   validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });

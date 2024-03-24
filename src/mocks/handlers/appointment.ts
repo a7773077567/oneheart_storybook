@@ -4,7 +4,6 @@ import { getErrorRes, getResponse } from '@/mocks/utils/response';
 import { TherapyTypes } from '@/const/general';
 import { faker } from '@faker-js/faker';
 import type { BookingItem, Client, Location, Therapist } from '@/api/appointment';
-import type { Employee } from '@/api/shift';
 
 const therapists = new Map(getTherapists());
 
@@ -91,7 +90,7 @@ export function getBookingItems() {
   );
 }
 
-function getEmployee(id: number): Employee {
+function getEmployee(id: number) {
   return {
     id,
     avatar: faker.image.avatar(),
