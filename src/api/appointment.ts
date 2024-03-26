@@ -1,5 +1,7 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
+import type { User } from '@/api/user';
+import type { UserShift } from '@/api/shift';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -21,12 +23,44 @@ export interface Location {
   name: string;
   accommodation: number;
 }
-export interface Client {
+// export interface Client {
+//   id: number;
+//   memberId: number;
+//   name: string;
+//   phone: string;
+//   address: string;
+// }
+
+export interface ClientAssociation {
   id: number;
-  memberId: number;
   name: string;
   phone: string;
-  address: string;
+  identityType: number;
+  identityNumber: string;
+  birthDate: string;
+}
+export interface Client extends ClientAssociation {
+  email: string;
+  lineUserId: string;
+  isVerifiedBySMS: boolean;
+  associations: ClientAssociation[];
+}
+
+export interface ClientSchedule {
+  id: number;
+  // clientId: number;
+  client: Client;
+  // date: string;
+  // userShiftId: number;
+  user: User;
+  userShift: UserShift;
+  userShiftSnapshot?: any;
+  userShiftSlotId: number;
+  userShiftSlotSnapshot?: any;
+  userShiftAppointmentId: number;
+  userShiftAppointmentSnapshot?: any;
+  paymentState: number;
+  state: number;
 }
 
 export interface BookingItem {

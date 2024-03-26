@@ -127,7 +127,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'list',
             name: 'appointmentList',
-            component: () => import('@/views/appointment/List.vue'),
+            component: () => import('@/views/appointment/AppointmentListView.vue'),
             redirect: { name: 'appointmentCalendar' },
             meta: {
               label: '預約列表',
@@ -137,7 +137,7 @@ export const routes: RouteRecordRaw[] = [
               {
                 path: 'calendar',
                 name: 'appointmentCalendar',
-                component: () => import('@/views/appointment/Calendar.vue'),
+                component: () => import('@/views/appointment/AppointmentCalendarView.vue'),
                 meta: {
                   label: '列表',
                   requiredAuth: true,
@@ -153,7 +153,6 @@ export const routes: RouteRecordRaw[] = [
                 },
                 props: true,
               },
-
             ],
           },
           {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { BookingQueryItem } from '@/components/appointment';
-import { getBookingItems } from '@/mocks/handlers/appointment';
+import { getMockClientSchedule } from '@/mocks/mockFunctions';
 
-const bookingItems = getBookingItems().slice(0, 5);
+const mockClientSchedules = [...Array(5).keys()].map(getMockClientSchedule);
 </script>
 
 <template>
@@ -36,9 +36,10 @@ const bookingItems = getBookingItems().slice(0, 5);
     </div>
     <div class="query__body">
       <BookingQueryItem
-        v-for="(item, idx) in bookingItems"
+        v-for="(item, idx) in mockClientSchedules"
         :key="idx"
         :data="item"
+        history-mode
       />
     </div>
   </div>
