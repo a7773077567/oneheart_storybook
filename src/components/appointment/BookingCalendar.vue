@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { BookingAdder, BookingBox } from '@/components/appointment';
 import { getBookingItems } from '@/mocks/handlers/appointment';
 import { useAppointmentStore, useUserStore } from '@/stores';
-import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 
@@ -30,13 +29,15 @@ function getBookings(scope: any) {
   const bookings = BookingItems.filter(item => item.employee.id === employeeId);
 
   return bookings.map(item => ({
+    ...item,
     left: scope.timeStartPosX(item.time),
     width: scope.timeDurationWidth(60),
     canBook: item.available && !item.isBooked,
   }));
 }
 
-function OpenBookingDialog() {
+function OpenBookingDialog(targetUserShiftId: number) {
+  appointmentStore.targetUserShiftId = targetUserShiftId;
   stateOfBookingDialog.value = true;
 }
 
@@ -60,7 +61,7 @@ function book() {
           :key="idx"
           :disable="!item.canBook"
           :style="getStyle(item)"
-          @add="OpenBookingDialog"
+          @add="() => OpenBookingDialog(item.id)"
         />
       </template>
     </ResourceCalendar>

@@ -1,13 +1,11 @@
-import dayjs from 'dayjs';
-
 export function getWeekDay(weekDay: number) {
   const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   return weekDays[weekDay];
 }
 
 export function getDurationLabel(startTime: string, endTime: string, isNotAvailableTime?: boolean) {
-  const [startHr] = startTime;
-  const [endHr] = endTime;
+  const [startHr] = startTime.split(':');
+  const [endHr] = endTime.split(':');
 
   if (!isNotAvailableTime) {
     return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;

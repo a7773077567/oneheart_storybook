@@ -158,7 +158,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'booking',
             name: 'appointmentBooking',
-            component: () => import('@/views/appointment/Booking.vue'),
+            component: () => import('@/views/appointment/AppointmentBookingView.vue'),
             meta: {
               label: '預約',
               requiredAuth: true,

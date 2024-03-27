@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { BookingCalendar, BookingQuery } from '@/components/appointment';
 import { useAppointmentStore } from '@/stores';
-import { storeToRefs } from 'pinia';
 
 const appointmentStore = useAppointmentStore();
-const { querySent } = storeToRefs(appointmentStore);
 </script>
 
 <template>
-  <BookingQuery v-if="!querySent" />
+  <BookingQuery v-if="!appointmentStore.querySent" />
   <BookingCalendar v-else />
 </template>
 

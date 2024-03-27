@@ -71,5 +71,4 @@ export const Types: Record<TypeName, Type> = {
     label: '團課',
     tabs: ['clientInfo', 'groupClass'],
   },
-
 };

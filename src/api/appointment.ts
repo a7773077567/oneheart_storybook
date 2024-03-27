@@ -23,6 +23,11 @@ export interface Location {
   name: string;
   accommodation: number;
 }
+
+export interface ClientsGetParams {
+  names?: string[];
+  phones?: string[];
+}
 // export interface Client {
 //   id: number;
 //   memberId: number;
@@ -87,6 +92,11 @@ export async function fetchTherapyTypes() {
 
 export async function fetchTherapists(type: number) {
   const { data } = await api.get<TherapistsRes>(`appointment/therapists/${type}`);
+  return data;
+}
+
+export async function fetchClients(params?: ClientsGetParams) {
+  const { data } = await api.get<Client[]>('clients', { params });
   return data;
 }
 
