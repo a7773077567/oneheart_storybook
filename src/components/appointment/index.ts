@@ -3,4 +3,4 @@ export { default as AppointmentQueryCalendar } from './AppointmentQueryCalendar.
 export { default as AppointmentAdder } from './AppointmentAdder.vue';
 export { default as AppointmentBox } from './AppointmentBox.vue';
 export { default as AppointmentCard } from './AppointmentCard.vue';
-export { default as BookingQueryItem } from './BookingQueryItem.vue';
+export { default as AppointmentQueryItem } from './AppointmentQueryItem.vue';

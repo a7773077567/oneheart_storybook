@@ -167,7 +167,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'current-query',
             name: 'appointmentCurrentQuery',
-            component: () => import('@/views/appointment/CurrentQuery.vue'),
+            component: () => import('@/views/appointment/AppointmentCurrentQueryView.vue'),
             meta: {
               label: '查詢預約',
               requiredAuth: true,

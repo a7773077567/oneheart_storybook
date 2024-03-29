@@ -1,6 +1,5 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { User } from '@/api/user';
 import type { UserShift } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 
@@ -29,13 +28,6 @@ export interface ClientsGetParams {
   names?: string[];
   phones?: string[];
 }
-// export interface Client {
-//   id: number;
-//   memberId: number;
-//   name: string;
-//   phone: string;
-//   address: string;
-// }
 
 export interface ClientAssociation {
   id: number;
@@ -54,19 +46,19 @@ export interface Client extends ClientAssociation {
 
 export interface ClientSchedule {
   id: number;
-  // clientId: number;
+  clientId: number;
   client: Client;
-  // date: string;
-  // userShiftId: number;
-  user: User;
+  date: string;
+  userShiftId: number;
   userShift: UserShift;
-  userShiftSnapshot?: any;
   userShiftSlotId: number;
-  userShiftSlotSnapshot?: any;
   userShiftAppointmentId: number;
-  userShiftAppointmentSnapshot?: any;
+  scheduleStartTime: string;
+  scheduleEndTime: string;
+  bookedNumber: number;
   paymentState: number;
   state: number;
+  isValidForRestore: boolean;
 }
 
 export interface BookingItem {
@@ -115,6 +107,12 @@ export interface AppointmentReq {
   bookingClientId: number;
 }
 
+export interface AppointmentRearrangeReq {
+  clientScheduleId: number;
+  slotId: number;
+  userShiftId: number;
+}
+
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -142,6 +140,26 @@ export async function fetchAvailable(params: AvailableReq) {
   return data;
 }
 
+export async function createAppointmentRearrange() {
+  const { data } = await api.post<any, AppointmentRearrangeReq>('appointments/appointment-rearrange');
+  return data;
+}
+
+export async function fetchClientSchedulesNotStarted(params: ClientSchedulesNotStartedReq) {
+  const { data } = await api.get<ClientSchedule[]>('clientSchedules/not-started', { params });
+  return data;
+}
+
+export async function fetchClientSchedulesHistories(params: ClientSchedulesHistoriesReq) {
+  const { data } = await api.get<ClientSchedule[]>('clientSchedules/histories', { params });
+  return data;
+}
+
+export async function cancelClientScheduleNotStarted(clientScheduleId: number) {
+  const { data } = await api.post(`clientSchedules/${clientScheduleId}/cancel`);
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),
@@ -159,3 +177,35 @@ export const availableReqSchema = z.object({
     path: ['endTime'],
   });
 export type AvailableReq = z.infer<typeof availableReqSchema>;
+
+export const availableRearrangedSchema = z.object({
+  clientScheduleId: z.number(),
+  date: z.string(),
+  startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+  endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+}).refine(({ startTime, endTime }) => {
+  const start = getTimeDate(startTime);
+  const end = getTimeDate(endTime);
+  return end.isAfter(start);
+}, {
+  message: '結束時間必須大於開始時間',
+  path: ['endTime'],
+});
+export type availableRearrangedReq = z.infer<typeof availableRearrangedSchema>;
+
+export const ClientSchedulesNotStartedSchema = z.object({
+  phone: z.string().optional(),
+  name: z.string().optional(),
+  userShiftTypes: z.number().array(),
+  date: z.string(),
+});
+export type ClientSchedulesNotStartedReq = z.infer<typeof ClientSchedulesNotStartedSchema>;
+
+export const ClientSchedulesHistoriesSchema = z.object({
+  phone: z.string().optional(),
+  name: z.string().optional(),
+  userShiftTypes: z.number().array(),
+  startDate: z.string(),
+  endDate: z.string(),
+});
+export type ClientSchedulesHistoriesReq = z.infer<typeof ClientSchedulesHistoriesSchema>;

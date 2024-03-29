@@ -8,6 +8,9 @@ interface Props {
   historyMode?: boolean;
 }
 const props = defineProps<Props>();
+defineEmits<{
+  cancel: [clientScheduleId: number];
+}>();
 
 const scheduleState = new Map([
   [1, { label: '預約' }],
@@ -28,11 +31,11 @@ const showRecoveryBtn = computed(() => props.historyMode && targetState.value?.s
 const showActions = computed(() => !props.historyMode || showRecoveryBtn.value);
 
 const tableData = new Map([
-  ['日期', () => props.data.userShift.date],
-  ['時間', () => `${props.data.userShift.startTime}-${props.data.userShift.endTime}`],
+  ['日期', () => props.data.date],
+  ['時間', () => `${props.data.scheduleStartTime}-${props.data.scheduleEndTime}`],
   ['客戶', () => props.data.client.name],
-  ['科別', () => Object.values(TherapyTypes)[props.data.userShift.type]],
-  ['治療師', () => props.data.user.name],
+  ['科別', () => props.data.userShift.name],
+  ['治療師', () => props.data.userShift.user.name],
 ]);
 </script>
 
@@ -60,7 +63,7 @@ const tableData = new Map([
     </div>
     <div v-if="showActions" class="table__actions">
       <template v-if="!props.historyMode">
-        <QBtn label="取消預約" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" />
+        <QBtn label="取消預約" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('cancel', data.id)" />
         <QBtn label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" />
       </template>
       <QBtn v-if="showRecoveryBtn" label="復原" outline rounded dense color="grey-9" padding="6px 23px" style="border-radius: 8px;" />

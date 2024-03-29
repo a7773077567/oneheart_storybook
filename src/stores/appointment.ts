@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchClients } from '@/api/appointment';
-import type { Available, AvailableReq, Client, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import type { Available, AvailableReq, Client, ClientSchedule, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -18,6 +18,8 @@ interface State {
   targetUserShift: UserShift | null;
   available: Available[];
   targetAvailable: Available | null;
+  ClientSchedulesNotStarted: ClientSchedule[];
+  ClientSchedulesNotStartedQuery: ClientSchedulesNotStartedReq | null;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -32,6 +34,8 @@ export const useAppointmentStore = defineStore('appointment', {
     targetUserShift: null,
     available: [],
     targetAvailable: null,
+    ClientSchedulesNotStarted: [],
+    ClientSchedulesNotStartedQuery: null,
   }),
   getters: {
     userOptions(state) {
@@ -87,6 +91,10 @@ export const useAppointmentStore = defineStore('appointment', {
     resetAppointmentQueryState() {
       this.availableQuery = null;
       this.available = [];
+    },
+    async getClientSchedulesNotStarted(params: ClientSchedulesNotStartedReq) {
+      const data = await fetchClientSchedulesNotStarted(params);
+      this.ClientSchedulesNotStarted = data;
     },
   },
 });

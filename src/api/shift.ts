@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
 import { omit } from 'radash';
+import type { Role, User } from './user';
 
 // ========== Types ==========
 
@@ -33,6 +34,11 @@ export interface UserShift {
   notAvailableTimes: Duration[];
   color: string;
   maxClients: number | null;
+  user: {
+    id: number;
+    name: string;
+    role: Role;
+  };
 }
 export interface UserShiftPost extends Omit<UserShift, 'id' | 'spaceId'> {}
 export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
