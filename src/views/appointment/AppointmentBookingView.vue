@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { BookingCalendar, BookingQuery } from '@/components/appointment';
+import { AppointmentQuery, AppointmentQueryCalendar } from '@/components/appointment';
 import { useAppointmentStore } from '@/stores';
 
 const appointmentStore = useAppointmentStore();
 </script>
 
 <template>
-  <BookingQuery v-if="!appointmentStore.querySent" />
-  <BookingCalendar v-else />
+  <AppointmentQuery v-if="!appointmentStore.querySent" />
+  <AppointmentQueryCalendar v-else />
 </template>
 
 <style lang="scss" scoped>

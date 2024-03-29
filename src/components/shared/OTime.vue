@@ -7,13 +7,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { value: fieldValue } = useField<string>(() => props.name || 'field', undefined, {
+const { value: fieldValue, errorMessage } = useField<string>(() => props.name || 'field', undefined, {
   syncVModel: true,
 });
 </script>
 
 <template>
-  <QInput v-model="fieldValue" mask="time" :rules="['time']" dense hide-bottom-space outlined>
+  <QInput v-model="fieldValue" mask="time" :error="!!errorMessage" :rules="['time']" dense :error-message="errorMessage" outlined>
     <template #append>
       <QIcon name="access_time" class="cursor-pointer">
         <QPopupProxy cover transition-show="scale" transition-hide="scale">

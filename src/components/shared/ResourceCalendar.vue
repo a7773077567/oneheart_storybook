@@ -9,12 +9,20 @@ import type { User } from '@/api/user';
 interface Props {
   modelValue: string;
   modelResources: User[];
+  intervalStart?: number;
+  intervalCount?: number;
 }
-const props = defineProps<Props>();
+
+const props = withDefaults(defineProps<Props>(), {
+  intervalStart: 9,
+  intervalCount: 9,
+});
 const emit = defineEmits<{
   'update:modelValue': [model: string];
   'update:modelResources': [model: any];
+  requery: [];
 }>();
+
 const model = computed({
   get: () => props.modelValue,
   set: (val) => {
@@ -66,7 +74,9 @@ function getCalendarStyle() {
           @next="calendar?.next"
         />
       </div>
-      <div class="pad" style="width: 164px;" />
+      <slot name="nav-right">
+        <div class="pad" style="width: 164px;" />
+      </slot>
     </div>
     <QCalendarResource
       ref="calendar"
@@ -74,8 +84,8 @@ function getCalendarStyle() {
       v-model:model-resources="selectedResources"
       resource-key="id"
       resource-label="name"
-      :interval-start="9"
-      :interval-count="9"
+      :interval-start="intervalStart"
+      :interval-count="intervalCount"
       :cell-width="125"
       animated
       bordered
@@ -89,9 +99,9 @@ function getCalendarStyle() {
       <template #resource-label="{ scope: { resource } }">
         <div class="col-12">
           <QChip>
-            <QAvatar>
+            <QAvatar v-if="resource.avatar">
               <img
-                v-if="resource.avatar"
+
                 :src="resource.avatar"
               >
             </QAvatar>

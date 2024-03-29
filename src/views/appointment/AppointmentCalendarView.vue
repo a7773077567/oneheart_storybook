@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
-import { BookingCard } from '@/components/appointment';
+import { AppointmentCard } from '@/components/appointment';
 import { getBookingItems } from '@/mocks/handlers/appointment';
 import { useRouter } from 'vue-router';
 
@@ -41,7 +41,7 @@ function getBookings(scope: any) {
     v-model:model-resources="appointmentStore.users"
   >
     <template #intervals="{ scope }">
-      <BookingCard
+      <AppointmentCard
         v-for="(item, idx) in getBookings(scope)"
         :key="idx"
         :data="item"

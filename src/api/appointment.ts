@@ -2,6 +2,7 @@ import { api } from '@/utils/api';
 import { z } from 'zod';
 import type { User } from '@/api/user';
 import type { UserShift } from '@/api/shift';
+import { getTimeDate } from '@/utils/date';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -85,6 +86,37 @@ export interface BookingItem {
   width?: number;
 }
 
+export interface AppointmentStatus {
+  maxNumber: number;
+  bookedNumber: number;
+  leftNumber: number;
+  currentProximateNumber: number;
+}
+
+export interface Available {
+  slotId: number;
+  userShiftId: number;
+  type: number | null;
+  name: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  user: {
+    id: number;
+    name: string;
+  };
+  appointmentStatus: AppointmentStatus | null;
+}
+
+export interface AppointmentReq {
+  isEmployeePrice: boolean;
+  slotId: number | null;
+  userShiftId: number;
+  bookingClientId: number;
+}
+
+// ========== Requests ==========
+
 export async function fetchTherapyTypes() {
   const { data } = await api.get<TherapyTypesRes>('appointment/therapy-types');
   return data;
@@ -100,12 +132,30 @@ export async function fetchClients(params?: ClientsGetParams) {
   return data;
 }
 
+export async function createAppointment(payload: AppointmentReq) {
+  const { data } = await api.post<any, AppointmentReq>('appointments/appointment', payload);
+  return data;
+}
+
+export async function fetchAvailable(params: AvailableReq) {
+  const { data } = await api.get<Available[]>('appointments/available', { params });
+  return data;
+}
+
 // ========== Schemas ==========
-export const bookingSchema = z.object({
-  therapyType: z.number({ required_error: '必填' }).nullable(),
-  therapist: z.number().optional().nullable(),
+export const availableReqSchema = z.object({
+  userShiftType: z.number({ required_error: '必填' }),
+  userIds: z.number().array().min(1, { message: '至少選擇1名治療師' }),
   date: z.string(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-});
-export type BookingSchema = z.infer<typeof bookingSchema>;
+  startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+  endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+})
+  .refine(({ startTime, endTime }) => {
+    const start = getTimeDate(startTime);
+    const end = getTimeDate(endTime);
+    return end.isAfter(start);
+  }, {
+    message: '結束時間必須大於開始時間',
+    path: ['endTime'],
+  });
+export type AvailableReq = z.infer<typeof availableReqSchema>;

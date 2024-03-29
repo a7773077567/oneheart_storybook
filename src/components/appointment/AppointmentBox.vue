@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Client } from '@/api/appointment';
+import { createAppointment } from '@/api/appointment';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
-import { getDateLabel, getType } from '@/utils/mappers';
+import { getDateLabel } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
 
 interface Column<T> {
@@ -16,18 +17,23 @@ interface TableData {
   value: string;
 }
 
+const emit = defineEmits<{
+  appointment: [];
+  close: [];
+}>();
+
 const appointmentStore = useAppointmentStore();
-const isStaffPrice = ref(false);
+const isEmployeePrice = ref(false);
 const pickedClientId = ref<number | null>(null);
 const clientTableData = computed(() => getTableData(appointmentStore.targetClient, [
   { key: 'name', label: '姓名' },
   { key: 'phone', label: '電話' },
 ]));
-const shiftTableData = computed(() => getTableData(appointmentStore.targetUserShift, [
+const availableTableData = computed(() => getTableData(appointmentStore.targetAvailable, [
   { key: 'date', label: '日期', mapFunc: target => getDateLabel(target.date) },
   { key: 'startTime', label: '時間', mapFunc: target => getDurationLabel(target.startTime, target.endTime) },
-  { key: 'type', label: '項目', mapFunc: target => getType(target.type)! },
-  { key: 'userId', label: '治療師' },
+  { key: 'name', label: '項目' },
+  { key: 'user', label: '治療師', mapFunc: target => target.user.name },
 ]));
 const phoneTableData = [
   { key: '會員電話', value: '0900-000-011', slotName: 'phone' },
@@ -35,11 +41,6 @@ const phoneTableData = [
 const chooseTableData = [
   { key: '選擇會員', slotName: 'pick' },
 ];
-
-async function queryClient() {
-  await appointmentStore.getClients();
-  await appointmentStore.getUserShift();
-}
 
 function pickClient(client: Client) {
   pickedClientId.value = client.id;
@@ -58,16 +59,37 @@ function getTableData<T extends Record<string, any>>(target: T | null, columns: 
     };
   });
 }
+
+function close() {
+  appointmentStore.resetTargetAppointmentState();
+  emit('close');
+}
+
+async function appointment() {
+  if (!appointmentStore.targetAvailable || !appointmentStore.targetClient) {
+    return;
+  }
+  const payload = {
+    isEmployeePrice: isEmployeePrice.value,
+    slotId: appointmentStore.targetAvailable.slotId ?? null,
+    userShiftId: appointmentStore.targetAvailable.userShiftId,
+    bookingClientId: appointmentStore.targetClient.id,
+  };
+  await createAppointment(payload);
+  await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+  appointmentStore.resetTargetAppointmentState();
+  emit('appointment');
+}
 </script>
 
 <template>
   <QCard style="width: 757px; min-height: 658px;">
     <QCardActions align="right" class="q-pa-none">
-      <QIcon v-close-popup name="close" size="24px" class="cursor-pointer q-pa-sm" />
+      <QIcon name="close" size="24px" class="cursor-pointer q-pa-sm" @click="close" />
     </QCardActions>
     <QCardSection class="column q-gutter-sm">
       <OCheckbox
-        v-model="isStaffPrice"
+        v-model="isEmployeePrice"
         label="員工價"
         left-label
         class="self-start q-pa-sm"
@@ -76,7 +98,7 @@ function getTableData<T extends Record<string, any>>(target: T | null, columns: 
         <template #phone>
           <div class="row justify-between items-center">
             <QInput v-model="appointmentStore.clientPhone" dense hide-bottom-space borderless style="font-size: 18px;" />
-            <QBtn label="查詢" outline dense padding="3px 26px" @click="queryClient" />
+            <QBtn label="查詢" outline dense padding="3px 26px" @click="appointmentStore.getClients" />
           </div>
         </template>
       </OTable>
@@ -97,8 +119,8 @@ function getTableData<T extends Record<string, any>>(target: T | null, columns: 
       <template v-if="appointmentStore.targetClient">
         <span class="q-pa-sm">會員編號 {{ appointmentStore.targetClient.identityNumber || 1234567890 }} </span>
         <OTable :data="clientTableData" />
-        <OTable :data="shiftTableData" />
-        <QBtn label="預約" class="self-end" outline dense padding="10px 46px" @click="$emit('book')" />
+        <OTable :data="availableTableData" />
+        <QBtn label="預約" class="self-end" outline dense padding="10px 46px" @click="appointment" />
       </template>
     </QCardSection>
   </QCard>
