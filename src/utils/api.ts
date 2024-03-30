@@ -74,6 +74,7 @@ const firstTokenList = [
   'users/reset-password',
   'users/me',
   'spaces/login',
+  'clients',
 ];
 
 // ========== Functions ==========

@@ -5,8 +5,8 @@ export const TherapyTypes = {
   nutrition: '營養門診',
   sleep: '睡眠門診',
   sports: '運科門診',
-  oneOnOne: '一對一教練課',
-  group: '團課',
+  // oneOnOne: '一對一教練課',
+  // group: '團課',
 };
 type TypeName = keyof typeof TherapyTypes;
 
@@ -59,17 +59,16 @@ export const Types: Record<TypeName, Type> = {
     label: '運科門診',
     tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
   },
-  oneOnOne: {
-    identifier: 7,
-    name: 'oneOnOne',
-    label: '一對一教練課',
-    tabs: ['clientInfo', 'trainingPlain', 'bodyAnalysis', 'memo'],
-  },
-  group: {
-    identifier: 8,
-    name: 'group',
-    label: '團課',
-    tabs: ['clientInfo', 'groupClass'],
-  },
-
+  // oneOnOne: {
+  //   identifier: 7,
+  //   name: 'oneOnOne',
+  //   label: '一對一教練課',
+  //   tabs: ['clientInfo', 'trainingPlain', 'bodyAnalysis', 'memo'],
+  // },
+  // group: {
+  //   identifier: 8,
+  //   name: 'group',
+  //   label: '團課',
+  //   tabs: ['clientInfo', 'groupClass'],
+  // },
 };

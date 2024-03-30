@@ -4,6 +4,7 @@ import { getErrorRes, getResponse } from '@/mocks/utils/response';
 import { TherapyTypes } from '@/const/general';
 import { faker } from '@faker-js/faker';
 import type { BookingItem, Client, Location, Therapist } from '@/api/appointment';
+import { getMockClient, getMockClientSchedule } from '../mockFunctions';
 
 const therapists = new Map(getTherapists());
 
@@ -67,7 +68,7 @@ export function getBookingItems() {
     const employeeId = Math.floor(id / 9);
     const type = faker.number.int({ max: 7 });
     const employee = getEmployee(employeeId);
-    const client = getClient(faker.number.int());
+    const client = getMockClient(faker.number.int());
     const isCheckout = faker.datatype.boolean();
     const state = faker.number.int({ max: 3 });
     const therapist = getTherapist(faker.number.int(5), faker.number.int(7));
@@ -95,16 +96,6 @@ function getEmployee(id: number) {
     id,
     avatar: faker.image.avatar(),
     name: faker.person.firstName(),
-  };
-}
-
-function getClient(id: number): Client {
-  return {
-    id,
-    memberId: faker.number.int(),
-    name: faker.person.firstName(),
-    phone: faker.phone.number(),
-    address: faker.location.streetAddress(),
   };
 }
 

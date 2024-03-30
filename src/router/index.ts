@@ -1,5 +1,5 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useUserStore } from '@/stores';
+import { useAppointmentStore, useUserStore } from '@/stores';
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -127,7 +127,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'list',
             name: 'appointmentList',
-            component: () => import('@/views/appointment/List.vue'),
+            component: () => import('@/views/appointment/AppointmentListView.vue'),
             redirect: { name: 'appointmentCalendar' },
             meta: {
               label: '預約列表',
@@ -137,7 +137,7 @@ export const routes: RouteRecordRaw[] = [
               {
                 path: 'calendar',
                 name: 'appointmentCalendar',
-                component: () => import('@/views/appointment/Calendar.vue'),
+                component: () => import('@/views/appointment/AppointmentCalendarView.vue'),
                 meta: {
                   label: '列表',
                   requiredAuth: true,
@@ -153,13 +153,12 @@ export const routes: RouteRecordRaw[] = [
                 },
                 props: true,
               },
-
             ],
           },
           {
             path: 'booking',
             name: 'appointmentBooking',
-            component: () => import('@/views/appointment/Booking.vue'),
+            component: () => import('@/views/appointment/AppointmentBookingView.vue'),
             meta: {
               label: '預約',
               requiredAuth: true,
@@ -168,11 +167,31 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'current-query',
             name: 'appointmentCurrentQuery',
-            component: () => import('@/views/appointment/CurrentQuery.vue'),
+            component: () => import('@/views/appointment/AppointmentCurrentQueryView.vue'),
+            redirect: { name: 'appointmentCurrentQueryList' },
             meta: {
               label: '查詢預約',
               requiredAuth: true,
             },
+            children: [
+              {
+                path: 'list',
+                name: 'appointmentCurrentQueryList',
+                component: () => import('@/views/appointment/AppointmentCurrentQueryListView.vue'),
+                meta: {
+                  requiredAuth: true,
+                },
+              },
+              {
+                path: 'rearrange',
+                name: 'appointmentCurrentQueryRearrange',
+                component: () => import('@/views/appointment/AppointmentCurrentQueryRearrangeView.vue'),
+                meta: {
+                  requiredAuth: true,
+                },
+                beforeEnter: rearrangeGuard,
+              },
+            ],
           },
           {
             path: 'history-query',
@@ -306,6 +325,13 @@ async function loginGuard() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     return { name: 'home' };
+  }
+}
+
+function rearrangeGuard() {
+  const appointmentStore = useAppointmentStore();
+  if (!appointmentStore.targetClientScheduleNotStarted) {
+    router.push({ name: 'appointmentCurrentQuery' });
   }
 }
 

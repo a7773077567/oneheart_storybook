@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import objectSupport from 'dayjs/plugin/objectSupport';
+
+dayjs.extend(objectSupport);
 
 export function getWeekDay(weekDay: number) {
   const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -6,8 +9,8 @@ export function getWeekDay(weekDay: number) {
 }
 
 export function getDurationLabel(startTime: string, endTime: string, isNotAvailableTime?: boolean) {
-  const [startHr] = startTime;
-  const [endHr] = endTime;
+  const [startHr] = startTime.split(':');
+  const [endHr] = endTime.split(':');
 
   if (!isNotAvailableTime) {
     return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;
@@ -20,16 +23,7 @@ export function getDurationLabel(startTime: string, endTime: string, isNotAvaila
   }
 }
 
-// export function getDurationLabel(duration: Record<string, any>, isUnavailable?: boolean) {
-//   const { startHr, startMin, endHr, endMin } = duration;
-//   const startTime = dayjs().set('h', startHr).set('m', startMin);
-//   const endTime = dayjs().set('h', endHr).set('m', endMin);
-//   if (!isUnavailable) {
-//     return `${amOrPm(startHr)}${startTime.format('hh:mm')}-${amOrPm(endHr)}${endTime.format('hh:mm')}`;
-//   }
-//   return `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
-
-//   function amOrPm(hr: number) {
-//     return hr >= 12 ? '下午' : '上午';
-//   }
-// }
+export function getTimeDate(time: string) {
+  const [hr, min] = time.split(':');
+  return dayjs({ h: hr, m: min });
+}

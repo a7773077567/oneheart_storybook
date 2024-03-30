@@ -42,3 +42,7 @@ export function omit<T extends Record<string, any>, K extends keyof T>(obj: T, k
 export function getArray(count: number) {
   return [...Array(count).keys()];
 }
+
+export function removeNullishKeys<T extends Record<string, any>>(obj: T): any {
+  return Object.fromEntries(Object.entries(obj).filter(([_, value]) => !(value === '' || value == null)));
+}
