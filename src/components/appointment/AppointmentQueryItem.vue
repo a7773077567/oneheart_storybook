@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
-import { TherapyTypes } from '@/const/general';
 import { computed } from 'vue';
 
 interface Props {
@@ -10,6 +9,7 @@ interface Props {
 const props = defineProps<Props>();
 defineEmits<{
   cancel: [clientScheduleId: number];
+  rearrange: [clientSchedule: ClientSchedule];
 }>();
 
 const scheduleState = new Map([
@@ -64,7 +64,7 @@ const tableData = new Map([
     <div v-if="showActions" class="table__actions">
       <template v-if="!props.historyMode">
         <QBtn label="取消預約" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('cancel', data.id)" />
-        <QBtn label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" />
+        <QBtn label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('rearrange', data)" />
       </template>
       <QBtn v-if="showRecoveryBtn" label="復原" outline rounded dense color="grey-9" padding="6px 23px" style="border-radius: 8px;" />
     </div>

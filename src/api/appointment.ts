@@ -139,9 +139,13 @@ export async function fetchAvailable(params: AvailableReq) {
   const { data } = await api.get<Available[]>('appointments/available', { params });
   return data;
 }
+export async function fetchAvailableRearranged(params: AvailableRearrangedReq) {
+  const { data } = await api.get<Available[]>('appointments/available-rearranged', { params });
+  return data;
+}
 
-export async function createAppointmentRearrange() {
-  const { data } = await api.post<any, AppointmentRearrangeReq>('appointments/appointment-rearrange');
+export async function createAppointmentRearrange(payload: AppointmentRearrangeReq) {
+  const { data } = await api.post<any, AppointmentRearrangeReq>('appointments/appointment-rearrange', payload);
   return data;
 }
 
@@ -191,7 +195,7 @@ export const availableRearrangedSchema = z.object({
   message: '結束時間必須大於開始時間',
   path: ['endTime'],
 });
-export type availableRearrangedReq = z.infer<typeof availableRearrangedSchema>;
+export type AvailableRearrangedReq = z.infer<typeof availableRearrangedSchema>;
 
 export const ClientSchedulesNotStartedSchema = z.object({
   phone: z.string().optional(),
@@ -201,11 +205,11 @@ export const ClientSchedulesNotStartedSchema = z.object({
 });
 export type ClientSchedulesNotStartedReq = z.infer<typeof ClientSchedulesNotStartedSchema>;
 
-export const ClientSchedulesHistoriesSchema = z.object({
+export const clientSchedulesHistoriesSchema = z.object({
   phone: z.string().optional(),
   name: z.string().optional(),
   userShiftTypes: z.number().array(),
   startDate: z.string(),
   endDate: z.string(),
 });
-export type ClientSchedulesHistoriesReq = z.infer<typeof ClientSchedulesHistoriesSchema>;
+export type ClientSchedulesHistoriesReq = z.infer<typeof clientSchedulesHistoriesSchema>;

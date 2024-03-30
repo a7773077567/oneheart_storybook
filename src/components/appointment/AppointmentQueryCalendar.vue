@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { AppointmentAdder, AppointmentBox } from '@/components/appointment';
-import { useAppointmentStore } from '@/stores';
-import dayjs from 'dayjs';
+import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available } from '@/api/appointment';
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
-const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
+const userStore = useUserStore();
+await appointmentStore.getUsers([userStore.currentSpace!]);
+const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
+
+onBeforeUnmount(() => {
+  appointmentStore.resetAppointmentQueryState();
+  appointmentStore.resetClientSchedulesNotStartedState();
+  appointmentStore.resetTargetAppointmentState();
+});
 
 function getStyle(interval: CalendarInterval) {
   return {
@@ -73,6 +80,11 @@ function getTimesArray(start: number, count: number) {
 function requery() {
   appointmentStore.resetAppointmentQueryState();
   appointmentStore.querySent = false;
+}
+
+function getDate() {
+  const target = appointmentStore.availableQuery || appointmentStore.rearrangeQuery;
+  return target!.date;
 }
 </script>
 

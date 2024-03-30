@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { Client } from '@/api/appointment';
-import { createAppointment } from '@/api/appointment';
+import { createAppointment, createAppointmentRearrange } from '@/api/appointment';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
 import { getDateLabel } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
+import { useRouter } from 'vue-router';
 
 interface Column<T> {
   key: keyof T;
@@ -22,6 +23,7 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const isEmployeePrice = ref(false);
 const pickedClientId = ref<number | null>(null);
@@ -69,14 +71,26 @@ async function appointment() {
   if (!appointmentStore.targetAvailable || !appointmentStore.targetClient) {
     return;
   }
-  const payload = {
-    isEmployeePrice: isEmployeePrice.value,
-    slotId: appointmentStore.targetAvailable.slotId ?? null,
-    userShiftId: appointmentStore.targetAvailable.userShiftId,
-    bookingClientId: appointmentStore.targetClient.id,
-  };
-  await createAppointment(payload);
-  await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+  if (!appointmentStore.rearrangeMode) {
+    const payload = {
+      isEmployeePrice: isEmployeePrice.value,
+      slotId: appointmentStore.targetAvailable.slotId ?? null,
+      userShiftId: appointmentStore.targetAvailable.userShiftId,
+      bookingClientId: appointmentStore.targetClient.id,
+    };
+    await createAppointment(payload);
+    await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+  }
+  else {
+    const payload = {
+      clientScheduleId: appointmentStore.targetClientScheduleNotStarted!.id,
+      slotId: appointmentStore.targetAvailable.slotId,
+      userShiftId: appointmentStore.targetAvailable.userShiftId,
+    };
+    await createAppointmentRearrange(payload);
+    router.push({ name: 'appointmentCurrentQueryList' });
+    return;
+  }
   appointmentStore.resetTargetAppointmentState();
   emit('appointment');
 }

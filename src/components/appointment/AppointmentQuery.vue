@@ -25,9 +25,9 @@ const { handleSubmit } = useForm({
   },
 });
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   appointmentStore.availableQuery = values;
-  appointmentStore.getAvailable(appointmentStore.availableQuery);
+  await appointmentStore.getAvailable(appointmentStore.availableQuery);
   appointmentStore.querySent = true;
 });
 </script>
@@ -45,9 +45,9 @@ const onSubmit = handleSubmit((values) => {
     </InputBox>
     <InputBox label="選擇預約時間" class="gutter">
       <OTime name="startTime" now-btn />
-      <span>至</span>
+      <span style="translate:0 -10px;">至</span>
       <OTime name="endTime" now-btn />
-      <span>止</span>
+      <span style="translate:0 -10px;">止</span>
     </InputBox>
     <QBtn label="搜尋" outline style="width: 126px;" @click="onSubmit" />
   </div>

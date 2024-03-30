@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
-import type { Available, AvailableReq, Client, ClientSchedule, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -10,7 +10,6 @@ import { getTimeDate } from '@/utils/date';
 interface State {
   users: User[];
   querySent: boolean;
-  // employees: any[];
   availableQuery: AvailableReq | null;
   clientPhone: string;
   clients: Client[];
@@ -18,15 +17,17 @@ interface State {
   targetUserShift: UserShift | null;
   available: Available[];
   targetAvailable: Available | null;
-  ClientSchedulesNotStarted: ClientSchedule[];
-  ClientSchedulesNotStartedQuery: ClientSchedulesNotStartedReq | null;
+  clientSchedulesNotStarted: ClientSchedule[];
+  clientSchedulesNotStartedQuery: ClientSchedulesNotStartedReq | null;
+  targetClientScheduleNotStarted: ClientSchedule | null;
+  rearrangeQuery: AvailableRearrangedReq | null;
+  rearrangeMode: boolean;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
   state: (): State => ({
     users: [],
     querySent: false,
-    // employees: [],
     availableQuery: null,
     clientPhone: '',
     clients: [],
@@ -34,8 +35,11 @@ export const useAppointmentStore = defineStore('appointment', {
     targetUserShift: null,
     available: [],
     targetAvailable: null,
-    ClientSchedulesNotStarted: [],
-    ClientSchedulesNotStartedQuery: null,
+    clientSchedulesNotStarted: [],
+    clientSchedulesNotStartedQuery: null,
+    targetClientScheduleNotStarted: null,
+    rearrangeQuery: null,
+    rearrangeMode: false,
   }),
   getters: {
     userOptions(state) {
@@ -51,10 +55,12 @@ export const useAppointmentStore = defineStore('appointment', {
       };
     },
     queryCalendarStyle(state) {
-      if (state.availableQuery === null) {
+      const { availableQuery, rearrangeQuery, rearrangeMode } = state;
+      if (availableQuery === null && rearrangeQuery === null) {
         return {};
       }
-      const { startTime, endTime } = state.availableQuery;
+      const targetQuery = rearrangeMode ? rearrangeQuery : availableQuery;
+      const { startTime, endTime } = targetQuery!;
       const start = getTimeDate(startTime);
       const end = getTimeDate(endTime);
       const count = Math.ceil(end.diff(start, 'm') / 60);
@@ -91,10 +97,23 @@ export const useAppointmentStore = defineStore('appointment', {
     resetAppointmentQueryState() {
       this.availableQuery = null;
       this.available = [];
+      this.querySent = false;
     },
     async getClientSchedulesNotStarted(params: ClientSchedulesNotStartedReq) {
       const data = await fetchClientSchedulesNotStarted(params);
-      this.ClientSchedulesNotStarted = data;
+      this.clientSchedulesNotStarted = data;
+    },
+    async getAvailableRearranged(params: AvailableRearrangedReq) {
+      const data = await fetchAvailableRearranged(params);
+      this.available = data;
+    },
+    resetClientSchedulesNotStartedState() {
+      this.clientSchedulesNotStarted = [];
+      this.clientSchedulesNotStartedQuery = null;
+      this.targetClientScheduleNotStarted = null;
+      this.rearrangeMode = false;
+      this.rearrangeQuery = null;
+      this.querySent = false;
     },
   },
 });
