@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { AppointmentCard } from '@/components/appointment';
-import { getBookingItems } from '@/mocks/handlers/appointment';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -12,7 +11,7 @@ const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpace!]);
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
-const bookingItems = getBookingItems();
+watchEffect(() => appointmentStore.getClientSchedulesInProgress(selectedDate.value));
 
 function getStyle(item: any) {
   return {
@@ -25,10 +24,10 @@ function getStyle(item: any) {
 
 function getBookings(scope: any) {
   const employeeId = scope.resource.id;
-  const bookings = bookingItems.filter(item => item.employee.id === employeeId && !item.available);
+  const bookings = appointmentStore.clientSchedulesInProgress.filter(item => item.userShift.user.id === employeeId);
   return bookings.map(item => ({
     ...item,
-    left: scope.timeStartPosX(item.time) + 10,
+    left: scope.timeStartPosX(item.scheduleStartTime) + 10,
     width: scope.timeDurationWidth(60),
     top: 10,
   }));
@@ -56,7 +55,7 @@ function getBookings(scope: any) {
         :key="idx"
         :data="item"
         :style="getStyle(item)"
-        @click="router.push({ name: 'appointmentInfo', params: { type: item.type } })"
+        @click="router.push({ name: 'appointmentInfo', params: { type: item.userShift.type } })"
       />
     </template>
   </ResourceCalendar>

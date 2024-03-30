@@ -1,37 +1,39 @@
 <script setup lang="ts">
-import type { BookingItem } from '@/api/appointment';
+import type { ClientSchedule } from '@/api/appointment';
 import { computed } from 'vue';
-import { TherapyTypes } from '@/const/general';
 
-interface BookingState {
+interface Props {
+  data: ClientSchedule;
+}
+const props = defineProps<Props>();
+
+interface State {
   identifier: number;
   name: string;
   label: string;
   color: string;
 }
-const props = defineProps<Props>();
-
-const States: BookingState[] = [
+const States: State[] = [
   {
-    identifier: 0,
+    identifier: 1,
     name: 'appointment',
     label: '預約',
     color: '#FFFFFF',
   },
   {
-    identifier: 1,
+    identifier: 2,
     name: 'checkIn',
     label: '報到',
     color: '#88F2D8',
   },
   {
-    identifier: 2,
+    identifier: 3,
     name: 'serviceDone',
     label: '完成服務',
     color: '#E86969',
   },
   {
-    identifier: 3,
+    identifier: 4,
     name: 'recordDone',
     label: '病例完成',
     color: '#FFFFFF',
@@ -39,15 +41,8 @@ const States: BookingState[] = [
   },
 ];
 
-interface Props {
-  data: BookingItem;
-}
-const bgc = computed(() => props.data.isCheckout ? '#A5D6F1' : '#F8C9CB');
-const type = computed(() => {
-  const types = Object.values(TherapyTypes);
-  return types[props.data.type];
-});
-const stateColor = computed(() => States[props.data.state].color);
+const bgc = computed(() => props.data.paymentState === 1 ? '#F8C9CB' : '#A5D6F1');
+const stateColor = computed(() => States[props.data.state + 1].color);
 </script>
 
 <template>
@@ -56,7 +51,7 @@ const stateColor = computed(() => States[props.data.state].color);
       客戶：{{ data.client.name }}
     </div>
     <p class="booking-card__type">
-      科別：{{ type }}
+      科別：{{ data.userShift.name }}
     </p>
     <p class="booking-card__state">
       {{ States[data.state].label }}

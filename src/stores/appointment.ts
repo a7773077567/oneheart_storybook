@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -22,6 +22,8 @@ interface State {
   targetClientScheduleNotStarted: ClientSchedule | null;
   rearrangeQuery: AvailableRearrangedReq | null;
   rearrangeMode: boolean;
+  clientSchedulesHistories: ClientSchedule[];
+  clientSchedulesInProgress: ClientSchedule[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -40,6 +42,8 @@ export const useAppointmentStore = defineStore('appointment', {
     targetClientScheduleNotStarted: null,
     rearrangeQuery: null,
     rearrangeMode: false,
+    clientSchedulesHistories: [],
+    clientSchedulesInProgress: [],
   }),
   getters: {
     userOptions(state) {
@@ -114,6 +118,17 @@ export const useAppointmentStore = defineStore('appointment', {
       this.rearrangeMode = false;
       this.rearrangeQuery = null;
       this.querySent = false;
+    },
+    async getClientSchedulesHistories(params: ClientSchedulesHistoriesReq) {
+      const data = await fetchClientSchedulesHistories(params);
+      this.clientSchedulesHistories = data;
+    },
+    resetClientSchedulesHistoriesState() {
+      this.clientSchedulesHistories = [];
+    },
+    async getClientSchedulesInProgress(date: string) {
+      const data = await fetchClientSchedulesInProgress(date);
+      this.clientSchedulesInProgress = data;
     },
   },
 });

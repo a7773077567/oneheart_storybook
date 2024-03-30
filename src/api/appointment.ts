@@ -164,6 +164,11 @@ export async function cancelClientScheduleNotStarted(clientScheduleId: number) {
   return data;
 }
 
+export async function fetchClientSchedulesInProgress(date: string) {
+  const { data } = await api.get<ClientSchedule[]>('clientSchedules/in-progress', { params: { date } });
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),

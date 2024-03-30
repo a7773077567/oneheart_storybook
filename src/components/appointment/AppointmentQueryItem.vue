@@ -17,7 +17,7 @@ const scheduleState = new Map([
   [2, { label: '報到' }],
   [3, { label: '完成服務', showState: true, bgc: '#D9D9D9', color: '#000000' }],
   [4, { label: '病歷完成' }],
-  [5, { label: '取消預約', showState: true, showRecoveryBtn: true, bgc: '#E86969', color: '#FFFFFF' }],
+  [5, { label: '取消預約', showState: true, bgc: '#E86969', color: '#FFFFFF' }],
   [6, { label: '預約改期', showState: true, showRecoveryBtn: true, bgc: '#91D0C1', color: '#FFFFFF' }],
   [7, { label: '刪除' }],
 ]);
@@ -27,7 +27,7 @@ const showState = computed(() => props.historyMode && targetState.value?.showSta
 const stateLabel = computed(() => targetState.value?.label);
 const stateBgc = computed(() => targetState.value?.bgc);
 const stateColor = computed(() => targetState.value?.color);
-const showRecoveryBtn = computed(() => props.historyMode && targetState.value?.showRecoveryBtn);
+const showRecoveryBtn = computed(() => props.historyMode && props.data.isValidForRestore);
 const showActions = computed(() => !props.historyMode || showRecoveryBtn.value);
 
 const tableData = new Map([
