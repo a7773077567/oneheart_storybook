@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue';
-import { AppointmentAdder, AppointmentBox } from '@/components/appointment';
+import { AppointmentAdder, AppointmentBox, AppointmentBoxRearranged } from '@/components/appointment';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available } from '@/api/appointment';
+import { getTimeDate } from '@/utils/date';
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
@@ -18,19 +19,21 @@ onBeforeUnmount(() => {
   appointmentStore.resetTargetAppointmentState();
 });
 
-function getStyle(interval: CalendarInterval) {
-  return {
-    position: 'absolute',
-    left: `${interval.left}px`,
-    width: `${interval.width - 1}px`,
-  };
-}
-
 interface CalendarInterval {
   available?: Available;
   left: number;
   width: number;
   canBook: boolean;
+  index: number;
+}
+function getStyle(interval: CalendarInterval) {
+  return {
+    'position': 'absolute',
+    'left': `${interval.left}px`,
+    'width': `${interval.width - 1}px`,
+    'z-index': `${interval.index}`,
+    'background': 'white',
+  };
 }
 
 function getIntervals(scope: any): CalendarInterval[] {
@@ -44,13 +47,21 @@ function getIntervals(scope: any): CalendarInterval[] {
         left: scope.timeStartPosX(time),
         width: scope.timeDurationWidth(60),
         canBook: false,
+        index: 0,
       };
     }
+    const { startTime, endTime } = targetAvailable;
+    const start = getTimeDate(startTime);
+    const end = getTimeDate(endTime);
+    const duration = end.diff(start, 'm');
+    const isSlotType = targetAvailable.type === 2;
+    const durationWidth = isSlotType ? 60 : duration;
     return {
       available: targetAvailable,
-      left: scope.timeStartPosX(targetAvailable.startTime),
-      width: scope.timeDurationWidth(60),
+      left: scope.timeStartPosX(startTime),
+      width: scope.timeDurationWidth(durationWidth),
       canBook: true,
+      index: 10,
     };
   },
   );
@@ -110,7 +121,8 @@ function getDate() {
       </template>
     </ResourceCalendar>
     <QDialog v-model="stateOfAppointmentDialog" persistent>
-      <AppointmentBox @close="stateOfAppointmentDialog = false" @appointment="afterAppointment" />
+      <AppointmentBoxRearranged v-if="appointmentStore.rearrangeMode" @close="stateOfAppointmentDialog = false" @appointment="afterAppointment" />
+      <AppointmentBox v-else @close="stateOfAppointmentDialog = false" @appointment="afterAppointment" />
     </QDialog>
   </div>
 </template>
@@ -122,5 +134,9 @@ function getDate() {
 }
 :deep(.q-calendar-resource__resource--interval) {
   min-height: 116px !important;
+}
+// Display the user block above the interval-item
+:deep(.q-calendar-resource__resource.q-calendar__sticky) {
+  z-index: 100;
 }
 </style>

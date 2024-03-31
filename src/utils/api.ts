@@ -3,13 +3,14 @@ import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosReques
 import { Dialog, Notify } from 'quasar';
 import type { QNotifyCreateOptions } from 'quasar';
 import { getCookie } from '@/utils/helpers';
+import { ErrorMessages } from '@/api/errorMessages';
 
 // ========== Types ==========
 interface APIResponse<T, D = any> {
   data: T;
   meta?: D;
 };
-type StatusPair<T> = [number, T];
+// type StatusPair<T> = [number, T];
 
 // ========== Interceptors ==========
 const instance = axios.create({
@@ -104,66 +105,86 @@ function responseInterceptor(response: AxiosResponse) {
   return response.data;
 }
 
-function responseInterceptorCatch(error: AxiosError) {
-  const { status } = error.response!;
-  const notifyMessage = getNotifyMessage(status);
-  const notifyOptions = getNotifyOptions(notifyMessage, error.message);
-  Notify.create(notifyOptions);
-  getCatchHandler(error)?.();
+interface ErrorResponse {
+  data: {
+    message: string;
+  };
+}
+
+async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
+  const {
+    // status,
+    data,
+  } = error.response!;
+  // const notifyMessage = getNotifyMessage(status);
+  // const notifyOptions = getNotifyOptions(notifyMessage, error.message);
+  // Notify.create(notifyOptions);
+
+  const response = data.data.message;
+  const errorMessage = ErrorMessages.get(response) ?? '未知的錯誤';
+  await dialogPromise(errorMessage);
 
   return Promise.reject(error);
 }
 
-function getNotifyMessage(status?: number) {
-  if (!status) {
-    return 'No Internet or Unknown Error';
-  }
-
-  const STATUS_PAIRS: StatusPair<string>[] = [
-    [401, '401 - Unauthorized'],
-    [403, '403 - Forbidden'],
-    [404, '404 - Not Found'],
-    [422, '422 - Invalid Payload'],
-  ];
-  const statusMap = new Map(STATUS_PAIRS);
-
-  const message = statusMap.get(status);
-  if (!message) {
-    return 'No Matched Status';
-  }
-  return message;
+function dialogPromise(message: string) {
+  return new Promise<void>((resolve) => {
+    Dialog.create({
+      message,
+    }).onOk(() => resolve());
+  });
 }
 
-function getNotifyOptions(
-  message: string,
-  caption: string,
-) {
-  const options: QNotifyCreateOptions = {
-    message,
-    caption,
-    type: 'negative',
-    timeout: 5000,
-    progress: true,
-  };
-  return options;
-}
+// function getNotifyMessage(status?: number) {
+//   if (!status) {
+//     return 'No Internet or Unknown Error';
+//   }
 
-function getCatchHandler(error: AxiosError) {
-  const { url: endpoint } = error.config!;
-  const { status } = error.response!;
-  const STATUS_PAIRS: StatusPair<() => void>[] = [
-    [401, handler401],
-  ];
-  const handlerMap = new Map(STATUS_PAIRS);
+//   const STATUS_PAIRS: StatusPair<string>[] = [
+//     [401, '401 - Unauthorized'],
+//     [403, '403 - Forbidden'],
+//     [404, '404 - Not Found'],
+//     [422, '422 - Invalid Payload'],
+//   ];
+//   const statusMap = new Map(STATUS_PAIRS);
 
-  return handlerMap.get(status);
+//   const message = statusMap.get(status);
+//   if (!message) {
+//     return 'No Matched Status';
+//   }
+//   return message;
+// }
 
-  function handler401() {
-    if (endpoint?.endsWith('login')) {
-      Dialog.create({
-        title: '錯誤',
-        message: '帳號或密碼錯誤',
-      });
-    }
-  }
-}
+// function getNotifyOptions(
+//   message: string,
+//   caption: string,
+// ) {
+//   const options: QNotifyCreateOptions = {
+//     message,
+//     caption,
+//     type: 'negative',
+//     timeout: 5000,
+//     progress: true,
+//   };
+//   return options;
+// }
+
+// function getCatchHandler(error: AxiosError) {
+//   const { url: endpoint } = error.config!;
+//   const { status } = error.response!;
+//   const STATUS_PAIRS: StatusPair<() => void>[] = [
+//     [401, handler401],
+//   ];
+//   const handlerMap = new Map(STATUS_PAIRS);
+
+//   return handlerMap.get(status);
+
+//   function handler401() {
+//     if (endpoint?.endsWith('login')) {
+//       Dialog.create({
+//         title: '錯誤',
+//         message: '帳號或密碼錯誤',
+//       });
+//     }
+//   }
+// }

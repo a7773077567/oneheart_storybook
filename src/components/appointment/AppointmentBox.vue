@@ -3,7 +3,7 @@ import type { Client } from '@/api/appointment';
 import { createAppointment, createAppointmentRearrange } from '@/api/appointment';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
-import { getDateLabel } from '@/utils/mappers';
+import { getDateLabel, getType } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
 import { useRouter } from 'vue-router';
 
@@ -34,7 +34,7 @@ const clientTableData = computed(() => getTableData(appointmentStore.targetClien
 const availableTableData = computed(() => getTableData(appointmentStore.targetAvailable, [
   { key: 'date', label: '日期', mapFunc: target => getDateLabel(target.date) },
   { key: 'startTime', label: '時間', mapFunc: target => getDurationLabel(target.startTime, target.endTime) },
-  { key: 'name', label: '項目' },
+  { key: 'name', label: '項目', mapFunc: target => `${getType(target.type)}` },
   { key: 'user', label: '治療師', mapFunc: target => target.user.name },
 ]));
 const phoneTableData = [

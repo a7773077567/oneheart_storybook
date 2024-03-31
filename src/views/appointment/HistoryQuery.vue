@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { clientSchedulesHistoriesSchema, restoreClientSchedule } from '@/api/appointment';
+import { type ClientSchedulesHistoriesReq, clientSchedulesHistoriesSchema, restoreClientSchedule } from '@/api/appointment';
 import { Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -23,13 +23,16 @@ const { handleSubmit } = useForm({
   },
 });
 
+let historiesPayload: ClientSchedulesHistoriesReq | null = null;
 const onSubmit = handleSubmit(async (values) => {
+  historiesPayload = values;
   const payload = removeNullishKeys(values);
   await appointmentStore.getClientSchedulesHistories(payload);
 });
 
 async function onRestore(id: number) {
   await restoreClientSchedule(id);
+  await appointmentStore.getClientSchedulesHistories(historiesPayload!);
 }
 </script>
 

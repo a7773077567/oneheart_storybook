@@ -17,22 +17,32 @@ defineEmits<{
 const scheduleState = new Map([
   [1, { label: '預約' }],
   [2, { label: '報到' }],
-  [3, { label: '完成服務', showState: true, bgc: '#D9D9D9', color: '#000000' }],
+  [3, { label: '完成服務', bgc: '#D9D9D9', color: '#000000' }],
   [4, { label: '病歷完成' }],
-  [5, { label: '取消預約', showState: true, bgc: '#E86969', color: '#FFFFFF' }],
-  [6, { label: '預約改期', showState: true, showRecoveryBtn: true, bgc: '#91D0C1', color: '#FFFFFF' }],
+  [5, { label: '取消預約', bgc: '#E86969', color: '#FFFFFF' }],
+  [6, { label: '預約改期', bgc: '#91D0C1', color: '#FFFFFF' }],
   [7, { label: '刪除' }],
 ]);
 
 const targetState = computed(() => scheduleState.get(props.data.state));
-const showState = computed(() => props.historyMode && targetState.value?.showState);
+const showState = computed(() => props.historyMode);
 const stateLabel = computed(() => targetState.value?.label);
 const stateBgc = computed(() => targetState.value?.bgc);
 const stateColor = computed(() => targetState.value?.color);
 const showRecoveryBtn = computed(() => props.historyMode && props.data.isValidForRestore);
 const showActions = computed(() => !props.historyMode || showRecoveryBtn.value);
+const showRearrangeData = computed(() => props.historyMode && props.data.isBeenRearranged);
 
+const currentData = computed(() => props.data.isBeenRearranged ? props.data.rearrangeClientSchedule! : props.data);
 const tableData = new Map([
+  ['日期', () => currentData.value.date],
+  ['時間', () => `${currentData.value.scheduleStartTime}-${currentData.value.scheduleEndTime}`],
+  ['客戶', () => currentData.value.client.name],
+  ['科別', () => getType(currentData.value.userShift.type)],
+  ['治療師', () => currentData.value.userShift.user.name],
+]);
+
+const rearrangeTableData = new Map([
   ['日期', () => props.data.date],
   ['時間', () => `${props.data.scheduleStartTime}-${props.data.scheduleEndTime}`],
   ['客戶', () => props.data.client.name],
@@ -44,11 +54,7 @@ const tableData = new Map([
 <template>
   <div class="table">
     <div class="table__body">
-      <div
-        v-for="([key, getter], idx) in tableData.entries()"
-        :key="idx"
-        class="table__column"
-      >
+      <div v-for="([key, getter], idx) in tableData.entries()" :key="idx" class="table__column">
         <div class="table__cell">
           {{ key }}
         </div>
@@ -57,11 +63,15 @@ const tableData = new Map([
         </div>
       </div>
     </div>
-    <div
-      v-if="showState"
-      class="table__state"
-    >
+    <div v-if="showState" class="table__state">
       {{ stateLabel }}
+    </div>
+    <div v-if="showRearrangeData" class="table__body">
+      <div v-for="([, getter], idx) in rearrangeTableData.entries()" :key="idx" class="table__column">
+        <div class="table__cell">
+          {{ getter() }}
+        </div>
+      </div>
     </div>
     <div v-if="showActions" class="table__actions">
       <template v-if="!props.historyMode">

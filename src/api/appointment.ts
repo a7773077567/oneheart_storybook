@@ -59,6 +59,9 @@ export interface ClientSchedule {
   paymentState: number;
   state: number;
   isValidForRestore: boolean;
+  isBeenRearranged: boolean;
+  isRearrangedClientSchedule: boolean;
+  rearrangeClientSchedule: ClientSchedule | null;
 }
 
 export interface BookingItem {
@@ -88,7 +91,7 @@ export interface AppointmentStatus {
 export interface Available {
   slotId: number;
   userShiftId: number;
-  type: number | null;
+  type: number;
   name: string;
   date: string;
   startTime: string;

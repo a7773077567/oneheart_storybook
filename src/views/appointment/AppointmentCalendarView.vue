@@ -38,6 +38,8 @@ function getBookings(scope: any) {
   <ResourceCalendar
     v-model="selectedDate"
     v-model:model-resources="appointmentStore.users"
+    :interval-start="8"
+    :interval-count="15"
   >
     <template #nav-right>
       <div class="payment-indicator">

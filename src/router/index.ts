@@ -6,7 +6,6 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     redirect: { name: 'userLogin' },
-    beforeEnter: loginGuard,
     meta: {
       requiredAuth: false,
     },
