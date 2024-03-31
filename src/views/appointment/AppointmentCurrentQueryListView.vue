@@ -73,8 +73,8 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
           <OInput class="nav__input" name="date" hide-bottom-space date-mode />
         </div>
         <div class="nav__item--end">
-          <QBtn label="查詢預約" outline padding="10px 30px" @click="onSubmit" />
-          <QBtn label="清除" outline padding="10px 30px" @click="appointmentStore.resetClientSchedulesNotStartedState" />
+          <QBtn label="查詢預約" style="width: 126px;height: 40px;" outline @click="onSubmit" />
+          <QBtn label="清除" style="width: 80px;height: 40px;" outline @click="appointmentStore.resetClientSchedulesNotStartedState" />
         </div>
       </div>
     </div>

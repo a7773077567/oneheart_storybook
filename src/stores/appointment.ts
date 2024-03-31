@@ -23,6 +23,7 @@ interface State {
   rearrangeQuery: AvailableRearrangedReq | null;
   rearrangeMode: boolean;
   clientSchedulesHistories: ClientSchedule[];
+  clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
 }
 
@@ -43,6 +44,7 @@ export const useAppointmentStore = defineStore('appointment', {
     rearrangeQuery: null,
     rearrangeMode: false,
     clientSchedulesHistories: [],
+    clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
   }),
   getters: {
