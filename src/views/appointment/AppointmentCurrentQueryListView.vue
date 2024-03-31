@@ -62,7 +62,7 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
           <OInput class="nav__input" name="name" hide-bottom-space />
         </div>
         <p class="nav__item--end">
-          客戶電話與姓名擇一必填
+          客戶電話與姓名可不填
         </p>
         <div class="nav__item">
           <span>選擇項目</span>

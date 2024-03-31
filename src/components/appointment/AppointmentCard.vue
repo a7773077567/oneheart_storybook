@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
+import { getType } from '@/utils/mappers';
 import { computed } from 'vue';
 
 interface Props {
@@ -42,7 +43,9 @@ const States: State[] = [
 ];
 
 const bgc = computed(() => props.data.paymentState === 1 ? '#F8C9CB' : '#A5D6F1');
+const state = computed(() => States.find(state => state.identifier === props.data.state)?.label);
 const stateColor = computed(() => States[props.data.state + 1].color);
+const type = computed(() => getType(props.data.userShift.type));
 </script>
 
 <template>
@@ -51,12 +54,12 @@ const stateColor = computed(() => States[props.data.state + 1].color);
       客戶：{{ data.client.name }}
     </div>
     <p class="booking-card__type">
-      科別：{{ data.userShift.name }}
+      科別：{{ type }}
     </p>
     <p class="booking-card__state">
-      {{ States[data.state].label }}
+      {{ state }}
     </p>
-    <QBtn label="＄結帳" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" />
+    <QBtn label="＄結帳" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop />
   </div>
 </template>
 

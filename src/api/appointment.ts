@@ -169,6 +169,11 @@ export async function fetchClientSchedulesInProgress(date: string) {
   return data;
 }
 
+export async function restoreClientSchedule(clientScheduleId: number) {
+  const { data } = await api.post(`clientSchedules/${clientScheduleId}/restore`);
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),

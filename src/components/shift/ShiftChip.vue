@@ -4,6 +4,7 @@ import type { UserShift } from '@/api/shift';
 import { getWeekDay } from '@/utils/date';
 import dayjs from 'dayjs';
 import { TherapyTypes } from '@/const/general';
+import { getType } from '@/utils/mappers';
 
 interface Props {
   data: UserShift;
@@ -22,7 +23,7 @@ const date = computed(() => {
 });
 
 const duration = computed(() => toDurationLabel(props.data.startTime, props.data.endTime));
-const type = computed(() => [...Object.values(TherapyTypes)][props.data.type]);
+const type = computed(() => getType(props.data.type));
 const unavailable = computed(() => props.data.notAvailableTimes.map(item => toDurationLabel(item.startTime, item.endTime, true)));
 const bgc = computed(() => props.data.color);
 

@@ -40,7 +40,7 @@ export interface UserShift {
     role: Role;
   };
 }
-export interface UserShiftPost extends Omit<UserShift, 'id' | 'spaceId'> {}
+export interface UserShiftPost extends Omit<UserShift, 'id' | 'spaceId' | 'user'> {}
 export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
 export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
 export interface UserShiftsGet {

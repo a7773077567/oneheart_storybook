@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
+import { getType } from '@/utils/mappers';
 import { computed } from 'vue';
 
 interface Props {
@@ -10,6 +11,7 @@ const props = defineProps<Props>();
 defineEmits<{
   cancel: [clientScheduleId: number];
   rearrange: [clientSchedule: ClientSchedule];
+  restore: [clientScheduleId: number];
 }>();
 
 const scheduleState = new Map([
@@ -34,7 +36,7 @@ const tableData = new Map([
   ['日期', () => props.data.date],
   ['時間', () => `${props.data.scheduleStartTime}-${props.data.scheduleEndTime}`],
   ['客戶', () => props.data.client.name],
-  ['科別', () => props.data.userShift.name],
+  ['科別', () => getType(props.data.userShift.type)],
   ['治療師', () => props.data.userShift.user.name],
 ]);
 </script>
@@ -66,7 +68,7 @@ const tableData = new Map([
         <QBtn label="取消預約" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('cancel', data.id)" />
         <QBtn label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('rearrange', data)" />
       </template>
-      <QBtn v-if="showRecoveryBtn" label="復原" outline rounded dense color="grey-9" padding="6px 23px" style="border-radius: 8px;" />
+      <QBtn v-if="showRecoveryBtn" label="復原" outline rounded dense color="grey-9" padding="6px 23px" style="border-radius: 8px;" @click="$emit('restore', data.id)" />
     </div>
   </div>
 </template>

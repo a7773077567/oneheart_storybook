@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { clientSchedulesHistoriesSchema } from '@/api/appointment';
+import { clientSchedulesHistoriesSchema, restoreClientSchedule } from '@/api/appointment';
 import { Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -27,6 +27,10 @@ const onSubmit = handleSubmit(async (values) => {
   const payload = removeNullishKeys(values);
   await appointmentStore.getClientSchedulesHistories(payload);
 });
+
+async function onRestore(id: number) {
+  await restoreClientSchedule(id);
+}
 </script>
 
 <template>
@@ -58,10 +62,11 @@ const onSubmit = handleSubmit(async (values) => {
     </div>
     <div class="query__body">
       <AppointmentQueryItem
-        v-for="(item, idx) in appointmentStore.clientScheduleHistories"
+        v-for="(item, idx) in appointmentStore.clientSchedulesHistories"
         :key="idx"
         :data="item"
         history-mode
+        @restore="onRestore"
       />
       <!-- @cancel="cancelClientSchedule" -->
     </div>
