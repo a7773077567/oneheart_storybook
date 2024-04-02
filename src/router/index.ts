@@ -6,18 +6,12 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     redirect: { name: 'userLogin' },
-    meta: {
-      requiredAuth: false,
-    },
     children: [
       {
         path: 'user-login',
         name: 'userLogin',
         component: () => import('@/views/login/UserLogin.vue'),
         beforeEnter: loginGuard,
-        meta: {
-          requiredAuth: false,
-        },
       },
       {
         path: 'space-login',
@@ -299,7 +293,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const needAuth = to.meta.requiredAuth;
-  if (!needAuth || to.name === 'activatePassword') {
+  if (!needAuth) {
     return;
   }
 
