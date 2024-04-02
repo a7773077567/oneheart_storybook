@@ -14,12 +14,11 @@ const recordModules = getRecordModules();
 
 function getTabs() {
   const types = Object.values(Types);
-  const tabNames = types[+props.type].tabs;
-  const tabs = tabNames.map(item => ({
+  const tabs = types.find(type => type.identifier === +props.type)!.tabs;
+  return tabs.map(item => ({
     name: item,
     label: TabMap.get(item),
   }));
-  return tabs;
 }
 
 function getRecordModules() {
@@ -27,17 +26,19 @@ function getRecordModules() {
   const newModulesEntries = Object.entries(modules).map(mapFunc);
   return Object.fromEntries(newModulesEntries);
 
+  // Transform the key from file path to file name
   function mapFunc(entry: [string, any]) {
     const [key, value] = entry;
     const moduleName = trimKey(key)!;
     const newKey = unCapitalize(moduleName);
     return [newKey, value.default];
-  }
-  function trimKey(key: string) {
-    return key.split('/').at(-1)?.split('.')[0];
-  }
-  function unCapitalize(string: string) {
-    return string[0].toLocaleLowerCase() + string.slice(1);
+
+    function trimKey(key: string) {
+      return key.split('/').at(-1)?.split('.')[0];
+    }
+    function unCapitalize(string: string) {
+      return string[0].toLocaleLowerCase() + string.slice(1);
+    }
   }
 }
 </script>
@@ -65,7 +66,9 @@ function getRecordModules() {
         :key="idx"
         :name="tab.name"
       >
-        <component :is="recordModules[tab.name]" />
+        <KeepAlive>
+          <component :is="recordModules[tab.name]" />
+        </KeepAlive>
       </QTabPanel>
     </QTabPanels>
   </QCard>

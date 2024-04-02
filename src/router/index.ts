@@ -139,7 +139,7 @@ export const routes: RouteRecordRaw[] = [
               {
                 path: 'info/:type',
                 name: 'appointmentInfo',
-                component: () => import('@/views/appointment/Info.vue'),
+                component: () => import('@/views/appointment/InfoView.vue'),
                 meta: {
                   label: '預約資料',
                   requiredAuth: true,
