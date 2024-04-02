@@ -33,7 +33,7 @@ const data: DataItem[] = [
   },
   {
     title: '建議',
-    items: [{ name: 'exerciseRecommendations', label: '給運動組的建議' }],
+    items: [{ name: 'forExerciseGroup', label: '給運動組的建議' }],
   },
 
 ];

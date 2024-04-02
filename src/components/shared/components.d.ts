@@ -14,6 +14,7 @@ declare module '@vue/runtime-core' {
     ResourceCalendar: typeof import('@/components/shared')['ResourceCalendar']
     OTable: typeof import('@/components/shared')['OTable']
     OCheckbox: typeof import('@/components/shared')['OCheckbox']
+    OFile: typeof import('@/components/shared')['OFile']
   }
 }
 

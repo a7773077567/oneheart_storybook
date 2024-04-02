@@ -11,3 +11,4 @@ export { default as OTime } from './OTime.vue';
 export { default as ResourceCalendar } from './ResourceCalendar.vue';
 export { default as OTable } from './OTable.vue';
 export { default as OCheckbox } from './OCheckbox.vue';
+export { default as OFile } from './OFile.vue';
