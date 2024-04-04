@@ -43,7 +43,7 @@ function toggleDrawer() {
       <QToolbar>
         <QBtn dense flat round icon="menu" @click="toggleDrawer" />
         <QAvatar class="q-ml-lg">
-          <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+          <img src="/public/images/one-heart.png">
         </QAvatar>
         <QSpace />
         <div class="row q-gutter-lg items-center">

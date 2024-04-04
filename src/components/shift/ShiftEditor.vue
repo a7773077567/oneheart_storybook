@@ -7,6 +7,7 @@ import { TherapyTypes } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
+import { computed, watch } from 'vue';
 
 interface Props {
   data?: ShiftTemplate | null;
@@ -23,27 +24,33 @@ const emit = defineEmits<{
 dayjs.extend(objectSupport);
 const typeOptions = getTypeOptions();
 
-const { handleSubmit, values } = useForm({
+const { handleSubmit, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
+const showNotAvailableTimes = computed(() => values.type === 2);
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
+watch(showNotAvailableTimes, (newVal) => {
+  if (!newVal) {
+    setFieldValue('notAvailableTimes', []);
+  }
+});
 
 const onSubmit = handleSubmit((values) => {
   const { duration, notAvailableTimes, maxClients, ...needed } = values;
   if (!props.userShiftMode) {
-    const payload = {
+    const payload: ShiftTemplateReq = {
       ...needed,
-      ...splitTime(duration),
-      notAvailableTimes: notAvailableTimes.map(splitTime),
+      ...combineTime(duration),
+      notAvailableTimes: notAvailableTimes.map(combineTime),
       maxClients: maxClients ? +maxClients : null,
     };
 
     emit('confirm', payload);
   }
   else {
-    const payload = {
-      notAvailableTimes: notAvailableTimes.map(splitTime),
+    const payload: UserShiftPatch = {
+      notAvailableTimes: notAvailableTimes.map(combineTime),
     };
     emit('updateConfirm', payload);
   }
@@ -64,7 +71,7 @@ function getInitialValues(): ShiftTemplateSchema {
       type: typeOptions[0].value,
       name: '',
       duration: [0, 0, 0, 0],
-      notAvailableTimes: [[0, 0, 0, 0]],
+      notAvailableTimes: [],
       color: ShiftColors[0],
       maxClients: '',
     };
@@ -73,20 +80,22 @@ function getInitialValues(): ShiftTemplateSchema {
   function createInitials(data: ShiftTemplate) {
     return {
       ...data,
-      duration: combineTime(data),
-      notAvailableTimes: data.notAvailableTimes.map(combineTime),
+      duration: splitTime(data),
+      notAvailableTimes: data.notAvailableTimes.map(splitTime),
       maxClients: data.maxClients ? data.maxClients.toString() : '',
     };
   }
 }
 
-function combineTime(duration: Duration) {
+// HH:mm & HH:mm -> [H,m, H, m]
+function splitTime(duration: Duration) {
   const { startTime, endTime } = duration;
   const timeArray = [...startTime.split(':'), ...endTime.split(':')];
   return timeArray.map(time => +time);
 }
 
-function splitTime(duration: number[]): Duration {
+// [H,m, H, m] -> HH:mm & HH:mm
+function combineTime(duration: number[]): Duration {
   const startTime = dayjs({ h: duration[0], m: duration[1] });
   const endTime = dayjs({ h: duration[2], m: duration[3] });
   return {
@@ -113,16 +122,18 @@ function splitTime(duration: number[]): Duration {
       <InputBox label="時間" class="gutter">
         <MultiNumSelect :items="DurationItems" name="duration" :disable="userShiftMode" style="flex: 1 1 0" />
       </InputBox>
-      <InputBox
-        v-for="(field, idx) in fields"
-        :key="field.key"
-        :label="`不可預約時間${idx === 0 ? '' : idx}`"
-        class="gutter--sm"
-      >
-        <MultiNumSelect v-model="field.value" :items="DurationItems" style="flex: 1 1 0" />
-        <QBtn icon="o_delete" flat round @click="remove(idx)" />
-      </InputBox>
-      <QBtn label="新增不可預約時間" icon="add" dense flat class="gutter" @click="push([0, 0, 0, 0])" />
+      <template v-if="showNotAvailableTimes">
+        <InputBox
+          v-for="(field, idx) in fields"
+          :key="field.key"
+          :label="`不可預約時間${idx === 0 ? '' : idx}`"
+          class="gutter--sm"
+        >
+          <MultiNumSelect v-model="field.value" :items="DurationItems" style="flex: 1 1 0" />
+          <QBtn icon="o_delete" flat round @click="remove(idx)" />
+        </InputBox>
+        <QBtn label="新增不可預約時間" icon="add" dense flat class="gutter" @click="push([0, 0, 0, 0])" />
+      </template>
       <InputBox label="班別顏色" class="gutter">
         <ColorPicker :colors="ShiftColors" name="color" :disable="userShiftMode" style="padding: 6px 14px;" />
       </InputBox>

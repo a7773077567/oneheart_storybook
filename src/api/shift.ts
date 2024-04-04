@@ -51,7 +51,7 @@ export interface UserShiftsGet {
 
 export const shiftTemplateSchema = z.object({
   type: z.number(),
-  name: z.string().trim().min(1, { message: '不可為空' }),
+  name: z.string().trim().min(1, { message: '請輸入班別名稱' }),
   duration: z.number().array(),
   notAvailableTimes: z.number().array().array(),
   color: z.string(),

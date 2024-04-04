@@ -105,7 +105,7 @@ function responseInterceptor(response: AxiosResponse) {
 
 interface ErrorResponse {
   data: {
-    message: string;
+    message: string | string[];
   };
 }
 
@@ -121,9 +121,15 @@ async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
     return Promise.reject(error);
   }
 
-  const response = data.data.message;
-  const errorMessage = ErrorMessages.get(response) ?? '未知的錯誤';
-  await dialogPromise(errorMessage);
+  const resMsg = data.data.message;
+  let errMsg;
+  if (Array.isArray(resMsg)) {
+    errMsg = getMultipleErrorMessages(resMsg);
+  }
+  else {
+    errMsg = ErrorMessages.get(resMsg) ?? '未知的錯誤';
+  }
+  await dialogPromise(errMsg);
 
   return Promise.reject(error);
 }
@@ -132,6 +138,14 @@ function dialogPromise(message: string) {
   return new Promise<void>((resolve) => {
     Dialog.create({
       message,
+      html: true,
     }).onOk(() => resolve());
   });
+}
+
+function getMultipleErrorMessages(msgArr: string[]) {
+  return msgArr.map((item) => {
+    const msg = ErrorMessages.get(item);
+    return msg ? `<p>${msg}</p>` : '<p>未知的錯誤</p>';
+  }).join('');
 }
