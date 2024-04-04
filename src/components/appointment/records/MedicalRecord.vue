@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { ref } from 'vue';
+
+const data: DataItem[] = [
+  { name: 'chiefComplain', label: '主訴', showCopyBtn: true },
+  { name: 'assessmentResults', label: '評估結果' },
+  { name: 'treatmentPlan', label: '治療計畫' },
+  { name: 'treatmentNotes', label: '治療備註' },
+  { name: 'forExerciseGroup', label: '給運動組的建議' },
+  { name: 'forFrontDesk', label: '給櫃檯的建議' },
+];
+const stateOfHistoryDialog = ref(false);
 
 const { handleSubmit } = useForm();
 const onSubmit = handleSubmit((values) => {
@@ -12,14 +23,13 @@ interface DataItem {
   showCopyBtn?: boolean;
 }
 
-const data: DataItem[] = [
-  { name: 'chiefComplain', label: '主訴', showCopyBtn: true },
-  { name: 'assessmentResults', label: '評估結果' },
-  { name: 'treatmentPlan', label: '治療計畫' },
-  { name: 'treatmentNotes', label: '治療備註' },
-  { name: 'forExerciseGroup', label: '給運動組的建議' },
-  { name: 'forFrontDesk', label: '給櫃檯的建議' },
-];
+function openHistoryDialog() {
+  stateOfHistoryDialog.value = true;
+}
+
+function pasteHistory() {
+  stateOfHistoryDialog.value = false;
+}
 </script>
 
 <template>
@@ -31,7 +41,7 @@ const data: DataItem[] = [
       <div v-for="(item, idx) in data" :key="idx" class="input">
         <div class="input__label">
           <span>{{ item.label }}</span>
-          <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" />
+          <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="openHistoryDialog" />
         </div>
         <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
       </div>
@@ -41,6 +51,24 @@ const data: DataItem[] = [
       <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" />
       <QBtn label="完成服務" outline style="width: 126px;height: 40px;" @click="onSubmit" />
     </div>
+    <QDialog v-model="stateOfHistoryDialog">
+      <QCard style="width: 440px; height: 612px;">
+        <QCardSection>
+          <QList class="column q-gutter-md">
+            <QItem clickable @click="pasteHistory">
+              <QItemSection>
+                <QItemLabel class="q-mb-xs">
+                  2024/01/23
+                </QItemLabel>
+                <QItemLabel style="height: 137px;overflow: scroll; border: 1px solid black; padding: 10px;">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo minus eius excepturi tempora aperiam tempore? Est quo aliquid magni, deleniti nobis facere veniam voluptates molestiae voluptatum alias? Delectus, saepe reprehenderit? lorem
+                </QItemLabel>
+              </QItemSection>
+            </QItem>
+          </QList>
+        </QCardSection>
+      </QCard>
+    </QDialog>
   </div>
 </template>
 
