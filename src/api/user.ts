@@ -14,6 +14,8 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  state: 1 | 2;
+  isSuspended: boolean;
   role: Role;
   spaces: Space[];
   avatar?: string;

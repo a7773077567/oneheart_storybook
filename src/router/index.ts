@@ -263,13 +263,47 @@ export const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        path: '/staff',
-        name: 'staff',
-        component: () => import('@/views/staff/Staff.vue'),
+        path: '/user',
+        name: 'user',
+        component: () => import('@/views/user/UserView.vue'),
+        redirect: { name: 'userList' },
         meta: {
           label: '人員設定',
           requiredAuth: true,
         },
+        children: [
+          {
+            path: 'list',
+            name: 'userList',
+            component: () => import('@/views/user/ListView.vue'),
+            children: [
+              {
+                path: 'edit',
+                name: 'userEdition',
+                component: () => import('@/views/user/EditView.vue'),
+                meta: {
+                  label: '編輯',
+                  requiredAuth: true,
+                  notShownInSidebar: true,
+                },
+              },
+            ],
+            meta: {
+              label: '人員總表',
+              requiredAuth: true,
+            },
+          },
+          // {
+          //   path: 'list/edit',
+          //   name: 'userEdition',
+          //   component: () => import('@/views/user/EditView.vue'),
+          //   meta: {
+          //     label: '編輯',
+          //     requiredAuth: true,
+          //     notShownInSidebar: true,
+          //   },
+          // },
+        ],
       },
       {
         path: '/gym',
