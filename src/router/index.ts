@@ -90,8 +90,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'dashboard',
             name: 'dashboard',
-            component: () => import('@/components/appointment/records/Memo.vue'),
-            // component: () => import('@/views/home/Dashboard.vue'),
+            component: () => import('@/views/home/Dashboard.vue'),
             meta: {
               label: '儀表板',
               requiredAuth: true,
