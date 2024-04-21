@@ -1,11 +1,12 @@
 import { api } from '@/utils/api';
 import type { User } from './user';
+import type { ShiftType } from '@/const/general';
 
 export interface Memo {
   id: number;
-  fromUserShiftType: number;
+  fromUserShiftType: ShiftType;
   fromUser: User;
-  toUserShiftType: number; // 留言對象排班類別
+  toUserShiftType: ShiftType; // 留言對象排班類別
   content: string;
   createdAt: string;
   reply: Omit<Memo, 'id'>[];

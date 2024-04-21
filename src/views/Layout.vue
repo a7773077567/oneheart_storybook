@@ -82,4 +82,10 @@ function toggleDrawer() {
     border-radius: 15px 15px 0 0;
   }
 }
+main.q-page {
+  height: calc(100vh - 106px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 </style>

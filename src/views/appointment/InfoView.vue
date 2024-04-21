@@ -71,7 +71,7 @@ function getRecordModules() {
       >
         <KeepAlive>
           <Suspense>
-            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" />
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetAppointment" />
           </Suspense>
         </KeepAlive>
       </QTabPanel>
