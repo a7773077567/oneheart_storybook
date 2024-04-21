@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import type { QTableProps } from 'quasar';
 import { useUserStore } from '@/stores';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 enum State {
   '未開通' = 1,
@@ -12,7 +12,9 @@ enum State {
 
 const { currentRoute } = useLayoutRoute();
 const userStore = useUserStore();
-userStore.getUsers();
+await userStore.getUsers();
+
+const jobTitleFilter = ref(userStore.userJobTitleOptions.map(item => item.value));
 
 const cols: QTableProps['columns'] = [
   { name: 'state', label: '開通', field: 'state', align: 'left' },
@@ -21,20 +23,24 @@ const cols: QTableProps['columns'] = [
   { name: 'spaces', label: '場館', field: 'spaces', align: 'left' },
   { name: 'email', label: '帳號', field: 'email', align: 'left' },
 ];
-const rows = computed(() => userStore.users.map(user => ({
-  state: user.state,
-  name: user.name,
-  jobTitle: user.role.name,
-  spaces: user.spaces.map(space => space.name).join(),
-  email: user.email,
-  isSuspended: user.isSuspended,
-})));
+const rows = computed(() => userStore.users
+  .filter(user => jobTitleFilter.value.includes(user.role.id))
+  .map(user => ({
+    state: user.state,
+    name: user.name,
+    jobTitle: user.role.name,
+    spaces: user.spaces.map(space => space.name).join(),
+    email: user.email,
+    isSuspended: user.isSuspended,
+  })));
 </script>
 
 <template>
   <main class="q-py-sm">
     <div v-if="currentRoute === 'userList'" class="staff-list">
-      <div class="staff-list__header" />
+      <div class="staff-list__header">
+        <QSelect v-model="jobTitleFilter" :options="userStore.userJobTitleOptions" label="全部人員" outlined color="#515050" dense multiple emit-value map-options />
+      </div>
       <div class="staff-list__body">
         <QTable :columns="cols" :rows="rows" row-key="name" separator="cell" hide-pagination class="no-shadow" bordered>
           <template #body="props">
@@ -72,6 +78,16 @@ const rows = computed(() => userStore.users.map(user => ({
 </template>
 
 <style lang="scss" scoped>
+.staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &__header {
+    max-width: 164px;
+  }
+}
+
 .state {
   display: block;
   width: 10px;

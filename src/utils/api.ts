@@ -72,6 +72,7 @@ const firstTokenList = [
   'users/activate/email',
   'users/reset-password',
   'users/me',
+  'spaces',
   'spaces/login',
   'clients',
 ];

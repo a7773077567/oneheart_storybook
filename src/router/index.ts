@@ -293,6 +293,15 @@ export const routes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+          {
+            path: 'add',
+            name: 'userAdding',
+            component: () => import('@/views/user/AddView.vue'),
+            meta: {
+              label: '人員新增',
+              requiredAuth: true,
+            },
+          },
           // {
           //   path: 'list/edit',
           //   name: 'userEdition',
