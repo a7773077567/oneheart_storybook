@@ -116,6 +116,37 @@ export interface AppointmentRearrangeReq {
   userShiftId: number;
 }
 
+export interface MedicalRecord {
+  userShiftType: number;
+  chiefComplaint: string; // 主訴
+  pastHistory: string;
+  occupationType: string;
+  exerciseHabits: string;
+  others: string;
+  clinicalObservation: string;
+  palpation: string;
+  movementAssessment: string;
+  problemSummary: string;
+  treatmentNotes: string;
+  forExerciseGroup: string;
+  assessmentResults: string;
+  treatmentPlan: string;
+  forFrontDesk: string;
+  attachments: string[];
+  note: string;
+  dynamicPressureAttachments: string[];
+  staticPressureAttachments: string[];
+  personalHealthStatus: string;
+  nutritionistAdvice: string;
+  customerProblemDescription: string;
+  assessmentStatus: string;
+  productDescription: string;
+  coachAdvice: string;
+}
+export interface ClientScheduleDetail extends ClientSchedule {
+  record: MedicalRecord;
+};
+
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -149,6 +180,11 @@ export async function fetchAvailableRearranged(params: AvailableRearrangedReq) {
 
 export async function createAppointmentRearrange(payload: AppointmentRearrangeReq) {
   const { data } = await api.post<any, AppointmentRearrangeReq>('appointments/appointment-rearrange', payload);
+  return data;
+}
+
+export async function fetchClientScheduleDetail(clientScheduleId: number) {
+  const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
   return data;
 }
 

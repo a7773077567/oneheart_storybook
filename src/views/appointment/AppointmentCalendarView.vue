@@ -57,7 +57,7 @@ function getBookings(scope: any) {
         :key="idx"
         :data="item"
         :style="getStyle(item)"
-        @click="router.push({ name: 'appointmentInfo', params: { type: item.userShift.type } })"
+        @click="router.push({ name: 'appointmentInfo', params: { scheduleId: item.id } })"
       />
     </template>
   </ResourceCalendar>

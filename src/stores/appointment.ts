@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientScheduleDetail, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -25,6 +25,7 @@ interface State {
   clientSchedulesHistories: ClientSchedule[];
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
+  targetAppointment: ClientScheduleDetail | null;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -46,6 +47,7 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesHistories: [],
     clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
+    targetAppointment: null,
   }),
   getters: {
     userOptions(state) {
@@ -76,6 +78,7 @@ export const useAppointmentStore = defineStore('appointment', {
         count,
       };
     },
+    targetAppointmentType: state => state?.targetAppointment?.userShift?.type,
   },
   actions: {
     async getUsers(spaceIds: number[]) {
@@ -131,6 +134,9 @@ export const useAppointmentStore = defineStore('appointment', {
     async getClientSchedulesInProgress(date: string) {
       const data = await fetchClientSchedulesInProgress(date);
       this.clientSchedulesInProgress = data;
+    },
+    async getScheduleDetail(scheduleId: number) {
+      this.targetAppointment = await fetchClientScheduleDetail(scheduleId);
     },
   },
 });

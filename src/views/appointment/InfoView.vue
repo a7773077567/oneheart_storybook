@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
+import { useAppointmentStore } from '@/stores';
 
 interface Props {
-  type: string;
+  scheduleId: string;
 }
 const props = defineProps<Props>();
+const appointmentStore = useAppointmentStore();
+await appointmentStore.getScheduleDetail(+props.scheduleId);
 
-const tabs = computed(() => getTabs());
+const tabs = computed(() => appointmentStore.targetAppointmentType ? getTabs(appointmentStore.targetAppointmentType) : []);
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
 
-function getTabs() {
+function getTabs(displayType: number) {
   const types = Object.values(Types);
-  const tabs = types.find(type => type.identifier === +props.type)!.tabs;
+  const tabs = types.find(type => type.identifier === displayType)!.tabs;
   return tabs.map(item => ({
     name: item,
     label: TabMap.get(item),
@@ -67,7 +70,9 @@ function getRecordModules() {
         :name="tab.name"
       >
         <KeepAlive>
-          <component :is="recordModules[tab.name]" />
+          <Suspense>
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" />
+          </Suspense>
         </KeepAlive>
       </QTabPanel>
     </QTabPanels>
@@ -75,5 +80,11 @@ function getRecordModules() {
 </template>
 
 <style lang="scss" scoped>
-
-</style>q
+.info {
+  flex: 1;
+  height: 0;
+  .q-tab-panels {
+    height: 100%;
+  }
+}
+</style>
