@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientScheduleDetail, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -25,7 +25,8 @@ interface State {
   clientSchedulesHistories: ClientSchedule[];
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
-  targetAppointment: ClientScheduleDetail | null;
+  // targetAppointment: ClientScheduleDetail | null;
+  targetClientSchedule: ClientSchedule | null;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -47,7 +48,8 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesHistories: [],
     clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
-    targetAppointment: null,
+    // targetAppointment: null,
+    targetClientSchedule: null,
   }),
   getters: {
     userOptions(state) {
@@ -59,7 +61,7 @@ export const useAppointmentStore = defineStore('appointment', {
     },
     clientQuery(state): ClientsGetParams {
       return {
-        phones: [state.clientPhone],
+        nameOrPhone: state.clientPhone,
       };
     },
     queryCalendarStyle(state) {
@@ -78,7 +80,7 @@ export const useAppointmentStore = defineStore('appointment', {
         count,
       };
     },
-    targetAppointmentType: state => state?.targetAppointment?.userShift?.type,
+    // targetAppointmentType: state => state?.targetAppointment?.userShift?.type,
   },
   actions: {
     async getUsers(spaceIds: number[]) {
@@ -135,8 +137,12 @@ export const useAppointmentStore = defineStore('appointment', {
       const data = await fetchClientSchedulesInProgress(date);
       this.clientSchedulesInProgress = data;
     },
-    async getScheduleDetail(scheduleId: number) {
-      this.targetAppointment = await fetchClientScheduleDetail(scheduleId);
+    // async getScheduleDetail(scheduleId: number) {
+    //   this.targetAppointment = await fetchClientScheduleDetail(scheduleId);
+    // },
+    async getClientSchedule(clientScheduleId: number) {
+      const data = await fetchClientSchedule(clientScheduleId);
+      this.targetClientSchedule = data;
     },
   },
 });

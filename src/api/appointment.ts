@@ -25,8 +25,7 @@ export interface Location {
 }
 
 export interface ClientsGetParams {
-  names?: string[];
-  phones?: string[];
+  nameOrPhone: string;
 }
 
 export interface ClientAssociation {
@@ -42,6 +41,33 @@ export interface Client extends ClientAssociation {
   lineUserId: string;
   isVerifiedBySMS: boolean;
   associations: ClientAssociation[];
+}
+
+export interface Record {
+  chiefComplaint: string;
+  pastHistory: string;
+  occupationType: string;
+  exerciseHabits: string;
+  others: string;
+  clinicalObservation: string;
+  palpation: string;
+  movementAssessment: string;
+  problemSummary: null;
+  treatmentNotes: string;
+  forExerciseGroup: string;
+  assessmentResults: string;
+  treatmentPlan: string;
+  forFrontDesk: string;
+  attachments: string[];
+  note: string;
+  dynamicPressureAttachments: string[];
+  staticPressureAttachments: string[];
+  personalHealthStatus: string;
+  nutritionistAdvice: string;
+  customerProblemDescription: string;
+  assessmentStatus: string;
+  productDescription: string;
+  coachAdvice: string;
 }
 
 export interface ClientSchedule {
@@ -62,6 +88,8 @@ export interface ClientSchedule {
   isBeenRearranged: boolean;
   isRearrangedClientSchedule: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
+  medicalAndTrainingRecordId: number;
+  record: Record & { userShiftType: number };
 }
 
 export interface BookingItem {
@@ -143,9 +171,9 @@ export interface MedicalRecord {
   productDescription: string;
   coachAdvice: string;
 }
-export interface ClientScheduleDetail extends ClientSchedule {
-  record: MedicalRecord;
-};
+// export interface ClientScheduleDetail extends ClientSchedule {
+//   record: MedicalRecord;
+// };
 
 // ========== Requests ==========
 
@@ -183,10 +211,10 @@ export async function createAppointmentRearrange(payload: AppointmentRearrangeRe
   return data;
 }
 
-export async function fetchClientScheduleDetail(clientScheduleId: number) {
-  const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
-  return data;
-}
+// export async function fetchClientScheduleDetail(clientScheduleId: number) {
+//   const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
+//   return data;
+// }
 
 export async function fetchClientSchedulesNotStarted(params: ClientSchedulesNotStartedReq) {
   const { data } = await api.get<ClientSchedule[]>('clientSchedules/not-started', { params });
@@ -210,6 +238,11 @@ export async function fetchClientSchedulesInProgress(date: string) {
 
 export async function restoreClientSchedule(clientScheduleId: number) {
   const { data } = await api.post(`clientSchedules/${clientScheduleId}/restore`);
+  return data;
+}
+
+export async function fetchClientSchedule(clientScheduleId: number) {
+  const { data } = await api.get<ClientSchedule>(`clientSchedules/${clientScheduleId}`);
   return data;
 }
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
 import { omit } from 'radash';
-import type { Role, User } from './user';
+import type { Role, Space, User } from './user';
 
 // ========== Types ==========
 
@@ -18,20 +18,21 @@ export interface ShiftTemplate {
   name: string;
   startTime: string;
   endTime: string;
-  notAvailableTimes: Duration[];
+  notAvailableTimes?: Duration[];
   color: string;
   maxClients: number | null;
 }
 export interface UserShift {
   id: number;
   spaceId: number;
+  space?: Space; // this property is for ClientSchedule temporary
   userId: number;
   type: number;
   name: string;
   date: string;
   startTime: string;
   endTime: string;
-  notAvailableTimes: Duration[];
+  notAvailableTimes?: Duration[] ;
   color: string;
   maxClients: number | null;
   user: {

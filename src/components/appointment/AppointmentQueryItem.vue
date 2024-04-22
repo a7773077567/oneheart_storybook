@@ -2,6 +2,7 @@
 import type { ClientSchedule } from '@/api/appointment';
 import { getType } from '@/utils/mappers';
 import { computed } from 'vue';
+import { ScheduleState } from '@/const/schedule';
 
 interface Props {
   data: ClientSchedule;
@@ -14,17 +15,7 @@ defineEmits<{
   restore: [clientScheduleId: number];
 }>();
 
-const scheduleState = new Map([
-  [1, { label: '預約' }],
-  [2, { label: '報到' }],
-  [3, { label: '完成服務', bgc: '#D9D9D9', color: '#000000' }],
-  [4, { label: '病歷完成' }],
-  [5, { label: '取消預約', bgc: '#E86969', color: '#FFFFFF' }],
-  [6, { label: '預約改期', bgc: '#91D0C1', color: '#FFFFFF' }],
-  [7, { label: '刪除' }],
-]);
-
-const targetState = computed(() => scheduleState.get(props.data.state));
+const targetState = computed(() => ScheduleState.get(props.data.state));
 const showState = computed(() => props.historyMode);
 const stateLabel = computed(() => targetState.value?.label);
 const stateBgc = computed(() => targetState.value?.bgc);

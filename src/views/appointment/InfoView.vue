@@ -8,16 +8,16 @@ interface Props {
 }
 const props = defineProps<Props>();
 const appointmentStore = useAppointmentStore();
-await appointmentStore.getScheduleDetail(+props.scheduleId);
-
-const tabs = computed(() => appointmentStore.targetAppointmentType ? getTabs(appointmentStore.targetAppointmentType) : []);
+await appointmentStore.getClientSchedule(+props.scheduleId);
+const userShiftType = computed(() => appointmentStore.targetClientSchedule?.userShift.type);
+const tabs = computed(() => getTabs());
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
 
-function getTabs(displayType: number) {
+function getTabs() {
   const types = Object.values(Types);
-  const tabs = types.find(type => type.identifier === displayType)!.tabs;
+  const tabs = types.find(type => type.identifier === userShiftType.value)!.tabs;
   return tabs.map(item => ({
     name: item,
     label: TabMap.get(item),
@@ -71,7 +71,7 @@ function getRecordModules() {
       >
         <KeepAlive>
           <Suspense>
-            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetAppointment" />
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
           </Suspense>
         </KeepAlive>
       </QTabPanel>

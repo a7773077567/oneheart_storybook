@@ -118,7 +118,7 @@ function getCalendarStyle() {
 
 <style lang="scss" scoped>
 .calendar {
-  max-width: 1225px;
+  // max-width: 1225px;
   &__nav {
     display: flex;
     justify-content: space-between;

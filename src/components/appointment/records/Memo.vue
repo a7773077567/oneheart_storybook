@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { addMemo, getMemos, replyMemo } from '@/api';
-import type { ClientScheduleDetail, Memo } from '@/api';
+import type { ClientSchedule, Memo } from '@/api';
 import { ShiftType, TherapyTypes } from '@/const/general';
 
 const props = defineProps<{
   scheduleId: number;
-  scheduleDetail: ClientScheduleDetail;
+  scheduleDetail: ClientSchedule;
 }>();
 
 const memoLogs = ref<Memo[]>([]);
