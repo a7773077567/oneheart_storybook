@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
+import { useAppointmentStore } from '@/stores';
 
 interface Props {
-  type: string;
+  scheduleId: string;
 }
 const props = defineProps<Props>();
 
+const appointmentStore = useAppointmentStore();
+await appointmentStore.getClientSchedule(+props.scheduleId);
+
+const userShiftType = computed(() => appointmentStore.targetClientSchedule?.userShift.type);
 const tabs = computed(() => getTabs());
 
 const currentTab = ref('clientInfo');
@@ -14,7 +19,7 @@ const recordModules = getRecordModules();
 
 function getTabs() {
   const types = Object.values(Types);
-  const tabs = types.find(type => type.identifier === +props.type)!.tabs;
+  const tabs = types.find(type => type.identifier === userShiftType.value)!.tabs;
   return tabs.map(item => ({
     name: item,
     label: TabMap.get(item),

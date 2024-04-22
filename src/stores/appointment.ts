@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
 import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
@@ -25,6 +25,7 @@ interface State {
   clientSchedulesHistories: ClientSchedule[];
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
+  targetClientSchedule: ClientSchedule | null;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -46,6 +47,7 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesHistories: [],
     clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
+    targetClientSchedule: null,
   }),
   getters: {
     userOptions(state) {
@@ -57,7 +59,7 @@ export const useAppointmentStore = defineStore('appointment', {
     },
     clientQuery(state): ClientsGetParams {
       return {
-        phones: [state.clientPhone],
+        nameOrPhone: state.clientPhone,
       };
     },
     queryCalendarStyle(state) {
@@ -131,6 +133,10 @@ export const useAppointmentStore = defineStore('appointment', {
     async getClientSchedulesInProgress(date: string) {
       const data = await fetchClientSchedulesInProgress(date);
       this.clientSchedulesInProgress = data;
+    },
+    async getClientSchedule(clientScheduleId: number) {
+      const data = await fetchClientSchedule(clientScheduleId);
+      this.targetClientSchedule = data;
     },
   },
 });

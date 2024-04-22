@@ -17,13 +17,13 @@ export function getDurationLabel(startTime: string, endTime: string, isNotAvaila
   }
 
   return `${startTime}-${endTime}`;
-
-  function amOrPm(hr: number) {
-    return hr >= 12 ? '下午' : '上午';
-  }
 }
 
 export function getTimeDate(time: string) {
   const [hr, min] = time.split(':');
   return dayjs({ h: hr, m: min });
+}
+
+export function amOrPm(hr: number) {
+  return hr >= 12 ? '下午' : '上午';
 }

@@ -1,19 +1,49 @@
 <script setup lang="ts">
-const data = [
-  { label: '姓名', value: '王小姐' },
-  { label: '電話', value: '0900-000-000' },
-  { label: '地址', value: '台中市西屯區青海路' },
-  { label: '日期', value: '2024/01/23' },
-  { label: '時間', value: '下午15:00-下午16:00' },
-  { label: '地點', value: '桃園物理治療' },
-  { label: '醫師', value: 'AA治療師' },
-];
+import { useAppointmentStore } from '@/stores';
+import { getDurationLabel } from '@/utils/date';
+import dayjs from 'dayjs';
+import { ScheduleState } from '@/const/schedule';
+import router from '@/router';
+import { useQuasar } from 'quasar';
+import { cancelClientScheduleNotStarted } from '@/api/appointment';
+import { computed } from 'vue';
 
-const states = [
-  { label: '狀態', value: '預約改期' },
-  { label: '更改時間', value: '2024/01/03' },
-  { label: '更改人帳號', value: 'example@gmail.com' },
-];
+const $q = useQuasar();
+const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const client = computed(() => schedule.value.client);
+const userShift = computed(() => schedule.value.userShift);
+const scheduleState = computed(() => ScheduleState.get(schedule.value.state)?.label);
+
+const data = computed(() => [
+  { label: '姓名', value: client.value.name },
+  { label: '電話', value: client.value.phone },
+  { label: '地址', value: '台中市西屯區青海路(mock data)' },
+  { label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
+  { label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
+  { label: '地點', value: userShift.value.space?.name },
+  { label: '醫師', value: userShift.value.name },
+]);
+
+const states = computed(() => [
+  { label: '狀態', value: scheduleState.value },
+  // { label: '更改時間', value: '2024/01/03' },
+  // { label: '更改人帳號', value: 'example@gmail.com' },
+]);
+
+function rearrangeClientSchedule() {
+  appointmentStore.targetClientScheduleNotStarted = appointmentStore.targetClientSchedule;
+  router.push({ name: 'appointmentCurrentQueryRearrange' });
+}
+
+function cancelClientSchedule() {
+  $q.dialog({
+    message: '是否確定要取消預約？',
+  }).onOk(async () => {
+    await cancelClientScheduleNotStarted(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+  });
+}
 </script>
 
 <template>
@@ -51,8 +81,16 @@ const states = [
         </p>
       </div>
     </div>
-    <div class="client-info__action">
-      <QBtn label="報到" outline style="width: 127px;" />
+    <div class="client-info__actions">
+      <div class="actions">
+        <div class="actions__rearrange">
+          <QBtn label="預約改期" :disable="schedule.state !== 1" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+          <QBtn label="取消預約" :disable="schedule.state === 5" outline style="width: 127px;" @click="cancelClientSchedule" />
+        </div>
+        <div class="actions__checkin">
+          <QBtn label="報到" outline style="width: 127px;" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -63,11 +101,11 @@ const states = [
     margin-bottom: 15px;
   }
   &__caption {
-    margin-bottom: 65px;
+    margin-bottom: 25px;
   }
-  &__action {
-    display: flex;
-    justify-content: flex-end;
+  &__actions {
+    // display: flex;
+    // justify-content: flex-end;
   }
 }
 
@@ -100,6 +138,17 @@ const states = [
   }
   &__value {
     color: #e86969;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  &__rearrange {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 </style>
