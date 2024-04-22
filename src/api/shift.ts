@@ -18,7 +18,7 @@ export interface ShiftTemplate {
   name: string;
   startTime: string;
   endTime: string;
-  notAvailableTimes?: Duration[];
+  notAvailableTimes: Duration[];
   color: string;
   maxClients: number | null;
 }
@@ -32,7 +32,7 @@ export interface UserShift {
   date: string;
   startTime: string;
   endTime: string;
-  notAvailableTimes?: Duration[] ;
+  notAvailableTimes: Duration[] ;
   color: string;
   maxClients: number | null;
   user: {
