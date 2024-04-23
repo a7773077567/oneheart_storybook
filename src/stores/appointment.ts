@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, getUploadS3Url, upload2awsS3 } from '@/api';
 import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
@@ -25,7 +25,6 @@ interface State {
   clientSchedulesHistories: ClientSchedule[];
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
-  // targetAppointment: ClientScheduleDetail | null;
   targetClientSchedule: ClientSchedule | null;
 }
 
@@ -48,7 +47,6 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesHistories: [],
     clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
-    // targetAppointment: null,
     targetClientSchedule: null,
   }),
   getters: {
@@ -80,7 +78,6 @@ export const useAppointmentStore = defineStore('appointment', {
         count,
       };
     },
-    // targetAppointmentType: state => state?.targetAppointment?.userShift?.type,
   },
   actions: {
     async getUsers(spaceIds: number[]) {
@@ -137,12 +134,15 @@ export const useAppointmentStore = defineStore('appointment', {
       const data = await fetchClientSchedulesInProgress(date);
       this.clientSchedulesInProgress = data;
     },
-    // async getScheduleDetail(scheduleId: number) {
-    //   this.targetAppointment = await fetchClientScheduleDetail(scheduleId);
-    // },
     async getClientSchedule(clientScheduleId: number) {
       const data = await fetchClientSchedule(clientScheduleId);
       this.targetClientSchedule = data;
     },
+    async uploadAttachments(medicalRecordId: number, attachment: File) {
+      const { url, fileName } = await getUploadS3Url(medicalRecordId);
+      await upload2awsS3(url, attachment);
+      return fileName;
+    },
   },
+
 });

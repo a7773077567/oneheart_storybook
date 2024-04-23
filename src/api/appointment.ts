@@ -43,6 +43,7 @@ export interface Client extends ClientAssociation {
   associations: ClientAssociation[];
 }
 
+// todo 區分不同病例種類
 export interface Record {
   chiefComplaint: string;
   pastHistory: string;
@@ -68,6 +69,12 @@ export interface Record {
   assessmentStatus: string;
   productDescription: string;
   coachAdvice: string;
+}
+
+export interface Nutrition {
+  personalHealthStatus: string; // 個人健康狀況
+  nutritionistAdvice: string; // 營養師建議
+  attachments: string[];
 }
 
 export interface ClientSchedule {
@@ -175,6 +182,13 @@ export interface MedicalRecord {
 //   record: MedicalRecord;
 // };
 
+interface UploadInfo {
+  fileName: string;
+  maxFileSizeInMB: number;
+  method: 'PUT';
+  url: string;
+}
+
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -211,11 +225,6 @@ export async function createAppointmentRearrange(payload: AppointmentRearrangeRe
   return data;
 }
 
-// export async function fetchClientScheduleDetail(clientScheduleId: number) {
-//   const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
-//   return data;
-// }
-
 export async function fetchClientSchedulesNotStarted(params: ClientSchedulesNotStartedReq) {
   const { data } = await api.get<ClientSchedule[]>('clientSchedules/not-started', { params });
   return data;
@@ -243,6 +252,14 @@ export async function restoreClientSchedule(clientScheduleId: number) {
 
 export async function fetchClientSchedule(clientScheduleId: number) {
   const { data } = await api.get<ClientSchedule>(`clientSchedules/${clientScheduleId}`);
+  return data;
+}
+export async function updateClientSchedule(medicalRecordId: number, updateContent: Partial<Record>) {
+  const { data } = await api.patch(`medicalAndTrainingRecords/${medicalRecordId}`, updateContent);
+  return data;
+}
+export async function getUploadS3Url(medicalRecordId: number) {
+  const { data } = await api.get<UploadInfo>(`medicalAndTrainingRecords/${medicalRecordId}/attachments/write-url`);
   return data;
 }
 
