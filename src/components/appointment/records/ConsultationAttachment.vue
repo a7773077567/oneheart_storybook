@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import Konva from 'konva';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import type { ClientScheduleDetail } from '@/api';
+import { updateClientSchedule } from '@/api';
 
-defineProps<{
+const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-const container = ref();
-const selectTool = ref();
+defineEmits<{
+  (e: 'save'): void;
+}>();
 
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
+
+const container = ref();
 type Mode = 'brush' | 'eraser';
 const mode = ref<Mode>('brush');
 
@@ -51,6 +56,25 @@ function createKonva() {
     context.value!.strokeStyle = '#df4b26';
     context.value!.lineJoin = 'round';
     context.value!.lineWidth = 5;
+
+    // background
+    const img = new Image();
+    img.src = ('/images/humanGraph.png');
+
+    img.onload = function () {
+      let background = new Konva.Rect({
+        x: 0,
+        y: 0,
+        // width: stage.value.width(),
+        // height: stage.value.height(),
+        width: 874,
+        height: 750,
+        fillPatternImage: img,
+        fillPatternRepeat: 'no-repeat',
+        listening: false,
+      });
+      layer.add(background);
+    };
 
     let lastPointerPosition = ref<Konva.Vector2d | null>(null);
 
@@ -106,27 +130,34 @@ function createKonva() {
   return { init, save };
 }
 
-function handleModeChange(_mode: Mode) {
-  mode.value = _mode;
-}
-
 function handleSave() {
   const canvasJson = save();
-  console.log(canvasJson);
+  // to fix
+  updateClientSchedule(recordId.value, { attachments: canvasJson });
 }
 </script>
 
 <template>
   <div class="consultation_attachment">
     <div class="settings">
-      <select id="tool" ref="selectTool" @change="handleModeChange">
-        <option value="brush">
-          Brush
-        </option>
-        <option value="eraser">
-          Eraser
-        </option>
-      </select>
+      <div class="canvas_tools">
+        <QBtn
+          round
+          icon="o_edit"
+          size="md"
+          :color="mode === 'brush' ? 'primary' : 'white'"
+          :text-color="mode === 'brush' ? 'white' : 'black'"
+          @click="mode = 'brush'"
+        />
+        <QBtn
+          round
+          icon="auto_fix_normal"
+          size="md"
+          :color="mode === 'eraser' ? 'primary' : 'white'"
+          :text-color="mode === 'eraser' ? 'white' : 'black'"
+          @click="mode = 'eraser'"
+        />
+      </div>
       <QIcon name="save" class="save_btn" @click="handleSave" />
     </div>
     <div id="container" ref="container" style="width:100%; height:100%" />
@@ -137,11 +168,17 @@ function handleSave() {
 .consultation_attachment {
   width: 100%;
   height: 100%;
+  .canvas_tools {
+    .q-btn {
+      margin: 0 6px;
+    }
+  }
 
   .settings {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 12px;
     .save_btn {
       font-size: 20px;
     }
