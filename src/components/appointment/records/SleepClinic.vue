@@ -11,10 +11,6 @@ const props = defineProps<{
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-const emit = defineEmits<{
-  (e: 'save'): void;
-}>();
-
 const appointmentStore = useAppointmentStore();
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 
@@ -42,7 +38,7 @@ const onSubmit = handleSubmit(async (formValue) => {
   }
 
   await updateClientSchedule(recordId.value, { ...formValue, attachments: [...formValue.attachments, ...fileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[] });
-  emit('save');
+  appointmentStore.getClientSchedule(props.scheduleId);
 });
 </script>
 
