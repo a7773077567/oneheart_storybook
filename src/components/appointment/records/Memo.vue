@@ -3,11 +3,14 @@ import { computed, ref } from 'vue';
 import { addMemo, getMemos, replyMemo } from '@/api';
 import type { ClientScheduleDetail, Memo } from '@/api';
 import { ShiftType, TherapyTypes } from '@/const/general';
+import { useUserStore } from '@/stores';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
+
+const userStore = useUserStore();
 
 const memoLogs = ref<Memo[]>([]);
 const newMessage = ref('');
@@ -15,7 +18,7 @@ const messageTo = ref(ShiftType['物理治療門診']);
 const messageFrom = computed(() => ({
   shiftId: props.scheduleDetail?.userShift?.id ?? '',
   shiftType: props.scheduleDetail?.userShift?.type ?? ShiftType['物理治療門診'],
-  person: props.scheduleDetail?.userShift?.user?.name ?? '', // to confirmed, use login account
+  person: userStore.userInfo?.name ?? '', // to confirmed, use login account
 }));
 const clientId = computed(() => props.scheduleDetail?.clientId);
 
@@ -39,6 +42,7 @@ async function addMemoReply() {
     { clientId: clientId.value, memoId: targetMemoId.value },
     { clientScheduleId: props.scheduleId, replyContent: replyMsg.value },
   );
+  replyMsg.value = '';
   getData();
 }
 
@@ -97,15 +101,15 @@ async function getData() {
           </div>
           <QList v-if="sessionDetail?.reply?.length > 0" class="reply_list">
             <template v-for="(replyContent, idx) in sessionDetail.reply" :key="idx">
-              <QItem class="q-px-sm">
+              <QItem class="q-pa-xs">
                 <QItemSection>
                   <div class="messenger_container">
                     <QIcon name="account_circle" size="30px" />
                     <span>{{ replyContent.fromUser?.name }} / </span>
                     <span>{{ ShiftType[replyContent.fromUserShiftType] }}</span>
                   </div>
-                  <QItemLabel caption lines="2">
-                    Secondary line text. Lorem ipsum dolor sit amet, consectetur adipiscit elit.
+                  <QItemLabel caption class="q-py-md q-px-sm">
+                    {{ replyContent.content }}
                   </QItemLabel>
                 </QItemSection>
 
@@ -115,7 +119,7 @@ async function getData() {
                   </QItemLabel>
                 </QItemSection>
               </QItem>
-              <QSeparator spaced inset />
+              <QSeparator spaced inset class="q-ma-xs" />
             </template>
           </QList>
 
@@ -252,11 +256,6 @@ async function getData() {
     .reply_list {
       overflow: auto;
       flex: 1;
-      // > li {
-      //   padding: 8px;
-      //   min-height: 80px;
-      //   border-bottom: 1px solid black;
-      // }
     }
   }
 }
