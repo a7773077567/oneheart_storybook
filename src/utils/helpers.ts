@@ -46,3 +46,13 @@ export function getArray(count: number) {
 export function removeNullishKeys<T extends Record<string, any>>(obj: T): any {
   return Object.fromEntries(Object.entries(obj).filter(([_, value]) => !(value === '' || value == null)));
 }
+
+export function extractUuidFromS3Url(url: string) {
+  const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+  const match = url.match(uuidRegex);
+
+  if (match && match.length > 0) {
+    return match[0];
+  }
+  return null;
+}
