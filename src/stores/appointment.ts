@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -25,7 +25,7 @@ interface State {
   clientSchedulesHistories: ClientSchedule[];
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
-  targetClientSchedule: ClientSchedule | null;
+  targetClientSchedule: ClientScheduleDetail | null;
 }
 
 export const useAppointmentStore = defineStore('appointment', {

@@ -77,6 +77,14 @@ export interface Nutrition {
   attachments: string[];
 }
 
+export interface Sleep {
+  customerProblemDescription: string; // 客戶問題描述
+  assessmentStatus: string; // 評估狀況
+  productDescription: string; // 產品描述
+  note: string; // 備註
+  attachments: string[];
+}
+
 export interface ClientSchedule {
   id: number;
   clientId: number;
@@ -95,8 +103,6 @@ export interface ClientSchedule {
   isBeenRearranged: boolean;
   isRearrangedClientSchedule: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
-  medicalAndTrainingRecordId: number;
-  record: Record & { userShiftType: number };
 }
 
 export interface BookingItem {
@@ -178,9 +184,11 @@ export interface MedicalRecord {
   productDescription: string;
   coachAdvice: string;
 }
-// export interface ClientScheduleDetail extends ClientSchedule {
-//   record: MedicalRecord;
-// };
+
+export interface ClientScheduleDetail extends ClientSchedule {
+  medicalAndTrainingRecordId: number;
+  record: Record & { userShiftType: number };
+};
 
 interface UploadInfo {
   fileName: string;
@@ -251,7 +259,7 @@ export async function restoreClientSchedule(clientScheduleId: number) {
 }
 
 export async function fetchClientSchedule(clientScheduleId: number) {
-  const { data } = await api.get<ClientSchedule>(`clientSchedules/${clientScheduleId}`);
+  const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
   return data;
 }
 export async function updateClientSchedule(medicalRecordId: number, updateContent: Partial<Record>) {
