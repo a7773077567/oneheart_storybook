@@ -71,7 +71,7 @@ function getRecordModules() {
       >
         <KeepAlive>
           <Suspense>
-            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" @save=" appointmentStore.getClientSchedule(+props.scheduleId)" />
           </Suspense>
         </KeepAlive>
       </QTabPanel>
