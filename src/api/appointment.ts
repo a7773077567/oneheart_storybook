@@ -96,6 +96,20 @@ export interface MedicalRecord {
   attachments: string[];
 }
 
+export interface PhysicalConsultation {
+  chiefComplaint: string; // 主訴
+  pastHistory: string; // 病史
+  occupationType: string; // 職業類型/生活型態
+  exerciseHabits: string; // 運動習慣
+  others: string; // 其他
+  clinicalObservation: string; // 臨床觀察
+  palpation: string; // 觸診
+  movementAssessment: string; // 動作測試
+  problemSummary: string; // 問題總結
+  treatmentNotes: string; // 治療備註
+  forExerciseGroup: string; // 給運動組的建議
+}
+
 export interface ClientSchedule {
   id: number;
   clientId: number;

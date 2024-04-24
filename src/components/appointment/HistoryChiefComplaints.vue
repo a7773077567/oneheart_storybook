@@ -13,7 +13,7 @@ defineEmits<{
 <template>
   <QCard style="width: 440px; height: 612px;">
     <QCardSection>
-      <QList class="column q-gutter-md">
+      <QList v-if="data.length > 0" class="column q-gutter-md">
         <QItem v-for="(item, idx) in data" :key="idx" clickable @click="$emit('choose', item)">
           <QItemSection>
             <QItemLabel class="q-mb-xs">
@@ -25,6 +25,9 @@ defineEmits<{
           </QItemSection>
         </QItem>
       </QList>
+      <div v-else>
+        無歷史資料
+      </div>
     </QCardSection>
   </QCard>
 </template>

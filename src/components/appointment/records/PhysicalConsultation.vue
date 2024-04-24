@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-
-const { handleSubmit } = useForm();
-const onSubmit = handleSubmit((values) => {
-  console.log(values);
-});
+import { HistoryChiefComplaints } from '@/components/appointment';
+import { type ClientScheduleDetail, type HistoryChiefComplaint, type PhysicalConsultation, updateClientSchedule } from '@/api/appointment';
+import { computed, ref } from 'vue';
+import { useAppointmentStore } from '@/stores';
+import { pick } from 'radash';
+import dayjs from 'dayjs';
+import { useQuasar } from 'quasar';
 
 interface DataItem {
   title: string;
@@ -14,10 +16,33 @@ interface DataItem {
     showCopyBtn?: boolean;
   }[];
 }
+
+const props = defineProps<{
+  scheduleId: number;
+  scheduleDetail: ClientScheduleDetail;
+}>();
+
+const appointmentStore = useAppointmentStore();
+const $q = useQuasar();
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
+await appointmentStore.getHistoryChiefComplaints(recordId.value);
+const stateOfHistoryDialog = ref(false);
+const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
+
+const initialValues = computed(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'pastHistory', 'occupationType', 'exerciseHabits', 'others', 'clinicalObservation', 'palpation', 'movementAssessment', 'problemSummary', 'treatmentNotes', 'forExerciseGroup']));
+const { handleSubmit, setFieldValue, resetForm } = useForm({ initialValues: initialValues.value });
+const onSubmit = handleSubmit(async (formValue) => {
+  await updateClientSchedule(recordId.value, formValue);
+  $q.notify({ message: '已存檔', timeout: 200 });
+
+  await appointmentStore.getClientSchedule(props.scheduleId);
+  resetForm({ values: initialValues.value });
+});
+
 const data: DataItem[] = [
   {
     title: '基本資料',
-    items: [{ name: 'chiefComplain', label: '主訴', showCopyBtn: true }, { name: 'pastHistory', label: '病史' }, { name: 'occupationType', label: '職業類型/生活型態' }, { name: 'exerciseHabits', label: '運動習慣' }, { name: 'others', label: '其他' }],
+    items: [{ name: 'chiefComplaint', label: '主訴', showCopyBtn: true }, { name: 'pastHistory', label: '病史' }, { name: 'occupationType', label: '職業類型/生活型態' }, { name: 'exerciseHabits', label: '運動習慣' }, { name: 'others', label: '其他' }],
   },
   {
     title: '理學檢查',
@@ -37,12 +62,17 @@ const data: DataItem[] = [
   },
 
 ];
+
+function pasteHistory(history: HistoryChiefComplaint) {
+  setFieldValue('chiefComplaint', history.chiefComplaint);
+  stateOfHistoryDialog.value = false;
+}
 </script>
 
 <template>
   <div class="form">
     <div class="form__header">
-      <div>2024/01/23</div>
+      <div>{{ date }}</div>
     </div>
     <div class="form__body">
       <div v-for="({ items, title }, idx) in data" :key="idx" class="group">
@@ -53,7 +83,7 @@ const data: DataItem[] = [
           <div v-for="(item, itemIdx) in items" :key="itemIdx" class="input">
             <div class="input__label">
               <span>{{ item.label }}</span>
-              <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" />
+              <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="stateOfHistoryDialog = true" />
             </div>
             <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
           </div>
@@ -61,9 +91,12 @@ const data: DataItem[] = [
       </div>
     </div>
     <div class="form__actions">
-      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" />
-      <QBtn label="完成服務" outline style="width: 126px;height: 40px;" @click="onSubmit" />
+      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" @click="onSubmit" />
+      <QBtn label="完成服務" outline style="width: 126px;height: 40px;" />
     </div>
+    <QDialog v-model="stateOfHistoryDialog">
+      <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
+    </QDialog>
   </div>
 </template>
 
