@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Konva from 'konva';
 import { computed, onMounted, ref } from 'vue';
 import type { ClientScheduleDetail } from '@/api';
 import { updateClientSchedule } from '@/api';
@@ -23,7 +22,7 @@ const container = ref();
 const { init, importDrawing, save, mode } = useKonva();
 
 onMounted(() => {
-  if (initialValues.value) {
+  if (initialValues.value && Object.keys(initialValues.value).length > 0) {
     importDrawing(initialValues.value);
   }
   else {
@@ -64,7 +63,7 @@ async function handleSave() {
       </div>
       <QBtn round flat icon="o_save" size="md" @click="handleSave" />
     </div>
-    <div id="container" ref="container" style="width:100%; height:100%" />
+    <div id="container" ref="container" />
   </div>
 </template>
 
@@ -89,4 +88,3 @@ async function handleSave() {
   }
 }
 </style>
-@/composables/konva
