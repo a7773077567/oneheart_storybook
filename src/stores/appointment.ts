@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams } from '@/api/appointment';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, getUploadS3Url, upload2awsS3 } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api/appointment';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -26,6 +26,7 @@ interface State {
   clientSchedulesHistoriesQuery: ClientSchedulesHistoriesReq | null;
   clientSchedulesInProgress: ClientSchedule[];
   targetClientSchedule: ClientScheduleDetail | null;
+  historyChiefComplaints: HistoryChiefComplaint[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -48,6 +49,7 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesHistoriesQuery: null,
     clientSchedulesInProgress: [],
     targetClientSchedule: null,
+    historyChiefComplaints: [],
   }),
   getters: {
     userOptions(state) {
@@ -142,6 +144,10 @@ export const useAppointmentStore = defineStore('appointment', {
       const { url, fileName } = await getUploadS3Url(medicalRecordId);
       await upload2awsS3(url, attachment);
       return fileName;
+    },
+    async getHistoryChiefComplaints(medicalRecordId: number) {
+      const data = await fetchHistoryChiefComplaints(medicalRecordId);
+      this.historyChiefComplaints = data;
     },
   },
 

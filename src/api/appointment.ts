@@ -86,6 +86,16 @@ export interface Sleep {
   attachments: string[];
 }
 
+export interface MedicalRecord {
+  chiefComplaint: string; // 主訴
+  assessmentResults: string; // 評估結果
+  treatmentPlan: string; // 治療計畫
+  treatmentNotes: string; // 治療備註
+  forExerciseGroup: string; // 給運動組的建議
+  forFrontDesk: string; // 給櫃檯的建議
+  attachments: string[];
+}
+
 export interface ClientSchedule {
   id: number;
   clientId: number;
@@ -170,6 +180,10 @@ interface UploadInfo {
   url: string;
 }
 
+export interface HistoryChiefComplaint {
+  date: string;
+  chiefComplaint: string;
+}
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -241,6 +255,11 @@ export async function updateClientSchedule(medicalRecordId: number, updateConten
 }
 export async function getUploadS3Url(medicalRecordId: number) {
   const { data } = await api.get<UploadInfo>(`medicalAndTrainingRecords/${medicalRecordId}/attachments/write-url`);
+  return data;
+}
+
+export async function fetchHistoryChiefComplaints(medicalRecordId: number) {
+  const { data } = await api.get<HistoryChiefComplaint[]>(`medicalAndTrainingRecords/${medicalRecordId}/historyChiefComplaint`);
   return data;
 }
 

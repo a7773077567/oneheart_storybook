@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { ref } from 'vue';
-
-const data: DataItem[] = [
-  { name: 'chiefComplain', label: '主訴', showCopyBtn: true },
-  { name: 'assessmentResults', label: '評估結果' },
-  { name: 'treatmentPlan', label: '治療計畫' },
-  { name: 'treatmentNotes', label: '治療備註' },
-  { name: 'forExerciseGroup', label: '給運動組的建議' },
-  { name: 'forFrontDesk', label: '給櫃檯的建議' },
-];
-const stateOfHistoryDialog = ref(false);
-
-const { handleSubmit } = useForm();
-const onSubmit = handleSubmit((values) => {
-  console.log(values);
-});
+import { type ClientScheduleDetail, type HistoryChiefComplaint, type MedicalRecord, updateClientSchedule } from '@/api/appointment';
+import { computed, ref } from 'vue';
+import { useAppointmentStore } from '@/stores';
+import { HistoryChiefComplaints } from '@/components/appointment';
+import { pick } from 'radash';
+import { useQuasar } from 'quasar';
+import { extractUuidFromS3Url } from '@/utils/helpers';
+import dayjs from 'dayjs';
 
 interface DataItem {
   name: string;
@@ -23,11 +15,54 @@ interface DataItem {
   showCopyBtn?: boolean;
 }
 
+const props = defineProps<{
+  scheduleId: number;
+  scheduleDetail: ClientScheduleDetail;
+}>();
+
+const appointmentStore = useAppointmentStore();
+const $q = useQuasar();
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
+const stateOfHistoryDialog = ref(false);
+const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
+await appointmentStore.getHistoryChiefComplaints(recordId.value);
+
+const data: DataItem[] = [
+  { name: 'chiefComplaint', label: '主訴', showCopyBtn: true },
+  { name: 'assessmentResults', label: '評估結果' },
+  { name: 'treatmentPlan', label: '治療計畫' },
+  { name: 'treatmentNotes', label: '治療備註' },
+  { name: 'forExerciseGroup', label: '給運動組的建議' },
+  { name: 'forFrontDesk', label: '給櫃檯的建議' },
+];
+
+const initialValues = computed(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'assessmentResults', 'treatmentPlan', 'treatmentNotes', 'forExerciseGroup', 'forFrontDesk', 'attachments']));
+const { handleSubmit, resetForm, setFieldValue, values } = useForm({ initialValues: initialValues.value });
+const displayAttachments = computed(() => values.attachments?.map((attUrl, idx) => ({ name: `attachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
+
+const newAttachment = ref([]);
+
+const onSubmit = handleSubmit(async (formValue) => {
+  let fileUUIDs: string[] = [];
+  if (newAttachment.value.length > 0) {
+    fileUUIDs = await Promise.all(newAttachment.value.map(file =>
+      appointmentStore.uploadAttachments(recordId.value, file),
+    ));
+  }
+
+  await updateClientSchedule(recordId.value, { ...formValue, attachments: [...formValue.attachments ?? [], ...fileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[] });
+  $q.notify({ message: '已存檔', timeout: 200 });
+
+  await appointmentStore.getClientSchedule(props.scheduleId);
+  resetForm({ values: initialValues.value });
+});
+
 function openHistoryDialog() {
   stateOfHistoryDialog.value = true;
 }
 
-function pasteHistory() {
+function pasteHistory(history: HistoryChiefComplaint) {
+  setFieldValue('chiefComplaint', history.chiefComplaint);
   stateOfHistoryDialog.value = false;
 }
 </script>
@@ -35,7 +70,7 @@ function pasteHistory() {
 <template>
   <div class="form">
     <div class="form__header">
-      <div>2024/01/23</div>
+      <div>{{ date }}</div>
     </div>
     <div class="form__body">
       <div v-for="(item, idx) in data" :key="idx" class="input">
@@ -45,29 +80,21 @@ function pasteHistory() {
         </div>
         <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
       </div>
-      <OFile name="attachment" label="選擇檔案" />
+      <OFile v-model="newAttachment" label="選擇檔案" multiple />
+      <div class="preview_files">
+        <OPreview
+          v-for="(attachment, idx) in displayAttachments" :key="attachment.name"
+          :name="attachment.name"
+          :label="`附件資料 ${idx + 1}`"
+        />
+      </div>
     </div>
     <div class="form__actions">
-      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" />
-      <QBtn label="完成服務" outline style="width: 126px;height: 40px;" @click="onSubmit" />
+      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" @click="onSubmit" />
+      <QBtn label="完成服務" outline style="width: 126px;height: 40px;" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
-      <QCard style="width: 440px; height: 612px;">
-        <QCardSection>
-          <QList class="column q-gutter-md">
-            <QItem clickable @click="pasteHistory">
-              <QItemSection>
-                <QItemLabel class="q-mb-xs">
-                  2024/01/23
-                </QItemLabel>
-                <QItemLabel style="height: 137px;overflow: scroll; border: 1px solid black; padding: 10px;">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo minus eius excepturi tempora aperiam tempore? Est quo aliquid magni, deleniti nobis facere veniam voluptates molestiae voluptatum alias? Delectus, saepe reprehenderit? lorem
-                </QItemLabel>
-              </QItemSection>
-            </QItem>
-          </QList>
-        </QCardSection>
-      </QCard>
+      <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
     </QDialog>
   </div>
 </template>
