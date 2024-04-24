@@ -69,6 +69,7 @@ export interface Record {
   assessmentStatus: string;
   productDescription: string;
   coachAdvice: string;
+  canvasAttachment: string;
 }
 
 export interface Nutrition {
@@ -155,34 +156,6 @@ export interface AppointmentRearrangeReq {
   clientScheduleId: number;
   slotId: number;
   userShiftId: number;
-}
-
-export interface MedicalRecord {
-  userShiftType: number;
-  chiefComplaint: string; // 主訴
-  pastHistory: string;
-  occupationType: string;
-  exerciseHabits: string;
-  others: string;
-  clinicalObservation: string;
-  palpation: string;
-  movementAssessment: string;
-  problemSummary: string;
-  treatmentNotes: string;
-  forExerciseGroup: string;
-  assessmentResults: string;
-  treatmentPlan: string;
-  forFrontDesk: string;
-  attachments: string[];
-  note: string;
-  dynamicPressureAttachments: string[];
-  staticPressureAttachments: string[];
-  personalHealthStatus: string;
-  nutritionistAdvice: string;
-  customerProblemDescription: string;
-  assessmentStatus: string;
-  productDescription: string;
-  coachAdvice: string;
 }
 
 export interface ClientScheduleDetail extends ClientSchedule {
