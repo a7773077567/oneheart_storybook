@@ -36,7 +36,7 @@ const data: DataItem[] = [
   { name: 'forFrontDesk', label: '給櫃檯的建議' },
 ];
 
-const initialValues = computed(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'assessmentResults', 'treatmentPlan', 'treatmentNotes', 'forExerciseGroup', 'forFrontDesk', 'attachments']));
+const initialValues = computed<{ [key in keyof MedicalRecord]: MedicalRecord[key] }>(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'assessmentResults', 'treatmentPlan', 'treatmentNotes', 'forExerciseGroup', 'forFrontDesk', 'attachments']));
 const { handleSubmit, resetForm, setFieldValue, values } = useForm({ initialValues: initialValues.value });
 const displayAttachments = computed(() => values.attachments?.map((attUrl, idx) => ({ name: `attachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
 
