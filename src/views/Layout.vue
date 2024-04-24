@@ -39,12 +39,10 @@ function toggleDrawer() {
 
 <template>
   <QLayout view="hHh LpR lFf">
-    <QHeader elevated class="bg-primary text-white q-px-sm q-pt-sm" height-hint="98">
+    <QHeader elevated class="bg-white text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
       <QToolbar>
         <QBtn dense flat round icon="menu" @click="toggleDrawer" />
-        <QAvatar class="q-ml-lg">
-          <img src="/images/one-heart.png">
-        </QAvatar>
+        <img src="/images/one-heart.png" class="q-ml-md" style="display: block; height: 45px;">
         <QSpace />
         <div class="row q-gutter-lg items-center">
           <QSelect v-model="currentSpace" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
@@ -78,7 +76,7 @@ function toggleDrawer() {
   .q-field__native {
     min-height: fit-content;
     padding: 4.5px 38px;
-    background-color: white;
+    background-color: #ddd;
     border-radius: 15px 15px 0 0;
   }
 }
