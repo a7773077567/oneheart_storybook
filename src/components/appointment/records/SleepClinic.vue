@@ -5,6 +5,7 @@ import type { ClientScheduleDetail, Sleep } from '@/api';
 import { useForm } from 'vee-validate';
 import { useAppointmentStore } from '@/stores';
 import { extractUuidFromS3Url } from '@/utils/helpers';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   scheduleId: number;
@@ -12,8 +13,9 @@ const props = defineProps<{
 }>();
 
 const appointmentStore = useAppointmentStore();
-const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
+const $q = useQuasar();
 
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const initialValues = computed<{ [key in keyof Sleep]: Sleep[key] }>(() => {
   const { customerProblemDescription, assessmentStatus, productDescription, note, attachments } = props.scheduleDetail.record;
   return ({
@@ -25,8 +27,8 @@ const initialValues = computed<{ [key in keyof Sleep]: Sleep[key] }>(() => {
   });
 });
 
-const { handleSubmit, values } = useForm({ initialValues: initialValues.value });
-const displayAttachments = computed(() => values.attachments.filter(a => !!a));
+const { handleSubmit, values, resetForm } = useForm({ initialValues: initialValues.value });
+const displayAttachments = computed(() => values.attachments?.map((attUrl, idx) => ({ name: `attachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
 
 const newAttachment = ref([]);
 const onSubmit = handleSubmit(async (formValue) => {
@@ -37,8 +39,11 @@ const onSubmit = handleSubmit(async (formValue) => {
     ));
   }
 
-  await updateClientSchedule(recordId.value, { ...formValue, attachments: [...formValue.attachments, ...fileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[] });
-  appointmentStore.getClientSchedule(props.scheduleId);
+  await updateClientSchedule(recordId.value, { ...formValue, attachments: [...formValue.attachments ?? [], ...fileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[] });
+  $q.notify({ message: '已存檔', timeout: 200 });
+
+  await appointmentStore.getClientSchedule(props.scheduleId);
+  resetForm({ values: initialValues.value });
 });
 </script>
 
@@ -68,15 +73,15 @@ const onSubmit = handleSubmit(async (formValue) => {
         <OFile v-model="newAttachment" multiple label="選擇檔案" />
         <div class="preview_files">
           <OPreview
-            v-for="(attachment, idx) in displayAttachments" :key="attachment"
-            :name="`attachments[${idx}]`"
+            v-for="(attachment, idx) in displayAttachments" :key="attachment.name"
+            :name="attachment.name"
             :label="`附件資料 ${idx + 1}`"
           />
         </div>
       </fieldset>
     </form>
     <div class="sleep_form_action">
-      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" @click="onSubmit" />
+      <QBtn round flat icon="o_save" size="md" @click="onSubmit" />
     </div>
   </div>
 </template>
