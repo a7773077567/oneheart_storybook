@@ -110,6 +110,12 @@ export interface PhysicalConsultation {
   forExerciseGroup: string; // 給運動組的建議
 }
 
+export interface FootPressure {
+  staticPressureAttachments: string[]; // 靜態足壓檔案
+  dynamicPressureAttachments: string[]; // 動態足壓檔案
+  notes: string; // 備註
+}
+
 export interface ClientSchedule {
   id: number;
   clientId: number;

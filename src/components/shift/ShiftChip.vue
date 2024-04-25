@@ -28,7 +28,7 @@ const unavailable = computed(() => props.data.notAvailableTimes.map(item => toDu
 const bgc = computed(() => props.data.color);
 
 function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boolean) {
-  const label = `${startTime}:${endTime}`;
+  const label = `${startTime}-${endTime}`;
   return isUnavailable
     ? `${label}不可預約`
     : label;
@@ -81,6 +81,7 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
     text-align: center;
     color: black;
     font-size: 12px;
+    font-weight: 500;
   }
 }
 </style>
