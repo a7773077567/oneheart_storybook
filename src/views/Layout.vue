@@ -61,7 +61,7 @@ function toggleDrawer() {
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
       <QPage class="q-py-md q-px-lg">
-        <Breadcrumbs class="gutter--sm" />
+        <Breadcrumbs class="gutter--sm breadcrumb" />
         <RouterView />
       </QPage>
     </QPageContainer>
@@ -85,5 +85,8 @@ main.q-page {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  > *:not(.breadcrumb) {
+    overflow: auto;
+  }
 }
 </style>
