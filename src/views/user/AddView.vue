@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { createUser, fetchSpaces } from '@/api/userSettings';
-import type { UsersPost } from '@/api/userSettings';
+import { type CreateUserPost, createUser, fetchSpaces } from '@/api/userSettings';
 import { useForm } from 'vee-validate';
+import { useQuasar } from 'quasar';
+import router from '@/router';
 
 const spaces = await fetchSpaces();
 
+const $q = useQuasar();
 const weightForOrderOptions = [1, 2, 3, 4, 5].map(order => ({ label: `${order}`, value: order }));
 const roleIdOptions = [
   { label: '管理者', value: 1 },
@@ -45,13 +47,32 @@ const formItems: FormItem[] = [
   { label: '描述', name: 'description', element: 'input', type: 'textarea', fluid: true },
 ];
 
-const { handleSubmit } = useForm<UsersPost>();
+const { handleSubmit, resetForm } = useForm<CreateUserPost>({
+  initialValues: {
+    name: '',
+    email: '',
+    weightForOrder: weightForOrderOptions[0].value,
+    roleId: roleIdOptions[0].value,
+    spaceIds: [spaceOptions[0].value],
+  },
+});
 const onSubmit = handleSubmit(async (values) => {
-  // const payload = {
-  //   ...values,
-  //   spaceIds: values.spaceIds,
-  // };
-  await createUser(values);
+  let { description, ...payload } = values;
+  payload = {
+    ...payload,
+    ...(description && { description }),
+  };
+  try {
+    await createUser(payload);
+    $q.dialog({
+      message: '新增成功',
+    }).onOk(() => {
+      resetForm();
+    });
+  }
+  catch (err) {
+    console.log(err);
+  }
 });
 
 const state = ref(2); // temporary

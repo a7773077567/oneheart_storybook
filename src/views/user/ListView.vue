@@ -42,7 +42,7 @@ const rows = computed(() => userStore.users
         <QSelect v-model="jobTitleFilter" :options="userStore.userJobTitleOptions" label="全部人員" outlined color="#515050" dense multiple emit-value map-options />
       </div>
       <div class="staff-list__body">
-        <QTable :columns="cols" :rows="rows" row-key="name" separator="cell" hide-pagination class="no-shadow" bordered>
+        <QTable :columns="cols" :rows="rows" row-key="name" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
           <template #body="props">
             <QTr :props="props">
               <QTd key="state" :props="props" auto-width>
