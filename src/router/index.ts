@@ -21,28 +21,32 @@ export const routes: RouteRecordRaw[] = [
           requiredAuth: true,
         },
       },
+      {
+        path: 'activate',
+        name: 'activate',
+        component: () => import('@/views/login/Activate.vue'),
+        children: [
+          {
+            path: 'email',
+            name: 'activateEmail',
+            component: () => import('@/views/login/ActivateEmail.vue'),
+            meta: {
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'password',
+            name: 'activatePassword',
+            component: () => import('@/views/login/ActivatePassword.vue'),
+            meta: {
+              requiredAuth: true,
+            },
+          },
+        ],
+      },
     ],
   },
-  {
-    path: '/activate',
-    name: 'activate',
-    component: () => import('@/views/login/Activate.vue'),
-    children: [
-      {
-        path: 'email',
-        name: 'activateEmail',
-        component: () => import('@/views/login/ActivateEmail.vue'),
-        meta: {
-          requiredAuth: true,
-        },
-      },
-      {
-        path: 'password',
-        name: 'activatePassword',
-        component: () => import('@/views/login/ActivatePassword.vue'),
-      },
-    ],
-  },
+
   {
     path: '/forget',
     name: 'forget',

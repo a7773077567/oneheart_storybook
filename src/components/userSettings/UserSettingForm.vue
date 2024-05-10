@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type CreateUser, type UpdateUser, createUser, fetchSpaces, getAvatarS3Info, suspendUser, updateUser, uploadAvatar } from '@/api';
+import { type CreateUser, type UpdateUser, createUser, fetchSpaces, getAvatarS3Info, resendActivateEmail, suspendUser, updateUser, uploadAvatar } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
 import { useUserStore } from '@/stores';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import { omit } from 'radash';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   type: 'add' | 'edit';
@@ -15,6 +16,7 @@ const props = defineProps<{
 const spaces = await fetchSpaces();
 
 const $q = useQuasar();
+const router = useRouter();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
 const state = computed(() => targetUser.value.state);
@@ -102,18 +104,19 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     if (props.type === 'add') {
       await createUser(payload);
+      router.push({ name: 'activateEmail' });
     }
     else {
       await updateUser(targetUser.value.id, payload);
-    }
-    $q.dialog({
-      message: '新增成功',
-    }).onOk(async () => {
-      await userStore.getUsers(); // temporary
-      await userStore.getUser(+props.userId!);
+      $q.dialog({
+        message: '更新成功',
+      }).onOk(async () => {
+        await userStore.getUsers(); // temporary
+        await userStore.getUser(+props.userId!);
 
-      resetForm({ values: targetInitialValues.value });
-    });
+        resetForm({ values: targetInitialValues.value });
+      });
+    }
   }
   catch (err) {
     console.log(err);
@@ -125,6 +128,16 @@ async function onSuspend() {
   await userStore.getUsers(); // temporary
   await userStore.getUser(+props.userId!);
   resetForm({ values: targetInitialValues.value });
+}
+
+async function onResend() {
+  try {
+    await resendActivateEmail(targetUser.value.id);
+    router.push({ name: 'activateEmail' });
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
 </script>
 
@@ -154,7 +167,10 @@ async function onSuspend() {
           </div>
         </div>
         <div class="user-settings__actions">
-          <QBtn v-if="type === 'edit'" :label="targetUser.isSuspended ? '解除停權' : '停權'" outline style="width: 126px;" @click="onSuspend" />
+          <div v-if="type === 'edit'" class="row q-gutter-md">
+            <QBtn v-if="targetUser.state === 1" label="重寄驗證信" outline style="width: 126px;" @click="onResend" />
+            <QBtn :label="targetUser.isSuspended ? '解除停權' : '停權'" outline style="width: 126px;" @click="onSuspend" />
+          </div>
           <QBtn label="完成" outline style="width: 126px;" @click="onSubmit" />
         </div>
       </div>
