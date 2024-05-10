@@ -44,35 +44,35 @@ export const routes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'forget',
+        name: 'forget',
+        component: () => import('@/views/login/Forget.vue'),
+        redirect: { name: 'email' },
+        beforeEnter: loginGuard,
+        children: [
+          {
+            path: 'email',
+            name: 'email',
+            component: () => import('@/views/login/Email.vue'),
+            meta: {
+              requireAuth: false,
+            },
+          },
+          {
+            path: 'confirm',
+            name: 'confirm',
+            component: () => import('@/views/login/Confirm.vue'),
+            meta: {
+              requireAuth: false,
+            },
+            props: route => ({ token: route.query.token }),
+          },
+        ],
+      },
     ],
   },
 
-  {
-    path: '/forget',
-    name: 'forget',
-    component: () => import('@/views/login/Forget.vue'),
-    redirect: { name: 'email' },
-    beforeEnter: loginGuard,
-    children: [
-      {
-        path: 'email',
-        name: 'email',
-        component: () => import('@/views/login/Email.vue'),
-        meta: {
-          requireAuth: false,
-        },
-      },
-      {
-        path: 'confirm',
-        name: 'confirm',
-        component: () => import('@/views/login/Confirm.vue'),
-        meta: {
-          requireAuth: false,
-        },
-        props: route => ({ token: route.query.token }),
-      },
-    ],
-  },
   {
     path: '/',
     name: 'layout',
