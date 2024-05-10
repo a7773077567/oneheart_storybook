@@ -114,6 +114,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/appointment',
         name: 'appointment',
+        component: () => import('@/views/appointment/Appointment.vue'),
         redirect: { name: 'appointmentList' },
         meta: {
           label: '客戶預約',
@@ -123,8 +124,8 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'list',
             name: 'appointmentList',
-            component: () => import('@/views/appointment/AppointmentListView.vue'),
-            redirect: { name: 'appointmentCalendar' },
+            component: () => import('@/views/appointment/list/IndexView.vue'),
+            redirect: { name: 'appointmentListCalendar' },
             meta: {
               label: '預約列表',
               requiredAuth: true,
@@ -132,8 +133,8 @@ export const routes: RouteRecordRaw[] = [
             children: [
               {
                 path: 'calendar',
-                name: 'appointmentCalendar',
-                component: () => import('@/views/appointment/AppointmentCalendarView.vue'),
+                name: 'appointmentListCalendar',
+                component: () => import('@/views/appointment/list/CalendarView.vue'),
                 meta: {
                   label: '列表',
                   requiredAuth: true,
@@ -141,8 +142,8 @@ export const routes: RouteRecordRaw[] = [
               },
               {
                 path: 'info/:scheduleId',
-                name: 'appointmentInfo',
-                component: () => import('@/views/appointment/InfoView.vue'),
+                name: 'appointmentListInfo',
+                component: () => import('@/views/appointment/list/InfoView.vue'),
                 meta: {
                   label: '預約資料',
                   requiredAuth: true,
@@ -154,7 +155,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'booking',
             name: 'appointmentBooking',
-            component: () => import('@/views/appointment/AppointmentBookingView.vue'),
+            component: () => import('@/views/appointment/BookingView.vue'),
             meta: {
               label: '預約',
               requiredAuth: true,
@@ -163,7 +164,7 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'current-query',
             name: 'appointmentCurrentQuery',
-            component: () => import('@/views/appointment/AppointmentCurrentQueryView.vue'),
+            component: () => import('@/views/appointment/currentQuery/IndexView.vue'),
             redirect: { name: 'appointmentCurrentQueryList' },
             meta: {
               label: '查詢預約',
@@ -173,7 +174,7 @@ export const routes: RouteRecordRaw[] = [
               {
                 path: 'list',
                 name: 'appointmentCurrentQueryList',
-                component: () => import('@/views/appointment/AppointmentCurrentQueryListView.vue'),
+                component: () => import('@/views/appointment/currentQuery/ListView.vue'),
                 meta: {
                   requiredAuth: true,
                 },
@@ -181,7 +182,7 @@ export const routes: RouteRecordRaw[] = [
               {
                 path: 'rearrange',
                 name: 'appointmentCurrentQueryRearrange',
-                component: () => import('@/views/appointment/AppointmentCurrentQueryRearrangeView.vue'),
+                component: () => import('@/views/appointment/currentQuery/RearrangeView.vue'),
                 meta: {
                   requiredAuth: true,
                 },
