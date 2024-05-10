@@ -72,9 +72,11 @@ const firstTokenList = [
   'users/activate/email',
   'users/reset-password',
   'users/me',
+  'avatar/write-url',
   'spaces',
   'spaces/login',
-  'clients',
+  // 'clients',
+  'resend-activation-email',
 ];
 
 // ========== Functions ==========
@@ -89,7 +91,7 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
     return config;
   }
 
-  const needFirstToken = firstTokenList.includes(url) || url.includes('resend-activation-email');
+  const needFirstToken = firstTokenList.some(item => url.includes(item));
   const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
   config.headers!.Authorization = `Bearer ${token}`;
 

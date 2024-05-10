@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
-import { type User, fetchUserInfo, fetchUsers } from '@/api/user';
+import { type User, fetchUser, fetchUserInfo, fetchUsers } from '@/api/user';
 
 interface State {
   currentSpace: number | null;
   userInfo: User | null;
   users: User[];
+  targetUser: User | null;
 }
 
 interface SelectOption {
@@ -18,6 +19,7 @@ export const useUserStore = defineStore('user', {
       currentSpace: null,
       userInfo: null,
       users: [],
+      targetUser: null,
     };
   },
   getters: {
@@ -47,6 +49,10 @@ export const useUserStore = defineStore('user', {
     async getUsers() {
       const data = await fetchUsers([this.currentSpace!]);
       this.users = data;
+    },
+    async getUser(userId: number) {
+      const data = await fetchUser(userId);
+      this.targetUser = data;
     },
   },
 });

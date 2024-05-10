@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
+import { useUserStore } from '@/stores';
 
 export interface LoginRes {
   accessToken: string;
@@ -18,7 +19,8 @@ export interface User {
   isSuspended: boolean;
   role: Role;
   spaces: Space[];
-  avatar?: string;
+  description: string;
+  avatarUrl: string | null;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;
@@ -85,6 +87,14 @@ export async function resetPassword(payload: NewPasswordReq) {
 export async function fetchUsers(spaceIds: number[]) {
   const { data } = await api.get<User[]>('users', { params: { spaceIds } });
   return data;
+}
+
+export async function fetchUser(userId: number) {
+  // const {data} = await api.get<User>(`users/${userId}`)
+  // return data
+
+  const userStore = useUserStore();
+  return userStore.users.find(user => user.id === userId)!;
 }
 
 export async function fetchUserInfo() {

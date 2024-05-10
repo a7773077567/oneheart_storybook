@@ -103,7 +103,6 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               label: '個人設定',
               requiredAuth: true,
-
             },
           },
         ],
@@ -281,6 +280,7 @@ export const routes: RouteRecordRaw[] = [
                 path: 'edit',
                 name: 'userEdition',
                 component: () => import('@/views/user/EditView.vue'),
+                props: route => ({ userId: route.query.userId }),
                 meta: {
                   label: '編輯',
                   requiredAuth: true,

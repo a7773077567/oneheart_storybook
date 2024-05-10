@@ -26,12 +26,9 @@ const cols: QTableProps['columns'] = [
 const rows = computed(() => userStore.users
   .filter(user => jobTitleFilter.value.includes(user.role.id))
   .map(user => ({
-    state: user.state,
-    name: user.name,
+    ...user,
     jobTitle: user.role.name,
     spaces: user.spaces.map(space => space.name).join(),
-    email: user.email,
-    isSuspended: user.isSuspended,
   })));
 </script>
 
@@ -64,7 +61,7 @@ const rows = computed(() => userStore.users
                   <p>{{ props.row.email }}</p>
                   <div class="row q-gutter-sm flex-center">
                     <span v-if="props.row.isSuspended" style="color: #E86969;">停權</span>
-                    <QBtn icon="o_edit" flat round />
+                    <QBtn icon="o_edit" flat round @click="() => $router.push({ name: 'userEdition', query: { userId: props.row.id } })" />
                   </div>
                 </div>
               </QTd>
