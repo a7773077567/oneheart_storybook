@@ -2,6 +2,7 @@
 import type { ClientSchedule } from '@/api/appointment';
 import { getType } from '@/utils/mappers';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 interface Props {
   data: ClientSchedule;
@@ -42,6 +43,7 @@ const States: State[] = [
   },
 ];
 
+const router = useRouter();
 const bgc = computed(() => props.data.paymentState === 1 ? '#F8C9CB' : '#A5D6F1');
 const state = computed(() => States.find(state => state.identifier === props.data.state)?.label);
 const stateColor = computed(() => States[props.data.state + 1].color);
@@ -59,7 +61,7 @@ const type = computed(() => getType(props.data.userShift.type));
     <p class="booking-card__state">
       {{ state }}
     </p>
-    <QBtn label="＄結帳" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop />
+    <QBtn label="＄結帳" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
   </div>
 </template>
 

@@ -150,6 +150,16 @@ export const routes: RouteRecordRaw[] = [
                 },
                 props: true,
               },
+              {
+                path: 'checkout/:scheduleId',
+                name: 'appointmentListCheckout',
+                component: () => import('@/views/appointment/list/Checkout.vue'),
+                meta: {
+                  label: '結帳',
+                  requiredAuth: true,
+                },
+                props: true,
+              },
             ],
           },
           {

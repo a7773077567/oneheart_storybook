@@ -75,7 +75,7 @@ const firstTokenList = [
   'avatar/write-url',
   'spaces',
   'spaces/login',
-  // 'clients',
+  'clients',
   'resend-activation-email',
 ];
 
