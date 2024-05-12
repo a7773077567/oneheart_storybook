@@ -18,7 +18,8 @@ export const createUserSchema = z.object({
   avatar: z.string().nullish(),
 });
 export type CreateUser = z.infer<typeof createUserSchema>;
-export type UpdateUser = Required<CreateUser>;
+// export type UpdateUser = Required<CreateUser>;
+export type UpdateUser = CreateUser;
 
 export interface UploadInfo {
   method: string;
