@@ -219,6 +219,27 @@ export const routes: RouteRecordRaw[] = [
           label: '客戶管理',
           requiredAuth: true,
         },
+        redirect: { name: 'clientList' },
+        children: [
+          {
+            path: 'list',
+            name: 'clientList',
+            component: () => import('@/views/client/ClientList.vue'),
+            meta: {
+              label: '客戶總表',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'add',
+            name: 'clientAdding',
+            component: () => import('@/views/client/ClientAdd.vue'),
+            meta: {
+              label: '新增客戶',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
         path: '/store',
