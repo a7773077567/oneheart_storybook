@@ -4,7 +4,10 @@ import type { ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 
 export interface ClientsGetParams {
-  nameOrPhone: string;
+  nameOrPhone?: string;
+  order?: 'ASC' | 'DESC';
+  page?: number;
+  take?: number;
 }
 
 export interface ClientAssociation {
