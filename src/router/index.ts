@@ -231,6 +231,21 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: 'info/:clientId',
+            name: 'clientInfo',
+            component: () => import('@/views/client/ClientInfo.vue'),
+            props: route => ({ clientId: route.query.clientId }),
+            meta: {
+              customLabel: true,
+              label: '客戶編號',
+              requiredAuth: true,
+            },
+            beforeEnter: (to) => {
+              to.meta.label = `客戶編號 - ${to.params.clientId}`;
+              return true;
+            },
+          },
+          {
             path: 'add',
             name: 'clientAdding',
             component: () => import('@/views/client/ClientAdd.vue'),

@@ -8,7 +8,7 @@ interface Crumb {
   label: string;
 }
 
-const { currentRoute, currentMatched } = useLayoutRoute();
+const { currentRoute, currentMatched, currentMeta } = useLayoutRoute();
 const crumbList = ref<Crumb[]>();
 
 watch(currentRoute, getCrumbs, { immediate: true });
@@ -16,7 +16,7 @@ watch(currentRoute, getCrumbs, { immediate: true });
 function getCrumbs() {
   const crumbs = currentMatched.value.map<Crumb>(route => ({
     name: route.name,
-    label: route.meta.label as string,
+    label: route.meta.customLabel ? currentMeta.value.label as string : route.meta.label as string,
   }));
   crumbList.value = crumbs;
 }
