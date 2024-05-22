@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { UserShift } from '@/api/shift';
+import type { Client, UserShift } from '@/api';
 import { getTimeDate } from '@/utils/date';
 
 export interface TherapyTypesRes {
@@ -22,25 +22,6 @@ export interface Location {
   type: number;
   name: string;
   accommodation: number;
-}
-
-export interface ClientsGetParams {
-  nameOrPhone: string;
-}
-
-export interface ClientAssociation {
-  id: number;
-  name: string;
-  phone: string;
-  identityType: number;
-  identityNumber: string;
-  birthDate: string;
-}
-export interface Client extends ClientAssociation {
-  email: string;
-  lineUserId: string;
-  isVerifiedBySMS: boolean;
-  associations: ClientAssociation[];
 }
 
 // todo 區分不同病例種類
@@ -213,11 +194,6 @@ export async function fetchTherapyTypes() {
 
 export async function fetchTherapists(type: number) {
   const { data } = await api.get<TherapistsRes>(`appointment/therapists/${type}`);
-  return data;
-}
-
-export async function fetchClients(params?: ClientsGetParams) {
-  const { data } = await api.get<Client[]>('clients', { params });
   return data;
 }
 

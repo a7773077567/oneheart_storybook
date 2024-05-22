@@ -2,6 +2,25 @@ import { api } from '@/utils/api';
 import type { User } from './user';
 import type { ShiftType } from '@/const/general';
 
+export interface ClientsGetParams {
+  nameOrPhone: string;
+}
+
+export interface ClientAssociation {
+  id: number;
+  name: string;
+  phone: string;
+  identityType: number;
+  identityNumber: string;
+  birthDate: string;
+}
+export interface Client extends ClientAssociation {
+  email: string;
+  lineUserId: string;
+  isVerifiedBySMS: boolean;
+  associations: ClientAssociation[];
+}
+
 export interface Memo {
   id: number;
   fromUserShiftType: ShiftType;
@@ -38,3 +57,17 @@ export async function replyMemo({ clientId, memoId }: { clientId: number; memoId
   const { data } = await api.patch(`clients/${clientId}/memos/${memoId}`, content);
   return data;
 }
+
+// 建立客戶
+
+// 取得所有客戶
+export async function fetchClients(params?: ClientsGetParams) {
+  const { data } = await api.get<Client[]>('clients', { params });
+  return data;
+}
+
+// 更新 Inbody
+
+// 取得 Inbody 上傳 url
+
+// 取得單一客戶
