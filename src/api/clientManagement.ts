@@ -77,7 +77,7 @@ export async function fetchClients(params?: ClientsGetParams) {
 
 // 取得單一客戶
 export async function getClientInfo(clientId: string) {
-  const { data } = await api.get<Client[]>(`clients/${clientId}`);
+  const { data } = await api.get<Client>(`clients/${clientId}`);
   return data;
 }
 
