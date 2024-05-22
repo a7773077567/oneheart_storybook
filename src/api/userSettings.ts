@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import { upload2awsS3 } from './common';
+import { upload2awsS3 } from './upload';
 
 interface Space {
   id: number;
