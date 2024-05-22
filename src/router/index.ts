@@ -234,7 +234,7 @@ export const routes: RouteRecordRaw[] = [
             path: 'info/:clientId',
             name: 'clientInfo',
             component: () => import('@/views/client/ClientInfo.vue'),
-            props: route => ({ clientId: route.query.clientId }),
+            props: true,
             meta: {
               customLabel: true,
               label: '客戶編號',
