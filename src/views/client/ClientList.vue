@@ -82,11 +82,6 @@ function handlePageChange(page: number) {
 
 <style scoped lang="scss">
 .client_list :deep(.q-table) {
-  th,
-  td {
-    font-size: 16px;
-    vertical-align: middle;
-  }
   tr {
     cursor: pointer;
   }
