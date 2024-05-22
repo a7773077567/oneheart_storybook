@@ -5,7 +5,7 @@ interface State {
   targetClient: Client | null;
 }
 
-export const useUserStore = defineStore('user', {
+export const useClientStore = defineStore('client', {
   state: (): State => {
     return {
       targetClient: null,

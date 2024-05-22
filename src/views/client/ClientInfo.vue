@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { getClientInfo } from '@/api';
 import { useRoute } from 'vue-router';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { Associations, BasicInfo, InbodyRecords, PointsGroup, PurchaseRecords } from '@/components/client';
 
 defineProps<{
@@ -9,7 +9,7 @@ defineProps<{
 }>();
 
 const clientId = useRoute().params.clientId as string;
-const data = ref();
+
 const tabs = [
   { name: 'basicInfo', label: '客戶資料', component: BasicInfo },
   { name: 'associations', label: '常用人員', component: Associations },
@@ -18,8 +18,6 @@ const tabs = [
   { name: 'inbodyRecords', label: '身體組成表', component: InbodyRecords },
 ];
 const currentTab = ref(tabs[0].name);
-
-data.value = await getClientInfo(clientId);
 </script>
 
 <template>
@@ -47,7 +45,7 @@ data.value = await getClientInfo(clientId);
       >
         <KeepAlive>
           <Suspense>
-            <component :is="tab.component" />
+            <component :is="tab.component" :client-id="clientId" />
           </Suspense>
         </KeepAlive>
       </QTabPanel>
