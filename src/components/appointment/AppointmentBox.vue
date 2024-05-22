@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Client } from '@/api/appointment';
+import type { Client } from '@/api';
 import { createAppointment, createAppointmentRearrange } from '@/api/appointment';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';

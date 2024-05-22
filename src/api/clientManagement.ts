@@ -1,6 +1,7 @@
 import { api } from '@/utils/api';
 import type { User } from './user';
 import type { ShiftType } from '@/const/general';
+import type { PagingMeta } from '@/types/common';
 
 export interface ClientsGetParams {
   nameOrPhone: string;
@@ -20,6 +21,8 @@ export interface Client extends ClientAssociation {
   isVerifiedBySMS: boolean;
   associations: ClientAssociation[];
 }
+
+export type ClientBasic = Pick<Client, 'name' | 'email' | 'phone'>;
 
 export interface Memo {
   id: number;
@@ -59,15 +62,22 @@ export async function replyMemo({ clientId, memoId }: { clientId: number; memoId
 }
 
 // 建立客戶
+export async function createClient(params: ClientBasic) {
+  await api.post('clients', params);
+}
 
 // 取得所有客戶
 export async function fetchClients(params?: ClientsGetParams) {
-  const { data } = await api.get<Client[]>('clients', { params });
+  const { data, meta } = await api.get<Client[], PagingMeta>('clients', { params });
+  return { data, meta };
+}
+
+// 取得單一客戶
+export async function getClientInfo(clientId: string) {
+  const { data } = await api.get<Client[]>(`clients/${clientId}`);
   return data;
 }
 
 // 更新 Inbody
 
 // 取得 Inbody 上傳 url
-
-// 取得單一客戶
