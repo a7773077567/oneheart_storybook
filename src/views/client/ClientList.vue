@@ -3,7 +3,9 @@ import { OInput } from '@/components/shared';
 import { ref } from 'vue';
 import { type Client, fetchClients } from '@/api';
 import { QPagination, type QTableProps } from 'quasar';
+import { useLayoutRoute } from '@/composables/layoutRoute';
 
+const { currentRoute } = useLayoutRoute();
 const search = ref('');
 const rows = ref<Client[]>([]);
 const paging = ref<QPagination['$props']>({
@@ -60,7 +62,7 @@ function handlePageChange(page: number) {
 </script>
 
 <template>
-  <div>
+  <div v-if="currentRoute === 'clientList'">
     <section class="q-mb-md flex">
       <div class="flex">
         <OInput v-model="search" placeholder="輸入客戶名稱或電話" hide-bottom-space class="q-mr-md" clearable />
@@ -78,6 +80,7 @@ function handlePageChange(page: number) {
 
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered @row-click="(_, row) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })" />
   </div>
+  <RouterView />
 </template>
 
 <style scoped lang="scss">

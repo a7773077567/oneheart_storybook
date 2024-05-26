@@ -229,21 +229,24 @@ export const routes: RouteRecordRaw[] = [
               label: '客戶總表',
               requiredAuth: true,
             },
-          },
-          {
-            path: 'info/:clientId',
-            name: 'clientInfo',
-            component: () => import('@/views/client/ClientInfo.vue'),
-            props: true,
-            meta: {
-              customLabel: true,
-              label: '客戶編號',
-              requiredAuth: true,
-            },
-            beforeEnter: (to) => {
-              to.meta.label = `客戶編號 - ${to.params.clientId}`;
-              return true;
-            },
+            children: [
+              {
+                path: 'info/:clientId',
+                name: 'clientInfo',
+                component: () => import('@/views/client/ClientInfo.vue'),
+                props: true,
+                meta: {
+                  customLabel: true,
+                  label: '客戶編號',
+                  requiredAuth: true,
+                  notShownInSidebar: true,
+                },
+                beforeEnter: (to) => {
+                  to.meta.label = `客戶編號 - ${to.params.clientId}`;
+                  return true;
+                },
+              },
+            ],
           },
           {
             path: 'add',
