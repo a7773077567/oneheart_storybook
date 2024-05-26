@@ -13,3 +13,4 @@ export { default as OTable } from './OTable.vue';
 export { default as OCheckbox } from './OCheckbox.vue';
 export { default as OFile } from './OFile.vue';
 export { default as OPreview } from './OPreview.vue';
+export { default as OConfirmDialog } from './OConfirmDialog.vue';
