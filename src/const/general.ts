@@ -81,3 +81,11 @@ export const Types: Record<TypeName, Type> = {
   //   tabs: ['clientInfo', 'groupClass'],
   // },
 };
+
+export const pointsGroup = {
+  物理治療: 1,
+  院長物理治療: 2,
+  營養: 3,
+} as const;
+
+export const pointsGroupOptions = Object.keys(pointsGroup).map(group => ({ label: group, value: group }));
