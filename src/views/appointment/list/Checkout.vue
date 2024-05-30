@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { CheckTable } from '@/components/appointment';
+import { CheckTable, Receipt } from '@/components/appointment';
 import { ShiftType } from '@/const/general';
 import { computed, ref } from 'vue';
 
@@ -64,10 +64,44 @@ const groupDetails = [
 ];
 
 const amountInput = ref('2000');
+
+const checkData = {
+  name: '李小姐',
+  gender: '女',
+  id: 'X000000000',
+  birthDate: '1999/09/09',
+  amount: 2000,
+  declaration: false,
+  selfPay: '足壓治療',
+  date: '2024/01/23',
+  userName: 'AA治療師',
+};
+
+const isReceiptDialogOpen = ref(false);
 </script>
 
 <template>
   <div class="checkout">
+    <QDialog v-model="isReceiptDialogOpen" persistent>
+      <QCard class="q-py-md q-px-xl relative-position">
+        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right" size="24px" style="top: 10px; right: 10px;" />
+        <QCardSection class="q-pb-none">
+          <div class="text-h6 text-center q-mb-md text-bold">
+            結帳確定
+          </div>
+          <div class="text-subtitle2 text-center">
+            確定以現金方式支付，如確定無誤請按按鈕。
+          </div>
+        </QCardSection>
+        <QCardSection>
+          <Receipt :data="checkData" />
+        </QCardSection>
+        <QCardActions align="center">
+          <QBtn label="確定結帳" outline style="width: 100%;" />
+        </QCardActions>
+      </QCard>
+    </QDialog>
+
     <CheckTable :data="info">
       <template #date="{ data }">
         <div class="slot-padding">
@@ -111,7 +145,7 @@ const amountInput = ref('2000');
             <input v-model="amountInput" type="text" class="amount-input__input">
             <span>{{ isPointType ? '點' : '元' }}</span>
           </div>
-          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" />
+          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" @click="isReceiptDialogOpen = true" />
         </div>
       </template>
       <template #cashDetails>
