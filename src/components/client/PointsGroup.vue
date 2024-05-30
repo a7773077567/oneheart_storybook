@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { QTableProps } from 'quasar';
 import { useConfirm } from '@/composables/dialog';
 import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
@@ -9,11 +9,11 @@ defineProps<{
   clientId: string;
 }>();
 
-const displayGroupType = ref(1);
+const displayGroupType = ref(pointsGroupOptions);
 const showGroupForm = ref(false);
 const dialogType = ref<'add' | 'edit'>('add');
 
-const groupList = [
+const groupList = computed(() => [
   {
     type: '物理治療',
     name: '群組A',
@@ -60,7 +60,7 @@ const groupList = [
       },
     ],
   },
-];
+]);
 
 const cols: QTableProps['columns'] = [
   {
@@ -108,8 +108,8 @@ async function deleteGroup() {
       <QSelect
         v-model="displayGroupType"
         :options="pointsGroupOptions"
-        outline multiple
-        emit-value map-options
+        outline
+        multiple
       />
       <QBtn outline icon="o_add" class="q-ml-auto" @click="(showGroupForm = true), (dialogType = 'add')">
         新增群組
