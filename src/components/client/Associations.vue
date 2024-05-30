@@ -6,7 +6,7 @@ import type { QTableProps } from 'quasar';
 const props = defineProps<{ clientId: string }>();
 
 const clientStore = useClientStore();
-await clientStore.getClientInfo(props.clientId);
+await clientStore.getClientInfo(+props.clientId);
 
 const rows = computed(() => clientStore.targetClient?.associations ?? []);
 const cols: QTableProps['columns'] = [

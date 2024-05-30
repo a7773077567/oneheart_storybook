@@ -23,9 +23,16 @@ export interface Client extends ClientAssociation {
   lineUserId: string;
   isVerifiedBySMS: boolean;
   associations: ClientAssociation[];
+  inBodyFiles: InbodyFile[];
+  inBodyFileUrls: string[];
 }
 
 export type ClientBasic = Pick<Client, 'name' | 'email' | 'phone'>;
+
+interface InbodyFile {
+  createdAt: string;
+  fileName: string;
+}
 
 export interface Memo {
   id: number;
@@ -45,6 +52,13 @@ export interface MemoReply {
   clientScheduleId: number;
   replyContent: string;
 };
+
+export interface UploadFileInfo {
+  method: string;
+  url: string;
+  maxFileSizeInMB: number;
+  fileName: string;
+}
 
 // 取得 memo
 export async function getMemos(clientId: number) {
@@ -76,11 +90,18 @@ export async function fetchClients(params?: ClientsGetParams) {
 }
 
 // 取得單一客戶
-export async function getClientInfo(clientId: string) {
+export async function getClientInfo(clientId: number) {
   const { data } = await api.get<Client>(`clients/${clientId}`);
   return data;
 }
 
-// 更新 Inbody
+// 上傳 Inbody
+export async function uploadInbodyFile(clientId: number) {
+  await api.post(`/clients/${clientId}/addInbodyFiles`);
+}
 
 // 取得 Inbody 上傳 url
+export async function getInbodyUploadUrl(clientId: number) {
+  const { data } = await api.get<UploadFileInfo>(`/clients/${clientId}/inbodyFileWriteUrl`);
+  return data;
+}
