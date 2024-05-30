@@ -57,7 +57,7 @@ const onSubmit = handleSubmit((values) => {
 });
 
 function getTypeOptions() {
-  return Object.values(TherapyTypes).slice(0, 6).map((value, idx) => ({
+  return Object.values(TherapyTypes).map((value, idx) => ({
     label: value,
     value: idx + 1,
   }));

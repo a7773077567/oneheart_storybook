@@ -7,6 +7,9 @@ export const TherapyTypes = {
   sports: '運科門診',
   // oneOnOne: '一對一教練課',
   // group: '團課',
+  deanConsultation: '院長諮詢門診',
+  deanTherapy: '院長物理治療',
+  nutritionConsultation: '營養諮詢門診',
 };
 type TypeName = keyof typeof TherapyTypes;
 
@@ -20,7 +23,9 @@ export enum ShiftType {
   足壓門診 = 3,
   營養門診 = 4,
   睡眠門診 = 5,
-  運科門診 = 6,
+  院長評估門診 = 6,
+  院長物理治療 = 7,
+  營養諮詢門診 = 8,
 }
 
 type TabName = typeof TabNames[number];
@@ -80,12 +85,31 @@ export const Types: Record<TypeName, Type> = {
   //   label: '團課',
   //   tabs: ['clientInfo', 'groupClass'],
   // },
+  deanConsultation: {
+    identifier: 6,
+    name: 'physicalConsultation',
+    label: '物理諮詢門診',
+    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
+  },
+  deanTherapy: {
+    identifier: 7,
+    name: 'physicalTherapy',
+    label: '物理治療門診',
+    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
+  },
+  nutritionConsultation: {
+    identifier: 8,
+    name: 'nutrition',
+    label: '營養門診',
+    tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
+  },
 };
 
+// 點數群組
 export const pointsGroup = {
   物理治療: 1,
   院長物理治療: 2,
   營養: 3,
 } as const;
 
-export const pointsGroupOptions = Object.keys(pointsGroup).map(group => ({ label: group, value: group }));
+export const pointsGroupOptions = Object.keys(pointsGroup).map(group => ({ label: group, value: pointsGroup[group as keyof typeof pointsGroup] }));
