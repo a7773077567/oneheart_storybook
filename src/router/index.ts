@@ -273,9 +273,30 @@ export const routes: RouteRecordRaw[] = [
         name: 'order',
         component: () => import('@/views/order/Order.vue'),
         meta: {
-          label: '訂單與付款',
+          label: '交易管理',
           requiredAuth: true,
         },
+        redirect: { name: 'pointsTopup' },
+        children: [
+          {
+            path: 'points-topup',
+            name: 'pointsTopup',
+            component: () => import('@/views/order/PointsTopup.vue'),
+            meta: {
+              label: '點數儲值',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'transaction-records',
+            name: 'transactionRecords',
+            component: () => import('@/views/order/TransactionRecords.vue'),
+            meta: {
+              label: '查詢交易紀錄',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
         path: '/shift',
