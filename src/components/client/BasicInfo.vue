@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const clientStore = useClientStore();
-await clientStore.getClientInfo(props.clientId);
+await clientStore.getClientInfo(+props.clientId);
 
 const initialValues = computed(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate']) : {});
 useForm({ initialValues });
