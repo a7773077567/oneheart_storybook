@@ -25,7 +25,7 @@ const isEdit = ref(false);
         客戶編號
         #{{ clientId }}
       </QBadge>
-      <QBtn round :icon="isEdit ? 'o_save' : 'o_edit'" size="sm" @click="isEdit = !isEdit" />
+      <!-- <QBtn round :icon="isEdit ? 'o_save' : 'o_edit'" size="sm" @click="isEdit = !isEdit" /> -->
     </div>
     <div class="user-settings__form">
       <form class="client_basic_info_form row q-col-gutter-md" @submit.prevent>
