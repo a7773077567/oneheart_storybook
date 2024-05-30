@@ -21,7 +21,7 @@ const { handleSubmit, resetForm } = useForm({
 
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (values) => {
-  // 須重新確認建立客戶所需要欄位
+  // @ts-expect-error 須重新確認建立客戶所需要欄位
   await createClient(values);
   $q.dialog({
     message: '新增客戶成功！',
