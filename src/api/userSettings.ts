@@ -49,8 +49,8 @@ export async function getAvatarS3Info(userId: number) {
 }
 
 export async function uploadAvatar(userId: number, file: File) {
-  const { url, fileName } = await getAvatarS3Info(userId);
-  await upload2awsS3(url, file);
+  const { url, fileName, maxFileSizeInMB } = await getAvatarS3Info(userId);
+  await upload2awsS3(url, file, maxFileSizeInMB);
   return fileName;
 }
 

@@ -19,8 +19,8 @@ export const useClientStore = defineStore('client', {
       this.targetClient = await getClientInfo(clientId);
     },
     async uploadInbody2S3(clientId: number, attachment: File) {
-      const { url, fileName } = await getInbodyUploadUrl(clientId);
-      await upload2awsS3(url, attachment);
+      const { url, fileName, maxFileSizeInMB } = await getInbodyUploadUrl(clientId);
+      await upload2awsS3(url, attachment, maxFileSizeInMB);
       return fileName;
     },
     uploadInbodyFile,

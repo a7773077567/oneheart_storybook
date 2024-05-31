@@ -141,8 +141,8 @@ export const useAppointmentStore = defineStore('appointment', {
       this.targetClientSchedule = data;
     },
     async uploadAttachments(medicalRecordId: number, attachment: File) {
-      const { url, fileName } = await getUploadS3Url(medicalRecordId);
-      await upload2awsS3(url, attachment);
+      const { url, fileName, maxFileSizeInMB } = await getUploadS3Url(medicalRecordId);
+      await upload2awsS3(url, attachment, maxFileSizeInMB);
       return fileName;
     },
     async getHistoryChiefComplaints(medicalRecordId: number) {
