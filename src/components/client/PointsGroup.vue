@@ -23,6 +23,11 @@ const targetGroup = ref<PointsGroup>({} as PointsGroup);
 const emptyGroupInitVal = ref<Partial<PointsGroup>>({});
 
 const displayGroupType = ref(pointsGroupOptions);
+const displayGroupList = computed(() => {
+  const filteredGroupType = displayGroupType.value.map(option => option.value);
+  return groupList.value.filter(group => filteredGroupType.includes(group.type));
+});
+
 const showGroupForm = ref(false);
 const groupFormType = ref<'add' | 'edit'>('add');
 
@@ -107,6 +112,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
         :options="pointsGroupOptions"
         outline
         multiple
+        label="顯示類別"
       />
       <QBtn outline icon="o_add" class="q-ml-auto" @click="clickCreateBtn">
         新增群組
@@ -114,7 +120,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
     </div>
     <QList class="rounded-borders points_group_list">
       <template v-if="groupList.length > 0">
-        <QExpansionItem v-for="group in groupList" :key="group.id" switch-toggle-side class="q-my-sm" dense-toggle expand-icon-class="toggle_avatar">
+        <QExpansionItem v-for="group in displayGroupList" :key="group.id" switch-toggle-side class="q-my-sm" dense-toggle expand-icon-class="toggle_avatar">
           <template #header>
             <QItemSection class="points_group_list__header">
               <div class="group_title">
@@ -144,7 +150,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
         </QExpansionItem>
       </template>
       <div v-else class="text-center">
-        目前無點數群組
+        無點數群組
       </div>
     </QList>
   </div>
