@@ -22,9 +22,8 @@ const emit = defineEmits<{
 const pointGroupSchema = z.object({
   type: z.nativeEnum(PointTypes),
   name: z.string(),
-  // adminClientId: z.array(z.number()),
   adminClient: z.object({ name: z.string(), phone: z.string(), id: z.number() }),
-  memberClients: z.array(z.object({ name: z.string(), phone: z.string(), id: z.number() })),
+  memberClients: z.array(z.object({ name: z.string(), phone: z.string(), id: z.number() })).optional(),
 });
 
 const initialValues = computed(() => props.initVal);
@@ -34,7 +33,7 @@ const { handleSubmit, values, setFieldValue } = useForm({
 });
 
 const onSubmit = handleSubmit((values) => {
-  const memberClientIds = values.memberClients.map(member => member.id);
+  const memberClientIds = values.memberClients?.map(member => member.id) ?? [];
   if (props.type === 'add') {
     const { name, type } = values;
     const adminClientId = values.adminClient.id;
@@ -70,11 +69,11 @@ function removeMember(delMember: Client) {
       <form class="row q-col-gutter-md" @submit.prevent>
         <fieldset class="col-6">
           <span class="label">群組類別</span>
-          <OSelect name="type" :options="pointsGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" />
+          <OSelect name="type" :options="pointsGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" error-message="" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">群組名稱</span>
-          <OInput name="name" hide-bottom-space placeholder="請輸入群組名稱" />
+          <OInput name="name" hide-bottom-space placeholder="請輸入群組名稱" error-message="" />
         </fieldset>
         <section class="col-12">
           <div class="label_divider">

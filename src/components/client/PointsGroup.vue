@@ -50,11 +50,11 @@ const cols: QTableProps['columns'] = [
     field: row => row.phone,
   },
   {
-    name: '群組稱號',
+    name: 'remark',
     required: true,
     label: '備註',
     align: 'left',
-    field: row => row.note,
+    field: row => row.isAdmin ? '群長' : '',
   },
 ];
 
@@ -70,10 +70,10 @@ function clickCreateBtn() {
   };
 }
 
-async function deleteGroup() {
+async function deleteGroup(delGroupId: number) {
   const { onOk } = await useConfirm({ title: '確定刪除此群組', content: '一但刪除群組，則無法復原，如確認無誤請按確定。' });
   onOk(async () => {
-    await deletePointGroup(targetGroup.value.id);
+    await deletePointGroup(delGroupId);
     getGroupList();
   });
 }
@@ -87,6 +87,7 @@ async function createGroup(value: CreateGroupField) {
   showGroupForm.value = false;
   getGroupList();
 }
+
 async function editGroup(value: EditGroupField & { clientGroupId: number }) {
   const { clientGroupId, ...editVals } = value;
   showGroupForm.value = false;
@@ -131,18 +132,18 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
             <QItemSection side>
               <div class="row items-center">
                 <QBtn round flat icon="o_edit" size="sm" color="black" @click.stop="(showGroupForm = true), (groupFormType = 'edit'), (targetGroup = group)" />
-                <QBtn round flat icon="o_delete" size="sm" color="black" @click.stop="deleteGroup" />
+                <QBtn round flat icon="o_delete" size="sm" color="black" @click.stop="deleteGroup(group.id)" />
               </div>
             </QItemSection>
           </template>
           <QCard>
             <QCardSection>
-              <QTable :columns="cols" :rows="[]" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered />
+              <QTable :columns="cols" :rows="[{ ...group.adminClient, isAdmin: true }, ...group.memberClients]" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered />
             </QCardSection>
           </QCard>
         </QExpansionItem>
       </template>
-      <div class="text-center">
+      <div v-else class="text-center">
         目前無點數群組
       </div>
     </QList>
