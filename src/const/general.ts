@@ -4,10 +4,10 @@ export const TherapyTypes = {
   footPressure: '足壓門診',
   nutrition: '營養門診',
   sleep: '睡眠門診',
-  sports: '運科門診',
+  // sports: '運科門診',
   // oneOnOne: '一對一教練課',
   // group: '團課',
-  deanConsultation: '院長諮詢門診',
+  deanConsultation: '院長評估門診',
   deanTherapy: '院長物理治療',
   nutritionConsultation: '營養諮詢門診',
 };
@@ -67,12 +67,12 @@ export const Types: Record<TypeName, Type> = {
     label: '睡眠門診',
     tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'memo'],
   },
-  sports: {
-    identifier: 6,
-    name: 'sports',
-    label: '運科門診',
-    tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
-  },
+  // sports: {
+  //   identifier: 6,
+  //   name: 'sports',
+  //   label: '運科門診',
+  //   tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
+  // },
   // oneOnOne: {
   //   identifier: 7,
   //   name: 'oneOnOne',
@@ -87,20 +87,20 @@ export const Types: Record<TypeName, Type> = {
   // },
   deanConsultation: {
     identifier: 6,
-    name: 'physicalConsultation',
-    label: '物理諮詢門診',
+    name: 'deanConsultation',
+    label: '院長評估門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
   },
   deanTherapy: {
     identifier: 7,
-    name: 'physicalTherapy',
-    label: '物理治療門診',
+    name: 'deanTherapy',
+    label: '院長物理治療',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
   },
   nutritionConsultation: {
     identifier: 8,
-    name: 'nutrition',
-    label: '營養門診',
+    name: 'nutritionConsultation',
+    label: '營養諮詢門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
   },
 };

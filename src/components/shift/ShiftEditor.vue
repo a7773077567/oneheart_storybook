@@ -8,6 +8,7 @@ import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import { computed, watch } from 'vue';
+import { omit } from 'radash';
 
 interface Props {
   data?: ShiftTemplate | null;
@@ -25,10 +26,10 @@ dayjs.extend(objectSupport);
 const typeOptions = getTypeOptions();
 
 const { handleSubmit, values, setFieldValue } = useForm({
-  validationSchema: toTypedSchema(shiftTemplateSchema),
+  // validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
-const showNotAvailableTimes = computed(() => values.type === 2);
+const showNotAvailableTimes = computed(() => values.type !== 1);
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 watch(showNotAvailableTimes, (newVal) => {
   if (!newVal) {
@@ -37,7 +38,7 @@ watch(showNotAvailableTimes, (newVal) => {
 });
 
 const onSubmit = handleSubmit((values) => {
-  const { duration, notAvailableTimes, maxClients, ...needed } = values;
+  const { duration, notAvailableTimes, maxClients, ...needed } = omit(values, ['id', 'spaceId']);
   if (!props.userShiftMode) {
     const payload: ShiftTemplateReq = {
       ...needed,
@@ -52,6 +53,7 @@ const onSubmit = handleSubmit((values) => {
     const payload: UserShiftPatch = {
       notAvailableTimes: notAvailableTimes.map(combineTime),
     };
+
     emit('updateConfirm', payload);
   }
 });
@@ -63,7 +65,7 @@ function getTypeOptions() {
   }));
 }
 
-function getInitialValues(): ShiftTemplateSchema {
+function getInitialValues() {
   return props.data ? createInitials(props.data) : createDefault();
 
   function createDefault() {
@@ -87,7 +89,7 @@ function getInitialValues(): ShiftTemplateSchema {
   }
 }
 
-// HH:mm & HH:mm -> [H,m, H, m]
+// HH:mm & HH:mm -> [H, m, H, m]
 function splitTime(duration: Duration) {
   const { startTime, endTime } = duration;
   const timeArray = [...startTime.split(':'), ...endTime.split(':')];
@@ -137,7 +139,7 @@ function combineTime(duration: number[]): Duration {
       <InputBox label="班別顏色" class="gutter">
         <ColorPicker :colors="ShiftColors" name="color" :disable="userShiftMode" style="padding: 6px 14px;" />
       </InputBox>
-      <InputBox v-if="values.type !== 2" label="最多可預約人數">
+      <InputBox v-if="values.type === 1" label="最多可預約人數">
         <OInput name="maxClients" dense outlined :disable="userShiftMode" style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>

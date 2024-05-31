@@ -77,6 +77,7 @@ const firstTokenList = [
   'spaces/login',
   'clients',
   'resend-activation-email',
+  'clientGroups',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
