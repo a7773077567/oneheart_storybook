@@ -4,3 +4,4 @@ export * from './shift';
 export * from './user';
 export * from './upload';
 export * from './userSettings';
+export * from './points';

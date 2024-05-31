@@ -3,64 +3,28 @@ import { computed, ref } from 'vue';
 import type { QTableProps } from 'quasar';
 import { useConfirm } from '@/composables/dialog';
 import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
-import { pointsGroupOptions } from '@/const/general';
+import { PointTypes, pointsGroupOptions } from '@/const/general';
+import { type CreateGroupField, type EditGroupField, type PointsGroup, createPointGroup, deletePointGroup, getClientPointGroup, updatePointGroup } from '@/api';
+import { useQuasar } from 'quasar';
+import { useClientStore } from '@/stores';
 
-defineProps<{
+const props = defineProps<{
   clientId: string;
 }>();
 
+const clientStore = useClientStore();
+const groupList = ref<PointsGroup[]>([]);
+async function getGroupList() {
+  groupList.value = await getClientPointGroup(+props.clientId);
+}
+getGroupList();
+
+const targetGroup = ref<PointsGroup>({} as PointsGroup);
+const emptyGroupInitVal = ref<Partial<PointsGroup>>({});
+
 const displayGroupType = ref(pointsGroupOptions);
 const showGroupForm = ref(false);
-const dialogType = ref<'add' | 'edit'>('add');
-
-const groupList = computed(() => [
-  {
-    type: '物理治療',
-    name: '群組A',
-    id: 1,
-    points: 10,
-    members: [
-      {
-        id: 1,
-        name: '王小明',
-        isLeader: true,
-      },
-      {
-        id: 2,
-        name: '王大明',
-        isLeader: false,
-      },
-      {
-        id: 3,
-        name: '王中明',
-        isLeader: false,
-      },
-    ],
-  },
-  {
-    type: '睡眠門診',
-    name: '群組B',
-    id: 2,
-    points: 10,
-    members: [
-      {
-        id: 1,
-        name: '王小明',
-        isLeader: true,
-      },
-      {
-        id: 2,
-        name: '王大明',
-        isLeader: false,
-      },
-      {
-        id: 3,
-        name: '王中明',
-        isLeader: false,
-      },
-    ],
-  },
-]);
+const groupFormType = ref<'add' | 'edit'>('add');
 
 const cols: QTableProps['columns'] = [
   {
@@ -94,11 +58,43 @@ const cols: QTableProps['columns'] = [
   },
 ];
 
+function clickCreateBtn() {
+  showGroupForm.value = true;
+  groupFormType.value = 'add';
+  emptyGroupInitVal.value = {
+    adminClient: {
+      id: +props.clientId,
+      name: clientStore.targetClient?.name ?? '',
+      phone: clientStore.targetClient?.phone ?? '',
+    },
+  };
+}
+
 async function deleteGroup() {
   const { onOk } = await useConfirm({ title: '確定刪除此群組', content: '一但刪除群組，則無法復原，如確認無誤請按確定。' });
-  onOk(() => {
-    console.log('fetch delete api');
+  onOk(async () => {
+    await deletePointGroup(targetGroup.value.id);
+    getGroupList();
   });
+}
+
+const $q = useQuasar();
+async function createGroup(value: CreateGroupField) {
+  await createPointGroup(value);
+  $q.dialog({
+    message: '群組創建成功',
+  });
+  showGroupForm.value = false;
+  getGroupList();
+}
+async function editGroup(value: EditGroupField & { clientGroupId: number }) {
+  const { clientGroupId, ...editVals } = value;
+  showGroupForm.value = false;
+  await updatePointGroup(clientGroupId, editVals);
+  $q.dialog({
+    message: '編輯成功',
+  });
+  getGroupList();
 }
 </script>
 
@@ -111,44 +107,49 @@ async function deleteGroup() {
         outline
         multiple
       />
-      <QBtn outline icon="o_add" class="q-ml-auto" @click="(showGroupForm = true), (dialogType = 'add')">
+      <QBtn outline icon="o_add" class="q-ml-auto" @click="clickCreateBtn">
         新增群組
       </QBtn>
     </div>
     <QList class="rounded-borders points_group_list">
-      <QExpansionItem v-for="group in groupList" :key="group.id" switch-toggle-side class="q-my-sm" dense-toggle expand-icon-class="toggle_avatar">
-        <template #header>
-          <QItemSection class="points_group_list__header">
-            <div class="group_title">
-              <span>{{ group.type }}</span>
-              <div class="group_title_name">
-                {{ group.name }}
+      <template v-if="groupList.length > 0">
+        <QExpansionItem v-for="group in groupList" :key="group.id" switch-toggle-side class="q-my-sm" dense-toggle expand-icon-class="toggle_avatar">
+          <template #header>
+            <QItemSection class="points_group_list__header">
+              <div class="group_title">
+                <span>{{ PointTypes[group.type] }}</span>
+                <div class="group_title_name">
+                  {{ group.name }}
+                </div>
+                <span class="q-ml-md">點數</span>
+                <div class="group_title_points">
+                  {{ group.points ?? 0 }}
+                </div>
+                <span>點</span>
               </div>
-              <span class="q-ml-md">點數</span>
-              <div class="group_title_points">
-                {{ group.points ?? 0 }}
+            </QItemSection>
+            <QItemSection side>
+              <div class="row items-center">
+                <QBtn round flat icon="o_edit" size="sm" color="black" @click.stop="(showGroupForm = true), (groupFormType = 'edit'), (targetGroup = group)" />
+                <QBtn round flat icon="o_delete" size="sm" color="black" @click.stop="deleteGroup" />
               </div>
-              <span>點</span>
-            </div>
-          </QItemSection>
-
-          <QItemSection side>
-            <div class="row items-center">
-              <QBtn round flat icon="o_edit" size="sm" color="black" @click.stop="(showGroupForm = true), (dialogType = 'edit')" />
-              <QBtn round flat icon="o_delete" size="sm" color="black" @click.stop="deleteGroup" />
-            </div>
-          </QItemSection>
-        </template>
-
-        <QCard>
-          <QCardSection>
-            <QTable :columns="cols" :rows="[]" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered />
-          </QCardSection>
-        </QCard>
-      </QExpansionItem>
+            </QItemSection>
+          </template>
+          <QCard>
+            <QCardSection>
+              <QTable :columns="cols" :rows="[]" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered />
+            </QCardSection>
+          </QCard>
+        </QExpansionItem>
+      </template>
+      <div class="text-center">
+        目前無點數群組
+      </div>
     </QList>
   </div>
-  <PointsGroupForm v-model:state="showGroupForm" :type="dialogType" :initial-values="{}" />
+  <QDialog v-model="showGroupForm">
+    <PointsGroupForm :type="groupFormType" :init-val="groupFormType === 'add' ? emptyGroupInitVal : targetGroup" @cancel="showGroupForm = false" @edit="editGroup" @create="createGroup" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">
