@@ -23,7 +23,6 @@ const onSubmit = handleSubmit((values) => {
 
 const showClientSearch = ref(false);
 const targetClient = ref<Client>();
-// const totalPoints = computed(() => values);
 const totalPoints = computed(() => (Number(values.points ?? 0)) + (Number(values.freePoints ?? 0)));
 </script>
 
@@ -51,7 +50,7 @@ const totalPoints = computed(() => (Number(values.points ?? 0)) + (Number(values
       </QCard>
     </section>
     <QDialog v-model="showClientSearch">
-      <ClientSearch @select="(targetClient = $event), (showClientSearch = false)" @cancel="showClientSearch = false" />
+      <ClientSearch mode="single" @select="(targetClient = ($event as Client)), (showClientSearch = false)" @cancel="showClientSearch = false" />
     </QDialog>
 
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
@@ -61,8 +60,7 @@ const totalPoints = computed(() => (Number(values.points ?? 0)) + (Number(values
       </fieldset>
       <fieldset class="col-8">
         <span class="field--key">方案</span>
-        <!-- <OSelect name="type" :options="pointsGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" /> -->
-        <OInput class="field--val" name="activity" hide-bottom-space placeholder="請輸入群組名稱" />
+        <OSelect name="type" :options="[]" hide-bottom-space :virtual-scroll-item-size="50" />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-4">

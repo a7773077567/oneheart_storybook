@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{
 });
 
 defineEmits<{
-  (e: 'select', clientInfo: (T extends 'single' ? Client[] : Client)): void;
+  (e: 'select', clientInfo: Client[] | Client): void;
   // (e: 'select', clientInfo: (typeof props['mode'] extends 'multi' ? Client[] : Client)): void;
   (e: 'cancel'): void;
 }>();
@@ -50,6 +50,7 @@ function toggleSelection(newSelect: Client, ori: Client[]): Client[] {
 }
 
 const selectionId = computed(() => {
+  // @ts-expect-error to be done
   return props.mode === 'single' ? new Set([selection.value?.id]) : new Set(selection.value.map(c => c.id));
 });
 </script>
