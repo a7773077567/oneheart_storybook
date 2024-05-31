@@ -106,10 +106,10 @@ export const Types: Record<TypeName, Type> = {
 };
 
 // 點數群組
-export const pointsGroup = {
-  物理治療: 1,
-  院長物理治療: 2,
-  營養: 3,
-} as const;
+export enum PointTypes {
+  '物理治療' = 1,
+  '院長物理治療' = 2,
+  '營養' = 3,
+} ;
 
-export const pointsGroupOptions = Object.keys(pointsGroup).map(group => ({ label: group, value: pointsGroup[group as keyof typeof pointsGroup] }));
+export const pointsGroupOptions = Object.keys(PointTypes).slice(3, 6).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
