@@ -75,13 +75,35 @@ const firstTokenList = [
   'avatar/write-url',
   'spaces',
   'spaces/login',
-  // 'clients',
+  'clients',
   'resend-activation-email',
 ];
 
+function checkClientFirstToken(url: string, method: string) {
+  const clientExclusionList = [
+    'memos',
+    'addInBodyFiles',
+    'inBodyFileWriteUrl',
+  ];
+  const inExclusion = clientExclusionList.some(item => url.includes(item));
+  const isMemos = url.includes('memos');
+
+  if (!inExclusion) {
+    return true;
+  }
+  if (!isMemos) {
+    return false;
+  }
+  if (method !== 'get') {
+    return false;
+  }
+  return true;
+}
+
 // ========== Functions ==========
 function requestInterceptor(config: InternalAxiosRequestConfig) {
-  const { url } = config;
+  const { url, method } = config;
+
   if (!url) {
     return config;
   }
@@ -91,7 +113,7 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
     return config;
   }
 
-  const needFirstToken = firstTokenList.some(item => url.includes(item));
+  const needFirstToken = firstTokenList.some(item => url.includes(item)) && checkClientFirstToken(url, method!);
   const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
   config.headers!.Authorization = `Bearer ${token}`;
 
