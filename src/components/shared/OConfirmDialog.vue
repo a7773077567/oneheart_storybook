@@ -15,6 +15,11 @@ defineEmits<{
 }>();
 
 const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
+
+function onOkClick() {
+  onDialogOK();
+  onDialogHide();
+}
 </script>
 
 <template>
@@ -33,7 +38,7 @@ const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
       </QCardSection>
 
       <QCardActions vertical class="q-pa-lg add_association_dialog__actions">
-        <QBtn label="確定" color="black" @click="onDialogOK" />
+        <QBtn label="確定" color="black" @click="onOkClick" />
         <QBtn label="取消" @click="onDialogHide" />
       </QCardActions>
     </QCard>

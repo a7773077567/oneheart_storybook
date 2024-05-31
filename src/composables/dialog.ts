@@ -13,7 +13,7 @@ export async function useConfirm({
   content,
 }: ConfirmParam) {
   const modelValue = ref(true);
-  const { onOk, onCancel } = Dialog.create({
+  const { onOk, onCancel, hide } = Dialog.create({
     component: OConfirmDialog,
     componentProps: {
       title,
@@ -23,6 +23,6 @@ export async function useConfirm({
     },
   });
 
-  return { onOk, onCancel }
+  return { onOk, onCancel, hide }
   ;
 }
