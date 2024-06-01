@@ -36,13 +36,13 @@ async function handleUpload(file: File) {
     <div class="flex justify-end q-mb-md">
       <QBtn outline label="上傳身體組成表" icon="o_add" @click="showUpload = true" />
     </div>
-    <QList class="rounded-borders points_group_list" bordered>
-      <QItem v-for="(file, index) in inbodyFiles" :key="file.createdAt" switch-toggle-side dense-toggle expand-icon-class="toggle_avatar" clickable>
+    <QList class="rounded-borders points_group_list" bordered separator>
+      <QItem v-for="(file, index) in inbodyFiles" :key="file.createdAt" switch-toggle-side dense-toggle expand-icon-class="toggle_avatar">
         <QItemSection class="points_group_list__header" click>
           {{ dayjs(file.createdAt).format('YYYY/MM/DD') }}
         </QItemSection>
         <QItemSection side>
-          <QIcon name="o_attach_file" @click="previewFile(inbodyFileUrls[index])" />
+          <QBtn round flat icon="o_attach_file" @click="previewFile(inbodyFileUrls[index])" />
         </QItemSection>
       </QItem>
     </QList>
