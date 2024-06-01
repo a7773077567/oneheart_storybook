@@ -113,3 +113,10 @@ export enum PointTypes {
 } ;
 
 export const pointsGroupOptions = Object.keys(PointTypes).slice(3, 6).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
+
+// 交易項目
+export enum TransactionTypes {
+  點數交易 = 1,
+  門診費用 = 2,
+  商品購買 = 3,
+}
