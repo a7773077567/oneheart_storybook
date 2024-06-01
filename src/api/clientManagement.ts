@@ -96,8 +96,8 @@ export async function getClientInfo(clientId: number) {
 }
 
 // 上傳 Inbody
-export async function uploadInbodyFile(clientId: number) {
-  await api.post(`/clients/${clientId}/addInbodyFiles`);
+export async function uploadInbodyFile(clientId: number, attachment: { fileName: string }) {
+  await api.post(`/clients/${clientId}/addInbodyFiles`, attachment);
 }
 
 // 取得 Inbody 上傳 url

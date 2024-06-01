@@ -3,6 +3,8 @@ import { useClientStore } from '@/stores';
 import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
 import UploadFileForm from './UploadFileForm.vue';
+import { uploadInbodyFile } from '@/api';
+import { extractUuidFromS3Url } from '@/utils/helpers';
 
 const props = defineProps<{
   clientId: string;
@@ -22,8 +24,8 @@ function previewFile(url: string) {
 }
 
 async function handleUpload(file: File) {
-  await clientStore.uploadInbody2S3(+props.clientId, file);
-
+  const fileName = await clientStore.uploadInbody2S3(+props.clientId, file);
+  await uploadInbodyFile(+props.clientId, { fileName: extractUuidFromS3Url(fileName) ?? '' });
   showUpload.value = false;
   clientStore.getClientInfo(+props.clientId);
 }
