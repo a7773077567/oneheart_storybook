@@ -83,19 +83,17 @@ const firstTokenList = [
 function checkClientFirstToken(url: string, method: string) {
   const clientExclusionList = [
     'memos',
-    'addInBodyFiles',
-    'inBodyFileWriteUrl',
+    'addInbodyFiles',
   ];
   const inExclusion = clientExclusionList.some(item => url.includes(item));
   const isMemos = url.includes('memos');
 
-  if (!inExclusion) {
-    return true;
+  if (isMemos) {
+    if (method !== 'get') {
+      return false;
+    }
   }
-  if (!isMemos) {
-    return false;
-  }
-  if (method !== 'get') {
+  else if (inExclusion) {
     return false;
   }
   return true;
