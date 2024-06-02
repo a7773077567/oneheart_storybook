@@ -259,6 +259,21 @@ export async function fetchHistoryChiefComplaints(medicalRecordId: number) {
   return data;
 }
 
+export async function appointmentCheckIn(clientScheduleId: number) {
+  const { data } = await api.post(`clientSchedules/${clientScheduleId}/check-in`);
+  return data;
+}
+
+export async function appointmentFinishService(clientScheduleId: number) {
+  const { data } = await api.post(`clientSchedules/${clientScheduleId}/finish-service`);
+  return data;
+}
+
+export async function appointmentFinishRecord(clientScheduleId: number) {
+  const { data } = await api.post(`clientSchedules/${clientScheduleId}/finish-record`);
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),

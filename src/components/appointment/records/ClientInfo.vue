@@ -2,10 +2,10 @@
 import { useAppointmentStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
-import { ScheduleState } from '@/const/schedule';
+import { ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { cancelClientScheduleNotStarted } from '@/api/appointment';
+import { appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted } from '@/api/appointment';
 import { computed } from 'vue';
 
 const $q = useQuasar();
@@ -13,7 +13,7 @@ const appointmentStore = useAppointmentStore();
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
 const client = computed(() => schedule.value.client);
 const userShift = computed(() => schedule.value.userShift);
-const scheduleState = computed(() => ScheduleState.get(schedule.value.state)?.label);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 
 const data = computed(() => [
   { label: '姓名', value: client.value.name },
@@ -43,6 +43,19 @@ function cancelClientSchedule() {
     await cancelClientScheduleNotStarted(schedule.value.id);
     await appointmentStore.getClientSchedule(schedule.value.id);
   });
+}
+
+async function checkIn() {
+  await appointmentCheckIn(schedule.value.id);
+  await appointmentStore.getClientSchedule(schedule.value.id);
+}
+async function finishService() {
+  await appointmentFinishService(schedule.value.id);
+  await appointmentStore.getClientSchedule(schedule.value.id);
+}
+async function finishRecord() {
+  await appointmentFinishRecord(schedule.value.id);
+  await appointmentStore.getClientSchedule(schedule.value.id);
 }
 </script>
 
@@ -88,7 +101,9 @@ function cancelClientSchedule() {
           <QBtn label="取消預約" :disable="schedule.state === 5" outline style="width: 127px;" @click="cancelClientSchedule" />
         </div>
         <div class="actions__checkin">
-          <QBtn label="報到" outline style="width: 127px;" />
+          <QBtn v-if="scheduleState === '預約'" label="報到" outline style="width: 127px;" @click="checkIn" />
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" outline style="width: 127px;" @click="finishService" />
+          <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" outline style="width: 127px;" @click="finishRecord" />
         </div>
       </div>
     </div>

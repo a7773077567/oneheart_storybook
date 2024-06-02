@@ -2,7 +2,7 @@
 import type { ClientSchedule } from '@/api/appointment';
 import { getType } from '@/utils/mappers';
 import { computed } from 'vue';
-import { ScheduleState } from '@/const/schedule';
+import { ScheduleStateMap } from '@/const/appointment';
 
 interface Props {
   data: ClientSchedule;
@@ -15,11 +15,11 @@ defineEmits<{
   restore: [clientScheduleId: number];
 }>();
 
-const targetState = computed(() => ScheduleState.get(props.data.state));
+const state = computed(() => ScheduleStateMap.get(props.data.state)!);
 const showState = computed(() => props.historyMode);
-const stateLabel = computed(() => targetState.value?.label);
-const stateBgc = computed(() => targetState.value?.bgc);
-const stateColor = computed(() => targetState.value?.color);
+const stateLabel = computed(() => state.value?.label);
+const stateBgc = computed(() => state.value.queryStyle?.bgc);
+const stateColor = computed(() => state.value.queryStyle?.color);
 const showRecoveryBtn = computed(() => props.historyMode && props.data.isValidForRestore);
 const showActions = computed(() => !props.historyMode || showRecoveryBtn.value);
 const showRearrangeData = computed(() => props.historyMode && props.data.isBeenRearranged);

@@ -11,6 +11,7 @@ export const TherapyTypes = {
   deanTherapy: '院長物理治療',
   nutritionConsultation: '營養諮詢門診',
 };
+
 type TypeName = keyof typeof TherapyTypes;
 
 const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlain', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic'] as const;
