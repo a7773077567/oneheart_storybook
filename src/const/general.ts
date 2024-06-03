@@ -121,3 +121,12 @@ export enum TransactionTypes {
   門診費用 = 2,
   商品購買 = 3,
 }
+
+// 付款方式
+export enum PaymentTypes {
+  現金 = 1,
+  匯款 = 2,
+  信用卡 = 3,
+  LINEPay = 4,
+  街口 = 5,
+}

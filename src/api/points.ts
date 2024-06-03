@@ -18,6 +18,16 @@ export interface CreateGroupField {
   memberClientIds: number[];
 }
 
+export interface TopupDetail {
+  clientId: number;
+  clientGroupId: number;
+  plan: string;
+  paidPointGained: number;
+  giftPointGained: number;
+  amount: number;
+  payMethod: number;
+}
+
 export type EditGroupField = Pick<CreateGroupField, 'name' | 'memberClientIds'>;
 
 // 取得客戶點數群組
@@ -39,4 +49,9 @@ export async function updatePointGroup(clientGroupId: number, param: EditGroupFi
 // 刪除點數群組
 export async function deletePointGroup(clientGroupId: number) {
   await api.delete(`/clientGroups/${clientGroupId}`);
+}
+
+// 儲值點數
+export async function gainPoint(param: TopupDetail) {
+  await api.post('clientGroups/gainPoin', param);
 }
