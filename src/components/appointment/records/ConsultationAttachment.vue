@@ -61,7 +61,7 @@ async function handleSave() {
           @click="mode = 'eraser'"
         />
       </div>
-      <QBtn round flat icon="o_save" size="md" @click="handleSave" />
+      <QBtn label="儲存" style="width: 100px" @click="handleSave" />
     </div>
     <div id="container" ref="container" />
   </div>

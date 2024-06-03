@@ -69,7 +69,7 @@ const onSubmit = handleSubmit(async (formValue) => {
       </fieldset>
     </form>
     <div class="nutrition_form_action">
-      <QBtn round flat icon="o_save" size="md" @click="onSubmit" />
+      <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
   </div>
 </template>

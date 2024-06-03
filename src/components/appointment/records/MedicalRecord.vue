@@ -90,8 +90,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
       </div>
     </div>
     <div class="form__actions">
-      <QIcon name="o_save" size="24px" class="cursor-pointer q-pa-xs" @click="onSubmit" />
-      <QBtn label="完成服務" outline style="width: 126px;height: 40px;" />
+      <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
       <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
