@@ -9,11 +9,12 @@ const props = defineProps<{
     id: string;
     birthDate: string;
     amount: number;
-    declaration: boolean;
+    declaration: string;
     selfPay: string;
     date: string;
     userName: string;
   };
+  spaceName?: string;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -27,6 +28,7 @@ const LabelMap = new Map<keyof typeof props.data, string>([
   ['selfPay', '自費項目'],
   ['date', '看診日期'],
   ['userName', '治療師'],
+  ['amount', '現金'],
 ]);
 
 const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShift.space?.name);
@@ -35,7 +37,7 @@ const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShif
 <template>
   <div class="receipt">
     <p class="receipt__title">
-      唯心物理治療所<span>（{{ spaceName }}）</span>
+      {{ spaceName }}
     </p>
     <p class="receipt__subtitle">
       醫療費用收據（客戶聯）
@@ -47,6 +49,9 @@ const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShif
           <td>{{ data[key] }}</td>
         </tr>
       </table>
+    </div>
+    <div class="receipt__stamp">
+      <img src="@/assets/images/appointment/duty-stamp.png" alt="">
     </div>
   </div>
 </template>
@@ -82,6 +87,13 @@ const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShif
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  &__stamp {
+    bottom: 30px;
+    width: 200px;
+    img {
+      width: 100%;
+    }
   }
 }
 

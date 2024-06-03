@@ -56,3 +56,7 @@ export function extractUuidFromS3Url(url: string) {
   }
   return null;
 }
+
+export function checkGender(id: string) {
+  return id.slice(1, 2) === '1' ? { name: 'male', label: '男' } : { name: 'female', label: '女' };
+}

@@ -185,6 +185,28 @@ export interface HistoryChiefComplaint {
   date: string;
   chiefComplaint: string;
 }
+
+export interface ClientInGroup {
+  id: number;
+  name: string;
+  phone: string;
+}
+
+export interface ClientGroup {
+  id: number;
+  type: number;
+  name: string;
+  adminClient: ClientGroup;
+  memberClients: ClientInGroup[];
+  points: number;
+}
+
+export interface CheckoutPost {
+  payMethod: number;
+  payAmount: number | null;
+  clientGroupId: number | null;
+  pointUsed: number | null;
+}
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -271,6 +293,16 @@ export async function appointmentFinishService(clientScheduleId: number) {
 
 export async function appointmentFinishRecord(clientScheduleId: number) {
   const { data } = await api.post(`clientSchedules/${clientScheduleId}/finish-record`);
+  return data;
+}
+
+export async function fetchClientGroup(clientId: number) {
+  const { data } = await api.get<ClientGroup[]>(`clients/${clientId}/clientGroups`);
+  return data;
+}
+
+export async function checkout(scheduleId: number, payload: CheckoutPost) {
+  const { data } = await api.post<any, CheckoutPost>(`clientSchedules/${scheduleId}/checkout`, payload);
   return data;
 }
 

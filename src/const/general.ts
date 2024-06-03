@@ -35,6 +35,8 @@ interface Type {
   name: string;
   label: string;
   tabs: TabName[];
+  canUsePoint: boolean;
+  calcAmount: (usePoint?: boolean) => number;
 }
 
 export const Types: Record<TypeName, Type> = {
@@ -43,30 +45,40 @@ export const Types: Record<TypeName, Type> = {
     name: 'physicalConsultation',
     label: '物理諮詢門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 200,
   },
   physicalTherapy: {
     identifier: 2,
     name: 'physicalTherapy',
     label: '物理治療門診',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
+    canUsePoint: true,
+    calcAmount: usePoint => usePoint ? 1 : 2000,
   },
   footPressure: {
     identifier: 3,
     name: 'footPressure',
     label: '足壓門診',
     tabs: ['clientInfo', 'footPressure', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 2000,
   },
   nutrition: {
     identifier: 4,
     name: 'nutrition',
     label: '營養門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
+    canUsePoint: true,
+    calcAmount: usePoint => usePoint ? 1 : 2000,
   },
   sleep: {
     identifier: 5,
     name: 'sleep',
     label: '睡眠門診',
     tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 2000,
   },
   // sports: {
   //   identifier: 6,
@@ -91,18 +103,24 @@ export const Types: Record<TypeName, Type> = {
     name: 'deanConsultation',
     label: '院長評估門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 699,
   },
   deanTherapy: {
     identifier: 7,
     name: 'deanTherapy',
     label: '院長物理治療',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
+    canUsePoint: true,
+    calcAmount: usePoint => usePoint ? 1 : 3000,
   },
   nutritionConsultation: {
     identifier: 8,
     name: 'nutritionConsultation',
     label: '營養諮詢門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 499,
   },
 };
 

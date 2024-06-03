@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, getUploadS3Url, upload2awsS3 } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api';
 import { fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
@@ -27,6 +27,7 @@ interface State {
   clientSchedulesInProgress: ClientSchedule[];
   targetClientSchedule: ClientScheduleDetail | null;
   historyChiefComplaints: HistoryChiefComplaint[];
+  targetClientGroup: ClientGroup[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -50,6 +51,7 @@ export const useAppointmentStore = defineStore('appointment', {
     clientSchedulesInProgress: [],
     targetClientSchedule: null,
     historyChiefComplaints: [],
+    targetClientGroup: [],
   }),
   getters: {
     userOptions(state) {
@@ -148,6 +150,10 @@ export const useAppointmentStore = defineStore('appointment', {
     async getHistoryChiefComplaints(medicalRecordId: number) {
       const data = await fetchHistoryChiefComplaints(medicalRecordId);
       this.historyChiefComplaints = data;
+    },
+    async getClientGroup(clientId: number) {
+      const data = await fetchClientGroup(clientId);
+      this.targetClientGroup = data;
     },
   },
 

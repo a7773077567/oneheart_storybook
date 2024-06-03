@@ -1,3 +1,12 @@
+export enum PaymentMethod {
+  現金 = 1,
+  匯款 = 2,
+  信用卡 = 3,
+  'LINEPay' = 4,
+  街口 = 5,
+  點數 = 6,
+}
+
 export const ScheduleStateMap = new Map([
   [1, { name: 'appointment', label: '預約', cardStyle: { color: '#FFFFFF' } }],
   [2, { name: 'checkIn', label: '報到', cardStyle: { color: '#88F2D8' } }],

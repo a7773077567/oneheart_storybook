@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
 import { CheckTable, Receipt } from '@/components/appointment';
-import { ShiftType } from '@/const/general';
-import { computed, ref } from 'vue';
+import { ShiftType, Types } from '@/const/general';
+import { PaymentMethod } from '@/const/appointment';
+import { computed, ref, watch } from 'vue';
+import { checkGender } from '@/utils/helpers';
+import { checkout } from '@/api/appointment';
+import router from '@/router';
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 
@@ -12,13 +16,16 @@ const props = defineProps<{
 
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
-const { date, client, userShift } = appointmentStore.targetClientSchedule!;
+const { id, date, client, userShift } = appointmentStore.targetClientSchedule!;
+await appointmentStore.getClientGroup(client.id);
+const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
+const amountInput = ref('');
 
 const info: CheckTableData = [
   { key: 'date', value: date, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
-  { key: 'type', value: ShiftType[userShift.type], label: '項目' },
+  { key: 'type', value: shiftType.value?.label, label: '項目' },
   { key: 'userName', value: userShift.user.name, label: '治療師' },
 ];
 
@@ -26,15 +33,15 @@ const payment: CheckTableData = [
   { key: 'title', value: '支付方式', span: true, custom: true },
   { key: 'payment', span: true, custom: true },
 ];
-const selectedPayment = ref('cash');
-const isPointType = computed(() => selectedPayment.value === 'points');
+const selectedPayment = ref(1);
+const isPointType = computed(() => selectedPayment.value === PaymentMethod['點數']);
 const paymentGroup = [
-  { label: '現金', value: 'cash' },
-  { label: '轉帳', value: 'transfer' },
-  { label: '信用卡', value: 'creditCard' },
-  { label: 'Line Pay', value: 'linePay' },
-  { label: '街口', value: 'jkoPay' },
-  { label: '點數', value: 'points' },
+  { label: '現金', value: PaymentMethod['現金'] },
+  { label: '轉帳', value: PaymentMethod['匯款'] },
+  { label: '信用卡', value: PaymentMethod['信用卡'] },
+  { label: 'Line Pay', value: PaymentMethod.LINEPay },
+  { label: '街口', value: PaymentMethod['街口'] },
+  { label: '點數', value: PaymentMethod['點數'], disable: !shiftType.value?.canUsePoint || !appointmentStore.targetClientGroup.length },
 ];
 
 const details = computed<CheckTableData>(() => {
@@ -46,46 +53,67 @@ const details = computed<CheckTableData>(() => {
     { key: 'cashDetails', label: '現金', span: true, custom: true },
     { key: 'groupDetails', span: true, custom: true },
   ];
-  return selectedPayment.value === 'points'
+  return selectedPayment.value === PaymentMethod['點數']
     ? allDetails.filter(item => !['cashDetails'].includes(item.key))
     : allDetails.filter(item => !['selectGroup', 'remainingPoints', 'groupDetails'].includes(item.key));
 },
 );
-const groupOptions = [
-  { label: '群組1', value: 'group1' },
-  { label: '群組2', value: 'group2' },
-  { label: '群組3', value: 'group3' },
-];
+const groupOptions = appointmentStore.targetClientGroup.map(item => ({
+  label: item.name,
+  value: item.points,
+  id: item.id,
+}));
 const selectedGroup = ref(groupOptions[0]);
-const groupDetails = [
-  { label: '群組', labelValue: selectedGroup.value.label, value: 150 },
-  { label: '項目', labelValue: ShiftType[userShift.type], value: -4 },
-  { label: '剩餘點數', value: 146 },
-];
+const selectedGroupPoints = computed(() => selectedGroup.value.value);
+const groupDetails = computed(() => [
+  { label: '群組', labelValue: selectedGroup.value.label, value: selectedGroup.value.value },
+  { label: '項目', labelValue: ShiftType[userShift.type], value: -amountInput.value },
+  { label: '剩餘點數', value: selectedGroup.value.value - +amountInput.value },
+]);
 
-const amountInput = ref('2000');
+watch(isPointType, (newType: boolean) => {
+  if (newType) {
+    return amountInput.value = shiftType.value.calcAmount(true).toString();
+  }
+  amountInput.value = shiftType.value.calcAmount().toString();
+}, { immediate: true });
 
-const checkData = {
-  name: '李小姐',
-  gender: '女',
-  id: 'X000000000',
-  birthDate: '1999/09/09',
+const spaceName = computed(() => userShift.space?.name);
+const checkData = computed(() => ({
+  name: client.name,
+  gender: checkGender(client.identityNumber).label,
+  id: client.identityNumber,
+  birthDate: client.birthDate,
+  declaration: '無',
+  selfPay: ShiftType[userShift.type],
+  date,
+  userName: userShift.user.name,
   amount: 2000,
-  declaration: false,
-  selfPay: '足壓治療',
-  date: '2024/01/23',
-  userName: 'AA治療師',
-};
+}));
 
 const isReceiptDialogOpen = ref(false);
+
+function print() {
+  window.print();
+}
+
+async function onCheckout() {
+  await checkout(id, {
+    payMethod: selectedPayment.value,
+    payAmount: isPointType.value ? null : +amountInput.value,
+    clientGroupId: isPointType.value ? selectedGroup.value.id : null,
+    pointUsed: isPointType.value ? +amountInput.value : null,
+  });
+  router.push({ name: 'appointmentListCalendar' });
+}
 </script>
 
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
       <QCard class="q-py-md q-px-xl relative-position">
-        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right" size="24px" style="top: 10px; right: 10px;" />
-        <QCardSection class="q-pb-none">
+        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
+        <QCardSection class="q-pb-none no-print">
           <div class="text-h6 text-center q-mb-md text-bold">
             結帳確定
           </div>
@@ -94,11 +122,12 @@ const isReceiptDialogOpen = ref(false);
           </div>
         </QCardSection>
         <QCardSection>
-          <Receipt :data="checkData" />
+          <Receipt :data="checkData" :space-name="spaceName" />
         </QCardSection>
-        <QCardActions align="center">
-          <QBtn label="確定結帳" outline style="width: 100%;" />
-        </QCardActions>
+        <QCardSection class="actions no-print">
+          <QBtn label="列印收據" outline @click="print" />
+          <QBtn label="確定結帳" outline @click="onCheckout" />
+        </QCardSection>
       </QCard>
     </QDialog>
 
@@ -130,7 +159,7 @@ const isReceiptDialogOpen = ref(false);
       <template #remainingPoints>
         <div class="remaining-points slot-padding">
           <span>群組點數</span>
-          <span>{{ 150 }} 點</span>
+          <span>{{ selectedGroupPoints }} 點</span>
         </div>
       </template>
       <template #detailTitle="{ data }">
@@ -225,6 +254,21 @@ const isReceiptDialogOpen = ref(false);
   &__item {
     display: flex;
     justify-content: space-between;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+  .q-card {
+    box-shadow: none;
   }
 }
 </style>
