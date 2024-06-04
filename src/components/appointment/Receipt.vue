@@ -5,9 +5,9 @@ import { computed } from 'vue';
 const props = defineProps<{
   data: {
     name: string;
-    gender: string;
-    id: string;
-    birthDate: string;
+    gender?: string;
+    id?: string;
+    birthDate?: string;
     amount: number;
     declaration: string;
     selfPay: string;
@@ -43,7 +43,7 @@ const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShif
       醫療費用收據（客戶聯）
     </p>
     <div class="receipt__body">
-      <table class="table">
+      <table v-if="data" class="table">
         <tr v-for="[key, val] in LabelMap.entries()" :key="key">
           <td>{{ val }}</td>
           <td>{{ data[key] }}</td>

@@ -16,13 +16,15 @@ const props = defineProps<{
 
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
-const { id, date, client, userShift } = appointmentStore.targetClientSchedule!;
+
+const { id: scheduleId, date: scheduleDate, client, userShift } = (appointmentStore.targetClientSchedule!);
+
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
 const amountInput = ref('');
 
 const info: CheckTableData = [
-  { key: 'date', value: date, span: true, custom: true },
+  { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
   { key: 'type', value: shiftType.value?.label, label: '項目' },
@@ -79,17 +81,18 @@ watch(isPointType, (newType: boolean) => {
 }, { immediate: true });
 
 const spaceName = computed(() => userShift.space?.name);
-const checkData = computed(() => ({
+
+const receiptData = {
   name: client.name,
-  gender: checkGender(client.identityNumber).label,
+  gender: checkGender(client.identityNumber)?.label,
   id: client.identityNumber,
   birthDate: client.birthDate,
   declaration: '無',
   selfPay: ShiftType[userShift.type],
-  date,
+  date: scheduleDate,
   userName: userShift.user.name,
   amount: 2000,
-}));
+};
 
 const isReceiptDialogOpen = ref(false);
 
@@ -98,7 +101,7 @@ function print() {
 }
 
 async function onCheckout() {
-  await checkout(id, {
+  await checkout(scheduleId, {
     payMethod: selectedPayment.value,
     payAmount: isPointType.value ? null : +amountInput.value,
     clientGroupId: isPointType.value ? selectedGroup.value.id : null,
@@ -122,7 +125,7 @@ async function onCheckout() {
           </div>
         </QCardSection>
         <QCardSection>
-          <Receipt :data="checkData" :space-name="spaceName" />
+          <Receipt :data="receiptData" :space-name="spaceName" />
         </QCardSection>
         <QCardSection class="actions no-print">
           <QBtn label="列印收據" outline @click="print" />
