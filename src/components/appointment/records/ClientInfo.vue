@@ -97,8 +97,8 @@ async function finishRecord() {
     <div class="client-info__actions">
       <div class="actions">
         <div class="actions__rearrange">
-          <QBtn label="預約改期" :disable="schedule.state !== 1" outline style="width: 127px;" @click="rearrangeClientSchedule" />
-          <QBtn label="取消預約" :disable="schedule.state === 5" outline style="width: 127px;" @click="cancelClientSchedule" />
+          <QBtn label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+          <QBtn label="取消預約" :disable="schedule.state > 2" outline style="width: 127px;" @click="cancelClientSchedule" />
         </div>
         <div class="actions__checkin">
           <QBtn v-if="scheduleState === '預約'" label="報到" outline style="width: 127px;" @click="checkIn" />

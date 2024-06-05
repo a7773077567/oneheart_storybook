@@ -10,6 +10,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const isCheckedOut = computed(() => props.data.paymentState === 2);
+const beforeCheckIn = computed(() => props.data.state === 1);
 
 // interface State {
 //   identifier: number;
@@ -65,7 +66,7 @@ const type = computed(() => getType(props.data.userShift.type));
     <p class="booking-card__state">
       {{ stateLabel }}
     </p>
-    <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
+    <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
   </div>
 </template>
 
