@@ -1,5 +1,5 @@
 import { api } from '@/utils/api';
-import type { PointTypes } from '@/const/general';
+import type { PaymentTypes, PointTypes } from '@/const/general';
 import type { Client } from './clientManagement';
 
 export interface PointsGroup {
@@ -25,7 +25,7 @@ export interface TopupDetail {
   paidPointGained: number;
   giftPointGained: number;
   amount: number;
-  payMethod: number;
+  payMethod: PaymentTypes;
 }
 
 export type EditGroupField = Pick<CreateGroupField, 'name' | 'memberClientIds'>;
@@ -53,5 +53,5 @@ export async function deletePointGroup(clientGroupId: number) {
 
 // 儲值點數
 export async function gainPoint(param: TopupDetail) {
-  await api.post('clientGroups/gainPoin', param);
+  await api.post('clientGroups/gainPoint', param);
 }

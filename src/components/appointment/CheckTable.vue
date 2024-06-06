@@ -2,7 +2,7 @@
 defineProps<{
   data: {
     key: string;
-    value?: string;
+    value?: string | number;
     label?: string;
     span?: boolean;
     custom?: boolean;
