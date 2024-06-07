@@ -1,8 +1,16 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import type { QTableProps } from 'quasar';
+import { type PurchaseRecord, getClientPayments } from '@/api';
+import { PaymentTypes, TransactionTypes } from '@/const/general';
 
-const rows = ref([{ id: 1, date: '2024/05/31', place: '台北館', item: '物理治療', payment: '現金', points: '2000元' }]);
+const props = defineProps<{
+  clientId: string;
+}>();
+
+const rows = ref<PurchaseRecord[]>([]);
+rows.value = await getClientPayments(+props.clientId);
+
 const cols: QTableProps['columns'] = [
   {
     name: 'date',
@@ -13,32 +21,42 @@ const cols: QTableProps['columns'] = [
     field: row => row.date,
   },
   {
-    name: 'place',
+    name: 'spaceName',
     required: true,
     label: '場館',
     align: 'left',
-    field: row => row.place,
+    field: row => row.spaceName,
   },
   {
-    name: 'item',
+    name: 'type',
     required: true,
     label: '項目',
     align: 'left',
-    field: row => row.item,
+    field: row => TransactionTypes[row.type],
   },
   {
-    name: 'payment',
+    name: 'payMethod',
     required: true,
     label: '支付方式',
     align: 'left',
-    field: row => row.payment,
+    field: row => PaymentTypes[row.payMethod],
   },
   {
-    name: 'points',
+    name: 'amount',
     required: true,
     label: '金額/點數',
     align: 'left',
-    field: row => row.points,
+    field: (row) => {
+      switch (row.type) {
+        case TransactionTypes.門診費用:
+        case TransactionTypes.商品購買:
+          return row.payMethod === PaymentTypes.點數 ? row.usedPoint : row.amount;
+
+        case TransactionTypes.點數交易:
+        default:
+          return row.amount;
+      }
+    },
   },
 ];
 </script>

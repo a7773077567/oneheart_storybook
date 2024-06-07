@@ -147,4 +147,5 @@ export enum PaymentTypes {
   信用卡 = 3,
   LINEPay = 4,
   街口 = 5,
+  點數 = 6,
 }

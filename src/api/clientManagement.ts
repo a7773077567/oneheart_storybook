@@ -60,6 +60,15 @@ export interface UploadFileInfo {
   fileName: string;
 }
 
+export interface PurchaseRecord {
+  amount: number;
+  date: string;
+  payMethod: number;
+  spaceName: string | null;
+  type: number;
+  usedPoint: number | null;
+}
+
 // 取得 memo
 export async function getMemos(clientId: number) {
   const { data } = await api.get<Memo[]>(`clients/${clientId}/memos`);
@@ -97,11 +106,17 @@ export async function getClientInfo(clientId: number) {
 
 // 上傳 Inbody
 export async function uploadInbodyFile(clientId: number, attachment: { fileName: string }) {
-  await api.post(`/clients/${clientId}/addInbodyFiles`, attachment);
+  await api.post(`clients/${clientId}/addInbodyFiles`, attachment);
 }
 
 // 取得 Inbody 上傳 url
 export async function getInbodyUploadUrl(clientId: number) {
-  const { data } = await api.get<UploadFileInfo>(`/clients/${clientId}/inbodyFileWriteUrl`);
+  const { data } = await api.get<UploadFileInfo>(`clients/${clientId}/inbodyFileWriteUrl`);
+  return data;
+}
+
+// 取得客戶付款記錄
+export async function getClientPayments(clientId: number) {
+  const { data } = await api.get<PurchaseRecord[]>(`clients/${clientId}/payments`);
   return data;
 }
