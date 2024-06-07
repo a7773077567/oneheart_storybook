@@ -25,7 +25,7 @@ const initialTopup = {
   clientName: '',
   clientPhone: '',
   clientGroupId: Number.NaN,
-  pointType: +(PointTypes.物理治療),
+  pointType: Number.NaN,
   groupName: '',
   plan: '',
   paidPointGained: 0,

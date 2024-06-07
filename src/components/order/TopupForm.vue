@@ -89,9 +89,14 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
       <fieldset class="col-8">
         <span class="field--key">點數群組</span>
         <OSelect class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" :disable="!values.clientId" error-message="" @update:model-value="getPointGroup" />
+        <div class="q-ml-md text-caption" style="min-width:98px">
+          點數類別：<span v-if="!!values.pointType" class="text-caption">
+            {{ PointTypes[values.pointType] }}
+          </span>
+        </div>
       </fieldset>
       <fieldset class="col-8">
-        <span class="field--key">方案 {{ values.pointType }}</span>
+        <span class="field--key">方案</span>
         <OSelect class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50" error-message="" />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
