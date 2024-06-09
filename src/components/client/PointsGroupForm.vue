@@ -100,7 +100,7 @@ function removeMember(delMember: Client) {
     </QCardActions>
   </QCard>
   <QDialog v-model="showClientSearch">
-    <ClientSearch mode="multi" @select="handleMemberChose($event as Client[])" @cancel="showClientSearch = false" />
+    <ClientSearch multiple @select="handleMemberChose" @cancel="showClientSearch = false" />
   </QDialog>
 </template>
 

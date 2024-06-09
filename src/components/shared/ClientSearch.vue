@@ -1,25 +1,22 @@
-<script setup lang='ts' generic="T extends 'single' | 'multi'">
+<script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { type Client, fetchClients } from '@/api';
 
 const props = withDefaults(defineProps<{
-  // multiple?: T;
-  mode: T;
+  multiple?: boolean;
 }>(), {
-  mode: () => 'single' as T,
+  multiple: false,
 });
 
 defineEmits<{
-  (e: 'select', clientInfo: Client[] | Client): void;
-  // (e: 'select', clientInfo: (typeof props['mode'] extends 'multi' ? Client[] : Client)): void;
+  (e: 'select', clientInfo: Client[]): void;
   (e: 'cancel'): void;
 }>();
 
 const searchInput = ref('');
 const resultList = ref<Client[]>([]);
-
-const getSelectionInital = (mode: T): Client | Client[] => mode === 'single' ? {} as Client : [];
-const selection = ref(getSelectionInital(props.mode));
+const selection = ref<Client[]>([]);
+const selectionId = computed(() => new Set(selection.value.map(c => c.id)));
 
 async function searchClient() {
   const { data } = await fetchClients({ nameOrPhone: searchInput.value });
@@ -27,14 +24,13 @@ async function searchClient() {
 }
 
 function handleSelect(client: Client) {
-  switch (props.mode) {
-    case 'multi':
-      (selection.value as Client[]) = toggleSelection(client, selection.value as Client[]);
-      return;
-    case 'single':
-    default:
-      return (selection.value as Client) = client;
+  if (!client)
+    return;
+
+  if (props.multiple) {
+    return selection.value = toggleSelection(client, selection.value);
   }
+  return selection.value = [client];
 }
 
 function toggleSelection(newSelect: Client, ori: Client[]): Client[] {
@@ -48,11 +44,6 @@ function toggleSelection(newSelect: Client, ori: Client[]): Client[] {
 
   return [...ori ?? [], newSelect];
 }
-
-const selectionId = computed(() => {
-  // @ts-expect-error to be done
-  return props.mode === 'single' ? new Set([selection.value?.id]) : new Set(selection.value.map(c => c.id));
-});
 </script>
 
 <template>
@@ -67,7 +58,9 @@ const selectionId = computed(() => {
       <QList bordered separator>
         <QItem v-for="client in resultList" :key="client.id" clickable :class="{ selected: selectionId.has(client.id) }" @click="handleSelect(client)">
           <QItemSection>
-            <QItemLabel>{{ client.name }}</QItemLabel>
+            <QItemLabel>
+              {{ client.name }}
+            </QItemLabel>
             <QItemLabel caption>
               {{ client.phone }}
             </QItemLabel>

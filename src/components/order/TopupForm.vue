@@ -46,17 +46,17 @@ const planOptions = computed(() => {
   return pointsPlan.filter(({ type }) => type === values?.pointType).map(({ name }) => ({ label: name, value: name }));
 });
 
-function selectClient(client: Client[] | Client) {
-  if (!Array.isArray(client)) {
-    setFieldValue('clientId', client.id);
-    setFieldValue('clientName', client.name);
-    setFieldValue('clientPhone', client.phone);
+function selectClient(selectList: Client[]) {
+  const client = selectList[0];
 
-    resetField('clientGroupId');
+  setFieldValue('clientId', client.id);
+  setFieldValue('clientName', client.name);
+  setFieldValue('clientPhone', client.phone);
 
-    showClientSearch.value = false;
-    pointsStore.getPointGroupOptions(client.id);
-  }
+  resetField('clientGroupId');
+
+  showClientSearch.value = false;
+  pointsStore.getPointGroupOptions(client.id);
 }
 
 function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
@@ -72,7 +72,7 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
       <QBtn outline label="選擇儲值會員" @click="showClientSearch = true" />
     </section>
     <QDialog v-model="showClientSearch">
-      <ClientSearch mode="single" @select="selectClient" @cancel="showClientSearch = false" />
+      <ClientSearch @select="selectClient" @cancel="showClientSearch = false" />
     </QDialog>
 
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
