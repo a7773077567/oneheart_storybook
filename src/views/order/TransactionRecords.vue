@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
 import { PaymentTypes, TransactionTypes } from '@/const/general';
-import { type PaymentQuery, getPayments } from '@/api';
+import { type PaymentQuery, getPayments, getSinglePayment } from '@/api';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
@@ -112,6 +112,11 @@ async function getRecordList(query: Partial<PaymentQuery>) {
 }
 
 getRecordList({});
+
+async function checkRecipe(paymentId: number) {
+  const data = await getSinglePayment(paymentId);
+  console.log('payment detail', data);
+}
 </script>
 
 <template>
@@ -139,7 +144,7 @@ getRecordList({});
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
       <template #body-cell-attachment="{ value }">
         <QTd>
-          <QBtn v-if="!!value" flat round icon="o_description" />
+          <QBtn v-if="!!value" flat round icon="o_description" @click="checkRecipe(value)" />
           <span v-else>-</span>
         </QTd>
       </template>
