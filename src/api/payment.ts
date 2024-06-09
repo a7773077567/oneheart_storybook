@@ -14,21 +14,22 @@ export interface Payment {
   clientName: string;
 }
 
-interface PaymentQuery {
+export interface PaymentQuery {
   order?: 'ASC' | 'DESC';
   page?: number;
   take?: number;
   phone?: string;
   name?: string;
-  date: string;
+  startDate: string;
+  endDate: string;
 }
 
 type PaymentDetail = Omit<Payment, 'clientId' | 'clientName'> & { client: Client };
 
 // 客戶所有交易紀錄
 export async function getPayments(params?: PaymentQuery) {
-  const { data } = await api.get<{ data: Payment[]; meta: PagingMeta }>(`/payments`, { params });
-  return data;
+  const { data, meta } = await api.get<{ data: Payment[]; meta: PagingMeta }>(`payments`, { params });
+  return { data, meta };
 }
 
 // 單一交易記錄

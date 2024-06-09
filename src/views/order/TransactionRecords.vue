@@ -1,13 +1,12 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
-import { TransactionTypes } from '@/const/general';
-
-const rows = ref();
-const paging = ref<QPagination['$props']>({
-  max: 1,
-  modelValue: 1,
-});
+import { PaymentTypes, TransactionTypes } from '@/const/general';
+import { type PaymentQuery, getPayments } from '@/api';
+import dayjs from 'dayjs';
+import { useForm } from 'vee-validate';
+import { z } from 'zod';
+import { toTypedSchema } from '@vee-validate/zod';
 
 const cols: QTableProps['columns'] = [
   {
@@ -19,11 +18,11 @@ const cols: QTableProps['columns'] = [
     field: row => row.date,
   },
   {
-    name: 'id',
+    name: 'clientId',
     required: true,
     label: '會員編號',
     align: 'left',
-    field: row => row.id,
+    field: row => row.clientId,
   },
   {
     name: 'type',
@@ -33,52 +32,108 @@ const cols: QTableProps['columns'] = [
     field: row => TransactionTypes[row.type],
   },
   {
-    name: 'name',
+    name: 'clientName',
     required: true,
     label: '會員姓名',
     align: 'left',
-    field: row => row.name,
+    field: row => row.clientName,
   },
   {
-    name: 'paymentMethod',
+    name: 'payMethod',
     required: true,
     label: '支付方式',
     align: 'left',
-    field: row => row.paymentMethod,
+    field: row => PaymentTypes[row.payMethod],
   },
   {
     name: 'amount',
     required: true,
     label: '金額/點數',
     align: 'left',
-    field: row => row.amount,
+    field: (row) => {
+      switch (row.type) {
+        case TransactionTypes.門診費用:
+        case TransactionTypes.商品購買:
+          return row.payMethod === PaymentTypes.點數 ? `${row.usedPoint} 點` : `$ ${row.amount}`;
+
+        case TransactionTypes.點數交易:
+        default:
+          return `$ ${row.amount}`;
+      }
+    },
   },
   {
     name: 'attachment',
     required: true,
     label: '收據',
     align: 'left',
-    field: row => row.attachment,
+    field: row => row.clientId,
   },
 ];
 
-async function getRecordList(page = 1) {
-  console.log('fetch record list api', page);
-  rows.value = [{ id: 1, date: '2024/05/31', type: 1, name: 'Sherry', place: '台北館', item: '物理治療', paymentMethod: '現金', amount: '2000元' }];
-  paging.value = { max: 1, modelValue: 1 };
+const rows = ref();
+const paging = ref<QPagination['$props']>({
+  max: 1,
+  modelValue: 1,
+});
+
+const schema = z.object({
+  date: z.object({ from: z.string(), to: z.string() }),
+  name: z.string().optional(),
+});
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(schema),
+  initialValues: {
+    date: {
+      from: dayjs().format('YYYY-MM-DD'),
+      to: dayjs().format('YYYY-MM-DD'),
+    },
+  },
+});
+
+const onSubmit = handleSubmit((values) => {
+  getRecordList({
+    page: paging.value.modelValue,
+    startDate: values?.date?.from ?? dayjs().format('YYYY-MM-DD'),
+    endDate: values?.date?.to ?? dayjs().format('YYYY-MM-DD'),
+    ...(values.name ? { name: values.name } : {}),
+  });
+});
+
+async function getRecordList(query: Partial<PaymentQuery>) {
+  const { data, meta } = await getPayments({
+    page: 1,
+    startDate: dayjs().format('YYYY-MM-DD'),
+    endDate: dayjs().format('YYYY-MM-DD'),
+    ...query,
+  });
+  rows.value = data;
+  paging.value = { max: meta.pageCount, modelValue: meta.page };
 }
 
-getRecordList();
+getRecordList({});
 </script>
 
 <template>
-  <div class="transaction_records_page">
-    <div class="flex justify-end q-mb-md">
+  <div class="transaction_records_page q-py-sm">
+    <div class="row q-col-gutter-md items-center" style="max-width: 860px">
+      <InputBox label="" class="col-xs-12 col-sm-5">
+        <OInput name="name" rounded dense hide-bottom-space placeholder="請輸入客戶名稱或電話" clearable />
+      </InputBox>
+      <InputBox label="" class="col-xs-12 col-sm-5">
+        <DatePicker name="date" range />
+      </InputBox>
+      <div class="col-2">
+        <QBtn outline label="搜尋" @click="onSubmit" />
+      </div>
+    </div>
+
+    <div class="flex justify-end q-py-md">
       <QPagination
         v-model="paging.modelValue"
         :max="paging.max"
         input
-        @update:model-value="getRecordList"
+        @update:model-value="getRecordList({ page: $event })"
       />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
