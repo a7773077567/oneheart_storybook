@@ -49,7 +49,7 @@ export const newPasswordSchema = z.object({
   confirmPassword: z.string().min(6),
 }).refine(data => data.confirmPassword === data.password, {
   message: '密碼須一致',
-  path: ['confirm'],
+  path: ['confirmPassword'],
 });
 
 export interface Space {
@@ -114,5 +114,10 @@ export async function activateUser(payload: NewPasswordReq) {
 
 export async function resendActivateEmail(userId: number) {
   const { data } = await api.post(`users/${userId}/resend-activation-email`);
+  return data;
+}
+
+export async function updatePassword(payload: { password: string }) {
+  const { data } = await api.post(`users/update-password`, payload);
   return data;
 }
