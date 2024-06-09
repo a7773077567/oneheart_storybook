@@ -46,15 +46,17 @@ const planOptions = computed(() => {
   return pointsPlan.filter(({ type }) => type === values?.pointType).map(({ name }) => ({ label: name, value: name }));
 });
 
-function selectClient(client: Client) {
-  setFieldValue('clientId', client.id);
-  setFieldValue('clientName', client.name);
-  setFieldValue('clientPhone', client.phone);
+function selectClient(client: Client[] | Client) {
+  if (!Array.isArray(client)) {
+    setFieldValue('clientId', client.id);
+    setFieldValue('clientName', client.name);
+    setFieldValue('clientPhone', client.phone);
 
-  resetField('clientGroupId');
+    resetField('clientGroupId');
 
-  showClientSearch.value = false;
-  pointsStore.getPointGroupOptions(client.id);
+    showClientSearch.value = false;
+    pointsStore.getPointGroupOptions(client.id);
+  }
 }
 
 function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
