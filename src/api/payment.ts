@@ -19,8 +19,7 @@ export interface PaymentQuery {
   order?: 'ASC' | 'DESC';
   page?: number;
   take?: number;
-  phone?: string;
-  name?: string;
+  nameOrPhone?: string;
   startDate: string;
   endDate: string;
 }

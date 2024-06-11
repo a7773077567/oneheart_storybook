@@ -83,36 +83,40 @@ const paging = ref<QPagination['$props']>({
 
 const schema = z.object({
   date: z.object({ from: z.string(), to: z.string() }),
-  name: z.string().optional(),
+  nameOrPhone: z.string().nullable().optional(),
 });
-const { handleSubmit } = useForm({
+const { handleSubmit, values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: {
     date: {
-      from: dayjs().format('YYYY-MM-DD'),
-      to: dayjs().format('YYYY-MM-DD'),
+      from: dayjs().startOf('month').format('YYYY-MM-DD'),
+      to: dayjs().endOf('month').format('YYYY-MM-DD'),
     },
   },
 });
 
 const onSubmit = handleSubmit((values) => {
-  getRecordList({
+  getRecordList(extractValidQuery({
     page: paging.value.modelValue,
-    startDate: values?.date?.from ?? dayjs().format('YYYY-MM-DD'),
-    endDate: values?.date?.to ?? dayjs().format('YYYY-MM-DD'),
-    ...(values.name ? { name: values.name } : {}),
-  });
+    startDate: values?.date?.from,
+    endDate: values?.date?.to,
+    nameOrPhone: values.nameOrPhone ?? '',
+  }));
 });
 
 async function getRecordList(query: Partial<PaymentQuery>) {
-  const { data, meta } = await getPayments({
-    page: 1,
-    startDate: dayjs().format('YYYY-MM-DD'),
-    endDate: dayjs().format('YYYY-MM-DD'),
-    ...query,
-  });
+  const { data, meta } = await getPayments(extractValidQuery(query));
   rows.value = data;
   paging.value = { max: meta.pageCount, modelValue: meta.page };
+}
+
+function extractValidQuery(query: Partial<PaymentQuery>) {
+  return {
+    page: query.page ?? 1,
+    startDate: query?.startDate ?? dayjs().startOf('month').format('YYYY-MM-DD'),
+    endDate: query?.endDate ?? dayjs().endOf('month').format('YYYY-MM-DD'),
+    ...(query.nameOrPhone ? { nameOrPhone: query.nameOrPhone } : {}),
+  };
 }
 
 getRecordList({});
@@ -149,7 +153,7 @@ function print() {
   <div class="transaction_records_page q-py-sm">
     <div class="row q-col-gutter-md items-center" style="max-width: 860px">
       <InputBox label="" class="col-xs-12 col-sm-5">
-        <OInput name="name" rounded dense hide-bottom-space placeholder="請輸入客戶名稱或電話" clearable />
+        <OInput name="nameOrPhone" rounded dense hide-bottom-space placeholder="請輸入客戶名稱或電話" clearable />
       </InputBox>
       <InputBox label="" class="col-xs-12 col-sm-5">
         <DatePicker name="date" range />
@@ -164,7 +168,7 @@ function print() {
         v-model="paging.modelValue"
         :max="paging.max"
         input
-        @update:model-value="getRecordList({ page: $event })"
+        @update:model-value="getRecordList({ page: $event, ...values.date, ...(values.nameOrPhone && { nameOrPhone: values.nameOrPhone }) })"
       />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
