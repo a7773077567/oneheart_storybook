@@ -82,7 +82,7 @@ watch(isPointType, (newType: boolean) => {
 
 const spaceName = computed(() => userShift.space?.name);
 
-const receiptData = {
+const receiptData = computed(() => ({
   name: client.name,
   gender: checkGender(client.identityNumber)?.label,
   id: client.identityNumber,
@@ -91,8 +91,9 @@ const receiptData = {
   selfPay: ShiftType[userShift.type],
   date: scheduleDate,
   userName: userShift.user.name,
-  amount: 2000,
-};
+  amount: +amountInput.value,
+  points: +amountInput.value,
+}));
 
 const isReceiptDialogOpen = ref(false);
 
@@ -125,11 +126,11 @@ async function onCheckout() {
           </div>
         </QCardSection>
         <QCardSection>
-          <Receipt :data="receiptData" :space-name="spaceName" />
+          <Receipt :data="receiptData" :space-name="spaceName" :is-point-type="isPointType" />
         </QCardSection>
         <QCardSection class="actions no-print">
-          <QBtn label="列印收據" outline @click="print" />
-          <QBtn label="確定結帳" outline @click="onCheckout" />
+          <QBtn label="列印收據" color="black" @click="print" />
+          <QBtn label="確定結帳" color="black" @click="onCheckout" />
         </QCardSection>
       </QCard>
     </QDialog>

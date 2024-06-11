@@ -2,12 +2,13 @@ import { api } from '@/utils/api';
 import type { PaymentTypes, TransactionTypes } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
+import type { UserShift } from './shift';
 
 export interface Payment {
   date: string;
   spaceName: string;
   type: `${TransactionTypes}`;
-  paymentMethod: `${PaymentTypes}`;
+  payMethod: `${PaymentTypes}`;
   usedPoint: number | null;
   amount: number | null;
   clientId: number;
@@ -24,7 +25,7 @@ export interface PaymentQuery {
   endDate: string;
 }
 
-type PaymentDetail = Omit<Payment, 'clientId' | 'clientName'> & { client: Client };
+type PaymentDetail = Omit<Payment, 'clientId' | 'clientName'> & { client: Client; userShift: UserShift };
 
 // 客戶所有交易紀錄
 export async function getPayments(params?: PaymentQuery) {

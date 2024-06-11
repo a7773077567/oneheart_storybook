@@ -2,34 +2,64 @@
 import { useAppointmentStore } from '@/stores';
 import { computed } from 'vue';
 
-const props = defineProps<{
+interface Props {
   data: {
     name: string;
     gender?: string;
     id?: string;
     birthDate?: string;
-    amount: number;
+    points?: number | null;
+    amount: number | null;
     declaration: string;
     selfPay: string;
     date: string;
     userName: string;
   };
   spaceName?: string;
-}>();
+  isPointType?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  data: () => ({
+    name: '',
+    gender: '',
+    id: '',
+    birthDate: '',
+    amount: 1000,
+    declaration: '',
+    selfPay: '',
+    date: '',
+    userName: '',
+  }),
+  isPointType: false,
+});
 
 const appointmentStore = useAppointmentStore();
 
-const LabelMap = new Map<keyof typeof props.data, string>([
-  ['name', '姓名'],
-  ['gender', '姓別'],
-  ['id', '身分證字號'],
-  ['birthDate', '出生年月日'],
-  ['declaration', '健保申報'],
-  ['selfPay', '自費項目'],
-  ['date', '看診日期'],
-  ['userName', '治療師'],
-  ['amount', '現金'],
-]);
+const cols = computed(() => props.isPointType
+  ? {
+      name: '姓名',
+      gender: '姓別',
+      id: '身分證字號',
+      birthDate: '出生年月日',
+      points: '點數',
+      declaration: '健保申報',
+      selfPay: '自費項目',
+      date: '看診日期',
+      userName: '治療師',
+    }
+  : {
+      name: '姓名',
+      gender: '姓別',
+      id: '身分證字號',
+      birthDate: '出生年月日',
+      declaration: '健保申報',
+      selfPay: '自費項目',
+      date: '看診日期',
+      userName: '治療師',
+      amount: '總金額',
+    },
+);
 
 const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShift.space?.name);
 </script>
@@ -44,8 +74,8 @@ const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShif
     </p>
     <div class="receipt__body">
       <table v-if="data" class="table">
-        <tr v-for="[key, val] in LabelMap.entries()" :key="key">
-          <td>{{ val }}</td>
+        <tr v-for="(val, key) in cols" :key="key">
+          <td>{{ cols[key] }}</td>
           <td>{{ data[key] }}</td>
         </tr>
       </table>

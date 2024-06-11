@@ -1,12 +1,16 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
-import { PaymentTypes, TransactionTypes } from '@/const/general';
+import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { type PaymentQuery, getPayments, getSinglePayment } from '@/api';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
+import { Receipt } from '@/components/appointment';
+import { checkGender } from '@/utils/helpers';
+
+type ReceiptData = InstanceType<typeof Receipt>['$props']['data'];
 
 const cols: QTableProps['columns'] = [
   {
@@ -67,7 +71,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '收據',
     align: 'left',
-    field: row => row.clientId,
+    field: row => row.id,
   },
 ];
 
@@ -112,10 +116,32 @@ async function getRecordList(query: Partial<PaymentQuery>) {
 }
 
 getRecordList({});
+const receiptData = ref<ReceiptData | undefined>();
+const isReceiptDialogOpen = ref(false);
+const space = ref<string | undefined>();
+const paymentMethod = ref<number | undefined>();
 
-async function checkRecipe(paymentId: number) {
-  const data = await getSinglePayment(paymentId);
-  console.log('payment detail', data);
+async function checkReceipt(paymentId: number) {
+  const { client, amount, date, userShift, spaceName, usedPoint, payMethod } = await getSinglePayment(paymentId);
+  space.value = spaceName;
+  paymentMethod.value = +payMethod;
+  receiptData.value = {
+    name: client.name,
+    gender: checkGender(client.identityNumber)?.label,
+    id: client.identityNumber,
+    birthDate: client.birthDate,
+    declaration: '無',
+    selfPay: ShiftType[userShift.type],
+    date,
+    userName: userShift?.user?.name,
+    amount,
+    points: usedPoint,
+  };
+  isReceiptDialogOpen.value = true;
+}
+
+function print() {
+  window.print();
 }
 </script>
 
@@ -144,10 +170,26 @@ async function checkRecipe(paymentId: number) {
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
       <template #body-cell-attachment="{ value }">
         <QTd>
-          <QBtn v-if="!!value" flat round icon="o_description" @click="checkRecipe(value)" />
+          <QBtn v-if="!!value" flat round icon="o_description" @click="checkReceipt(value)" />
           <span v-else>-</span>
         </QTd>
       </template>
     </QTable>
+    <QDialog v-model="isReceiptDialogOpen">
+      <QCard class="q-py-md q-px-xl relative-position">
+        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
+        <QCardSection class="q-pb-none ">
+          <div class="text-h6 text-center q-mb-none text-bold">
+            收據
+          </div>
+        </QCardSection>
+        <QCardSection>
+          <Receipt :data="receiptData" :space-name="space" :is-point-type="paymentMethod === PaymentTypes['點數']" />
+        </QCardSection>
+        <QCardSection class="actions no-print">
+          <QBtn label="列印收據" style="width: 100%; font-size: 16px;" padding="12px 0" color="black" @click="print" />
+        </QCardSection>
+      </QCard>
+    </QDialog>
   </div>
 </template>
