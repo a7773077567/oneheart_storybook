@@ -24,8 +24,8 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
   { key: 'plan', value: pointsStore.topupDetail?.plan ?? '', label: '方案' },
   { key: 'amount', value: `$ ${(pointsStore.topupDetail?.amount ?? 0)}`, label: '金額' },
-  { key: 'paidPointGained', value: `${(pointsStore.topupDetail?.paidPointGained ?? 0)} 點`, label: '點數' },
-  { key: 'giftPointGained', value: `${(pointsStore.topupDetail?.giftPointGained ?? 0)} 點`, label: '贈點' },
+  { key: 'paidPointGained', value: `${(pointsStore.topupDetail?.paidPointGained ?? 0)} 堂`, label: '點堂' },
+  { key: 'giftPointGained', value: `${(pointsStore.topupDetail?.giftPointGained ?? 0)} 堂`, label: '贈堂' },
 ]);
 
 const payment: CheckTableData = [
@@ -79,17 +79,18 @@ async function submit() {
         </div>
       </template>
       <template #payment>
-        <QOptionGroup v-model="selectedPayment" :options="paymentGroup" inline left-label color="black" class="slot-padding--payment q-gutter-x-md" />
+        <QOptionGroup v-model="selectedPayment" :options="paymentGroup" inline left-label color="black"
+          class="slot-padding--payment q-gutter-x-md" />
       </template>
     </CheckTable>
 
     <CheckTable :data="summary">
-      <template #amount>
+      <template #amount="{ data: { value } }">
         <div class="flex justify-between items-center slot-padding">
           <div class="summary">
             <span>結帳金額：</span>
             <div class="summary_amount">
-              20,000
+              {{ value }}
             </div>
             <span>元</span>
           </div>
@@ -125,6 +126,7 @@ async function submit() {
 
   .slot-padding {
     padding: 10px;
+
     &--payment {
       @extend .slot-padding;
       padding: 18px 10px;
@@ -135,6 +137,7 @@ async function submit() {
     display: flex;
     align-items: center;
     gap: 5px;
+
     &_amount {
       width: 134px;
       background: #f5f5f5;

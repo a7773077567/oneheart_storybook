@@ -21,21 +21,21 @@ const pointsTopupSchema = z.object({
   clientPhone: z.string(),
   groupName: z.string(),
   clientGroupId: z.number(),
-  plan: z.string().min(1),
+  plan: z.number().min(1),
   pointType: z.nativeEnum(PointTypes),
   paidPointGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
 });
 
-const initialValues = computed(() => pointsStore.topupDetail);
+// const initialValues = computed(() => pointsStore.topupDetail);
 const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(pointsTopupSchema),
-  initialValues: initialValues.value,
+  // initialValues: initialValues.value,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = values;
+  pointsStore.topupDetail = { ...values, plan: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
   emit('goNext');
 });
 
@@ -43,7 +43,7 @@ const showClientSearch = ref(false);
 const totalPoints = computed(() => (Number(values.paidPointGained ?? 0)) + (Number(values.giftPointGained ?? 0)));
 
 const planOptions = computed(() => {
-  return pointsPlan.filter(({ type }) => type === values?.pointType).map(({ name }) => ({ label: name, value: name }));
+  return pointsPlan.filter(({ type }) => type === values?.pointType).map(({ name, id }) => ({ label: name, value: id }));
 });
 
 function selectClient(selectList: Client[]) {
@@ -63,6 +63,14 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
   setFieldValue('clientGroupId', group.id ?? '');
   setFieldValue('groupName', group.name ?? '');
   setFieldValue('pointType', group.type);
+}
+
+function setDefaultVal(selectedId: number) {
+  const selectedPlan = pointsPlan.find(plan => plan.id === selectedId)!
+
+  setFieldValue('paidPointGained', selectedPlan?.paidPointGained);
+  setFieldValue('giftPointGained', selectedPlan?.giftPointGained);
+  setFieldValue('amount', selectedPlan?.price);
 }
 </script>
 
@@ -90,7 +98,9 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
       </fieldset>
       <fieldset class="col-8">
         <span class="field--key">點數群組</span>
-        <OSelect class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" :disable="!values.clientId" error-message="" @update:model-value="getPointGroup" />
+        <OSelect class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
+          :virtual-scroll-item-size="50" :disable="!values.clientId" error-message=""
+          @update:model-value="getPointGroup" />
         <div class="q-ml-md text-caption" style="min-width:98px">
           點數類別：<span v-if="!!values.pointType" class="text-caption">
             {{ PointTypes[values.pointType] }}
@@ -99,20 +109,23 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
       </fieldset>
       <fieldset class="col-8">
         <span class="field--key">方案</span>
-        <OSelect class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50" error-message="" />
+        <OSelect class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50"
+          error-message="" @update:modelValue="setDefaultVal" />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">
-          <span class="field--key">點數</span>
-          <OInput type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量" error-message="" />
+          <span class="field--key">堂數</span>
+          <OInput type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量"
+            error-message="" />
         </fieldset>
         <fieldset class="col-6 col-md-3">
-          <span class="field--key">贈點</span>
+          <span class="field--key">贈堂</span>
           <OInput type="number" class="field--val" name="giftPointGained" hide-bottom-space placeholder="數量" />
         </fieldset>
         <fieldset class="col-12 col-md-2">
           <span class="field--key">總數：</span>
-          <QInput type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable readonly />
+          <QInput type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable
+            readonly />
         </fieldset>
       </div>
       <fieldset class="col-8">
@@ -131,15 +144,18 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
 .points_topup {
   &_form {
     padding: 16px 0;
+
     fieldset {
       display: flex;
       align-items: center;
     }
+
     .field--key {
       width: 65px;
       margin-right: 8px;
       text-align: right;
     }
+
     .field--val {
       flex: 1;
     }
