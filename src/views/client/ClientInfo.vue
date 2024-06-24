@@ -33,7 +33,7 @@ const currentTab = ref(tabs[0].name);
       :label="tab.label"
     />
   </QTabs>
-  <QCard flat bordered class="info">
+  <QCard flat bordered class="tab_content">
     <QTabPanels
       v-model="currentTab"
       animated
@@ -52,3 +52,9 @@ const currentTab = ref(tabs[0].name);
     </QTabPanels>
   </QCard>
 </template>
+
+<style scoped lang="scss">
+.tab_content {
+  overflow:auto
+}
+</style>
