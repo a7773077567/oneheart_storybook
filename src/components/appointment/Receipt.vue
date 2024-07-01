@@ -57,7 +57,7 @@ const cols = computed(() => props.isPointType
       selfPay: '自費項目',
       date: '看診日期',
       userName: '治療師',
-      amount: '總金額',
+      amount: '消費金額',
     },
 );
 
