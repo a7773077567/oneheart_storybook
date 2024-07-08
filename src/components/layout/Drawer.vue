@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLayoutRoute } from '@/composables/layoutRoute';
+import { useUserStore } from '@/stores';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -9,13 +10,20 @@ const emit = defineEmits<{
   (e: 'update:modelValue', drawerOpen: boolean): void;
 }>();
 
+const userStore = useUserStore();
 const drawerOpen = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
 });
 const { currentMatched } = useLayoutRoute();
 
-const drawerItems = computed(() => currentMatched.value[0].children);
+const drawerItems = computed(() => currentMatched.value[0].children.filter((item) => {
+  if (userStore.currentSpaceType === 1) {
+    return !item.meta?.gymOnly;
+  }
+  return item;
+},
+));
 </script>
 
 <template>

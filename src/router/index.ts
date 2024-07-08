@@ -335,6 +335,15 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: 'group-template',
+            name: 'groupShiftTemplate',
+            component: () => import('@/views/shift/GroupTemplate.vue'),
+            meta: {
+              label: '新增團課',
+              gymOnly: true,
+            },
+          },
+          {
             path: 'query',
             name: 'shiftQuery',
             component: () => import('@/views/shift/Query.vue'),
