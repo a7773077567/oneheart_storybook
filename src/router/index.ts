@@ -288,6 +288,15 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: 'group-class-voucher',
+            name: 'GroupClassVoucher',
+            component: () => import('@/views/order/GroupClassVoucher.vue'),
+            meta: {
+              label: '功能性團課券',
+              requiredAuth: true,
+            },
+          },
+          {
             path: 'transaction-records',
             name: 'transactionRecords',
             component: () => import('@/views/order/TransactionRecords.vue'),

@@ -6,3 +6,4 @@ export * from './upload';
 export * from './userSettings';
 export * from './points';
 export * from './payment';
+export * from './voucher';
