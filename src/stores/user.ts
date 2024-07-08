@@ -40,6 +40,9 @@ export const useUserStore = defineStore('user', {
         return acc;
       }, []);
     },
+    currentSpaceType(state) {
+      return state.userInfo?.spaces.find(space => space.id === state.currentSpace)!.type;
+    },
   },
   actions: {
     async getUserInfo() {
