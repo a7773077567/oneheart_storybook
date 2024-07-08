@@ -48,12 +48,12 @@ const summary = computed(() => [
 ]);
 
 async function submit() {
-  const { clientId, clientGroupId, plan, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
 
   await gainPoint({
     clientId,
     clientGroupId,
-    plan,
+    plan: planName,
     paidPointGained,
     giftPointGained,
     amount,
@@ -79,8 +79,10 @@ async function submit() {
         </div>
       </template>
       <template #payment>
-        <QOptionGroup v-model="selectedPayment" :options="paymentGroup" inline left-label color="black"
-          class="slot-padding--payment q-gutter-x-md" />
+        <QOptionGroup
+          v-model="selectedPayment" :options="paymentGroup" inline left-label color="black"
+          class="slot-padding--payment q-gutter-x-md"
+        />
       </template>
     </CheckTable>
 

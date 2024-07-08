@@ -21,21 +21,21 @@ const pointsTopupSchema = z.object({
   clientPhone: z.string(),
   groupName: z.string(),
   clientGroupId: z.number(),
-  plan: z.number().min(1),
+  plan: z.number().min(1).nullable(),
   pointType: z.nativeEnum(PointTypes),
   paidPointGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
 });
 
-// const initialValues = computed(() => pointsStore.topupDetail);
+const initialValues = computed(() => pointsStore.topupDetail);
 const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(pointsTopupSchema),
-  // initialValues: initialValues.value,
+  initialValues: initialValues.value,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = { ...values, plan: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
+  pointsStore.topupDetail = { ...values, planName: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
   emit('goNext');
 });
 
@@ -66,7 +66,7 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
 }
 
 function setDefaultVal(selectedId: number) {
-  const selectedPlan = pointsPlan.find(plan => plan.id === selectedId)!
+  const selectedPlan = pointsPlan.find(plan => plan.id === selectedId)!;
 
   setFieldValue('paidPointGained', selectedPlan?.paidPointGained);
   setFieldValue('giftPointGained', selectedPlan?.giftPointGained);
@@ -98,9 +98,11 @@ function setDefaultVal(selectedId: number) {
       </fieldset>
       <fieldset class="col-8">
         <span class="field--key">點數群組</span>
-        <OSelect class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
+        <OSelect
+          class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
           :virtual-scroll-item-size="50" :disable="!values.clientId" error-message=""
-          @update:model-value="getPointGroup" />
+          @update:model-value="getPointGroup"
+        />
         <div class="q-ml-md text-caption" style="min-width:98px">
           點數類別：<span v-if="!!values.pointType" class="text-caption">
             {{ PointTypes[values.pointType] }}
@@ -109,14 +111,18 @@ function setDefaultVal(selectedId: number) {
       </fieldset>
       <fieldset class="col-8">
         <span class="field--key">方案</span>
-        <OSelect class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50"
-          error-message="" @update:modelValue="setDefaultVal" />
+        <OSelect
+          class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50"
+          error-message="" @update:model-value="setDefaultVal"
+        />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">
           <span class="field--key">堂數</span>
-          <OInput type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量"
-            error-message="" />
+          <OInput
+            type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量"
+            error-message=""
+          />
         </fieldset>
         <fieldset class="col-6 col-md-3">
           <span class="field--key">贈堂</span>
@@ -124,8 +130,10 @@ function setDefaultVal(selectedId: number) {
         </fieldset>
         <fieldset class="col-12 col-md-2">
           <span class="field--key">總數：</span>
-          <QInput type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable
-            readonly />
+          <QInput
+            type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable
+            readonly
+          />
         </fieldset>
       </div>
       <fieldset class="col-8">

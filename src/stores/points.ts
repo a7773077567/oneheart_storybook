@@ -14,7 +14,8 @@ interface PointsPurchase {
   pointType: PointTypes;
   groupName: string;
   clientGroupId: number;
-  plan: string;
+  plan: number | null;
+  planName: string;
   paidPointGained: number;
   giftPointGained: number;
   amount: number;
@@ -27,7 +28,8 @@ const initialTopup = {
   clientGroupId: Number.NaN,
   pointType: Number.NaN,
   groupName: '',
-  plan: '',
+  plan: null,
+  planName: '',
   paidPointGained: 0,
   giftPointGained: 0,
   amount: 0,
