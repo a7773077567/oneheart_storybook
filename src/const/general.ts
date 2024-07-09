@@ -14,7 +14,7 @@ export const TherapyTypes = {
 
 type TypeName = keyof typeof TherapyTypes;
 
-const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlain', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic'] as const;
+const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlan', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic'] as const;
 const TabLabels = ['客戶資料', '病歷單', '身體組成表', 'MEMO', '諮詢表', '附件', '運動訓練單', '運科門診', '團體課程單', '營養諮詢單', '足壓門診單', '睡眠門診單'] as const;
 export const TabMap = new Map(TabNames.map((item, idx) => [item, TabLabels[idx]]));
 
@@ -52,7 +52,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: 2,
     name: 'physicalTherapy',
     label: '物理治療門診',
-    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
+    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'trainingPlan', 'sportClinic', 'groupClass'], // to rm exercise tab
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
   },

@@ -51,6 +51,17 @@ export interface Record {
   productDescription: string;
   coachAdvice: string;
   canvasAttachment: string;
+  forMedicalGroup: string;
+  forClient: string;
+  records: [
+    {
+      action: string | null;
+      weight: string | null;
+      times: string | null;
+      sets: string | null;
+      note: string | null;
+    },
+  ];
 }
 
 export interface Nutrition {
@@ -95,6 +106,21 @@ export interface FootPressure {
   staticPressureAttachments: string[]; // 靜態足壓檔案
   dynamicPressureAttachments: string[]; // 動態足壓檔案
   notes: string; // 備註
+}
+
+export interface TrainingPlan {
+  forMedicalGroup: string; // 給治療組的建議
+  forFrontDesk: string; // 給櫃檯的建議
+  forClient: string; // 給客戶的建議
+  records: [
+    {
+      action: string | null;
+      weight: string | null;
+      times: string | null;
+      sets: string | null;
+      note: string | null;
+    },
+  ];
 }
 
 export interface ClientSchedule {
@@ -207,6 +233,7 @@ export interface CheckoutPost {
   clientGroupId: number | null;
   pointUsed: number | null;
 }
+
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
