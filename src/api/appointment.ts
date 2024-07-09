@@ -62,6 +62,7 @@ export interface Record {
       note: string | null;
     },
   ];
+  advice: string;
 }
 
 export interface Nutrition {
@@ -121,6 +122,11 @@ export interface TrainingPlan {
       note: string | null;
     },
   ];
+}
+
+export interface SportConsultation {
+  chiefComplaint: string; // 主訴
+  advice: string; // 給運動組的建議
 }
 
 export interface ClientSchedule {
