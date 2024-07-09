@@ -23,8 +23,8 @@ export async function purchaseVoucher(param: PurchaseVoucher) {
 }
 
 // 取得所有團課券
-export async function getMyVouchers(clientId: number): Voucher[] {
-  return [];
+export async function getMyVouchers(clientId: number) {
+  console.log(clientId);
   // await api.get('');
 }
 
