@@ -66,7 +66,7 @@ async function onUpdateUserShift(payload: UserShiftPatch) {
   isUpdatingShift.value = false;
 }
 
-function onChange(calendarDuration: ChangeParams) {
+function onCalendarChange(calendarDuration: ChangeParams) {
   const { start, end } = calendarDuration;
   duration.value = {
     startDate: start,
@@ -88,7 +88,7 @@ async function getUserShifts() {
       v-model="selectedDate"
       v-model:model-resources="shiftStore.users"
       view="week"
-      @change="onChange"
+      @change="onCalendarChange"
     >
       <template #day="{ scope: { resource, timestamp, isEditing } }">
         <div class="day">

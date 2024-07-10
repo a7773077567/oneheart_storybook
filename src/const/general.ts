@@ -4,12 +4,17 @@ export const TherapyTypes = {
   footPressure: '足壓門診',
   nutrition: '營養門診',
   sleep: '睡眠門診',
-  sports: '運動諮詢',
-  oneOnOne: '教練課',
-  group: '團課',
   deanConsultation: '院長評估門診',
   deanTherapy: '院長物理治療',
   nutritionConsultation: '營養諮詢門診',
+  sports: '運動諮詢',
+  oneOnOne: '教練課',
+  group: '團課',
+};
+
+export const SportTherapyTypes = {
+  sports: '運科門診',
+  oneOnOne: '教練課',
 };
 
 type TypeName = keyof typeof TherapyTypes;

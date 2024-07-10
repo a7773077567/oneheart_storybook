@@ -15,24 +15,6 @@ const isGroupShiftEditorOpen = ref(false);
 
 getGroupShiftTemplates();
 
-// async function onCreateShiftTemplate(values: ShiftTemplateReq) {
-//   await createShiftTemplate(values);
-//   await getShiftTemplates();
-//   isCreatingShiftTemplate.value = false;
-// }
-
-// async function openShift(templateId: number) {
-//   targetShiftTemplate.value = await fetchShiftTemplate(templateId);
-//   isUpdatingShiftTemplate.value = true;
-// }
-
-// async function onUpdateShiftTemplate(values: ShiftTemplateReq) {
-//   await updateShiftTemplate(targetShiftTemplate.value!.id, values);
-//   await getShiftTemplates();
-//   targetShiftTemplate.value = null;
-//   isUpdatingShiftTemplate.value = false;
-// }
-
 async function onDelete(id: number) {
   $q.dialog({
     title: '確認刪除',

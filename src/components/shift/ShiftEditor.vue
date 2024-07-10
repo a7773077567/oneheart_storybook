@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { ShiftColors, shiftTemplateSchema } from '@/api/shift';
-import type { Duration, ShiftTemplate, ShiftTemplateReq, ShiftTemplateSchema, UserShiftPatch } from '@/api/shift';
-import { TherapyTypes } from '@/const/general';
+import { ShiftColors } from '@/api/shift';
+import type { Duration, ShiftTemplate, ShiftTemplateReq, UserShiftPatch } from '@/api/shift';
+import { SportTherapyTypes, TherapyTypes } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import { computed, watch } from 'vue';
 import { omit } from 'radash';
+import { useUserStore } from '@/stores';
 
 interface Props {
   data?: ShiftTemplate | null;
@@ -23,13 +23,26 @@ const emit = defineEmits<{
 }>();
 
 dayjs.extend(objectSupport);
-const typeOptions = getTypeOptions();
+const userStore = useUserStore();
+const isSportSPace = computed(() => userStore.currentSpaceType === 2);
+const typeOptions = getTypeOptions(isSportSPace.value ? SportTherapyTypes : TherapyTypes);
 
 const { handleSubmit, values, setFieldValue } = useForm({
   // validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
-const showNotAvailableTimes = computed(() => values.type !== 1);
+const showNotAvailableTimes = computed(() => {
+  if (isSportSPace.value) {
+    return values.type !== 1;
+  }
+  return true;
+});
+const showMaxClients = computed(() => {
+  if (!isSportSPace.value) {
+    return values.type === 1;
+  }
+  return false;
+});
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 watch(showNotAvailableTimes, (newVal) => {
   if (!newVal) {
@@ -58,8 +71,8 @@ const onSubmit = handleSubmit((values) => {
   }
 });
 
-function getTypeOptions() {
-  return Object.values(TherapyTypes).map((value, idx) => ({
+function getTypeOptions(types: Record<string, any>) {
+  return Object.values(types).map((value, idx) => ({
     label: value,
     value: idx + 1,
   }));
@@ -139,7 +152,7 @@ function combineTime(duration: number[]): Duration {
       <InputBox label="班別顏色" class="gutter">
         <ColorPicker :colors="ShiftColors" name="color" :disable="userShiftMode" style="padding: 6px 14px;" />
       </InputBox>
-      <InputBox v-if="values.type === 1" label="最多可預約人數">
+      <InputBox v-if="showMaxClients" label="最多可預約人數">
         <OInput name="maxClients" dense outlined :disable="userShiftMode" style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>
