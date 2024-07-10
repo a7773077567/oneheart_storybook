@@ -8,3 +8,4 @@ export { default as AppointmentQueryItem } from './AppointmentQueryItem.vue';
 export { default as HistoryChiefComplaints } from './HistoryChiefComplaints.vue';
 export { default as CheckTable } from './CheckTable.vue';
 export { default as Receipt } from './Receipt.vue';
+export { default as AppointmentCountCard } from './AppointmentCountCard.vue';
