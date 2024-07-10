@@ -22,6 +22,24 @@ export interface ShiftTemplate {
   color: string;
   maxClients: number | null;
 }
+
+export interface GroupShiftTemplate {
+  id: number;
+  spaceId: number;
+  name: string;
+  startTime: string;
+  endTime: string;
+  maxClients: number;
+}
+
+export interface GroupShiftTemplatePayload {
+  totalSessions: number;
+  maxClients: number;
+  name: string;
+  startTime: string;
+  endTime: string;
+}
+
 export interface UserShift {
   id: number;
   spaceId: number;
@@ -143,7 +161,52 @@ export async function deleteUserShift(userShiftId: number) {
   const { data } = await api.delete(`userShifts/${userShiftId}`);
   return data;
 }
+// ========== Group Related ==========
+let fakeGroupShiftTemplates = [
+  {
+    id: 1,
+    spaceId: 5,
+    name: '1月瑜伽課A',
+    startTime: '08:00',
+    endTime: '10:00',
+    maxClients: 5,
+  },
+  {
+    id: 2,
+    spaceId: 5,
+    name: '1月瑜伽課B',
+    startTime: '10:00',
+    endTime: '12:00',
+    maxClients: 8,
+  },
+  {
+    id: 3,
+    spaceId: 5,
+    name: '2月瑜伽課A',
+    startTime: '09:00',
+    endTime: '11:00',
+    maxClients: 5,
+  },
+];
+export async function fetchGroupShiftTemplates() {
+  return fakeGroupShiftTemplates;
+}
 
+export async function createGroupShiftTemplate(payload: GroupShiftTemplatePayload) {
+  fakeGroupShiftTemplates = [
+    ...fakeGroupShiftTemplates,
+    {
+      id: fakeGroupShiftTemplates.length + 1,
+      spaceId: 5,
+      ...payload,
+    },
+  ];
+}
+
+export async function deleteGroupShiftTemplate(id: number) {
+  const index = fakeGroupShiftTemplates.findIndex(item => item.id === id);
+  fakeGroupShiftTemplates = [...fakeGroupShiftTemplates.slice(0, index), ...fakeGroupShiftTemplates.slice(index + 1)];
+}
 // ========== Utils ==========
 
 export function toUserShiftReq(shiftTemplate: ShiftTemplate, userId: number, date: string): UserShiftPost {

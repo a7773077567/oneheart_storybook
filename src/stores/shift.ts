@@ -1,6 +1,6 @@
 import type { User } from '@/api/user';
 import { fetchUsers } from '@/api/user';
-import { type ShiftTemplate, type UserShift, type UserShiftsGet, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
+import { type GroupShiftTemplate, type ShiftTemplate, type UserShift, type UserShiftsGet, fetchGroupShiftTemplates, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
 import { defineStore } from 'pinia';
 
 interface State {
@@ -9,6 +9,7 @@ interface State {
   users: User[];
   userShifts: UserShift[];
   targetUserShift: UserShift | null;
+  groupShiftTemplates: GroupShiftTemplate[];
 }
 
 export const useShiftStore = defineStore('shift', {
@@ -18,6 +19,7 @@ export const useShiftStore = defineStore('shift', {
     users: [],
     userShifts: [],
     targetUserShift: null,
+    groupShiftTemplates: [],
   }),
   getters: {
 
@@ -39,5 +41,11 @@ export const useShiftStore = defineStore('shift', {
       const data = await fetchUserShift(userShiftId);
       this.targetUserShift = data;
     },
+    // ========== Group related ==========
+    async getGroupShiftTemplates() {
+      const data = await fetchGroupShiftTemplates();
+      this.groupShiftTemplates = data;
+    },
+
   },
 });
