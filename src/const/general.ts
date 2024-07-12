@@ -4,9 +4,9 @@ export const TherapyTypes = {
   footPressure: '足壓門診',
   nutrition: '營養門診',
   sleep: '睡眠門診',
-  // sports: '運科門診',
-  // oneOnOne: '一對一教練課',
-  // group: '團課',
+  sports: '運動諮詢',
+  oneOnOne: '教練課',
+  group: '團課',
   deanConsultation: '院長評估門診',
   deanTherapy: '院長物理治療',
   nutritionConsultation: '營養諮詢門診',
@@ -15,7 +15,7 @@ export const TherapyTypes = {
 type TypeName = keyof typeof TherapyTypes;
 
 const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlan', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic'] as const;
-const TabLabels = ['客戶資料', '病歷單', '身體組成表', 'MEMO', '諮詢表', '附件', '運動訓練單', '運科門診', '團體課程單', '營養諮詢單', '足壓門診單', '睡眠門診單'] as const;
+const TabLabels = ['客戶資料', '病歷單', '身體組成表', 'MEMO', '諮詢表', '附件', '運動訓練單', '運動諮詢', '團體課程單', '營養諮詢單', '足壓門診單', '睡眠門診單'] as const;
 export const TabMap = new Map(TabNames.map((item, idx) => [item, TabLabels[idx]]));
 
 export enum ShiftType {
@@ -27,6 +27,9 @@ export enum ShiftType {
   院長評估門診 = 6,
   院長物理治療 = 7,
   營養諮詢門診 = 8,
+  教練課 = 9,
+  運動諮詢 = 10,
+  團課 = 11,
 }
 
 type TabName = typeof TabNames[number];
@@ -52,7 +55,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: 2,
     name: 'physicalTherapy',
     label: '物理治療門診',
-    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'trainingPlan', 'sportClinic', 'groupClass'], // to rm exercise tab
+    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
   },
@@ -80,24 +83,6 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 2000,
   },
-  // sports: {
-  //   identifier: 6,
-  //   name: 'sports',
-  //   label: '運科門診',
-  //   tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
-  // },
-  // oneOnOne: {
-  //   identifier: 7,
-  //   name: 'oneOnOne',
-  //   label: '一對一教練課',
-  //   tabs: ['clientInfo', 'trainingPlain', 'bodyAnalysis', 'memo'],
-  // },
-  // group: {
-  //   identifier: 8,
-  //   name: 'group',
-  //   label: '團課',
-  //   tabs: ['clientInfo', 'groupClass'],
-  // },
   deanConsultation: {
     identifier: 6,
     name: 'deanConsultation',
@@ -122,6 +107,30 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 499,
   },
+  oneOnOne: {
+    identifier: 9,
+    name: 'oneOnOne',
+    label: '教練課',
+    tabs: ['clientInfo', 'trainingPlan', 'bodyAnalysis', 'memo'],
+    canUsePoint: true,
+    calcAmount: () => 1650, // to be confirmed
+  },
+  sports: {
+    identifier: 10,
+    name: 'sports',
+    label: '運動諮詢',
+    tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 200, // to be confirmed
+  },
+  group: {
+    identifier: 11,
+    name: 'group',
+    label: '團課',
+    tabs: ['clientInfo', 'groupClass'],
+    canUsePoint: false,
+    calcAmount: () => 1650, // to be confirmed
+  },
 };
 
 // 點數群組
@@ -129,7 +138,7 @@ export enum PointTypes {
   '物理治療' = 1,
   '院長物理治療' = 2,
   '營養' = 3,
-} ;
+};
 
 export const pointsGroupOptions = Object.keys(PointTypes).slice(3, 6).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
 
