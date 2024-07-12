@@ -1,51 +1,58 @@
 <script setup lang="ts">
 // 運科諮詢
-import { computed, ref } from "vue";
-import dayjs from "dayjs";
-import { useAppointmentStore } from "@/stores";
-import type {
-  ClientScheduleDetail,
-  HistoryChiefComplaint,
-  SportConsultation,
-} from "@/api";
-import { useForm } from "vee-validate";
-import { pick } from "radash";
-import { HistoryChiefComplaints } from "@/components/appointment";
+import { computed, ref } from 'vue';
+import dayjs from 'dayjs';
+import { useAppointmentStore } from '@/stores';
+import {
+  type ClientScheduleDetail,
+  type HistoryChiefComplaint,
+  type SportConsultation,
+  updateClientSchedule,
+} from '@/api';
+import { useForm } from 'vee-validate';
+import { pick } from 'radash';
+import { HistoryChiefComplaints } from '@/components/appointment';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
+const $q = useQuasar();
 const recordId = computed(
-  () => props.scheduleDetail.medicalAndTrainingRecordId
+  () => props.scheduleDetail.medicalAndTrainingRecordId,
 );
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getHistoryChiefComplaints(recordId.value);
 
 const date = computed(() =>
-  dayjs(props.scheduleDetail.date).format("YYYY/MM/DD")
+  dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'),
 );
 const data = [
-  { name: "purpose", label: "主訴", showCopyBtn: true },
-  { name: "advice", label: "教練建議" },
+  { name: 'chiefComplaint', label: '主訴', showCopyBtn: true },
+  { name: 'coachAdvice', label: '教練建議' },
 ];
 
 const stateOfHistoryDialog = ref(false);
 
 const initialValues = computed<{
   [key in keyof SportConsultation]: SportConsultation[key];
-}>(() => pick(props.scheduleDetail.record, ["chiefComplaint", "advice"]));
+}>(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'coachAdvice']));
+
 const { handleSubmit, meta, setFieldValue } = useForm({
   initialValues: initialValues.value,
 });
 
-const onSubmit = handleSubmit((val) => {
-  console.log(val);
+const onSubmit = handleSubmit(async (val) => {
+  await updateClientSchedule(recordId.value, val);
+  $q.notify({ message: '已存檔', timeout: 200 });
+
+  await appointmentStore.getClientSchedule(props.scheduleId);
 });
 
 function pasteHistory(history: HistoryChiefComplaint) {
-  setFieldValue("chiefComplaint", history.chiefComplaint);
+  setFieldValue('chiefComplaint', history.chiefComplaint);
   stateOfHistoryDialog.value = false;
 }
 </script>

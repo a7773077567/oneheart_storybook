@@ -126,7 +126,7 @@ export interface TrainingPlan {
 
 export interface SportConsultation {
   chiefComplaint: string; // 主訴
-  advice: string; // 給運動組的建議
+  coachAdvice: string; // 教練建議
 }
 
 export interface ClientSchedule {

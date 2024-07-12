@@ -1,17 +1,25 @@
 <script setup lang="ts">
 // 團課單
-import { computed } from "vue";
-import dayjs from "dayjs";
-import type { ClientScheduleDetail } from "@/api";
-import { useForm } from "vee-validate";
+import { computed } from 'vue';
+import dayjs from 'dayjs';
+import { type ClientScheduleDetail, updateClientSchedule } from '@/api';
+import { useForm } from 'vee-validate';
+import { useAppointmentStore } from '@/stores';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
+const appointmentStore = useAppointmentStore();
+const $q = useQuasar();
+const recordId = computed(
+  () => props.scheduleDetail.medicalAndTrainingRecordId,
+);
+
 const date = computed(() =>
-  dayjs(props.scheduleDetail.date).format("YYYY/MM/DD")
+  dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'),
 );
 
 const initialValues = computed(() => {
@@ -21,8 +29,11 @@ const { handleSubmit, meta } = useForm({
   initialValues: initialValues.value,
 });
 
-const onSubmit = handleSubmit((val) => {
-  console.log(val);
+const onSubmit = handleSubmit(async (val) => {
+  await updateClientSchedule(recordId.value, val);
+  $q.notify({ message: '已存檔', timeout: 200 });
+
+  await appointmentStore.getClientSchedule(props.scheduleId);
 });
 </script>
 

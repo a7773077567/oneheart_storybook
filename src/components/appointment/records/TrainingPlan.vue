@@ -1,56 +1,55 @@
 <script setup lang="ts">
 // 運動訓練單
-import { computed } from "vue";
-import dayjs from "dayjs";
-import { pick } from "radash";
-import type { ClientScheduleDetail, TrainingPlan } from "@/api";
-import { useForm } from "vee-validate";
-
-// import { useAppointmentStore } from "@/stores";
-import { useQuasar } from "quasar";
+import { computed } from 'vue';
+import dayjs from 'dayjs';
+import { pick } from 'radash';
+import { type ClientScheduleDetail, type Record, type TrainingPlan, updateClientSchedule } from '@/api';
+import { useForm } from 'vee-validate';
+import { useAppointmentStore } from '@/stores';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-// const appointmentStore = useAppointmentStore();
+const appointmentStore = useAppointmentStore();
 const $q = useQuasar();
 
 const recordId = computed(
-  () => props.scheduleDetail.medicalAndTrainingRecordId
+  () => props.scheduleDetail.medicalAndTrainingRecordId,
 );
 const date = computed(() =>
-  dayjs(props.scheduleDetail.date).format("YYYY/MM/DD")
+  dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'),
 );
 const recordField = [
-  { name: "action", label: "動作" },
-  { name: "weight", label: "重量" },
-  { name: "times", label: "次數" },
-  { name: "sets", label: "組數/強度" },
-  { name: "note", label: "備註" },
-  { name: "del", label: "" },
+  { name: 'action', label: '動作' },
+  { name: 'weight', label: '重量' },
+  { name: 'times', label: '次數' },
+  { name: 'sets', label: '組數/強度' },
+  { name: 'note', label: '備註' },
+  { name: 'del', label: '' },
 ];
 const trainingPlanFields = [
-  { name: "forMedicalGroup", label: "給治療組的建議" },
-  { name: "forFrontDesk", label: "給櫃檯的建議" },
-  { name: "forClient", label: "給客戶的建議" },
+  { name: 'forMedicalGroup', label: '給治療組的建議' },
+  { name: 'forFrontDesk', label: '給櫃檯的建議' },
+  { name: 'forClient', label: '給客戶的建議' },
 ];
 
 const initialValues = computed<{
   [key in keyof TrainingPlan]: TrainingPlan[key];
 }>(() => {
   return pick(props.scheduleDetail.record, [
-    "records",
-    "forMedicalGroup",
-    "forFrontDesk",
-    "forClient",
+    'records',
+    'forMedicalGroup',
+    'forFrontDesk',
+    'forClient',
   ]);
 });
-const { handleSubmit, resetForm, setFieldValue, values, meta } = useForm({
+const { handleSubmit, setFieldValue, values, meta } = useForm({
   initialValues: {
     ...initialValues.value,
-    ...(initialValues.value.records?.length ?? 0 >= 1
+    ...((initialValues.value.records?.length ?? 0) >= 1
       ? initialValues.value.records
       : { records: [{}, {}, {}] }),
   },
@@ -59,20 +58,19 @@ const { handleSubmit, resetForm, setFieldValue, values, meta } = useForm({
 const onSubmit = handleSubmit(async (formValue) => {
   console.log(formValue, recordId.value);
 
-  // await updateClientSchedule(recordId.value, formValue);
-  $q.notify({ message: "已存檔", timeout: 200 });
+  await updateClientSchedule(recordId.value, formValue as Partial<Record>);
+  $q.notify({ message: '已存檔', timeout: 200 });
 
-  // await appointmentStore.getClientSchedule(props.scheduleId);
-  // resetForm({ values: initialValues.value });
+  await appointmentStore.getClientSchedule(props.scheduleId);
 });
 
 function addNewSet() {
-  setFieldValue("records", [...(values.records ?? []), {}]);
+  setFieldValue('records', [...(values.records ?? []), {}]);
 }
 
 function deleteSet(delIdx: number) {
   const newRecords = values.records.filter((record, idx) => idx !== delIdx);
-  setFieldValue("records", newRecords);
+  setFieldValue('records', newRecords);
 }
 </script>
 
