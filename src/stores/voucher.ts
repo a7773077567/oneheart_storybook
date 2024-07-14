@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
-import type { PurchaseVoucher } from '@/api';
+import { type GroupClass, type PurchaseVoucher, getAllGroupClass } from '@/api';
 
 interface State {
   voucherDetail: Partial<VoucherDetail> | null;
+  groupClassList: GroupClass[];
 }
 
-interface VoucherDetail extends PurchaseVoucher {
+export interface VoucherDetail extends PurchaseVoucher {
   clientName: string;
   clientPhone: string;
 }
@@ -14,12 +15,15 @@ export const useVoucherStore = defineStore('voucher', {
   state: (): State => {
     return {
       voucherDetail: null,
+      groupClassList: [],
     };
   },
   getters: {
-
+    groupClassOptions: state => state.groupClassList?.map(groupClass => ({ label: groupClass.name, value: groupClass.id })),
   },
   actions: {
-
+    async getGroupClass() {
+      this.groupClassList = await getAllGroupClass();
+    },
   },
 });

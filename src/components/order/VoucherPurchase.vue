@@ -4,6 +4,8 @@ import { CheckTable } from '@/components/appointment';
 import { useVoucherStore } from '@/stores';
 import dayjs from 'dayjs';
 import { PaymentTypes } from '@/const/general';
+import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
+import { useQuasar } from 'quasar';
 
 defineEmits<{
   (e: 'cancel'): void;
@@ -20,7 +22,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'name', value: voucherStore.voucherDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: voucherStore.voucherDetail?.clientPhone ?? '', label: '電話' },
   { key: 'classId', value: '瑜伽課', label: '團課名稱' },
-  { key: 'counts', value: `${voucherStore.voucherDetail?.counts} 張`, label: '數量' },
+  { key: 'ticketGained', value: `${voucherStore.voucherDetail?.ticketGained} 張`, label: '數量' },
   { key: 'amount', value: `$ ${(voucherStore.voucherDetail?.amount ?? 0)}`, label: '金額' },
 ]);
 
@@ -43,8 +45,23 @@ const summary = computed(() => [
   { key: 'cashDetails', label: '現金', value: voucherStore.voucherDetail?.amount, span: true, custom: true },
 ]);
 
+const $q = useQuasar();
 async function submit() {
   console.log(voucherStore.voucherDetail);
+  const { clientId, groupClassId, ticketGained, amount, payMethod } = voucherStore.voucherDetail as PurchaseVoucher;
+
+  await buyGroupClassTickets({
+    clientId,
+    groupClassId,
+    ticketGained,
+    amount,
+    payMethod,
+    authorisationCode: null, // todo, 複合式結帳時需修改
+    receiptNumber: null, // todo, 複合式結帳時需修改
+  });
+  $q.dialog({
+    message: '購買成功',
+  });
 }
 </script>
 

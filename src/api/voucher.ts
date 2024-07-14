@@ -1,31 +1,37 @@
 import { api } from '@/utils/api';
 import type { PaymentTypes } from '@/const/general';
 
-export interface Voucher {
-  amount: number;
-  counts: number;
-  classId: number;
-  date: string;
-  spaceName: string;
+export interface GroupClass {
+  id: number;
+  spaceId: number;
+  numberOfClasses: number;
+  maxClientsForGroupClass: number;
+  name: string;
+  startTime: string;
+  endTime: string;
+  color: string;
+  remainingClasses: number;
 }
 
 export interface PurchaseVoucher {
-  counts: number;
-  classId: number;
-  amount: number;
   clientId: number;
+  groupClassId: number;
+  ticketGained: number;
+  amount: number;
   payMethod: PaymentTypes;
+  authorisationCode: string | null; // 信用卡授權碼，如果payMethod!=信用卡，此欄位必為null
+  receiptNumber: string | null; // 信用卡簽單號，如果payMethod!=信用卡，此欄位必為null
 }
 
 // 購買團課券
-export async function purchaseVoucher(param: PurchaseVoucher) {
-  await api.post(`/clientGroups`, param);
+export async function buyGroupClassTickets(param: PurchaseVoucher) {
+  await api.post(`/groupClassTickets`, param);
 }
 
-// 取得所有團課券
-export async function getMyVouchers(clientId: number) {
-  console.log(clientId);
-  // await api.get('');
+// 取得所有團課
+export async function getAllGroupClass() {
+  const { data } = await api.get<GroupClass[]>('/groupClasses');
+  return data;
 }
 
 // 移轉團課券

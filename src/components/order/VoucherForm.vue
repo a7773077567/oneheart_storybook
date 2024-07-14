@@ -4,7 +4,7 @@ import { ClientSearch, OInput, OSelect } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import type { Client } from '@/api';
+import { type Client, getAllGroupClass } from '@/api';
 import { useVoucherStore } from '@/stores';
 
 const emit = defineEmits<{
@@ -13,6 +13,8 @@ const emit = defineEmits<{
 }>();
 
 const voucherStore = useVoucherStore();
+voucherStore.getGroupClass();
+
 const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
@@ -73,7 +75,7 @@ function selectClient(selectList: Client[]) {
       <fieldset class="col-8">
         <span class="field--key">團課課程</span>
         <OSelect
-          class="field--val" name="classId" :options="[]" hide-bottom-space :virtual-scroll-item-size="50"
+          class="field--val" name="classId" :options="voucherStore.groupClassOptions" hide-bottom-space :virtual-scroll-item-size="50"
           error-message=""
         />
       </fieldset>
