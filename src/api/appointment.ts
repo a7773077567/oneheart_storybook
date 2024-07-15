@@ -53,13 +53,13 @@ export interface Record {
   canvasAttachment: string;
   forMedicalGroup: string;
   forClient: string;
-  records: [
+  trainingRecords: [
     {
-      action: string | null;
-      weight: string | null;
-      times: string | null;
-      sets: string | null;
-      note: string | null;
+      exercise: string;
+      weight: string;
+      reps: string;
+      intensity_Sets: string;
+      notes: string;
     },
   ];
   advice: string;
@@ -113,13 +113,13 @@ export interface TrainingPlan {
   forMedicalGroup: string; // 給治療組的建議
   forFrontDesk: string; // 給櫃檯的建議
   forClient: string; // 給客戶的建議
-  records: [
+  trainingRecords: [
     {
-      action: string | null;
-      weight: string | null;
-      times: string | null;
-      sets: string | null;
-      note: string | null;
+      exercise: string;
+      weight: string;
+      reps: string;
+      intensity_Sets: string;
+      notes: string;
     },
   ];
 }

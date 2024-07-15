@@ -7,6 +7,8 @@ import { type ClientScheduleDetail, type Record, type TrainingPlan, updateClient
 import { useForm } from 'vee-validate';
 import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
+import { array, object, string } from 'zod';
+import { toTypedSchema } from '@vee-validate/zod';
 
 const props = defineProps<{
   scheduleId: number;
@@ -23,11 +25,11 @@ const date = computed(() =>
   dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'),
 );
 const recordField = [
-  { name: 'action', label: '動作' },
+  { name: 'exercise', label: '動作' },
   { name: 'weight', label: '重量' },
-  { name: 'times', label: '次數' },
-  { name: 'sets', label: '組數/強度' },
-  { name: 'note', label: '備註' },
+  { name: 'reps', label: '次數' },
+  { name: 'intensity_Sets', label: '組數/強度' },
+  { name: 'notes', label: '備註' },
   { name: 'del', label: '' },
 ];
 const trainingPlanFields = [
@@ -40,37 +42,49 @@ const initialValues = computed<{
   [key in keyof TrainingPlan]: TrainingPlan[key];
 }>(() => {
   return pick(props.scheduleDetail.record, [
-    'records',
+    'trainingRecords',
     'forMedicalGroup',
     'forFrontDesk',
     'forClient',
   ]);
 });
+
+const schema = object({
+  trainingRecords: array(object({
+    exercise: string().min(1),
+    weight: string().min(1),
+    reps: string().min(1),
+    intensity_Sets: string().min(1),
+    notes: string().min(1),
+  }).required()),
+}).required();
+
+const oneRecord = { exercise: '', weight: '', reps: '', intensity_Sets: '', notes: '' };
 const { handleSubmit, setFieldValue, values, meta } = useForm({
+  validationSchema: toTypedSchema(schema),
   initialValues: {
     ...initialValues.value,
-    ...((initialValues.value.records?.length ?? 0) >= 1
-      ? initialValues.value.records
-      : { records: [{}, {}, {}] }),
+    ...((initialValues.value.trainingRecords?.length ?? 0) >= 1
+      ? initialValues.value.trainingRecords
+      : { trainingRecords: [oneRecord, oneRecord, oneRecord] }),
   },
 });
 
 const onSubmit = handleSubmit(async (formValue) => {
-  console.log(formValue, recordId.value);
-
-  await updateClientSchedule(recordId.value, formValue as Partial<Record>);
+  const { trainingRecords, ...otherFields } = formValue;
+  await updateClientSchedule(recordId.value, { ...otherFields, trainingRecords: trainingRecords.filter(record => Object.keys(record).length > 0) } as Partial<Record>);
   $q.notify({ message: '已存檔', timeout: 200 });
 
   await appointmentStore.getClientSchedule(props.scheduleId);
 });
 
 function addNewSet() {
-  setFieldValue('records', [...(values.records ?? []), {}]);
+  setFieldValue('trainingRecords', [...(values.trainingRecords ?? [oneRecord]), oneRecord]);
 }
 
 function deleteSet(delIdx: number) {
-  const newRecords = values.records.filter((record, idx) => idx !== delIdx);
-  setFieldValue('records', newRecords);
+  const newRecords = values.trainingRecords?.filter((_, idx) => idx !== delIdx);
+  setFieldValue('trainingRecords', newRecords);
 }
 </script>
 
@@ -78,9 +92,9 @@ function deleteSet(delIdx: number) {
   <div class="form">
     <div class="form__header">
       <div>{{ date }}</div>
-      <div>
+      <!-- <div>
         <QBtn flat round icon="save" :disable="!meta.dirty" @click="onSubmit" />
-      </div>
+      </div> -->
     </div>
     <div class="form__body">
       <fieldset class="records">
@@ -92,7 +106,7 @@ function deleteSet(delIdx: number) {
           {{ oneSet.label }}
         </div>
         <template
-          v-for="(record, recordIdx) in values.records"
+          v-for="(record, recordIdx) in values.trainingRecords"
           :key="recordIdx"
         >
           <div
@@ -109,7 +123,7 @@ function deleteSet(delIdx: number) {
             />
             <OInput
               v-else
-              :name="`records[${recordIdx}]${oneSet.name}`"
+              :name="`trainingRecords[${recordIdx}]${oneSet.name}`"
               class="records__item"
               hide-bottom-space
             />
@@ -135,6 +149,14 @@ function deleteSet(delIdx: number) {
         />
       </fieldset>
     </div>
+    <div class="form__actions">
+      <QBtn
+        label="儲存"
+        style="width: 100px"
+        :disable="!meta.dirty || !meta.valid"
+        @click="onSubmit"
+      />
+    </div>
   </div>
 </template>
 
@@ -143,6 +165,7 @@ function deleteSet(delIdx: number) {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding: 12px 0;
   &__header {
     display: flex;
     justify-content: space-between;
