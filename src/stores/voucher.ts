@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type GroupClass, type PurchaseVoucher, getAllGroupClass } from '@/api';
+import { type GroupClass, type PurchaseVoucher, fetchGroupShiftTemplates } from '@/api';
 
 interface State {
   voucherDetail: Partial<VoucherDetail> | null;
@@ -23,7 +23,7 @@ export const useVoucherStore = defineStore('voucher', {
   },
   actions: {
     async getGroupClass() {
-      this.groupClassList = await getAllGroupClass();
+      this.groupClassList = await fetchGroupShiftTemplates();
     },
   },
 });

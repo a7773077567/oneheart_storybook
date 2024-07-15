@@ -28,10 +28,4 @@ export async function buyGroupClassTickets(param: PurchaseVoucher) {
   await api.post(`/groupClassTickets`, param);
 }
 
-// 取得所有團課
-export async function getAllGroupClass() {
-  const { data } = await api.get<GroupClass[]>('/groupClasses');
-  return data;
-}
-
 // 移轉團課券

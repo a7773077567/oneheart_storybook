@@ -4,7 +4,7 @@ import { ClientSearch, OInput, OSelect } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { type Client, getAllGroupClass } from '@/api';
+import type { Client } from '@/api';
 import { useVoucherStore } from '@/stores';
 
 const emit = defineEmits<{
