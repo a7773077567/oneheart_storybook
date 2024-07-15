@@ -25,9 +25,9 @@ async function onDelete(id: number) {
   });
 }
 
-async function createShift(data: GroupShiftTemplatePayload) {
+async function createShift(data: Omit<GroupShiftTemplatePayload, 'color'>) {
   try {
-    await createGroupShiftTemplate(data);
+    await createGroupShiftTemplate({ ...data, color: '#88F2D8' });
     await getGroupShiftTemplates();
     isGroupShiftEditorOpen.value = false;
   }

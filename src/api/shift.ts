@@ -26,18 +26,22 @@ export interface ShiftTemplate {
 export interface GroupShiftTemplate {
   id: number;
   spaceId: number;
+  numberOfClasses: number;
+  maxClientsForGroupClass: number;
   name: string;
   startTime: string;
   endTime: string;
-  maxClients: number;
+  color: string;
+  remainingClasses: number;
 }
 
 export interface GroupShiftTemplatePayload {
-  totalSessions: number;
-  maxClients: number;
+  numberOfClasses: number;
+  maxClientsForGroupClass: number;
   name: string;
   startTime: string;
   endTime: string;
+  color: string;
 }
 
 export interface UserShift {
@@ -162,50 +166,19 @@ export async function deleteUserShift(userShiftId: number) {
   return data;
 }
 // ========== Group Related ==========
-let fakeGroupShiftTemplates = [
-  {
-    id: 1,
-    spaceId: 5,
-    name: '1月瑜伽課A',
-    startTime: '08:00',
-    endTime: '10:00',
-    maxClients: 5,
-  },
-  {
-    id: 2,
-    spaceId: 5,
-    name: '1月瑜伽課B',
-    startTime: '10:00',
-    endTime: '12:00',
-    maxClients: 8,
-  },
-  {
-    id: 3,
-    spaceId: 5,
-    name: '2月瑜伽課A',
-    startTime: '09:00',
-    endTime: '11:00',
-    maxClients: 5,
-  },
-];
 export async function fetchGroupShiftTemplates() {
-  return fakeGroupShiftTemplates;
+  const { data } = await api.get<GroupShiftTemplate[]>('groupClasses');
+  return data;
 }
 
 export async function createGroupShiftTemplate(payload: GroupShiftTemplatePayload) {
-  fakeGroupShiftTemplates = [
-    ...fakeGroupShiftTemplates,
-    {
-      id: fakeGroupShiftTemplates.length + 1,
-      spaceId: 5,
-      ...payload,
-    },
-  ];
+  const { data } = await api.post('groupClasses', payload);
+  return data;
 }
 
 export async function deleteGroupShiftTemplate(id: number) {
-  const index = fakeGroupShiftTemplates.findIndex(item => item.id === id);
-  fakeGroupShiftTemplates = [...fakeGroupShiftTemplates.slice(0, index), ...fakeGroupShiftTemplates.slice(index + 1)];
+  const { data } = await api.delete(`groupClasses/${id}`);
+  return data;
 }
 // ========== Utils ==========
 

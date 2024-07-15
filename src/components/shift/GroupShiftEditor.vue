@@ -4,8 +4,8 @@ import { MultiNumSelect } from '@/components/shared';
 import { DurationItems } from '@/const/shift';
 
 interface ConfirmValues {
-  totalSessions: number;
-  maxClients: number;
+  numberOfClasses: number;
+  maxClientsForGroupClass: number;
   name: string;
   startTime: string;
   endTime: string;
@@ -23,12 +23,16 @@ const duration = ref<number[]>([]);
 
 function onConfirm() {
   emit('confirm', {
-    totalSessions: totalSessions.value,
-    maxClients: macClients.value,
+    numberOfClasses: +totalSessions.value,
+    maxClientsForGroupClass: +macClients.value,
     name: name.value,
-    startTime: `${duration.value[0]}:${duration.value[1]}`,
-    endTime: `${duration.value[2]}:${duration.value[3]}`,
+    startTime: toTimeString(duration.value[0], duration.value[1]),
+    endTime: toTimeString(duration.value[2], duration.value[3]),
   });
+}
+
+function toTimeString(start: number, end: number) {
+  return `${start.toString().padStart(2, '0')}:${end.toString().padStart(2, '0')}`;
 }
 </script>
 
