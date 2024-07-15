@@ -151,7 +151,7 @@ export const pointsGroupOptions = Object.keys(PointTypes).slice(3, 6).map(group 
 export enum TransactionTypes {
   點數交易 = 1,
   門診費用 = 2,
-  商品購買 = 3,
+  團課券購買 = 3,
 }
 
 // 付款方式

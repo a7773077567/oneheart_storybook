@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import type { QTableProps } from 'quasar';
-import { type Voucher, getMyVouchers } from '@/api';
+
+import type { Voucher } from '@/api';
 import { PaymentTypes, TransactionTypes } from '@/const/general';
 
 const props = defineProps<{
@@ -15,7 +16,7 @@ const rows = ref<Voucher[]>([{
   amount: 20000,
   classId: 0,
 }]);
-await getMyVouchers(+props.clientId);
+// await getMyVouchers(+props.clientId);
 
 const cols: QTableProps['columns'] = [
   {
