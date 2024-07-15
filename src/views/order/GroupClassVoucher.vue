@@ -15,5 +15,5 @@ function cancelTopup() {
 
 <template>
   <VoucherForm v-if="step === 1" @go-next="step = 2" @cancel="cancelTopup" />
-  <VoucherPurchase v-else-if="step === 2" @go-back="step = 1" @cancel="cancelTopup" />
+  <VoucherPurchase v-else-if="step === 2" @go-back="step = 1" @cancel="cancelTopup" @finish="cancelTopup" />
 </template>

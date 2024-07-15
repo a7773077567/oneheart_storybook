@@ -7,9 +7,10 @@ import { PaymentTypes } from '@/const/general';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'cancel'): void;
   (e: 'goBack'): void;
+  (e: 'finish'): void;
 }>();
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
@@ -48,20 +49,24 @@ const summary = computed(() => [
 const $q = useQuasar();
 async function submit() {
   console.log(voucherStore.voucherDetail);
-  const { clientId, groupClassId, ticketGained, amount, payMethod } = voucherStore.voucherDetail as PurchaseVoucher;
+  const { clientId, groupClassId, ticketGained, amount } = voucherStore.voucherDetail as PurchaseVoucher;
 
   await buyGroupClassTickets({
     clientId,
     groupClassId,
     ticketGained,
     amount,
-    payMethod,
+    payMethod: selectedPayment.value,
     authorisationCode: null, // todo, 複合式結帳時需修改
     receiptNumber: null, // todo, 複合式結帳時需修改
   });
+
+  // todo, show recipe
   $q.dialog({
     message: '購買成功',
-  });
+  }).onOk(() =>
+    emit('finish'),
+  );
 }
 </script>
 

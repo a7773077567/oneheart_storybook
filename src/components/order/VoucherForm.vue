@@ -19,9 +19,9 @@ const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
   clientPhone: z.string(),
-  counts: z.preprocess(a => Number(a), z.number().nonnegative()),
+  ticketGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
-  // classId: z.number(),
+  groupClassId: z.preprocess(a => Number(a), z.number().nonnegative()),
 });
 
 const initialValues = computed(() => voucherStore.voucherDetail);
@@ -75,7 +75,7 @@ function selectClient(selectList: Client[]) {
       <fieldset class="col-8">
         <span class="field--key">團課課程</span>
         <OSelect
-          class="field--val" name="classId" :options="voucherStore.groupClassOptions" hide-bottom-space :virtual-scroll-item-size="50"
+          class="field--val" name="groupClassId" :options="voucherStore.groupClassOptions" hide-bottom-space :virtual-scroll-item-size="50"
           error-message=""
         />
       </fieldset>
@@ -83,7 +83,7 @@ function selectClient(selectList: Client[]) {
         <fieldset class="col-6 col-md-3">
           <span class="field--key">堂數</span>
           <OInput
-            type="number" class="field--val" name="counts" hide-bottom-space placeholder="數量"
+            type="number" class="field--val" name="ticketGained" hide-bottom-space placeholder="數量"
             error-message=""
           />
         </fieldset>

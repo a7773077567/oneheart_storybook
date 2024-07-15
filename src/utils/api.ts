@@ -79,6 +79,7 @@ const firstTokenList = [
   'resend-activation-email',
   'clientGroups',
   'payments',
+  'groupClassTickets',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
