@@ -43,6 +43,9 @@ export const useUserStore = defineStore('user', {
     currentSpaceType(state) {
       return state.userInfo?.spaces.find(space => space.id === state.currentSpace)!.type;
     },
+    isGym(state) {
+      return state.userInfo?.spaces.find(space => space.id === state.currentSpace)!.type === 2;
+    },
   },
   actions: {
     async getUserInfo() {

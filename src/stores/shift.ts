@@ -1,6 +1,7 @@
 import type { User } from '@/api/user';
 import { fetchUsers } from '@/api/user';
-import { type GroupShiftTemplate, type ShiftTemplate, type UserShift, type UserShiftsGet, fetchGroupShiftTemplates, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
+import { fetchAvailableClassesForGym, fetchGroupShiftTemplates, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
+import type { AvailableClassesForGym, GroupShiftTemplate, ShiftTemplate, UserShift, UserShiftsGet } from '@/api/shift';
 import { defineStore } from 'pinia';
 
 interface State {
@@ -10,6 +11,7 @@ interface State {
   userShifts: UserShift[];
   targetUserShift: UserShift | null;
   groupShiftTemplates: GroupShiftTemplate[];
+  availableClassesForGym: AvailableClassesForGym | null;
 }
 
 export const useShiftStore = defineStore('shift', {
@@ -20,9 +22,16 @@ export const useShiftStore = defineStore('shift', {
     userShifts: [],
     targetUserShift: null,
     groupShiftTemplates: [],
+    availableClassesForGym: null,
   }),
   getters: {
-
+    shiftTemplatesForGym(state) {
+      if (state.availableClassesForGym === null) {
+        return [];
+      }
+      const { shiftTemplates, groupClasses } = state.availableClassesForGym;
+      return [...shiftTemplates, ...groupClasses];
+    },
   },
   actions: {
     async getShiftTemplates() {
@@ -46,6 +55,9 @@ export const useShiftStore = defineStore('shift', {
       const data = await fetchGroupShiftTemplates();
       this.groupShiftTemplates = data;
     },
-
+    async getAvailableClassesForGym() {
+      const data = await fetchAvailableClassesForGym();
+      this.availableClassesForGym = data;
+    },
   },
 });

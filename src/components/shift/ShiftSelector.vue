@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { ShiftTemplate } from '@/api/shift';
+import type { GroupShiftTemplate, ShiftTemplate } from '@/api/shift';
 import { ShiftItem } from '@/components/shift';
 import { ref } from 'vue';
 
 interface Props {
-  data: ShiftTemplate[];
+  data: (ShiftTemplate | GroupShiftTemplate)[];
 }
 
 defineProps<Props>();
 const emit = defineEmits<{
-  confirm: [shiftTemplate: ShiftTemplate];
+  confirm: [shiftTemplate: ShiftTemplate | GroupShiftTemplate];
 }>();
 
-const selectedTemplate = ref<ShiftTemplate | null>(null);
+const selectedTemplate = ref<ShiftTemplate | GroupShiftTemplate | null>(null);
 
-function selectShift(shiftTemplate: ShiftTemplate) {
+function selectShift(shiftTemplate: ShiftTemplate | GroupShiftTemplate) {
   selectedTemplate.value = shiftTemplate;
 }
 

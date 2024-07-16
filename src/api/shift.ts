@@ -14,26 +14,37 @@ export interface Duration {
 export interface ShiftTemplate {
   id: number;
   spaceId: number;
-  type: number;
+  type: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   name: string;
   startTime: string;
   endTime: string;
   notAvailableTimes: Duration[];
   color: string;
   maxClients: number | null;
+  maxClientsForCoachClass: number | null;
 }
 
 export interface GroupShiftTemplate {
   id: number;
   spaceId: number;
-  numberOfClasses: number;
-  maxClientsForGroupClass: number;
+  type: 11;
   name: string;
   startTime: string;
   endTime: string;
   color: string;
+  numberOfClasses: number;
+  maxClientsForGroupClass: number;
   remainingClasses: number;
 }
+
+export type UserShiftTemplate = ShiftTemplate | GroupShiftTemplate;
+
+export interface AvailableClassesForGym {
+  shiftTemplates: ShiftTemplate[];
+  groupClasses: GroupShiftTemplate[];
+}
+
+export type GroupShiftTemplates = (ShiftTemplate | GroupShiftTemplate)[];
 
 export interface GroupShiftTemplatePayload {
   numberOfClasses: number;
@@ -62,8 +73,23 @@ export interface UserShift {
     name: string;
     role: Role;
   };
+  maxClientsForCoachClass: number | null;
+  groupClassId: number | null;
 }
-export interface UserShiftPost extends Omit<UserShift, 'id' | 'spaceId' | 'user'> {}
+
+export interface CreateUserShift {
+  userId: number;
+  type: number;
+  name: string | null;
+  date: string;
+  startTime: string;
+  endTime: string;
+  notAvailableTimes: Duration[];
+  color: string;
+  maxClients: number | null;
+  maxClientsForCoachClass: number | null;
+  groupClassId: number | null;
+}
 export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
 export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
 export interface UserShiftsGet {
@@ -151,8 +177,8 @@ export async function fetchUserShift(userShiftId: number) {
   return data;
 }
 
-export async function createUserShift(payload: UserShiftPost) {
-  const { data } = await api.post<any, UserShiftPost>(`userShifts`, payload);
+export async function createUserShift(payload: CreateUserShift) {
+  const { data } = await api.post<any, CreateUserShift>(`userShifts`, payload);
   return data;
 }
 
@@ -180,12 +206,8 @@ export async function deleteGroupShiftTemplate(id: number) {
   const { data } = await api.delete(`groupClasses/${id}`);
   return data;
 }
-// ========== Utils ==========
 
-export function toUserShiftReq(shiftTemplate: ShiftTemplate, userId: number, date: string): UserShiftPost {
-  return {
-    ...omit(shiftTemplate, ['id', 'spaceId']),
-    userId,
-    date,
-  };
+export async function fetchAvailableClassesForGym() {
+  const { data } = await api.get<AvailableClassesForGym>('userShifts/availableClassesForGym');
+  return data;
 }

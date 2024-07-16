@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ShiftTemplate } from '@/api/shift';
+import type { GroupShiftTemplate, ShiftTemplate } from '@/api/shift';
 import { getDurationLabel } from '@/utils/date';
 
 interface Props {
-  data: ShiftTemplate;
+  data: ShiftTemplate | GroupShiftTemplate;
 }
 
 defineProps<Props>();

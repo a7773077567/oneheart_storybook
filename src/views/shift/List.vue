@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { omit } from 'radash';
 import { ShiftChip, ShiftEditor, ShiftSelector } from '@/components/shift';
-import { createUserShift, deleteUserShift, toUserShiftReq, updateUserShift } from '@/api/shift';
-import type { ShiftTemplate, UserShiftPatch } from '@/api/shift';
+import { createUserShift, deleteUserShift, updateUserShift } from '@/api/shift';
+import type { CreateUserShift, UserShiftPatch, UserShiftTemplate } from '@/api/shift';
 import dayjs from 'dayjs';
 import { useShiftStore, useUserStore } from '@/stores';
 import type { ChangeParams } from '@/components/shared/Calendar.vue';
@@ -18,6 +19,7 @@ const targetDate = ref<string | null >(null);
 const userIds = computed(() => shiftStore.users.map(user => user.id));
 const targetUserId = ref<number | null>(null);
 const targetUserShiftId = ref<number | null>(null);
+const targetShiftTemplates = computed(() => userStore.isGym ? shiftStore.shiftTemplatesForGym : shiftStore.shiftTemplates);
 
 watch(duration, getUserShifts);
 
@@ -39,8 +41,30 @@ async function openShiftSelector(date: string, userId: number) {
   isAddingShift.value = true;
 }
 
-async function addUserShift(shiftTemplate: ShiftTemplate) {
-  const payload = toUserShiftReq(shiftTemplate, targetUserId.value!, targetDate.value!);
+async function addUserShift(shiftTemplate: UserShiftTemplate) {
+  let payload: CreateUserShift;
+  const isGroupClass = shiftTemplate.type === 11;
+  if (isGroupClass) {
+    payload = {
+      ...omit(shiftTemplate, ['id', 'spaceId', 'remainingClasses', 'maxClientsForGroupClass', 'numberOfClasses']),
+      userId: targetUserId.value!,
+      date: targetDate.value!,
+      name: null,
+      groupClassId: shiftTemplate.id,
+      notAvailableTimes: [],
+      maxClients: null,
+      maxClientsForCoachClass: null,
+    };
+  }
+  else {
+    payload = {
+      ...omit(shiftTemplate, ['id', 'spaceId']),
+      userId: targetUserId.value!,
+      date: targetDate.value!,
+      groupClassId: null,
+    };
+  }
+
   await createUserShift(payload);
   await getUserShifts();
   targetUserId.value = null;
@@ -75,7 +99,10 @@ function onCalendarChange(calendarDuration: ChangeParams) {
 }
 
 async function getUserShifts() {
-  shiftStore.getUserShifts({
+  if (userStore.isGym) {
+    await shiftStore.getAvailableClassesForGym();
+  }
+  await shiftStore.getUserShifts({
     ...duration.value,
     userIds: userIds.value,
   });
@@ -105,7 +132,7 @@ async function getUserShifts() {
       </template>
     </Calendar>
     <QDialog v-model="isAddingShift" persistent>
-      <ShiftSelector :data="shiftStore.shiftTemplates" style="min-width: 336px;" @confirm="addUserShift" />
+      <ShiftSelector :data="targetShiftTemplates" style="min-width: 336px;" @confirm="addUserShift" />
     </QDialog>
     <QDialog v-model="isUpdatingShift" persistent>
       <ShiftEditor :data="shiftStore.targetUserShift" user-shift-mode @cancel="isUpdatingShift = false" @update-confirm="onUpdateUserShift" />
