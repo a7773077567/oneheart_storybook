@@ -9,16 +9,16 @@ import { spaceLogin } from '@/api/user';
 import { getCookie, setCookie } from '@/utils/helpers';
 
 const userStore = useUserStore();
-const { userInfo, currentSpace } = storeToRefs(userStore);
+const { userInfo, currentSpaceId } = storeToRefs(userStore);
 const router = useRouter();
 
 const spaceOptions = userInfo.value!.spaces.map(({ name, id }) => {
   return { label: name, value: id };
 });
-currentSpace.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
+currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
 
 // const currentSpaceId = ref(lastSpaceId);
-watch(currentSpace, async (newSpaceId) => {
+watch(currentSpaceId, async (newSpaceId) => {
   const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
   setCookie('secondToken', accessToken);
   setCookie('lastSpaceId', newSpaceId);
@@ -26,7 +26,7 @@ watch(currentSpace, async (newSpaceId) => {
 });
 
 function optionDisable(option: any): boolean {
-  return option.value === currentSpace.value;
+  return option.value === currentSpaceId.value;
 }
 
 const { navTabs } = useLayoutRoute();
@@ -45,7 +45,7 @@ function toggleDrawer() {
         <img src="/images/one-heart.png" class="q-ml-md" style="display: block; height: 45px;">
         <QSpace />
         <div class="row q-gutter-lg items-center">
-          <QSelect v-model="currentSpace" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
+          <QSelect v-model="currentSpaceId" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
           <Avatar />
         </div>
       </QToolbar>

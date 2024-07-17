@@ -82,22 +82,22 @@ watch(isPointType, (newType: boolean) => {
 
 const spaceName = computed(() => userShift.space?.name);
 
-const receiptData = computed(() => ({
-  name: client.name,
-  gender: checkGender(client.identityNumber)?.label,
-  id: client.identityNumber,
-  birthDate: client.birthDate,
-  declaration: '無',
-  selfPay: ShiftType[userShift.type],
-  date: scheduleDate,
-  userName: userShift.user.name,
-  amount: +amountInput.value,
-  points: +amountInput.value,
-}));
+const receiptData = computed(() => {
+  return [
+    { name: 'name', label: '姓名', value: client.name },
+    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'id', label: '身分證字號', value: client.identityNumber },
+    { name: 'birthDate', label: '出生年月日', value: client.birthDate },
+    { name: isPointType.value ? 'points' : 'cash', label: isPointType.value ? '點數' : '現金', value: amountInput.value },
+    { name: 'declaration', label: '健保申報', value: '無' },
+    { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
+    { name: 'userName', label: '治療師', value: userShift.user.name },
+  ];
+});
 
 const isReceiptDialogOpen = ref(false);
 
-function print() {
+function onPrint() {
   window.print();
 }
 
@@ -115,24 +115,7 @@ async function onCheckout() {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <QCard class="q-py-md q-px-xl relative-position">
-        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
-        <QCardSection class="q-pb-none no-print">
-          <div class="text-h6 text-center q-mb-md text-bold">
-            結帳確定
-          </div>
-          <div class="text-subtitle2 text-center">
-            確定以現金方式支付，如確定無誤請按按鈕。
-          </div>
-        </QCardSection>
-        <QCardSection>
-          <Receipt :data="receiptData" :space-name="spaceName" :is-point-type="isPointType" />
-        </QCardSection>
-        <QCardSection class="actions no-print">
-          <QBtn label="列印收據" color="black" @click="print" />
-          <QBtn label="確定結帳" color="black" @click="onCheckout" />
-        </QCardSection>
-      </QCard>
+      <Receipt :rows="receiptData" :payment-method="isPointType ? '點數' : '現金'" :space-name="spaceName" @print="onPrint" @checkout="onCheckout" />
     </QDialog>
 
     <CheckTable :data="info">
@@ -258,21 +241,6 @@ async function onCheckout() {
   &__item {
     display: flex;
     justify-content: space-between;
-  }
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-@media print {
-  .no-print {
-    display: none;
-  }
-  .q-card {
-    box-shadow: none;
   }
 }
 </style>

@@ -8,7 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
-await appointmentStore.getUsers([userStore.currentSpace!]);
+await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const typeOptions = Object.values(Types).map(({ label, identifier }) => ({
   label,
   value: identifier,

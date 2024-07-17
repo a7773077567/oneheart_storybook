@@ -23,7 +23,7 @@ const targetShiftTemplates = computed(() => userStore.isGym ? shiftStore.shiftTe
 
 watch(duration, getUserShifts);
 
-await shiftStore.getUsers([userStore.currentSpace!]);
+await shiftStore.getUsers([userStore.currentSpaceId!]);
 
 function getDayShifts(date: string, userId: string) {
   const currentDay = dayjs(date);

@@ -24,7 +24,7 @@ const emit = defineEmits<{
 
 dayjs.extend(objectSupport);
 const userStore = useUserStore();
-const isGym = computed(() => userStore.currentSpaceType === 2);
+const isGym = computed(() => userStore.currentSpace?.type === 2);
 const shiftTypeOptions = Object.values(Types).map(({ label, identifier }) => {
   return { label, value: identifier };
 });

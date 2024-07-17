@@ -15,7 +15,7 @@ const currentDate = computed(() => dayjs(duration.value.startDate).format('YYYY-
 const days = computed(() => dayjs(duration.value.endDate).diff(duration.value.startDate, 'day') + 1);
 const userIds = computed(() => shiftStore.users.map(user => user.id));
 
-await shiftStore.getUsers([userStore.currentSpace!]);
+await shiftStore.getUsers([userStore.currentSpaceId!]);
 watch(duration, getUserShifts, { immediate: true });
 
 function getDayShifts(date: string, employeeId: string) {

@@ -18,7 +18,7 @@ const drawerOpen = computed({
 const { currentMatched } = useLayoutRoute();
 
 const drawerItems = computed(() => currentMatched.value[0].children.filter((item) => {
-  if (userStore.currentSpaceType === 1) {
+  if (userStore.currentSpace?.type === 1) {
     return !item.meta?.gymOnly;
   }
   return item;

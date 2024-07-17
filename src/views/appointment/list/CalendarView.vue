@@ -9,7 +9,7 @@ import type { ClientSchedule } from '@/api';
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
-await appointmentStore.getUsers([userStore.currentSpace!]);
+await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const isBookingsBoxOpen = ref(false);
 const bookingsInBox = ref<any[]>();
 

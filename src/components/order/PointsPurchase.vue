@@ -1,11 +1,12 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { CheckTable, Receipt } from '@/components/appointment';
-import { usePointsStore } from '@/stores';
+import { useClientStore, usePointsStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { PaymentTypes, PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
 import { useQuasar } from 'quasar';
+import { checkGender } from '@/utils/helpers';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -16,7 +17,10 @@ const emit = defineEmits<{
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 
 const pointsStore = usePointsStore();
+const userStore = useUserStore();
+const clientStore = useClientStore();
 const selectedPayment = ref<PaymentTypes>(PaymentTypes.現金);
+const isCheckoutOpen = ref(false);
 
 const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
@@ -50,7 +54,24 @@ const summary = computed(() => [
 ]);
 
 const $q = useQuasar();
-async function submit() {
+const receiptData = computed(() => {
+  const { planName, paidPointGained, amount, clientName, groupName } = pointsStore.topupDetail;
+  const { identityNumber, birthDate } = clientStore.targetClient!;
+
+  return [
+    { name: 'name', label: '姓名', value: clientName },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label },
+    { name: 'id', label: '身分證字號', value: identityNumber },
+    { name: 'birthDate', label: '出生年月日', value: birthDate },
+    { name: 'group', label: '群組', value: groupName },
+    { name: 'amount', label: '金額', value: amount },
+    { name: 'planName', label: '方案', value: planName },
+    { name: 'pointGained', label: '點數', value: paidPointGained },
+    { name: 'paymentMethod', label: '付款方式', value: '現金' },
+  ];
+});
+
+async function onCheckout() {
   const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
 
   await gainPoint({
@@ -71,6 +92,10 @@ async function submit() {
   }).onOk(() =>
     emit('finish'),
   );
+}
+
+function onPrint() {
+  window.print();
 }
 </script>
 
@@ -108,7 +133,7 @@ async function submit() {
             </div>
             <span>元</span>
           </div>
-          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" @click="submit" />
+          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" @click="isCheckoutOpen = true" />
         </div>
       </template>
       <template #detailTitle="{ data }">
@@ -128,6 +153,9 @@ async function submit() {
       <QBtn outline size="md" label="取消" class="q-px-lg q-mr-md" @click="$emit('cancel')" />
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
+    <QDialog v-model="isCheckoutOpen">
+      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @print="onPrint" @checkout="onCheckout" />
+    </QDialog>
   </div>
 </template>
 

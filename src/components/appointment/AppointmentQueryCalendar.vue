@@ -9,7 +9,7 @@ import { getTimeDate } from '@/utils/date';
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
-await appointmentStore.getUsers([userStore.currentSpace!]);
+await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 

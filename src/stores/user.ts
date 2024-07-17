@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { type User, fetchUser, fetchUserInfo, fetchUsers } from '@/api/user';
 
 interface State {
-  currentSpace: number | null;
+  currentSpaceId: number | null;
   userInfo: User | null;
   users: User[];
   targetUser: User | null;
@@ -16,7 +16,7 @@ interface SelectOption {
 export const useUserStore = defineStore('user', {
   state: (): State => {
     return {
-      currentSpace: null,
+      currentSpaceId: null,
       userInfo: null,
       users: [],
       targetUser: null,
@@ -40,11 +40,11 @@ export const useUserStore = defineStore('user', {
         return acc;
       }, []);
     },
-    currentSpaceType(state) {
-      return state.userInfo?.spaces.find(space => space.id === state.currentSpace)!.type;
+    currentSpace(state) {
+      return state.userInfo?.spaces.find(space => space.id === state.currentSpaceId);
     },
     isGym(state) {
-      return state.userInfo?.spaces.find(space => space.id === state.currentSpace)!.type === 2;
+      return state.userInfo?.spaces.find(space => space.id === state.currentSpaceId)!.type === 2;
     },
   },
   actions: {
@@ -53,7 +53,7 @@ export const useUserStore = defineStore('user', {
       this.userInfo = userInfo;
     },
     async getUsers() {
-      const data = await fetchUsers([this.currentSpace!]);
+      const data = await fetchUsers([this.currentSpaceId!]);
       this.users = data;
     },
     async getUser(userId: number) {
