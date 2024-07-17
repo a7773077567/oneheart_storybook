@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
 import { ShiftColors } from '@/api/shift';
-import type { Duration, ShiftTemplate, ShiftTemplateReq, UserShiftPatch } from '@/api/shift';
-import { SportTherapyTypes, TherapyTypes } from '@/const/general';
+import type { Duration, ShiftTemplate, ShiftTemplateReq, UserShift, UserShiftPatch } from '@/api/shift';
+import { ShiftType, SportTherapyTypes, TherapyTypes, Types } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
@@ -11,38 +11,32 @@ import { omit } from 'radash';
 import { useUserStore } from '@/stores';
 
 interface Props {
-  data?: ShiftTemplate | null;
+  data?: any | null;
   userShiftMode?: boolean;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
   cancel: [state: boolean];
-  confirm: [values: ShiftTemplateReq ];
+  confirm: [values: any ];
   updateConfirm: [values: UserShiftPatch];
 }>();
 
 dayjs.extend(objectSupport);
 const userStore = useUserStore();
-const isSportSPace = computed(() => userStore.currentSpaceType === 2);
-const typeOptions = getTypeOptions(isSportSPace.value ? SportTherapyTypes : TherapyTypes);
+const isGym = computed(() => userStore.currentSpaceType === 2);
+const shiftTypeOptions = Object.values(Types).map(({ label, identifier }) => {
+  return { label, value: identifier };
+});
+const typeOptions = computed(() => isGym.value ? shiftTypeOptions.slice(8, 10) : shiftTypeOptions.slice(0, 8));
 
 const { handleSubmit, values, setFieldValue } = useForm({
   // validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
-const showNotAvailableTimes = computed(() => {
-  if (isSportSPace.value) {
-    return values.type !== 1;
-  }
-  return true;
-});
-const showMaxClients = computed(() => {
-  if (!isSportSPace.value) {
-    return values.type === 1;
-  }
-  return false;
-});
+const showNotAvailableTimes = computed(() => values.type !== 1);
+const showMaxClients = computed(() => values.type === 1);
+const showMaxClientsForCoachClass = computed(() => values.type === 9);
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 watch(showNotAvailableTimes, (newVal) => {
   if (!newVal) {
@@ -51,13 +45,14 @@ watch(showNotAvailableTimes, (newVal) => {
 });
 
 const onSubmit = handleSubmit((values) => {
-  const { duration, notAvailableTimes, maxClients, ...needed } = omit(values, ['id', 'spaceId']);
+  const { duration, notAvailableTimes, maxClients, maxClientsForCoachClass, ...needed } = omit(values, ['id', 'spaceId']);
   if (!props.userShiftMode) {
-    const payload: ShiftTemplateReq = {
+    const payload = {
       ...needed,
       ...combineTime(duration),
       notAvailableTimes: notAvailableTimes.map(combineTime),
       maxClients: maxClients ? +maxClients : null,
+      maxClientsForCoachClass: maxClientsForCoachClass ? +maxClientsForCoachClass : null,
     };
 
     emit('confirm', payload);
@@ -71,19 +66,12 @@ const onSubmit = handleSubmit((values) => {
   }
 });
 
-function getTypeOptions(types: Record<string, any>) {
-  return Object.values(types).map((value, idx) => ({
-    label: value,
-    value: idx + 1,
-  }));
-}
-
 function getInitialValues() {
   return props.data ? createInitials(props.data) : createDefault();
 
   function createDefault() {
     return {
-      type: typeOptions[0].value,
+      type: typeOptions.value[0].value,
       name: '',
       duration: [0, 0, 0, 0],
       notAvailableTimes: [],
@@ -92,7 +80,7 @@ function getInitialValues() {
     };
   }
 
-  function createInitials(data: ShiftTemplate) {
+  function createInitials(data: UserShift) {
     return {
       ...data,
       duration: splitTime(data),
@@ -154,6 +142,9 @@ function combineTime(duration: number[]): Duration {
       </InputBox>
       <InputBox v-if="showMaxClients" label="最多可預約人數">
         <OInput name="maxClients" dense outlined :disable="userShiftMode" style="flex: 0 1 100px" />
+      </InputBox>
+      <InputBox v-if="showMaxClientsForCoachClass" label="教練課人數">
+        <OInput name="maxClientsForCoachClass" dense outlined :disable="userShiftMode" style="flex: 0 1 100px" />
       </InputBox>
     </QCardSection>
     <QCardActions align="right">

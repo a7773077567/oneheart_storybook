@@ -28,10 +28,9 @@ await shiftStore.getUsers([userStore.currentSpace!]);
 function getDayShifts(date: string, userId: string) {
   const currentDay = dayjs(date);
 
-  const items = shiftStore.userShifts.filter(item =>
+  return shiftStore.userShifts.filter(item =>
     dayjs(item.date).isSame(currentDay, 'date') && +userId === item.userId,
   );
-  return items;
 }
 
 async function openShiftSelector(date: string, userId: number) {
@@ -124,6 +123,8 @@ async function getUserShifts() {
             :key="idx"
             :data="item"
             :edit-mode="isEditing"
+            :hide-edit="item.type === 1 || item.type === 11"
+            :is-group-class="item.type === 11"
             @delete="onDeleteUserShift"
             @update="openShiftEditor"
           />

@@ -9,6 +9,8 @@ import { getType } from '@/utils/mappers';
 interface Props {
   data: UserShift;
   editMode?: boolean;
+  hideEdit?: boolean;
+  isGroupClass?: boolean;
 }
 const props = defineProps<Props>();
 defineEmits<{
@@ -36,7 +38,7 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
 </script>
 
 <template>
-  <div class="shift-chip">
+  <div :class="[isGroupClass ? 'shift-chip--group-class' : 'shift-chip']">
     <div class="shift-chip__item">
       {{ duration }}
     </div>
@@ -62,7 +64,7 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
         </QCardSection>
         <QCardActions v-if="editMode" style="padding: 0 30px;">
           <QBtn icon="o_delete" flat round dense @click="$emit('delete', data.id)" />
-          <QBtn icon="o_edit" flat round dense @click="$emit('update', data.id)" />
+          <QBtn v-if="!hideEdit" icon="o_edit" flat round dense @click="$emit('update', data.id)" />
         </QCardActions>
       </QCard>
     </QPopupProxy>
@@ -77,6 +79,10 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
   border-radius: 5px;
   background-color: v-bind('bgc');
   cursor: pointer;
+  &--group-class {
+    @extend .shift-chip;
+    background-color: #f2c172;
+  }
   &__item {
     text-align: center;
     color: black;

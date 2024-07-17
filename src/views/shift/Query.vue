@@ -64,6 +64,7 @@ function getUserShifts() {
             v-for="(item, idx) in getDayShifts(timestamp.date, resource.id)"
             :key="idx"
             :data="item"
+            :is-group-class="item.type === 11"
           />
         </div>
       </template>
