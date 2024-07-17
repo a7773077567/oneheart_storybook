@@ -9,41 +9,13 @@ defineProps<{
   rows: Row[];
   paymentMethod: string;
   spaceName?: string;
+  hideCheckout?: boolean;
 }>();
 
 defineEmits<{
   (e: 'print'): void;
   (e: 'checkout'): void;
 }>();
-
-// const appointmentStore = useAppointmentStore();
-
-// const cols = computed(() => props.isPointType
-//   ? {
-//       name: '姓名',
-//       gender: '姓別',
-//       id: '身分證字號',
-//       birthDate: '出生年月日',
-//       points: '點數',
-//       declaration: '健保申報',
-//       selfPay: '自費項目',
-//       date: '看診日期',
-//       userName: '治療師',
-//     }
-//   : {
-//       name: '姓名',
-//       gender: '姓別',
-//       id: '身分證字號',
-//       birthDate: '出生年月日',
-//       declaration: '健保申報',
-//       selfPay: '自費項目',
-//       date: '看診日期',
-//       userName: '治療師',
-//       amount: '消費金額',
-//     },
-// );
-
-// const spaceName = computed(() => appointmentStore.targetClientSchedule?.userShift.space?.name);
 </script>
 
 <template>
@@ -80,7 +52,7 @@ defineEmits<{
     </QCardSection>
     <QCardSection class="actions no-print">
       <QBtn label="列印收據" color="black" @click="$emit('print')" />
-      <QBtn label="確定結帳" color="black" @click="$emit('checkout')" />
+      <QBtn v-if="!hideCheckout" label="確定結帳" color="black" @click="$emit('checkout')" />
     </QCardSection>
   </QCard>
 </template>

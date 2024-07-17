@@ -10,7 +10,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { Receipt } from '@/components/appointment';
 import { checkGender } from '@/utils/helpers';
 
-type ReceiptData = InstanceType<typeof Receipt>['$props']['data'];
+type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
 const cols: QTableProps['columns'] = [
   {
@@ -120,7 +120,7 @@ function extractValidQuery(query: Partial<PaymentQuery>) {
 }
 
 getRecordList({});
-const receiptData = ref<ReceiptData | undefined>();
+const receiptData = ref<ReceiptData>([]);
 const isReceiptDialogOpen = ref(false);
 const space = ref<string | undefined>();
 const paymentMethod = ref<number | undefined>();
@@ -129,22 +129,35 @@ async function checkReceipt(paymentId: number) {
   const { client, amount, date, userShift, spaceName, usedPoint, payMethod } = await getSinglePayment(paymentId);
   space.value = spaceName;
   paymentMethod.value = +payMethod;
-  receiptData.value = {
-    name: client.name,
-    gender: checkGender(client.identityNumber)?.label,
-    id: client.identityNumber,
-    birthDate: client.birthDate,
-    declaration: '無',
-    selfPay: ShiftType[userShift.type],
-    date,
-    userName: userShift?.user?.name,
-    amount,
-    points: usedPoint,
-  };
+  receiptData.value = [
+    { name: 'name', label: '姓名', value: client.name },
+    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'id', label: '身分證字號', value: client.identityNumber },
+    { name: 'birthDate', label: '出生年月日', value: client.birthDate },
+    { name: 'amount', label: '總額', value: amount },
+    { name: 'declaration', label: '健保申報', value: '無' },
+    { name: 'selfPay', label: '自費項目', value: ShiftType[userShift?.type] },
+    { name: 'userName', label: '治療師', value: userShift?.user?.name },
+    { name: 'points', label: '點數', value: usedPoint },
+    { name: 'date', label: '日期', value: date },
+  ];
+
+  // receiptData.value = {
+  //   name: client.name,
+  //   gender: checkGender(client.identityNumber)?.label,
+  //   id: client.identityNumber,
+  //   birthDate: client.birthDate,
+  //   declaration: '無',
+  //   selfPay: ShiftType[userShift.type],
+  //   date,
+  //   userName: userShift?.user?.name,
+  //   amount,
+  //   points: usedPoint,
+  // };
   isReceiptDialogOpen.value = true;
 }
 
-function print() {
+function onPrint() {
   window.print();
 }
 </script>
@@ -180,20 +193,7 @@ function print() {
       </template>
     </QTable>
     <QDialog v-model="isReceiptDialogOpen">
-      <QCard class="q-py-md q-px-xl relative-position">
-        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
-        <QCardSection class="q-pb-none ">
-          <div class="text-h6 text-center q-mb-none text-bold">
-            收據
-          </div>
-        </QCardSection>
-        <QCardSection>
-          <Receipt :data="receiptData" :space-name="space" :is-point-type="paymentMethod === PaymentTypes['點數']" />
-        </QCardSection>
-        <QCardSection class="actions no-print">
-          <QBtn label="列印收據" style="width: 100%; font-size: 16px;" padding="12px 0" color="black" @click="print" />
-        </QCardSection>
-      </QCard>
+      <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" @print="onPrint" />
     </QDialog>
   </div>
 </template>
