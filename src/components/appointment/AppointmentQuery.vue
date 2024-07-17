@@ -2,17 +2,17 @@
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useUserStore } from '@/stores';
-import { TherapyTypes } from '@/const/general';
+import { TherapyTypes, Types } from '@/const/general';
 import dayjs from 'dayjs';
 import { availableReqSchema } from '@/api/appointment';
 
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpace!]);
-const typeOptions = Object.values(TherapyTypes).map((item, idx) => ({
-  label: item,
-  value: idx + 1,
-}));
+const typeOptions = Object.values(Types).map(({ label, identifier }) => ({
+  label,
+  value: identifier,
+})).slice(-3);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
