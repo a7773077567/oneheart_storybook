@@ -22,7 +22,7 @@ const data = computed(() => [
   { label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
   { label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
   { label: '地點', value: userShift.value.space?.name },
-  { label: '醫師', value: userShift.value.name },
+  { label: '醫師', value: userShift.value.user.name },
 ]);
 
 const states = computed(() => [
