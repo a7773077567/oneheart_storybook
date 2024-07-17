@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
-import { getType } from '@/utils/mappers';
+
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
+import { Types } from '@/const/general';
 
 interface Props {
   data: ClientSchedule;
@@ -12,47 +13,15 @@ const props = defineProps<Props>();
 const isCheckedOut = computed(() => props.data.paymentState === 2);
 const beforeCheckIn = computed(() => props.data.state === 1);
 
-// interface State {
-//   identifier: number;
-//   name: string;
-//   label: string;
-//   color: string;
-// }
-// const States: State[] = [
-//   {
-//     identifier: 1,
-//     name: 'appointment',
-//     label: '預約',
-//     color: '#FFFFFF',
-//   },
-//   {
-//     identifier: 2,
-//     name: 'checkIn',
-//     label: '報到',
-//     color: '#88F2D8',
-//   },
-//   {
-//     identifier: 3,
-//     name: 'serviceDone',
-//     label: '完成服務',
-//     color: '#E86969',
-//   },
-//   {
-//     identifier: 4,
-//     name: 'recordDone',
-//     label: '病例完成',
-//     color: '#FFFFFF',
-
-//   },
-// ];
-
 const router = useRouter();
 const paymentInfo = computed(() => SchedulePaymentMap.get(props.data.paymentState)!);
 const stateInfo = computed(() => ScheduleStateMap.get(props.data.state)!);
 const cardBgc = computed(() => paymentInfo.value.cardStyle.bgc);
 const stateLabel = computed(() => stateInfo.value.label);
 const stateColor = computed(() => stateInfo.value.cardStyle?.color);
-const type = computed(() => getType(props.data.userShift.type));
+const isGroupClass = computed(() => props.data.userShift.type === 11);
+const type = computed(() => Object.values(Types).find(type => props.data.userShift.type === type.identifier));
+const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name : type.value?.label);
 </script>
 
 <template>
@@ -61,7 +30,7 @@ const type = computed(() => getType(props.data.userShift.type));
       客戶：{{ data.client.name }}
     </div>
     <p class="booking-card__type">
-      科別：{{ type }}
+      科別：{{ typeLabel }}
     </p>
     <p class="booking-card__state">
       {{ stateLabel }}
