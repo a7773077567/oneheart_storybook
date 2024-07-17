@@ -2,14 +2,13 @@
 import { ref } from 'vue';
 import type { QTableProps } from 'quasar';
 
-import type { Voucher } from '@/api';
 import { PaymentTypes, TransactionTypes } from '@/const/general';
 
-const props = defineProps<{
+defineProps<{
   clientId: string;
 }>();
 
-const rows = ref<Voucher[]>([{
+const rows = ref<any[]>([{
   date: '2024/07/08',
   spaceName: '台北運動場館',
   counts: 10,
@@ -47,19 +46,11 @@ const cols: QTableProps['columns'] = [
     label: '金額/點數',
     align: 'left',
     field: (row) => {
-      switch (row.type) {
-        case TransactionTypes.門診費用:
-        case TransactionTypes.商品購買:
-          return row.payMethod === PaymentTypes.點數 ? row.usedPoint : row.amount;
-
-        case TransactionTypes.點數交易:
-        default:
-          return row.amount;
-      }
+      return row.amount;
     },
   },
   {
-    name: 'counts',
+    name: 'usedGroupClassTicket',
     label: '張數',
     align: 'left',
     field: row => row.counts,

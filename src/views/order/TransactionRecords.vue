@@ -57,9 +57,9 @@ const cols: QTableProps['columns'] = [
     field: (row) => {
       switch (row.type) {
         case TransactionTypes.門診費用:
-        case TransactionTypes.商品購買:
           return row.payMethod === PaymentTypes.點數 ? `${row.usedPoint} 點` : `$ ${row.amount}`;
-
+        case TransactionTypes.團課券購買:
+          return row.usedGroupClassTicket ? `${row.usedGroupClassTicket}張` : '-';
         case TransactionTypes.點數交易:
         default:
           return `$ ${row.amount}`;

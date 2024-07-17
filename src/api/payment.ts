@@ -10,6 +10,7 @@ export interface Payment {
   type: `${TransactionTypes}`;
   payMethod: `${PaymentTypes}`;
   usedPoint: number | null;
+  usedGroupClassTicket: number | null;
   amount: number | null;
   clientId: number;
   clientName: string;
