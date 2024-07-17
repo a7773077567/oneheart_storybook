@@ -30,6 +30,10 @@ const onSubmit = handleSubmit(async (values) => {
   await appointmentStore.getAvailable(appointmentStore.availableQuery);
   appointmentStore.querySent = true;
 });
+
+function dateOptions(date: any) {
+  return date >= dayjs().format('YYYY/MM/DD');
+}
 </script>
 
 <template>
@@ -41,7 +45,7 @@ const onSubmit = handleSubmit(async (values) => {
       <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.userOptions" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
-      <DatePicker name="date" />
+      <DatePicker name="date" :options="dateOptions" />
     </InputBox>
     <InputBox label="選擇預約時間" class="gutter">
       <OTime name="startTime" now-btn />

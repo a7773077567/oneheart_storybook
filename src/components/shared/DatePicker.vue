@@ -9,6 +9,7 @@ interface Props {
   modelValue?: string;
   name?: string;
   range?: boolean;
+  options?: string[] | ((date: any) => boolean);
 }
 
 const props = defineProps<Props>();
@@ -30,7 +31,7 @@ const currentDate = computed<string>(() => {
     <span class="date-picker__label">{{ currentDate }}</span>
     <QIcon name="o_calendar_month" size="28px" class="cursor-pointer">
       <QPopupProxy cover transition-show="scale" transition-hide="scale">
-        <QDate v-model="fieldValue" mask="YYYY-MM-DD" today-btn :range="range">
+        <QDate v-model="fieldValue" mask="YYYY-MM-DD" today-btn :range="range" :options="options">
           <div class="row items-center justify-end">
             <QBtn v-close-popup label="Close" color="primary" flat />
           </div>
