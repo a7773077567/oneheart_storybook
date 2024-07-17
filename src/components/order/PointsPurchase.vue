@@ -3,12 +3,14 @@ import { computed, ref } from 'vue';
 import { CheckTable, Receipt } from '@/components/appointment';
 import { usePointsStore } from '@/stores';
 import dayjs from 'dayjs';
-import { PaymentTypes, PointTypes, ShiftType } from '@/const/general';
+import { PaymentTypes, PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
+import { useQuasar } from 'quasar';
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'cancel'): void;
   (e: 'goBack'): void;
+  (e: 'finish'): void;
 }>();
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
@@ -47,6 +49,7 @@ const summary = computed(() => [
   { key: 'cashDetails', label: '現金', value: pointsStore.topupDetail?.amount, span: true, custom: true },
 ]);
 
+const $q = useQuasar();
 async function submit() {
   const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
 
@@ -58,7 +61,16 @@ async function submit() {
     giftPointGained,
     amount,
     payMethod: selectedPayment.value,
+    authorisationCode: null, // todo, 複合式結帳時需修改
+    receiptNumber: null, // todo, 複合式結帳時需修改
   });
+
+  // todo 顯示收據
+  $q.dialog({
+    message: '儲值成功',
+  }).onOk(() =>
+    emit('finish'),
+  );
 }
 </script>
 

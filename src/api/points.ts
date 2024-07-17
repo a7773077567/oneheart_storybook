@@ -26,6 +26,8 @@ export interface TopupDetail {
   giftPointGained: number;
   amount: number;
   payMethod: PaymentTypes;
+  authorisationCode: string | null; // 信用卡授權碼，如果payMethod!=信用卡，此欄位必為null
+  receiptNumber: string | null; // 信用卡簽單號，如果payMethod!=信用卡，此欄位必為null
 }
 
 export type EditGroupField = Pick<CreateGroupField, 'name' | 'memberClientIds'>;

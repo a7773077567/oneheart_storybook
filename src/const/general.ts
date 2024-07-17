@@ -143,9 +143,10 @@ export enum PointTypes {
   '物理治療' = 1,
   '院長物理治療' = 2,
   '營養' = 3,
+  '教練課' = 4,
 };
 
-export const pointsGroupOptions = Object.keys(PointTypes).slice(3, 6).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
+export const pointsGroupOptions = Object.keys(PointTypes).slice(4, 8).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
 
 // 交易項目
 export enum TransactionTypes {
