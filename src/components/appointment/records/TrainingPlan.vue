@@ -66,7 +66,7 @@ const { handleSubmit, setFieldValue, values, meta } = useForm({
     ...initialValues.value,
     ...((initialValues.value.trainingRecords?.length ?? 0) >= 1
       ? initialValues.value.trainingRecords
-      : { trainingRecords: [oneRecord, oneRecord, oneRecord] }),
+      : { trainingRecords: [oneRecord, oneRecord] }),
   },
 });
 
@@ -92,9 +92,6 @@ function deleteSet(delIdx: number) {
   <div class="form">
     <div class="form__header">
       <div>{{ date }}</div>
-      <!-- <div>
-        <QBtn flat round icon="save" :disable="!meta.dirty" @click="onSubmit" />
-      </div> -->
     </div>
     <div class="form__body">
       <fieldset class="records">
@@ -123,7 +120,7 @@ function deleteSet(delIdx: number) {
             />
             <OInput
               v-else
-              :name="`trainingRecords[${recordIdx}]${oneSet.name}`"
+              :name="`trainingRecords[${recordIdx}].${oneSet.name}`"
               class="records__item"
               hide-bottom-space
             />
