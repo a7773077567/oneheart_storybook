@@ -340,7 +340,6 @@ export const routes: RouteRecordRaw[] = [
             component: () => import('@/views/shift/GroupTemplate.vue'),
             meta: {
               label: '新增團課',
-              gymOnly: true,
             },
           },
           {
