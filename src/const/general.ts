@@ -57,7 +57,7 @@ interface Type {
 
 export const Types: Record<TypeName, Type> = {
   physicalConsultation: {
-    identifier: 1,
+    identifier: ShiftType['物理諮詢門診'],
     name: 'physicalConsultation',
     label: '物理諮詢門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
@@ -66,7 +66,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   physicalTherapy: {
-    identifier: 2,
+    identifier: ShiftType['物理治療門診'],
     name: 'physicalTherapy',
     label: '物理治療門診',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
@@ -75,7 +75,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   footPressure: {
-    identifier: 3,
+    identifier: ShiftType['足壓門診'],
     name: 'footPressure',
     label: '足壓門診',
     tabs: ['clientInfo', 'footPressure', 'bodyAnalysis', 'memo'],
@@ -84,7 +84,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   nutrition: {
-    identifier: 4,
+    identifier: ShiftType['營養門診'],
     name: 'nutrition',
     label: '營養門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
@@ -93,7 +93,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   sleep: {
-    identifier: 5,
+    identifier: ShiftType['睡眠門診'],
     name: 'sleep',
     label: '睡眠門診',
     tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'memo'],
@@ -102,7 +102,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   deanConsultation: {
-    identifier: 6,
+    identifier: ShiftType['院長評估門診'],
     name: 'deanConsultation',
     label: '院長評估門診',
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
@@ -111,7 +111,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   deanTherapy: {
-    identifier: 7,
+    identifier: ShiftType['院長物理治療'],
     name: 'deanTherapy',
     label: '院長物理治療',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
@@ -120,7 +120,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   nutritionConsultation: {
-    identifier: 8,
+    identifier: ShiftType['營養諮詢門診'],
     name: 'nutritionConsultation',
     label: '營養諮詢門診',
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
@@ -129,8 +129,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
   },
   oneOnOne: {
-    identifier: 9,
-    name: 'oneOnOne',
+    identifier: ShiftType['教練課'],
+    name: 'coachClass',
     label: '教練課',
     tabs: ['clientInfo', 'trainingPlan', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
@@ -138,8 +138,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
   },
   sports: {
-    identifier: 10,
-    name: 'sports',
+    identifier: ShiftType['運動諮詢'],
+    name: 'sportConsultation',
     label: '運動諮詢',
     tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
@@ -147,8 +147,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
   },
   group: {
-    identifier: 11,
-    name: 'group',
+    identifier: ShiftType['團課'],
+    name: 'groupClass',
     label: '團課',
     tabs: ['clientInfo', 'groupClass'],
     canUsePoint: false,
