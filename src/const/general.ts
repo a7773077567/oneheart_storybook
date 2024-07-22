@@ -12,6 +12,13 @@ export const TherapyTypes = {
   group: '團課',
 };
 
+// 場館類別
+export enum SpaceType {
+  物理診所 = 1,
+  運動場館 = 2,
+  綜合 = 3,
+}
+
 export const SportTherapyTypes = {
   sports: '運科門診',
   oneOnOne: '教練課',
@@ -45,6 +52,7 @@ interface Type {
   tabs: TabName[];
   canUsePoint: boolean;
   calcAmount: (usePoint?: boolean) => number;
+  spaceType: SpaceType;
 }
 
 export const Types: Record<TypeName, Type> = {
@@ -55,6 +63,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 200,
+    spaceType: SpaceType['物理診所'],
   },
   physicalTherapy: {
     identifier: 2,
@@ -63,6 +72,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
+    spaceType: SpaceType['物理診所'],
   },
   footPressure: {
     identifier: 3,
@@ -71,6 +81,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'footPressure', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
   },
   nutrition: {
     identifier: 4,
@@ -79,6 +90,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
+    spaceType: SpaceType['物理診所'],
   },
   sleep: {
     identifier: 5,
@@ -87,6 +99,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
   },
   deanConsultation: {
     identifier: 6,
@@ -95,6 +108,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 699,
+    spaceType: SpaceType['物理診所'],
   },
   deanTherapy: {
     identifier: 7,
@@ -103,6 +117,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 3000,
+    spaceType: SpaceType['物理診所'],
   },
   nutritionConsultation: {
     identifier: 8,
@@ -111,6 +126,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 499,
+    spaceType: SpaceType['物理診所'],
   },
   oneOnOne: {
     identifier: 9,
@@ -119,6 +135,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'trainingPlan', 'bodyAnalysis', 'memo'],
     canUsePoint: true,
     calcAmount: () => 1650, // to be confirmed
+    spaceType: SpaceType['運動場館'],
   },
   sports: {
     identifier: 10,
@@ -127,6 +144,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo'],
     canUsePoint: false,
     calcAmount: () => 200, // to be confirmed
+    spaceType: SpaceType['運動場館'],
   },
   group: {
     identifier: 11,
@@ -135,6 +153,7 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'groupClass'],
     canUsePoint: false,
     calcAmount: () => 1650, // to be confirmed
+    spaceType: SpaceType['運動場館'],
   },
 };
 

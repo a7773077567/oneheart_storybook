@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { clientSchedulesHistoriesSchema, restoreClientSchedule } from '@/api/appointment';
-import { Types } from '@/const/general';
-import { useAppointmentStore } from '@/stores';
+import { useAppointmentStore, useShiftStore } from '@/stores';
 import { toTypedSchema } from '@vee-validate/zod';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
@@ -9,15 +9,13 @@ import { AppointmentQueryItem } from '@/components/appointment';
 import { removeNullishKeys } from '@/utils/helpers';
 
 const appointmentStore = useAppointmentStore();
-const typeOptions = Object.values(Types).map(type => ({
-  label: type.label,
-  value: type.identifier,
-}));
+const shiftStore = useShiftStore();
+const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(clientSchedulesHistoriesSchema),
   initialValues: {
-    userShiftTypes: typeOptions.map(option => option.value),
+    userShiftTypes: typeOptions.value.map(option => option.value),
     startDate: dayjs().format('YYYY-MM-DD'),
     endDate: dayjs().format('YYYY-MM-DD'),
   },

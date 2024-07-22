@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { AppointmentQueryItem } from '@/components/appointment';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { useAppointmentStore } from '@/stores';
+import { useAppointmentStore, useShiftStore } from '@/stores';
 import { type ClientSchedule, ClientSchedulesNotStartedSchema, cancelClientScheduleNotStarted } from '@/api/appointment';
-import { Types } from '@/const/general';
 import dayjs from 'dayjs';
 import { removeNullishKeys } from '@/utils/helpers';
 import { useQuasar } from 'quasar';
@@ -13,17 +13,15 @@ import { useRouter } from 'vue-router';
 const $q = useQuasar();
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
-const typeOptions = Object.values(Types).map(type => ({
-  label: type.label,
-  value: type.identifier,
-}));
+const shiftStore = useShiftStore();
+const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(ClientSchedulesNotStartedSchema),
   initialValues: {
     phone: '',
     name: '',
-    userShiftTypes: typeOptions.map(option => option.value),
+    userShiftTypes: typeOptions.value.map(option => option.value),
     date: dayjs().format('YYYY-MM-DD'),
   },
 });

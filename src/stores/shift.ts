@@ -3,6 +3,8 @@ import { fetchUsers } from '@/api/user';
 import { fetchAvailableClassesForGym, fetchGroupShiftTemplates, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
 import type { AvailableClassesForGym, GroupShiftTemplate, ShiftTemplate, UserShift, UserShiftsGet } from '@/api/shift';
 import { defineStore } from 'pinia';
+import { useUserStore } from './user';
+import { SpaceType, Types } from '@/const/general';
 
 interface State {
   shiftTemplates: ShiftTemplate[];
@@ -31,6 +33,17 @@ export const useShiftStore = defineStore('shift', {
       }
       const { shiftTemplates, groupClasses } = state.availableClassesForGym;
       return [...shiftTemplates, ...groupClasses];
+    },
+    spaceShiftOptions() {
+      const userStore = useUserStore();
+      if (userStore.currentSpace?.type === SpaceType['綜合']) {
+        return Object.values(Types).map(({ label, identifier }) => ({ label, value: identifier }));
+      }
+
+      return Object.values(Types).filter(({ spaceType }) => spaceType === userStore.currentSpace?.type).map(({ label, identifier }) => ({
+        label,
+        value: identifier,
+      }));
     },
   },
   actions: {

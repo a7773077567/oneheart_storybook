@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { useAppointmentStore, useUserStore } from '@/stores';
+import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
 import { TherapyTypes, Types } from '@/const/general';
 import dayjs from 'dayjs';
 import { availableReqSchema } from '@/api/appointment';
@@ -9,15 +10,13 @@ import { availableReqSchema } from '@/api/appointment';
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
-const typeOptions = Object.values(Types).map(({ label, identifier }) => ({
-  label,
-  value: identifier,
-})).slice(-3);
+const shiftStore = useShiftStore();
+const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
   initialValues: {
-    userShiftType: typeOptions[0].value,
+    userShiftType: typeOptions.value[0].value,
     userIds: appointmentStore.users.map(user => user.id),
     date: dayjs().format('YYYY-MM-DD'),
     startTime: dayjs().startOf('day').format('HH:mm'),
