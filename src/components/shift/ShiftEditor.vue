@@ -2,7 +2,7 @@
 import { useFieldArray, useForm } from 'vee-validate';
 import { ShiftColors } from '@/api/shift';
 import type { UpdateUserShift } from '@/api/shift';
-import { ShiftType, Types } from '@/const/general';
+import { ShiftType } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import { computed } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -11,16 +11,13 @@ import { z } from 'zod';
 
 const props = defineProps<{
   data: any | null;
+  shiftTypeOptions: any[];
 }>();
 const emit = defineEmits<{
   cancel: [state: boolean];
   confirm: [values: UpdateUserShift ];
   close: [];
 }>();
-
-const shiftTypeOptions = Object.values(Types).map(({ label, identifier }) => {
-  return { label, value: identifier };
-}).filter(option => option.value !== ShiftType['團課']);
 
 const userShiftSchema = z.object({
   type: z.number(),

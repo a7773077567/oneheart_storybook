@@ -2,7 +2,7 @@
 import { useFieldArray, useForm } from 'vee-validate';
 import { ShiftColors } from '@/api/shift';
 import type { CreateShiftTemplate } from '@/api/shift';
-import { ShiftType, Types } from '@/const/general';
+import { ShiftType } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import { computed, watch } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 const props = defineProps<{
   data?: any | null;
+  shiftTypeOptions: any[];
 }>();
 const emit = defineEmits<{
   cancel: [state: boolean];
@@ -18,9 +19,6 @@ const emit = defineEmits<{
   close: [];
 }>();
 
-const shiftTypeOptions = Object.values(Types).map(({ label, identifier }) => {
-  return { label, value: identifier };
-}).filter(option => option.value !== ShiftType['團課']);
 const isEditMode = computed(() => !!props.data);
 
 const shiftTemplateSchema = z.object({
@@ -43,7 +41,7 @@ const { handleSubmit, values: formValues, setFieldValue, resetForm } = useForm({
       }
     : {
         maxClientsForCoachClass: null,
-        type: shiftTypeOptions[0].value,
+        type: props.shiftTypeOptions[0].value,
         name: '',
         duration: [0, 0, 0, 0],
         notAvailableTimes: [],

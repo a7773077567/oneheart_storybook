@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { ShiftCard, ShiftTemplateEditor } from '@/components/shift';
 import { type CreateShiftTemplate, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
@@ -60,7 +60,7 @@ function closeShiftTemplateEditor() {
       </h2>
       <QBtn label="新增" icon="add" outline @click="openEditor" />
       <QDialog v-model="isEditorOpen" persistent>
-        <ShiftTemplateEditor :data="shiftStore.targetShiftTemplate" @cancel="isEditorOpen = false" @confirm="onEditorConfirm" @close="closeShiftTemplateEditor" />
+        <ShiftTemplateEditor :data="shiftStore.targetShiftTemplate" :shift-type-options="shiftStore.spaceShiftOptions" @cancel="isEditorOpen = false" @confirm="onEditorConfirm" @close="closeShiftTemplateEditor" />
       </QDialog>
     </div>
     <div class="shift__body ">

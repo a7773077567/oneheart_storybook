@@ -13,8 +13,8 @@ const userStore = useUserStore();
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const duration = ref({ startDate: '', endDate: '' });
-const isAddingShift = ref(false);
-const isUpdatingShift = ref(false);
+const isShiftSelectorOpen = ref(false);
+const isShiftEditorOpen = ref(false);
 const targetDate = ref<string | null >(null);
 const userIds = computed(() => shiftStore.users.map(user => user.id));
 const targetUserId = ref<number | null>(null);
@@ -37,7 +37,7 @@ async function openShiftSelector(date: string, userId: number) {
   await shiftStore.getShiftTemplates();
   targetDate.value = date;
   targetUserId.value = userId;
-  isAddingShift.value = true;
+  isShiftSelectorOpen.value = true;
 }
 
 async function addUserShift(shiftTemplate: UserShiftTemplate) {
@@ -68,7 +68,7 @@ async function addUserShift(shiftTemplate: UserShiftTemplate) {
   await getUserShifts();
   targetUserId.value = null;
   targetDate.value = null;
-  isAddingShift.value = false;
+  isShiftSelectorOpen.value = false;
 }
 
 async function onDeleteUserShift(userShiftId: number) {
@@ -79,14 +79,14 @@ async function onDeleteUserShift(userShiftId: number) {
 async function openShiftEditor(userShiftId: number) {
   await shiftStore.getUserShift(userShiftId);
   targetUserShiftId.value = userShiftId;
-  isUpdatingShift.value = true;
+  isShiftEditorOpen.value = true;
 }
 
 async function onUpdateUserShift(payload: Record<string, any>) {
   await updateUserShift(targetUserShiftId.value!, payload as UpdateUserShift);
   await getUserShifts();
   targetUserShiftId.value = null;
-  isUpdatingShift.value = false;
+  isShiftEditorOpen.value = false;
 }
 
 function onCalendarChange(calendarDuration: ChangeParams) {
@@ -132,11 +132,11 @@ async function getUserShifts() {
         </div>
       </template>
     </Calendar>
-    <QDialog v-model="isAddingShift" persistent>
+    <QDialog v-model="isShiftSelectorOpen" persistent>
       <ShiftSelector :data="targetShiftTemplates" style="min-width: 336px;" @confirm="addUserShift" />
     </QDialog>
-    <QDialog v-model="isUpdatingShift" persistent>
-      <ShiftEditor :data="shiftStore.targetUserShift" user-shift-mode @cancel="isUpdatingShift = false" @confirm="onUpdateUserShift" />
+    <QDialog v-model="isShiftEditorOpen" persistent>
+      <ShiftEditor :data="shiftStore.targetUserShift" :shift-type-options="shiftStore.spaceShiftOptions" @cancel="isShiftEditorOpen = false" @confirm="onUpdateUserShift" />
     </QDialog>
   </div>
 </template>
