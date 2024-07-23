@@ -62,8 +62,8 @@ const onSubmit = handleSubmit.withControlled((values) => {
     <div class="editor__body">
       <OSelect name="type" :options="shiftTypeOptions" disable emit-value map-options dense style="width: 230px;" />
       <OInput name="name" disable style="flex: 1 1 0" label="班別名稱" />
-      <OInput v-show="showMaxClients" name="maxClients" disable dense outlined label="人數上限" style="width: 100px;" />
-      <OInput v-show="showMaxClientsForCoachClass" disable name="maxClientsForCoachClass" label="教練課人數" dense outlined style="width: 100px;" />
+      <OInput v-show="showMaxClients" name="maxClients" type="number" disable dense outlined label="人數上限" style="width: 100px;" />
+      <OInput v-show="showMaxClientsForCoachClass" disable type="number" name="maxClientsForCoachClass" label="教練課人數" dense outlined style="width: 100px;" />
       <MultiNumSelect name="duration" :items="DurationItems" disable label="時間" class="gutter" />
       <div v-show="showNotAvailableTimes" class="not-available">
         <div v-for="(field, idx) in fields" :key="field.key" class="not-available__item">
