@@ -9,6 +9,7 @@ interface Props extends /* @vue-ignore */ Optional<QInputProps, 'modelValue'> {
   dateMode?: boolean;
   label?: string;
   disable?: boolean;
+  type?: QInputProps['type'];
 }
 const props = defineProps<Props>();
 
@@ -23,12 +24,13 @@ const { value, errorMessage } = useField<string>(() => props.name || '', props.c
       {{ label }}
     </div>
     <QInput
-      v-model.number="value"
+      v-model="value"
       :error="!!errorMessage"
       :error-message="errorMessage"
       dense
       outlined
       :disable="disable"
+      :type="type"
     >
       <template #append>
         <QIcon v-if="dateMode" name="o_calendar_month" size="28px" class="cursor-pointer">
