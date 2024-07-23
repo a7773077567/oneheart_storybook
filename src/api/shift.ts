@@ -56,7 +56,6 @@ export interface GroupShiftTemplatePayload {
 export interface UserShift {
   id: number;
   spaceId: number;
-  space?: Space; // this property is for ClientSchedule temporary
   userId: number;
   type: number;
   name: string;
@@ -66,11 +65,6 @@ export interface UserShift {
   notAvailableTimes: Duration[] ;
   color: string;
   maxClients: number | null;
-  user: {
-    id: number;
-    name: string;
-    role: Role;
-  };
   maxClientsForCoachClass: number | null;
   groupClassId: number | null;
 }
@@ -88,7 +82,9 @@ export interface CreateUserShift {
   maxClientsForCoachClass: number | null;
   groupClassId: number | null;
 }
-export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
+export interface UpdateUserShift {
+  notAvailableTimes: Duration[];
+}
 export interface CreateShiftTemplate {
   type: number;
   name: string;
@@ -173,7 +169,7 @@ export async function createUserShift(payload: CreateUserShift) {
   return data;
 }
 
-export async function updateUserShift(userShiftId: number, payload: UserShiftPatch) {
+export async function updateUserShift(userShiftId: number, payload: UpdateUserShift) {
   const { data } = await api.patch(`userShifts/${userShiftId}`, payload);
   return data;
 }

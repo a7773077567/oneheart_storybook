@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { omit } from 'radash';
 import { ShiftChip, ShiftEditor, ShiftSelector } from '@/components/shift';
 import { createUserShift, deleteUserShift, updateUserShift } from '@/api/shift';
-import type { CreateUserShift, UserShiftPatch, UserShiftTemplate } from '@/api/shift';
+import type { CreateUserShift, UpdateUserShift, UserShiftTemplate } from '@/api/shift';
 import dayjs from 'dayjs';
 import { useShiftStore, useUserStore } from '@/stores';
 import type { ChangeParams } from '@/components/shared/Calendar.vue';
@@ -83,7 +83,7 @@ async function openShiftEditor(userShiftId: number) {
 }
 
 async function onUpdateUserShift(payload: Record<string, any>) {
-  await updateUserShift(targetUserShiftId.value!, payload as UserShiftPatch);
+  await updateUserShift(targetUserShiftId.value!, payload as UpdateUserShift);
   await getUserShifts();
   targetUserShiftId.value = null;
   isUpdatingShift.value = false;

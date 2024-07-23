@@ -8,6 +8,7 @@ interface Props extends /* @vue-ignore */ Optional<QInputProps, 'modelValue'> {
   customRule?: any;
   dateMode?: boolean;
   label?: string;
+  disable?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -27,6 +28,7 @@ const { value, errorMessage } = useField<string>(() => props.name || '', props.c
       :error-message="errorMessage"
       dense
       outlined
+      :disable="disable"
     >
       <template #append>
         <QIcon v-if="dateMode" name="o_calendar_month" size="28px" class="cursor-pointer">
