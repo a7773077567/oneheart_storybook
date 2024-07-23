@@ -10,6 +10,7 @@ interface Item {
 
 interface Props {
   items: Item[];
+  label?: string;
   name?: string;
   modelValue?: number[];
   customRule?: any;
@@ -35,27 +36,38 @@ function updateModel(idx: number, val: number) {
 
 <template>
   <div class="multiple-select">
-    <template v-for="(item, idx) in items" :key="idx">
-      <QSelect
-        :model-value="model[idx]"
-        :options="getSequenceOptions(item.count)"
-        emit-value
-        outlined
-        dense
-        :disable="disable"
-        class="multiple-select__item"
-        @update:model-value="val => updateModel(idx, val)"
-      />
-      <span v-if="!!item.label">{{ item.label }}</span>
-    </template>
+    <div v-if="label" class="multiple-select__label">
+      {{ label }}
+    </div>
+    <div class="multiple-select__body">
+      <template v-for="(item, idx) in items" :key="idx">
+        <QSelect
+          :model-value="model[idx]"
+          :options="getSequenceOptions(item.count)"
+          emit-value
+          outlined
+          dense
+          :disable="disable"
+          class="multiple-select__item"
+          @update:model-value="val => updateModel(idx, val)"
+        />
+        <span v-if="!!item.label">{{ item.label }}</span>
+      </template>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .multiple-select {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+  &__label {
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
   &__item {
     max-width: 114px;
     flex: 1 1 0;

@@ -1,36 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useQuasar } from 'quasar';
-import { ShiftCard, ShiftEditor } from '@/components/shift';
-import { type ShiftTemplateReq, type UserShiftPatch, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
+import { ShiftCard, ShiftTemplateEditor } from '@/components/shift';
+import { type CreateShiftTemplate, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
 import { useShiftStore } from '@/stores';
-import { storeToRefs } from 'pinia';
 
 const shiftStore = useShiftStore();
-const { shiftTemplates, targetShiftTemplate } = storeToRefs(shiftStore);
-const { getShiftTemplates } = shiftStore;
 const $q = useQuasar();
-const isCreatingShiftTemplate = ref(false);
-const isUpdatingShiftTemplate = ref(false);
+const isEditorOpen = ref(false);
+const isEditMode = ref(false);
 
-getShiftTemplates();
+shiftStore.getShiftTemplates();
 
-async function onCreateShiftTemplate(values: ShiftTemplateReq) {
-  await createShiftTemplate(values);
-  await getShiftTemplates();
-  isCreatingShiftTemplate.value = false;
+async function onEditorConfirm(values: CreateShiftTemplate) {
+  if (isEditMode.value) {
+    await updateShiftTemplate(shiftStore.targetShiftTemplate!.id, values);
+  }
+  else {
+    await createShiftTemplate(values);
+  }
+  await shiftStore.getShiftTemplates();
+  isEditorOpen.value = false;
+  isEditMode.value = false;
+  shiftStore.targetShiftTemplate = null;
 }
 
-async function openShift(templateId: number) {
-  targetShiftTemplate.value = await fetchShiftTemplate(templateId);
-  isUpdatingShiftTemplate.value = true;
+function openEditor() {
+  isEditMode.value = false;
+  isEditorOpen.value = true;
 }
 
-async function onUpdateShiftTemplate(values: ShiftTemplateReq) {
-  await updateShiftTemplate(targetShiftTemplate.value!.id, values);
-  await getShiftTemplates();
-  targetShiftTemplate.value = null;
-  isUpdatingShiftTemplate.value = false;
+async function openEditorInEditMode(templateId: number) {
+  shiftStore.targetShiftTemplate = await fetchShiftTemplate(templateId);
+  isEditMode.value = true;
+  isEditorOpen.value = true;
 }
 
 async function onDeleteShift(shiftTemplateId: number) {
@@ -39,44 +42,45 @@ async function onDeleteShift(shiftTemplateId: number) {
     message: '是否要刪除此筆班別?',
   }).onOk(async () => {
     await deleteShiftTemplate(shiftTemplateId);
-    getShiftTemplates();
+    shiftStore.getShiftTemplates();
   });
 }
 
-function cancelUpdatingShiftTemplate() {
-  isUpdatingShiftTemplate.value = false;
-  targetShiftTemplate.value = null;
+function closeShiftTemplateEditor() {
+  isEditorOpen.value = false;
+  shiftStore.targetShiftTemplate = null;
 }
 </script>
 
 <template>
   <main class="shift">
-    <div class="shift__header row justify-between items-center gutter">
+    <div class="shift__header">
       <h2 class="text-h6">
         新增班表
       </h2>
-      <QBtn label="新增" icon="add" outline @click="isCreatingShiftTemplate = true" />
-      <QDialog v-model="isCreatingShiftTemplate" persistent>
-        <ShiftEditor @cancel="isCreatingShiftTemplate = false" @confirm="onCreateShiftTemplate" />
-      </QDialog>
-      <QDialog v-model="isUpdatingShiftTemplate" persistent>
-        <ShiftEditor :data="targetShiftTemplate" @cancel="cancelUpdatingShiftTemplate" @confirm="onUpdateShiftTemplate" />
+      <QBtn label="新增" icon="add" outline @click="openEditor" />
+      <QDialog v-model="isEditorOpen" persistent>
+        <ShiftTemplateEditor :data="shiftStore.targetShiftTemplate" @cancel="isEditorOpen = false" @confirm="onEditorConfirm" @close="closeShiftTemplateEditor" />
       </QDialog>
     </div>
-    <div class="shift__body column q-gutter-sm">
-      <ShiftCard
-        v-for="shift in shiftTemplates"
-        :key="shift.id"
-        :data="shift"
-        flat
-        style="border: 1px solid #79747E;"
-        @edit="openShift"
-        @delete="onDeleteShift"
-      />
+    <div class="shift__body ">
+      <ShiftCard v-for="shift in shiftStore.shiftTemplates" :key="shift.id" :data="shift" flat style="border: 1px solid #79747E;" @edit="openEditorInEditMode" @delete="onDeleteShift" />
     </div>
   </main>
 </template>
 
 <style lang="scss" scoped>
-
+.shift {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
 </style>

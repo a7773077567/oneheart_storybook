@@ -7,3 +7,4 @@ export { default as ShiftSelector } from './ShiftSelector.vue';
 export { default as DurationPicker } from './DurationPicker.vue';
 export { default as GroupShiftEditor } from './GroupShiftEditor.vue';
 export { default as GroupShiftCard } from './GroupShiftCard.vue';
+export { default as ShiftTemplateEditor } from './ShiftTemplateEditor.vue';

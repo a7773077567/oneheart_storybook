@@ -1,42 +1,34 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate';
 import { ShiftColors } from '@/api/shift';
-import type { Duration, ShiftTemplate, ShiftTemplateReq, UserShift, UserShiftPatch } from '@/api/shift';
-import { ShiftType, SportTherapyTypes, TherapyTypes, Types } from '@/const/general';
+import type { CreateShiftTemplate, Duration, UserShift, UserShiftPatch } from '@/api/shift';
+import { ShiftType, Types } from '@/const/general';
 import { DurationItems } from '@/const/shift';
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import { computed, watch } from 'vue';
-import { omit } from 'radash';
-import { useUserStore } from '@/stores';
 
-interface Props {
+const props = defineProps<{
   data?: any | null;
   userShiftMode?: boolean;
-}
-
-const props = defineProps<Props>();
+}>();
 const emit = defineEmits<{
   cancel: [state: boolean];
-  confirm: [values: any ];
-  updateConfirm: [values: UserShiftPatch];
+  confirm: [values: CreateShiftTemplate ];
 }>();
 
 dayjs.extend(objectSupport);
-const userStore = useUserStore();
-const isGym = computed(() => userStore.currentSpace?.type === 2);
 const shiftTypeOptions = Object.values(Types).map(({ label, identifier }) => {
   return { label, value: identifier };
 });
-const typeOptions = computed(() => isGym.value ? shiftTypeOptions.slice(8, 10) : shiftTypeOptions.slice(0, 8));
 
 const { handleSubmit, values, setFieldValue } = useForm({
   // validationSchema: toTypedSchema(shiftTemplateSchema),
   initialValues: getInitialValues(),
 });
-const showNotAvailableTimes = computed(() => values.type !== 1);
-const showMaxClients = computed(() => values.type === 1);
-const showMaxClientsForCoachClass = computed(() => values.type === 9);
+const showNotAvailableTimes = computed(() => values.type !== ShiftType['物理諮詢門診']);
+const showMaxClients = computed(() => values.type === ShiftType['物理諮詢門診']);
+const showMaxClientsForCoachClass = computed(() => values.type === ShiftType['教練課']);
 const { fields, push, remove } = useFieldArray<number[]>('notAvailableTimes');
 watch(showNotAvailableTimes, (newVal) => {
   if (!newVal) {
@@ -44,26 +36,21 @@ watch(showNotAvailableTimes, (newVal) => {
   }
 });
 
-const onSubmit = handleSubmit((values) => {
-  const { duration, notAvailableTimes, maxClients, maxClientsForCoachClass, ...needed } = omit(values, ['id', 'spaceId']);
-  if (!props.userShiftMode) {
-    const payload = {
-      ...needed,
-      ...combineTime(duration),
-      notAvailableTimes: notAvailableTimes.map(combineTime),
-      maxClients: maxClients ? +maxClients : null,
-      maxClientsForCoachClass: maxClientsForCoachClass ? +maxClientsForCoachClass : null,
-    };
+const onSubmit = handleSubmit.withControlled((values) => {
+  const { duration, notAvailableTimes, maxClients, maxClientsForCoachClass, ...needed } = values;
+  const payload = props.userShiftMode
+    ? {
+        notAvailableTimes: notAvailableTimes.map(combineTime),
+      }
+    : {
+        ...needed,
+        ...combineTime(duration),
+        notAvailableTimes: notAvailableTimes.map(combineTime),
+        maxClients: maxClients ? +maxClients : null,
+        maxClientsForCoachClass: maxClientsForCoachClass ? +maxClientsForCoachClass : null,
+      };
 
-    emit('confirm', payload);
-  }
-  else {
-    const payload: UserShiftPatch = {
-      notAvailableTimes: notAvailableTimes.map(combineTime),
-    };
-
-    emit('updateConfirm', payload);
-  }
+  emit('confirm', payload);
 });
 
 function getInitialValues() {
@@ -71,7 +58,7 @@ function getInitialValues() {
 
   function createDefault() {
     return {
-      type: typeOptions.value[0].value,
+      type: shiftTypeOptions[0].value,
       name: '',
       duration: [0, 0, 0, 0],
       notAvailableTimes: [],
@@ -91,8 +78,7 @@ function getInitialValues() {
 }
 
 // HH:mm & HH:mm -> [H, m, H, m]
-function splitTime(duration: Duration) {
-  const { startTime, endTime } = duration;
+function splitTime({ startTime, endTime }: Duration) {
   const timeArray = [...startTime.split(':'), ...endTime.split(':')];
   return timeArray.map(time => +time);
 }
@@ -118,7 +104,7 @@ function combineTime(duration: number[]): Duration {
     </QCardSection>
     <QSeparator color="grey-6" />
     <QCardSection>
-      <OSelect name="type" :options="typeOptions" label="班別類別" emit-value map-options outlined dense :disable="userShiftMode" style="width: 230px;" />
+      <OSelect name="type" :options="shiftTypeOptions" label="班別類別" emit-value map-options outlined dense :disable="userShiftMode" style="width: 230px;" />
       <InputBox label="班別名稱">
         <OInput name="name" :disable="userShiftMode" style="flex: 1 1 0" />
       </InputBox>
@@ -132,7 +118,7 @@ function combineTime(duration: number[]): Duration {
           :label="`不可預約時間${idx === 0 ? '' : idx}`"
           class="gutter--sm"
         >
-          <MultiNumSelect v-model="field.value" :items="DurationItems" style="flex: 1 1 0" />
+          <MultiNumSelect v-model="field.value" name="notAvailableTimes" :items="DurationItems" style="flex: 1 1 0" />
           <QBtn icon="o_delete" flat round @click="remove(idx)" />
         </InputBox>
         <QBtn label="新增不可預約時間" icon="add" dense flat class="gutter" @click="push([0, 0, 0, 0])" />

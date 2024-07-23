@@ -7,6 +7,7 @@ interface Props {
   modelValue?: string;
   name?: string;
   disable?: boolean;
+  label?: string;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
@@ -26,22 +27,34 @@ function updateModel(color: string) {
 
 <template>
   <div class="color-picker" :style="{ cursor: disable ? 'not-allowed' : 'pointer' }">
-    <span
-      v-for="(color, idx) in colors"
-      :key="idx"
-      class="color-picker__item"
-      :class="{ 'color-picker__item--active': color === fieldValue }"
-      :style="{ background: color, cursor: disable ? 'not-allowed' : 'pointer', opacity: disable ? '0.6' : '1' }"
-      @click="() => updateModel(color)"
-    />
+    <div class="color-picker__label">
+      {{ label }}
+    </div>
+    <div class="color-picker__body">
+      <span
+        v-for="(color, idx) in colors"
+        :key="idx"
+        class="color-picker__item"
+        :class="{ 'color-picker__item--active': color === fieldValue }"
+        :style="{ background: color, cursor: disable ? 'not-allowed' : 'pointer', opacity: disable ? '0.6' : '1' }"
+        @click="() => updateModel(color)"
+      />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .color-picker {
-  display: flex;
-  align-items: center;
-  gap: 28px;
+  &__label {
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 12px;
+  }
   &__item {
     width: 20px;
     height: 20px;

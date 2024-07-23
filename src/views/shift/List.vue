@@ -82,8 +82,8 @@ async function openShiftEditor(userShiftId: number) {
   isUpdatingShift.value = true;
 }
 
-async function onUpdateUserShift(payload: UserShiftPatch) {
-  await updateUserShift(targetUserShiftId.value!, payload);
+async function onUpdateUserShift(payload: Record<string, any>) {
+  await updateUserShift(targetUserShiftId.value!, payload as UserShiftPatch);
   await getUserShifts();
   targetUserShiftId.value = null;
   isUpdatingShift.value = false;
@@ -136,7 +136,7 @@ async function getUserShifts() {
       <ShiftSelector :data="targetShiftTemplates" style="min-width: 336px;" @confirm="addUserShift" />
     </QDialog>
     <QDialog v-model="isUpdatingShift" persistent>
-      <ShiftEditor :data="shiftStore.targetUserShift" user-shift-mode @cancel="isUpdatingShift = false" @update-confirm="onUpdateUserShift" />
+      <ShiftEditor :data="shiftStore.targetUserShift" user-shift-mode @cancel="isUpdatingShift = false" @confirm="onUpdateUserShift" />
     </QDialog>
   </div>
 </template>

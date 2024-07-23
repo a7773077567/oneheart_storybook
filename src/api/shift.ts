@@ -1,7 +1,5 @@
-import { z } from 'zod';
 import { api } from '@/utils/api';
-import { omit } from 'radash';
-import type { Role, Space, User } from './user';
+import type { Role, Space } from './user';
 
 // ========== Types ==========
 
@@ -91,33 +89,26 @@ export interface CreateUserShift {
   groupClassId: number | null;
 }
 export type UserShiftPatch = Pick<UserShift, 'notAvailableTimes'>;
-export type ShiftTemplateReq = Omit<ShiftTemplate, 'id' | 'spaceId'>;
+export interface CreateShiftTemplate {
+  type: number;
+  name: string;
+  startTime: string;
+  endTime: string;
+  notAvailableTimes: NotAvailableTime[];
+  color: string;
+  maxClients: number | null;
+  maxClientsForCoachClass: number | null;
+}
+
+interface NotAvailableTime {
+  startTime: string;
+  endTime: string;
+}
 export interface UserShiftsGet {
   userIds: number[];
   startDate: string;
   endDate: string;
 }
-
-export const shiftTemplateSchema = z.object({
-  type: z.number(),
-  name: z.string().trim().min(1, { message: '請輸入班別名稱' }),
-  duration: z.number().array(),
-  notAvailableTimes: z.number().array().array(),
-  color: z.string(),
-  maxClients: z.string().optional(),
-}).refine(({ maxClients, type }) => {
-  if (type === 2) {
-    return true;
-  }
-  if (!!maxClients && +maxClients > 0) {
-    return true;
-  }
-  return false;
-}, {
-  message: '必填並輸入大於1的數字',
-  path: ['maxClients'],
-});
-export type ShiftTemplateSchema = z.infer<typeof shiftTemplateSchema>;
 
 export interface ShiftReq {
   id?: number;
@@ -152,12 +143,12 @@ export async function fetchShiftTemplate(shiftTemplateId: number) {
   return data;
 }
 
-export async function createShiftTemplate(payload: ShiftTemplateReq) {
+export async function createShiftTemplate(payload: CreateShiftTemplate) {
   const { data } = await api.post('shiftTemplates', payload);
   return data;
 }
 
-export async function updateShiftTemplate(shiftTemplateId: number, payload: ShiftTemplateReq) {
+export async function updateShiftTemplate(shiftTemplateId: number, payload: CreateShiftTemplate) {
   const { data } = await api.put(`shiftTemplates/${shiftTemplateId}`, payload);
   return data;
 }
