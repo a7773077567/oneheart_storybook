@@ -53,6 +53,7 @@ interface Type {
   canUsePoint: boolean;
   calcAmount: (usePoint?: boolean) => number;
   spaceType: SpaceType;
+  showInOptions: boolean;
 }
 
 export const Types: Record<TypeName, Type> = {
@@ -64,6 +65,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 200,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   physicalTherapy: {
     identifier: ShiftType['物理治療門診'],
@@ -73,6 +75,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   footPressure: {
     identifier: ShiftType['足壓門診'],
@@ -82,6 +85,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 2000,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   nutrition: {
     identifier: ShiftType['營養門診'],
@@ -91,6 +95,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   sleep: {
     identifier: ShiftType['睡眠門診'],
@@ -100,6 +105,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 2000,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   deanConsultation: {
     identifier: ShiftType['院長評估門診'],
@@ -109,6 +115,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 699,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   deanTherapy: {
     identifier: ShiftType['院長物理治療'],
@@ -118,6 +125,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 3000,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   nutritionConsultation: {
     identifier: ShiftType['營養諮詢門診'],
@@ -127,6 +135,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 499,
     spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
   oneOnOne: {
     identifier: ShiftType['教練課'],
@@ -136,6 +145,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: true,
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
+    showInOptions: true,
   },
   sports: {
     identifier: ShiftType['運動諮詢'],
@@ -145,6 +155,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 200, // to be confirmed
     spaceType: SpaceType['運動場館'],
+    showInOptions: true,
   },
   group: {
     identifier: ShiftType['團課'],
@@ -154,6 +165,7 @@ export const Types: Record<TypeName, Type> = {
     canUsePoint: false,
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
+    showInOptions: false,
   },
 };
 

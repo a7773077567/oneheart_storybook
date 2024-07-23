@@ -40,7 +40,7 @@ export const useShiftStore = defineStore('shift', {
         return Object.values(Types).map(({ label, identifier }) => ({ label, value: identifier }));
       }
 
-      return Object.values(Types).filter(({ spaceType }) => spaceType === userStore.currentSpace?.type).map(({ label, identifier }) => ({
+      return Object.values(Types).filter(({ spaceType, showInOptions }) => spaceType === userStore.currentSpace?.type && showInOptions).map(({ label, identifier }) => ({
         label,
         value: identifier,
       }));
