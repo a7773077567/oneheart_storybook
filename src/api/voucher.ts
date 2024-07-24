@@ -1,5 +1,6 @@
 import { api } from '@/utils/api';
 import type { PaymentTypes } from '@/const/general';
+import type { Space } from './user';
 
 export interface GroupClass {
   id: number;
@@ -23,9 +24,22 @@ export interface PurchaseVoucher {
   receiptNumber: string | null; // 信用卡簽單號，如果payMethod!=信用卡，此欄位必為null
 }
 
+export interface Voucher {
+  id: number;
+  space: Space;
+  name: string;
+  useAbleGroupClassTickets: number;
+}
+
 // 購買團課券
 export async function buyGroupClassTickets(param: PurchaseVoucher) {
   await api.post(`/groupClassTickets`, param);
 }
 
 // 移轉團課券
+
+// 客戶已購買的團課券
+export async function getClientVouchers(clientId: number) {
+  const { data } = await api.get<Voucher[]>(`/clients/${clientId}/registeredGroupClasses`);
+  return data;
+}
