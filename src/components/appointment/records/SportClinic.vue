@@ -99,7 +99,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
   </QDialog>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .form {
   display: flex;
   flex-direction: column;
