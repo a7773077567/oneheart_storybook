@@ -24,6 +24,7 @@ export default antfu({
       'PascalCase',
       { registeredComponentsOnly: false },
     ],
+    'vue/singleline-html-element-content-newline': 'off',
 
     // Eslint-Plugin-Eslint-Comment
     'eslint-comments/no-unlimited-disable': 'off',

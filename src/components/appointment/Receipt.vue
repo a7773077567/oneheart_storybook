@@ -1,13 +1,10 @@
 <script setup lang="ts">
-interface Row {
-  name: string | undefined;
-  label: string;
-  value: any;
-}
-
 defineProps<{
-  rows: Row[];
-  paymentMethod: string;
+  rows: {
+    name: string | undefined;
+    label: string;
+    value: any;
+  }[];
   spaceName?: string;
   hideCheckout?: boolean;
 }>();
@@ -22,21 +19,13 @@ defineEmits<{
   <QCard class="q-py-md q-px-xl relative-position">
     <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
     <QCardSection class="q-pb-none no-print">
-      <div class="text-h6 text-center q-mb-md text-bold">
-        結帳確定
-      </div>
-      <div class="text-subtitle2 text-center">
-        確定以{{ paymentMethod }}方式支付，如確定無誤請按按鈕。
-      </div>
+      <div class="text-h6 text-center q-mb-md text-bold">結帳確定</div>
+      <div class="text-subtitle2 text-center">確定以現金方式支付，如確定無誤請按按鈕。</div>
     </QCardSection>
     <QCardSection>
       <div class="receipt">
-        <p class="receipt__title">
-          {{ spaceName }}
-        </p>
-        <p class="receipt__subtitle">
-          醫療費用收據（客戶聯）
-        </p>
+        <p class="receipt__title">{{ spaceName }}</p>
+        <p class="receipt__subtitle">醫療費用收據（客戶聯）</p>
         <div class="receipt__body">
           <table class="table">
             <tr v-for="(row, key) in rows" :key="key">

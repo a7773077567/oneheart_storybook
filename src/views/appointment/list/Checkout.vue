@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { CheckTable, Receipt } from '@/components/appointment';
+import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
 import { ShiftType, Types } from '@/const/general';
-import { PaymentMethod } from '@/const/appointment';
-import { computed, ref, watch } from 'vue';
+import { PaymentMethod, PaymentMethods } from '@/const/appointment';
+import { computed, ref } from 'vue';
 import { checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
+type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const props = defineProps<{
   scheduleId: string;
@@ -21,74 +22,42 @@ const { id: scheduleId, date: scheduleDate, client, userShift } = (appointmentSt
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
-const amountInput = ref('');
+// const amountInput = ref('');
+const totalAmount = ref(2000);
+const payments = ref<Payments>([]);
 
 const info: CheckTableData = [
   { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
   { key: 'type', value: shiftType.value?.label, label: '項目' },
-  { key: 'userName', value: userShift.user.name, label: '治療師' },
+  { key: 'userName', value: userShift?.user.name, label: '治療師' },
 ];
 
-const payment: CheckTableData = [
-  { key: 'title', value: '支付方式', span: true, custom: true },
-  { key: 'payment', span: true, custom: true },
-];
-const selectedPayment = ref(1);
-const isPointType = computed(() => selectedPayment.value === PaymentMethod['點數']);
-const paymentGroup = [
-  { label: '現金', value: PaymentMethod['現金'] },
-  { label: '轉帳', value: PaymentMethod['匯款'] },
-  { label: '信用卡', value: PaymentMethod['信用卡'] },
-  { label: 'Line Pay', value: PaymentMethod.LINEPay },
-  { label: '街口', value: PaymentMethod['街口'] },
-  { label: '點數', value: PaymentMethod['點數'], disable: !shiftType.value?.canUsePoint || !appointmentStore.targetClientGroup.length },
-];
-
-const details = computed<CheckTableData>(() => {
-  const allDetails = [
-    { key: 'selectGroup', custom: true },
-    { key: 'remainingPoints', custom: true },
-    { key: 'amount', span: true, custom: true },
-    { key: 'detailTitle', label: '付款明細', span: true, custom: true },
-    { key: 'cashDetails', label: '現金', span: true, custom: true },
-    { key: 'groupDetails', span: true, custom: true },
-  ];
-  return selectedPayment.value === PaymentMethod['點數']
-    ? allDetails.filter(item => !['cashDetails'].includes(item.key))
-    : allDetails.filter(item => !['selectGroup', 'remainingPoints', 'groupDetails'].includes(item.key));
-},
-);
+// const selectedPayment = ref(1);
+// const isPointType = computed(() => selectedPayment.value === PaymentMethod['點數']);
 const groupOptions = appointmentStore.targetClientGroup.map(item => ({
   label: item.name,
-  value: item.points,
-  id: item.id,
+  value: item.id,
+  points: item.points,
 }));
-const selectedGroup = ref(groupOptions[0]);
-const selectedGroupPoints = computed(() => selectedGroup.value.value);
-const groupDetails = computed(() => [
-  { label: '群組', labelValue: selectedGroup.value.label, value: selectedGroup.value.value },
-  { label: '項目', labelValue: ShiftType[userShift.type], value: -amountInput.value },
-  { label: '剩餘點數', value: selectedGroup.value.value - +amountInput.value },
-]);
 
-watch(isPointType, (newType: boolean) => {
-  if (newType) {
-    return amountInput.value = shiftType.value.calcAmount(true).toString();
-  }
-  amountInput.value = shiftType.value.calcAmount().toString();
-}, { immediate: true });
+// watch(isPointType, (newType: boolean) => {
+//   if (newType) {
+//     return amountInput.value = shiftType.value.calcAmount(true).toString();
+//   }
+//   amountInput.value = shiftType.value.calcAmount().toString();
+// }, { immediate: true });
 
 const spaceName = computed(() => userShift.space?.name);
 
 const receiptData = computed(() => {
   return [
-    { name: 'name', label: '姓名', value: client.name },
+    { name: 'name', label: '病患姓名', value: client.name },
     { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
-    { name: isPointType.value ? 'points' : 'cash', label: isPointType.value ? '點數' : '現金', value: amountInput.value },
+    { name: 'amount', label: '金額', value: getReceiptAmount() },
     { name: 'declaration', label: '健保申報', value: '無' },
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
@@ -96,6 +65,12 @@ const receiptData = computed(() => {
 });
 
 const isReceiptDialogOpen = ref(false);
+const methodOptions = computed(() => {
+  const options = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
+  return appointmentStore.targetClientSchedule?.userShift.type === ShiftType['團課']
+    ? options.filter(option => option.value === PaymentMethod['團課卷'])
+    : options.filter(option => option.value !== PaymentMethod['團課卷']);
+});
 
 function onPrint() {
   window.print();
@@ -103,19 +78,31 @@ function onPrint() {
 
 async function onCheckout() {
   await checkout(scheduleId, {
-    payMethod: selectedPayment.value,
-    payAmount: isPointType.value ? null : +amountInput.value,
-    clientGroupId: isPointType.value ? selectedGroup.value.id : null,
-    pointUsed: isPointType.value ? +amountInput.value : null,
+    totalAmount: totalAmount.value,
+    payments: payments.value,
   });
   router.push({ name: 'appointmentListCalendar' });
+}
+
+function getReceiptAmount() {
+  const total = payments.value.reduce((acc, { payMethod, payAmount }) => {
+    const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
+    if (!paymentDetail.calcInReceipt || payAmount === null) {
+      return acc;
+    }
+    if (!paymentDetail.isDiscount) {
+      return acc += payAmount;
+    }
+    return acc -= payAmount;
+  }, 0);
+  return total;
 }
 </script>
 
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :payment-method="isPointType ? '點數' : '現金'" :space-name="spaceName" @print="onPrint" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :space-name="spaceName" @print="onPrint" @checkout="onCheckout" />
     </QDialog>
 
     <CheckTable :data="info">
@@ -126,64 +113,17 @@ async function onCheckout() {
       </template>
     </CheckTable>
 
-    <CheckTable :data="payment">
-      <template #title="{ data }">
-        <div class="slot-padding">
-          {{ data.value }}
-        </div>
-      </template>
-      <template #payment>
-        <QOptionGroup v-model="selectedPayment" :options="paymentGroup" inline left-label color="black" class="slot-padding--payment q-gutter-x-md" />
-      </template>
-    </CheckTable>
-
-    <CheckTable :data="details ">
-      <template #selectGroup>
-        <div class="slot-padding">
-          <QSelect v-model="selectedGroup" :options="groupOptions" borderless dense hide-bottom-space style="font-size: 16px;" />
-        </div>
-      </template>
-      <template #remainingPoints>
-        <div class="remaining-points slot-padding">
-          <span>群組點數</span>
-          <span>{{ selectedGroupPoints }} 點</span>
-        </div>
-      </template>
-      <template #detailTitle="{ data }">
-        <div class="slot-padding">
-          {{ data.label }}
-        </div>
-      </template>
-      <template #amount>
-        <div class="amount slot-padding">
-          <div class="amount-input">
-            <span>結帳{{ isPointType ? '點數' : '金額' }}：</span>
-            <input v-model="amountInput" type="text" class="amount-input__input">
-            <span>{{ isPointType ? '點' : '元' }}</span>
-          </div>
-          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" @click="isReceiptDialogOpen = true" />
-        </div>
-      </template>
-      <template #cashDetails>
-        <div class="cash-details slot-padding">
-          <span>現金</span>
-          <span>${{ amountInput }}</span>
-        </div>
-      </template>
-      <template #groupDetails>
-        <div class="details slot-padding">
-          <div v-for="(item, idx) in groupDetails" :key="idx" class="details__item">
-            <div class="details__key">
-              <span>{{ item.label }}</span>
-              <span>{{ item.labelValue && `：${item.labelValue}` }}</span>
-            </div>
-            <div class="details__value">
-              {{ item.value }} 點
-            </div>
-          </div>
-        </div>
-      </template>
-    </CheckTable>
+    <div class="actions">
+      <div class="actions__amount">
+        <p>交易總金額：</p>
+        <QInput v-model.number="totalAmount" type="number" outlined dense style="width: 120px;" />
+        <span>元</span>
+      </div>
+      <div class="actions__checkout">
+        <QBtn label="結帳" outline style="width: 150px; font-size: 16px" @click="isReceiptDialogOpen = true" />
+      </div>
+    </div>
+    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
   </div>
 </template>
 
@@ -191,8 +131,25 @@ async function onCheckout() {
 .checkout {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
   width: 676px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #000;
+  &__amount {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    > p {
+      font-weight: 600;
+    }
+  }
 }
 
 .slot-padding {
@@ -242,5 +199,9 @@ async function onCheckout() {
     display: flex;
     justify-content: space-between;
   }
+}
+.checkout-btn {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

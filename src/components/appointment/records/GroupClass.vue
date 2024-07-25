@@ -66,7 +66,7 @@ const onSubmit = handleSubmit(async (val) => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .form {
   display: flex;
   flex-direction: column;

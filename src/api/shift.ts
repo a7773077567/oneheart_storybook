@@ -1,5 +1,5 @@
 import { api } from '@/utils/api';
-import type { Role, Space } from './user';
+import type { Role, Space, User } from './user';
 
 // ========== Types ==========
 
@@ -67,6 +67,8 @@ export interface UserShift {
   maxClients: number | null;
   maxClientsForCoachClass: number | null;
   groupClassId: number | null;
+  space: Space;
+  user: User;
 }
 
 export interface CreateUserShift {

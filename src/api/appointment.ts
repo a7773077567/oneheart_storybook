@@ -233,11 +233,19 @@ export interface ClientGroup {
   points: number;
 }
 
-export interface CheckoutPost {
-  payMethod: number;
-  payAmount: number | null;
-  clientGroupId: number | null;
-  pointUsed: number | null;
+// TODO waiting for API completion
+export interface Checkout {
+  totalAmount: number; // temporary
+  payments: { // temporary
+    payMethod: number;
+    authorisationCode: string | null;
+    receiptNumber: string | null;
+    payAmount: number | null;
+    clientGroupId: number | null;
+    pointUsed: number | null;
+    groupClassTicketUsed: number | null;
+    details: string;
+  }[];
 }
 
 // ========== Requests ==========
@@ -334,8 +342,8 @@ export async function fetchClientGroup(clientId: number) {
   return data;
 }
 
-export async function checkout(scheduleId: number, payload: CheckoutPost) {
-  const { data } = await api.post<any, CheckoutPost>(`clientSchedules/${scheduleId}/checkout`, payload);
+export async function checkout(scheduleId: number, payload: Checkout) {
+  const { data } = await api.post<any, Checkout>(`clientSchedules/${scheduleId}/checkout`, payload);
   return data;
 }
 

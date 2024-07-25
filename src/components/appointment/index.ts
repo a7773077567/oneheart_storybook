@@ -9,3 +9,4 @@ export { default as HistoryChiefComplaints } from './HistoryChiefComplaints.vue'
 export { default as CheckTable } from './CheckTable.vue';
 export { default as Receipt } from './Receipt.vue';
 export { default as AppointmentCountCard } from './AppointmentCountCard.vue';
+export { default as PaymentComposition } from './PaymentComposition.vue';
