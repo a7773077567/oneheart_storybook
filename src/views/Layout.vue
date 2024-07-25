@@ -22,7 +22,7 @@ watch(currentSpaceId, async (newSpaceId) => {
   const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
   setCookie('secondToken', accessToken);
   setCookie('lastSpaceId', newSpaceId);
-  router.go(0);
+  router.push({ name: 'home' });
 });
 
 function optionDisable(option: any): boolean {

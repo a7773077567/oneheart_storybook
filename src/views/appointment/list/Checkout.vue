@@ -22,7 +22,6 @@ const { id: scheduleId, date: scheduleDate, client, userShift } = (appointmentSt
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
-// const amountInput = ref('');
 const totalAmount = ref(2000);
 const payments = ref<Payments>([]);
 
@@ -34,20 +33,11 @@ const info: CheckTableData = [
   { key: 'userName', value: userShift?.user.name, label: '治療師' },
 ];
 
-// const selectedPayment = ref(1);
-// const isPointType = computed(() => selectedPayment.value === PaymentMethod['點數']);
 const groupOptions = appointmentStore.targetClientGroup.map(item => ({
   label: item.name,
   value: item.id,
   points: item.points,
 }));
-
-// watch(isPointType, (newType: boolean) => {
-//   if (newType) {
-//     return amountInput.value = shiftType.value.calcAmount(true).toString();
-//   }
-//   amountInput.value = shiftType.value.calcAmount().toString();
-// }, { immediate: true });
 
 const spaceName = computed(() => userShift.space?.name);
 
@@ -77,6 +67,10 @@ function onPrint() {
 }
 
 async function onCheckout() {
+  console.log(payments.value);
+
+  // TODO waiting for API completion
+  await new Promise(() => {});
   await checkout(scheduleId, {
     totalAmount: totalAmount.value,
     payments: payments.value,
