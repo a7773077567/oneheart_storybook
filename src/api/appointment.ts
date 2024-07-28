@@ -188,11 +188,11 @@ export interface Available {
   appointmentStatus: AppointmentStatus | null;
 }
 
-export interface AppointmentReq {
+export interface CreateAppointment {
   isEmployeePrice: boolean;
   slotId: number | null;
   userShiftId: number;
-  bookingClientId: number;
+  bookingClientIds: number[];
 }
 
 export interface AppointmentRearrangeReq {
@@ -233,14 +233,13 @@ export interface ClientGroup {
   points: number;
 }
 
-// TODO waiting for API completion
 export interface Checkout {
-  totalAmount: number; // temporary
-  payments: { // temporary
+  amount: number;
+  multiChannelPay: {
     payMethod: number;
+    amount: number | null;
     authorisationCode: string | null;
     receiptNumber: string | null;
-    payAmount: number | null;
     clientGroupId: number | null;
     pointUsed: number | null;
     groupClassTicketUsed: number | null;
@@ -260,8 +259,8 @@ export async function fetchTherapists(type: number) {
   return data;
 }
 
-export async function createAppointment(payload: AppointmentReq) {
-  const { data } = await api.post<any, AppointmentReq>('appointments/appointment', payload);
+export async function createAppointment(payload: CreateAppointment) {
+  const { data } = await api.post<any, CreateAppointment>('appointments/appointment', payload);
   return data;
 }
 
