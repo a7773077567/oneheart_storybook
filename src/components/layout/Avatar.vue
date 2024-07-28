@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { removeCookie } from '@/utils/helpers';
 import { useUserStore } from '@/stores';
+
+defineEmits<{
+  logOut: [];
+}>();
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -10,12 +13,6 @@ const router = useRouter();
 
 function goUserSettings() {
   router.push({ name: 'userSettings' });
-}
-
-function logout() {
-  removeCookie('firstToken');
-  removeCookie('secondToken');
-  router.go(0);
 }
 </script>
 
@@ -34,7 +31,7 @@ function logout() {
         </QCardSection>
         <QCardActions vertical>
           <QBtn label="編輯" color="white" unelevated text-color="black" rounded class="q-mb-xs" @click="goUserSettings" />
-          <QBtn label="登出" color="white" unelevated text-color="black" rounded @click="logout" />
+          <QBtn label="登出" color="white" unelevated text-color="black" rounded @click="() => $emit('logOut')" />
         </QCardActions>
       </QCard>
     </QMenu>

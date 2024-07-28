@@ -6,7 +6,7 @@ import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
 import { useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { spaceLogin } from '@/api/user';
-import { getCookie, setCookie } from '@/utils/helpers';
+import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
 
 const userStore = useUserStore();
 const { userInfo, currentSpaceId } = storeToRefs(userStore);
@@ -17,13 +17,12 @@ const spaceOptions = userInfo.value!.spaces.map(({ name, id }) => {
 });
 currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
 
-// const currentSpaceId = ref(lastSpaceId);
 watch(currentSpaceId, async (newSpaceId) => {
   const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
   setCookie('secondToken', accessToken);
   setCookie('lastSpaceId', newSpaceId);
   router.push({ name: 'home' });
-});
+}, { immediate: true });
 
 function optionDisable(option: any): boolean {
   return option.value === currentSpaceId.value;
@@ -34,6 +33,13 @@ const drawerOpen = ref(true);
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
+}
+
+function logout() {
+  removeCookie('firstToken');
+  removeCookie('secondToken');
+  removeCookie('lastSpaceId');
+  router.go(0);
 }
 </script>
 
@@ -46,7 +52,7 @@ function toggleDrawer() {
         <QSpace />
         <div class="row q-gutter-lg items-center">
           <QSelect v-model="currentSpaceId" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
-          <Avatar />
+          <Avatar @log-out="logout" />
         </div>
       </QToolbar>
       <QTabs>
