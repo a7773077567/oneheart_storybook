@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { MultiNumSelect } from '@/components/shared';
 import { DurationItems } from '@/const/shift';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { z } from 'zod';
+import { omit } from 'radash';
 
 interface ConfirmValues {
   numberOfClasses: number;
@@ -16,20 +19,29 @@ const emit = defineEmits<{
   (e: 'confirm', values: ConfirmValues): void;
 }>();
 
-const totalSessions = ref<number>(0);
-const macClients = ref<number>(0);
-const name = ref('');
-const duration = ref<number[]>([]);
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(z.object({
+    numberOfClasses: z.number({ invalid_type_error: '請輸入數字' }).min(1, '需大於1'),
+    maxClientsForGroupClass: z.number({ invalid_type_error: '請輸入數字' }).min(1, '需大於1'),
+    name: z.string().trim().min(1, '必填'),
+    duration: z.number().array(),
+  })),
+  initialValues: {
+    numberOfClasses: 0,
+    maxClientsForGroupClass: 0,
+    name: '',
+    duration: [0, 0, 0, 0],
+  },
+});
 
-function onConfirm() {
-  emit('confirm', {
-    numberOfClasses: +totalSessions.value,
-    maxClientsForGroupClass: +macClients.value,
-    name: name.value,
-    startTime: toTimeString(duration.value[0], duration.value[1]),
-    endTime: toTimeString(duration.value[2], duration.value[3]),
-  });
-}
+const onConfirm = handleSubmit((values) => {
+  const { duration: [startHr, startMin, endHr, endMin] } = values;
+  emit('confirm', omit({
+    ...values,
+    startTime: toTimeString(startHr, startMin),
+    endTime: toTimeString(endHr, endMin),
+  }, ['duration']));
+});
 
 function toTimeString(start: number, end: number) {
   return `${start.toString().padStart(2, '0')}:${end.toString().padStart(2, '0')}`;
@@ -47,16 +59,16 @@ function toTimeString(start: number, end: number) {
     <QSeparator color="grey-6" />
     <QCardSection>
       <InputBox label="堂數" style="width: 100px;">
-        <OInput v-model="totalSessions" type="number" />
+        <OInput name="numberOfClasses" type="number" />
       </InputBox>
       <InputBox label="人數上限" style="width: 100px;">
-        <OInput v-model="macClients" type="number" />
+        <OInput name="maxClientsForGroupClass" type="number" />
       </InputBox>
       <InputBox label="團課名稱">
-        <OInput v-model="name" />
+        <OInput name="name" />
       </InputBox>
       <InputBox label="時間" class="gutter">
-        <MultiNumSelect v-model="duration" :items="DurationItems" style="flex: 1 1 0" />
+        <MultiNumSelect name="duration" :items="DurationItems" style="flex: 1 1 0" />
       </InputBox>
     </QCardSection>
     <QCardActions align="right">

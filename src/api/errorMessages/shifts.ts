@@ -6,6 +6,7 @@ const messages: [string, string][] = [
   ['Out of range value for column \'maxClients\' at row 1', '人數上限過高'],
   ['maxClientsForCoachClass should not be empty or null', '請輸入教練課人數'],
   ['invalid shiftTemplate type for current space', '此場館無法新增此種班別'],
+  ['Same type and name groupClass already exists', '此團課名稱已經存在'],
 ];
 
 export default messages;
