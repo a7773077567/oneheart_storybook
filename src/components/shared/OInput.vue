@@ -34,6 +34,7 @@ const { value, errorMessage } = useField<string>(() => props.name || '', props.c
       :disable="disable"
       :type="type"
       :label="insideLabel"
+      v-bind="$attrs"
     >
       <template #append>
         <QIcon v-if="dateMode" name="o_calendar_month" size="28px" class="cursor-pointer">
@@ -58,6 +59,7 @@ const { value, errorMessage } = useField<string>(() => props.name || '', props.c
       :disable="disable"
       :type="type"
       :label="insideLabel"
+      v-bind="$attrs"
     >
       <template #append>
         <QIcon v-if="dateMode" name="o_calendar_month" size="28px" class="cursor-pointer">
