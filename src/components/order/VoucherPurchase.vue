@@ -1,11 +1,12 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { CheckTable } from '@/components/appointment';
-import { useVoucherStore } from '@/stores';
+import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
+import { useClientStore, useVoucherStore } from '@/stores';
 import dayjs from 'dayjs';
-import { PaymentTypes } from '@/const/general';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
+import { PaymentMethods } from '@/const/appointment';
+import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -14,9 +15,26 @@ const emit = defineEmits<{
 }>();
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
+  type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const voucherStore = useVoucherStore();
-const selectedPayment = ref<PaymentTypes>(PaymentTypes.現金);
+const clientStore = useClientStore();
+const totalAmount = ref<number>(0);
+const payments = ref<Payments>([]);
+const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
+const isCheckoutOpen = ref(false);
+const receiptData = computed(() => {
+  const { clientName, groupClassName } = voucherStore.voucherDetail!;
+  const { identityNumber, birthDate } = clientStore.targetClient!;
+  return [
+    { name: 'name', label: '姓名', value: clientName },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label ?? '' },
+    { name: 'id', label: '身分證字號', value: identityNumber },
+    { name: 'birthDate', label: '出生年月日', value: birthDate },
+    { name: 'groupClassName', label: '課程名稱', value: groupClassName },
+    { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },
+  ];
+});
 
 const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
@@ -27,46 +45,36 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'amount', value: `$ ${(voucherStore.voucherDetail?.amount ?? 0)}`, label: '金額' },
 ]);
 
-const payment: CheckTableData = [
-  { key: 'title', value: '支付方式', span: true, custom: true },
-  { key: 'payment', span: true, custom: true },
-];
-
-const paymentGroup = [
-  { label: '現金', value: PaymentTypes.現金 },
-  { label: '轉帳', value: PaymentTypes.匯款 },
-  { label: '信用卡', value: PaymentTypes.信用卡 },
-  { label: 'Line Pay', value: PaymentTypes.LINEPay },
-  { label: '街口', value: PaymentTypes.街口 },
-];
-
-const summary = computed(() => [
-  { key: 'amount', value: voucherStore.voucherDetail?.amount, span: true, custom: true },
-  { key: 'detailTitle', label: '付款明細', span: true, custom: true },
-  { key: 'cashDetails', label: '現金', value: voucherStore.voucherDetail?.amount, span: true, custom: true },
-]);
-
 const $q = useQuasar();
-async function submit() {
-  console.log(voucherStore.voucherDetail);
-  const { clientId, groupClassId, ticketGained, amount } = voucherStore.voucherDetail as PurchaseVoucher;
-
+async function onCheckout() {
+  const { clientId, groupClassId, ticketGained } = voucherStore.voucherDetail as PurchaseVoucher;
+  const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
+    return { payMethod, amount, authorisationCode, receiptNumber, details };
+  });
+  const hasEmptyPayAmount = multiChannelPay.some(item => !item.amount);
+  if (hasEmptyPayAmount) {
+    $q.dialog({
+      message: '所有支付方式的金額皆需填入',
+    });
+    return;
+  }
   await buyGroupClassTickets({
     clientId,
     groupClassId,
     ticketGained,
-    amount,
-    payMethod: selectedPayment.value,
-    authorisationCode: null, // todo, 複合式結帳時需修改
-    receiptNumber: null, // todo, 複合式結帳時需修改
+    amount: totalAmount.value,
+    multiChannelPay,
   });
 
-  // todo, show recipe
   $q.dialog({
     message: '購買成功',
   }).onOk(() =>
     emit('finish'),
   );
+}
+
+function onPrint() {
+  window.print();
 }
 </script>
 
@@ -80,50 +88,16 @@ async function submit() {
       </template>
     </CheckTable>
 
-    <CheckTable :data="payment">
-      <template #title="{ data }">
-        <div class="slot-padding">
-          {{ data.value }}
-        </div>
-      </template>
-      <template #payment>
-        <QOptionGroup
-          v-model="selectedPayment" :options="paymentGroup" inline left-label color="black"
-          class="slot-padding--payment q-gutter-x-md"
-        />
-      </template>
-    </CheckTable>
-
-    <CheckTable :data="summary">
-      <template #amount="{ data: { value } }">
-        <div class="flex justify-between items-center slot-padding">
-          <div class="summary">
-            <span>結帳金額：</span>
-            <div class="summary_amount">
-              {{ value }}
-            </div>
-            <span>元</span>
-          </div>
-          <QBtn label="結帳" outline style="width: 125px; font-size: 16px" @click="submit" />
-        </div>
-      </template>
-      <template #detailTitle="{ data }">
-        <div class="slot-padding">
-          {{ data.label }}
-        </div>
-      </template>
-      <template #cashDetails="{ data }">
-        <div class="flex justify-between slot-padding">
-          <span>現金</span>
-          <span>$ {{ data.value }}</span>
-        </div>
-      </template>
-    </CheckTable>
+    <CheckoutAction v-model="totalAmount" @checkout="isCheckoutOpen = true" />
+    <PaymentComposition v-model="payments" :method-options="methodOptions" />
 
     <div class="q-my-lg">
       <QBtn outline size="md" label="取消" class="q-px-lg q-mr-md" @click="$emit('cancel')" />
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
+    <QDialog v-model="isCheckoutOpen">
+      <Receipt :rows="receiptData" @checkout="onCheckout" @print="onPrint" />
+    </QDialog>
   </div>
 </template>
 

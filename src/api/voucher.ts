@@ -19,9 +19,13 @@ export interface PurchaseVoucher {
   groupClassId: number;
   ticketGained: number;
   amount: number;
-  payMethod: PaymentTypes;
-  authorisationCode: string | null; // 信用卡授權碼，如果payMethod!=信用卡，此欄位必為null
-  receiptNumber: string | null; // 信用卡簽單號，如果payMethod!=信用卡，此欄位必為null
+  multiChannelPay: {
+    payMethod: number;
+    amount: number | null;
+    authorisationCode: string | null;
+    receiptNumber: string | null;
+    details: string;
+  }[];
 }
 
 export interface Voucher {

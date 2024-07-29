@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
-import { useVoucherStore } from '@/stores';
+import { useClientStore, useVoucherStore } from '@/stores';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const voucherStore = useVoucherStore();
+const clientStore = useClientStore();
 voucherStore.getGroupClass();
 
 const pointsTopupSchema = z.object({
@@ -31,8 +32,11 @@ const { handleSubmit, values, setFieldValue, resetForm } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  voucherStore.voucherDetail = values;
-  console.log('go next', values);
+  const groupClassName = voucherStore.groupClassList.find(item => values.groupClassId === item.id)?.name;
+  voucherStore.voucherDetail = {
+    ...values,
+    groupClassName,
+  };
 
   emit('goNext');
 });
@@ -41,6 +45,7 @@ const showClientSearch = ref(false);
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
+  clientStore.targetClient = client;
 
   setFieldValue('clientId', client.id);
   setFieldValue('clientName', client.name);

@@ -19,56 +19,56 @@ export const PaymentMethods = {
     label: PaymentMethod['1'],
     name: 'cash',
     calcInReceipt: true,
-    forPoints: true,
+    forPointAndGroup: true,
   },
   transfer: {
     identifier: PaymentMethod['匯款'],
     label: PaymentMethod['2'],
     name: 'transfer',
     calcInReceipt: true,
-    forPoints: true,
+    forPointAndGroup: true,
   },
   creditCard: {
     identifier: PaymentMethod['信用卡'],
     label: PaymentMethod['3'],
     name: 'creditCard',
     calcInReceipt: true,
-    forPoints: true,
+    forPointAndGroup: true,
   },
   linePay: {
     identifier: PaymentMethod.LINEPay,
     label: PaymentMethod['4'],
     name: 'linePay',
     calcInReceipt: true,
-    forPoints: true,
+    forPointAndGroup: true,
   },
   jkoPay: {
     identifier: PaymentMethod['街口'],
     label: PaymentMethod['5'],
     name: 'jkoPay',
     calcInReceipt: true,
-    forPoints: true,
+    forPointAndGroup: true,
   },
   point: {
     identifier: PaymentMethod['堂數'],
     label: PaymentMethod['6'],
     name: 'point',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
   },
   groupTicket: {
     identifier: PaymentMethod['團課卷'],
     label: PaymentMethod['7'],
     name: 'groupTicket',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
   },
   supervisorDiscount: {
     identifier: PaymentMethod['主管折扣'],
     label: PaymentMethod['8'],
     name: 'supervisorDiscount',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
 
   },
   coupon: {
@@ -76,7 +76,7 @@ export const PaymentMethods = {
     label: PaymentMethod['9'],
     name: 'coupon',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
 
   },
   voucher: {
@@ -84,7 +84,7 @@ export const PaymentMethods = {
     label: PaymentMethod['10'],
     name: 'voucher',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
 
   },
   promotion: {
@@ -92,7 +92,7 @@ export const PaymentMethods = {
     label: PaymentMethod['11'],
     name: 'promotion',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
 
   },
   deposit: {
@@ -100,7 +100,7 @@ export const PaymentMethods = {
     label: PaymentMethod['12'],
     name: 'deposit',
     calcInReceipt: false,
-    forPoints: false,
+    forPointAndGroup: false,
 
   },
 };
