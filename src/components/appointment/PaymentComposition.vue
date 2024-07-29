@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Checkout } from '@/api';
-import { PaymentMethod } from '@/const/appointment';
+import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { useFieldArray, useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
 
-type Payment = Checkout['payments'][number];
+type Payment = Checkout['multiChannelPay'][number];
 type Option = Record<string, any> & { label: string;value: any };
 
 const props = defineProps<{
@@ -17,13 +17,17 @@ const emit = defineEmits<{
   'update:modelValue': [value: Payment[]];
 }>();
 
+defineExpose({
+  calcReceiptAmount,
+});
+
 const { values } = useForm<{ payments: Payment[] }>({
   initialValues: {
     payments: [{
       payMethod: props.methodOptions[0].value,
-      authorisationCode: '',
-      receiptNumber: '',
-      payAmount: null,
+      amount: null,
+      authorisationCode: null,
+      receiptNumber: null,
       clientGroupId: null,
       pointUsed: null,
       groupClassTicketUsed: null,
@@ -34,7 +38,18 @@ const { values } = useForm<{ payments: Payment[] }>({
 const { fields, push, remove, update } = useFieldArray<Payment>('payments');
 
 watch(values, () => {
-  emit('update:modelValue', values.payments);
+  emit('update:modelValue', values.payments.map((payment) => {
+    const { amount, authorisationCode, receiptNumber, clientGroupId, pointUsed, groupClassTicketUsed, ...needed } = payment;
+    return {
+      ...needed,
+      amount: amount ?? null,
+      authorisationCode: authorisationCode ?? null,
+      receiptNumber: receiptNumber ?? null,
+      clientGroupId: clientGroupId ?? null,
+      pointUsed: pointUsed ?? null,
+      groupClassTicketUsed: groupClassTicketUsed ?? null,
+    };
+  }));
 }, {
   immediate: true,
 });
@@ -50,7 +65,7 @@ function updateSelectedGroup(group: (typeof props.groupOptions)[number], field: 
 function addPayment() {
   push({
     payMethod: props.methodOptions.filter(option => !selectedMethods.value.includes(option.value))[0].value,
-    payAmount: null,
+    amount: null,
     authorisationCode: null,
     receiptNumber: null,
     clientGroupId: null,
@@ -72,6 +87,17 @@ function getAmountLabel(method: number) {
 
 function showExtra(method: number) {
   return method === PaymentMethod['堂數'] || method === PaymentMethod['信用卡'];
+}
+
+function calcReceiptAmount(payments: Payment[]) {
+  const total = payments.reduce((acc, { payMethod, amount }) => {
+    const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
+    if (!paymentDetail.calcInReceipt || amount === null) {
+      return acc;
+    }
+    return acc += amount;
+  }, 0);
+  return total;
 }
 </script>
 
@@ -95,7 +121,7 @@ function showExtra(method: number) {
             </template>
             <template v-else>
               <div class="input__label">{{ getAmountLabel(field.value.payMethod) }}</div>
-              <OInput :name="`payments[${idx}].payAmount`" type="number" style="background-color: white;" />
+              <OInput :name="`payments[${idx}].amount`" type="number" style="background-color: white;" />
             </template>
           </div>
           <div class="input--details">
@@ -160,10 +186,6 @@ function showExtra(method: number) {
     gap: 20px;
     align-items: center;
     margin-bottom: 10px;
-  }
-  &__extra {
-    // padding: 10px 0;
-    // margin-top: -24px;
   }
 }
 

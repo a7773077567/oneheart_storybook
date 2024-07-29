@@ -15,6 +15,7 @@ const props = defineProps<{
   scheduleId: string;
 }>();
 
+const paymentComposition = ref<InstanceType<typeof PaymentComposition> | null>(null);
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 
@@ -33,7 +34,10 @@ const info: CheckTableData = [
   { key: 'userName', value: userShift?.user.name, label: '治療師' },
 ];
 
-const groupOptions = appointmentStore.targetClientGroup.map(item => ({
+const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
+  const appointmentGroupType = Object.values(Types).find(type => type.identifier === userShift.type)?.pointType;
+  return group.type === appointmentGroupType;
+}).map(item => ({
   label: item.name,
   value: item.id,
   points: item.points,
@@ -47,7 +51,7 @@ const receiptData = computed(() => {
     { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
-    { name: 'amount', label: '金額', value: getReceiptAmount() },
+    { name: 'amount', label: '金額', value: paymentComposition.value?.calcReceiptAmount(payments.value) },
     { name: 'declaration', label: '健保申報', value: '無' },
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
@@ -67,29 +71,11 @@ function onPrint() {
 }
 
 async function onCheckout() {
-  console.log(payments.value);
-
-  // TODO waiting for API completion
-  await new Promise(() => {});
   await checkout(scheduleId, {
-    totalAmount: totalAmount.value,
-    payments: payments.value,
+    amount: totalAmount.value,
+    multiChannelPay: payments.value,
   });
   router.push({ name: 'appointmentListCalendar' });
-}
-
-function getReceiptAmount() {
-  const total = payments.value.reduce((acc, { payMethod, payAmount }) => {
-    const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
-    if (!paymentDetail.calcInReceipt || payAmount === null) {
-      return acc;
-    }
-    if (!paymentDetail.isDiscount) {
-      return acc += payAmount;
-    }
-    return acc -= payAmount;
-  }, 0);
-  return total;
 }
 </script>
 
@@ -113,11 +99,12 @@ function getReceiptAmount() {
         <QInput v-model.number="totalAmount" type="number" outlined dense style="width: 120px;" />
         <span>元</span>
       </div>
+
       <div class="actions__checkout">
         <QBtn label="結帳" outline style="width: 150px; font-size: 16px" @click="isReceiptDialogOpen = true" />
       </div>
     </div>
-    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
+    <PaymentComposition ref="paymentComposition" v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
   </div>
 </template>
 

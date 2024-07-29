@@ -1,3 +1,11 @@
+// 點數群組
+export enum PointTypes {
+  '物理治療' = 1,
+  '院長物理治療' = 2,
+  '營養' = 3,
+  '教練課' = 4,
+};
+
 export const TherapyTypes = {
   physicalConsultation: '物理諮詢門診',
   physicalTherapy: '物理治療門診',
@@ -54,6 +62,7 @@ interface Type {
   calcAmount: (usePoint?: boolean) => number;
   spaceType: SpaceType;
   showInOptions: boolean;
+  pointType?: number;
 }
 
 export const Types: Record<TypeName, Type> = {
@@ -76,6 +85,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
+    pointType: PointTypes['物理治療'],
   },
   footPressure: {
     identifier: ShiftType['足壓門診'],
@@ -126,6 +136,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: usePoint => usePoint ? 1 : 3000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
+    pointType: PointTypes['院長物理治療'],
   },
   nutritionConsultation: {
     identifier: ShiftType['營養諮詢門診'],
@@ -136,6 +147,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: () => 499,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
+    pointType: PointTypes['營養'],
   },
   oneOnOne: {
     identifier: ShiftType['教練課'],
@@ -146,6 +158,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
     showInOptions: true,
+    pointType: PointTypes['教練課'],
   },
   sports: {
     identifier: ShiftType['運動諮詢'],
@@ -167,14 +180,6 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
     showInOptions: false,
   },
-};
-
-// 點數群組
-export enum PointTypes {
-  '物理治療' = 1,
-  '院長物理治療' = 2,
-  '營養' = 3,
-  '教練課' = 4,
 };
 
 export const pointsGroupOptions = Object.keys(PointTypes).slice(4, 8).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
