@@ -2,13 +2,15 @@
 import { computed, ref } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
 import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
-import { type PaymentQuery, getPayments, getSinglePayment } from '@/api';
+import { getPayments, getSinglePayment } from '@/api';
+import type { MedicalPaymentRecord, PaymentQuery, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Receipt } from '@/components/appointment';
-import { checkGender } from '@/utils/helpers';
+import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import PaymentDetail from '@/components/order/PaymentDetail.vue';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -20,6 +22,13 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     style: 'width:1px',
     field: row => row.date,
+  },
+  {
+    name: 'spaceName',
+    required: true,
+    label: '場館',
+    align: 'left',
+    field: row => row.spaceName,
   },
   {
     name: 'clientId',
@@ -47,23 +56,40 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '支付方式',
     align: 'left',
-    field: row => PaymentTypes[row.payMethod],
+    field: ({ type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point }) => {
+      switch (type) {
+        case TransactionTypes.門診費用:
+          return Medical.length > 1 ? '複合式結帳' : PaymentTypes[Medical[0].payMethod];
+        case TransactionTypes.團課券購買:
+          return voucher.length > 1 ? '複合式結帳' : PaymentTypes[voucher[0].payMethod];
+        case TransactionTypes.點數交易:
+          return point.length > 1 ? '複合式結帳' : PaymentTypes[point[0].payMethod];
+        default:
+          return '';
+      }
+    },
   },
   {
     name: 'amount',
     required: true,
     label: '金額/點數',
     align: 'left',
-    field: (row) => {
-      switch (row.type) {
+    field: ({ type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point }) => {
+      let amount = 0;
+      switch (type) {
         case TransactionTypes.門診費用:
-          return row.payMethod === PaymentTypes.點數 ? `${row.usedPoint} 點` : `$ ${row.amount}`;
+          amount = calcReceiptAmount(Medical);
+          break;
         case TransactionTypes.團課券購買:
-          return row.usedGroupClassTicket ? `${row.usedGroupClassTicket}張` : '-';
+          amount = calcReceiptAmount(voucher);
+          break;
         case TransactionTypes.點數交易:
+          amount = calcReceiptAmount(point);
+          break;
         default:
-          return `$ ${row.amount}`;
+          amount = 0;
       }
+      return `$ ${amount}`;
     },
   },
   {
@@ -73,9 +99,16 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     field: row => row.id,
   },
+  {
+    name: 'detail',
+    required: true,
+    label: '明細',
+    align: 'left',
+    field: row => row,
+  },
 ];
 
-const rows = ref();
+const rows = ref<(MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord)[]>([]);
 const paging = ref<QPagination['$props']>({
   max: 1,
   modelValue: 1,
@@ -107,7 +140,7 @@ const onSubmit = handleSubmit((values) => {
 async function getRecordList(query: Partial<PaymentQuery>) {
   const { data, meta } = await getPayments(extractValidQuery(query));
   rows.value = data;
-  paging.value = { max: meta.pageCount, modelValue: meta.page };
+  paging.value = { max: meta!.pageCount, modelValue: meta!.page };
 }
 
 function extractValidQuery(query: Partial<PaymentQuery>) {
@@ -123,12 +156,28 @@ getRecordList({});
 const receiptData = ref<ReceiptData>([]);
 const isReceiptDialogOpen = ref(false);
 const space = ref<string | undefined>();
-const paymentMethod = ref<number | undefined>();
 
 async function checkReceipt(paymentId: number) {
-  const { client, amount, date, userShift, spaceName, usedPoint, payMethod } = await getSinglePayment(paymentId);
-  space.value = spaceName;
-  paymentMethod.value = +payMethod;
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay } = await getSinglePayment(paymentId);
+  let amount = 0;
+
+  switch (type) {
+    case TransactionTypes.門診費用:
+      amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
+
+      break;
+    case TransactionTypes.團課券購買:
+      amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
+
+      break;
+    case TransactionTypes.點數交易:
+      amount = calcReceiptAmount(pointPaymentMultiChannelPay);
+
+      break;
+    default:
+      amount = 0;
+  }
+
   receiptData.value = [
     { name: 'name', label: '姓名', value: client.name },
     { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
@@ -136,25 +185,21 @@ async function checkReceipt(paymentId: number) {
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
     { name: 'amount', label: '總額', value: amount },
     { name: 'declaration', label: '健保申報', value: '無' },
-    { name: 'selfPay', label: '自費項目', value: ShiftType[userShift?.type] },
+    { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' },
     { name: 'userName', label: '治療師', value: userShift?.user?.name },
-    { name: 'points', label: '點數', value: usedPoint },
+    { name: 'points', label: '點數', value: '' }, // 複合式結帳的點數怎麼顯示？
     { name: 'date', label: '日期', value: date },
   ];
-
-  // receiptData.value = {
-  //   name: client.name,
-  //   gender: checkGender(client.identityNumber)?.label,
-  //   id: client.identityNumber,
-  //   birthDate: client.birthDate,
-  //   declaration: '無',
-  //   selfPay: ShiftType[userShift.type],
-  //   date,
-  //   userName: userShift?.user?.name,
-  //   amount,
-  //   points: usedPoint,
-  // };
   isReceiptDialogOpen.value = true;
+}
+
+const targetPaymentDetails = ref<InstanceType<typeof PaymentDetail>['$props']['detail']>({} as any);
+const showDetail = ref(false);
+
+async function checkPaymentDetail(val: any) {
+  showDetail.value = true;
+  targetPaymentDetails.value = val;
+  await getSinglePayment(val.id);
 }
 
 function onPrint() {
@@ -191,9 +236,18 @@ function onPrint() {
           <span v-else>-</span>
         </QTd>
       </template>
+      <template #body-cell-detail="{ value }">
+        <QTd>
+          <QBtn v-if="!!value" flat round icon="o_description" @click="checkPaymentDetail(value)" />
+          <span v-else>-</span>
+        </QTd>
+      </template>
     </QTable>
     <QDialog v-model="isReceiptDialogOpen">
       <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" @print="onPrint" />
+    </QDialog>
+    <QDialog v-model="showDetail">
+      <PaymentDetail :detail="targetPaymentDetails" />
     </QDialog>
   </div>
 </template>

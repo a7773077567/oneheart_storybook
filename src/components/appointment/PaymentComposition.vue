@@ -13,29 +13,37 @@ interface GroupOption extends Option {
   points: number;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: Payment[];
   methodOptions: Option[];
   groupOptions?: GroupOption[];
-}>();
+  readonly?: boolean;
+}>(), {
+  readonly: false,
+});
 
 const emit = defineEmits<{
   'update:modelValue': [value: Payment[]];
 }>();
 
+const initVal = computed(() => {
+  return ({
+    payments: props.modelValue?.length >= 0
+      ? props.modelValue
+      : [{
+          payMethod: props.methodOptions[0].value,
+          amount: null,
+          authorisationCode: null,
+          receiptNumber: null,
+          clientGroupId: null,
+          pointUsed: null,
+          groupClassTicketUsed: null,
+          details: '',
+        }],
+  });
+});
 const { values } = useForm<{ payments: Payment[] }>({
-  initialValues: {
-    payments: [{
-      payMethod: props.methodOptions[0].value,
-      amount: null,
-      authorisationCode: null,
-      receiptNumber: null,
-      clientGroupId: null,
-      pointUsed: null,
-      groupClassTicketUsed: null,
-      details: '',
-    }],
-  },
+  initialValues: initVal.value,
 });
 const { fields, push, remove, update } = useFieldArray<Payment>('payments');
 
@@ -110,40 +118,40 @@ function showExtra(method: number) {
         <div class="payment__body">
           <div class="input--method">
             <div class="input__label">支付方式</div>
-            <OSelect :name="`payments[${idx}].payMethod`" :options="methodOptions" :option-disable="disableOption" bg-color="white" />
+            <OSelect :readonly="readonly" :name="`payments[${idx}].payMethod`" :options="methodOptions" :option-disable="disableOption" bg-color="white" />
           </div>
           <div class="input">
             <template v-if="field.value.payMethod === PaymentMethod['團課卷']">
               <div class="input__label">張數</div>
-              <OInput :name="`payments[${idx}].groupClassTicketUsed`" type="number" style="background-color: white;" />
+              <OInput :readonly="readonly" :name="`payments[${idx}].groupClassTicketUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else-if="field.value.payMethod === PaymentMethod['堂數']">
               <div class="input__label">堂數</div>
-              <OInput :name="`payments[${idx}].pointUsed`" type="number" style="background-color: white;" />
+              <OInput :readonly="readonly" :name="`payments[${idx}].pointUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else>
               <div class="input__label">{{ getAmountLabel(field.value.payMethod) }}</div>
-              <OInput :name="`payments[${idx}].amount`" type="number" style="background-color: white;" />
+              <OInput :readonly="readonly" :name="`payments[${idx}].amount`" type="number" style="background-color: white;" />
             </template>
           </div>
           <div class="input--details">
             <div class="input__label">明細</div>
-            <OInput :name="`payments[${idx}].details`" style="background-color: white;" />
+            <OInput :readonly="readonly" :name="`payments[${idx}].details`" style="background-color: white;" />
           </div>
-          <QBtn icon="o_delete" flat round style="translate: 0 10px;" @click="() => remove(idx)" />
+          <QBtn v-if="!readonly" icon="o_delete" flat round style="translate: 0 10px;" @click="() => remove(idx)" />
         </div>
         <div v-if="showExtra(field.value.payMethod)" class="payment__extra">
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
-            <QSelect :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="groupOption => updateSelectedGroup(groupOption, field)" />
+            <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="groupOption => updateSelectedGroup(groupOption, field)" />
             <p class="group__label">剩餘堂數：<span>{{ selectedGroup?.points }}</span></p>
           </div>
           <div v-else-if="field.value.payMethod === PaymentMethod['信用卡']" class="credit-card">
-            <OInput :name="`payments[${idx}].authorisationCode`" inside-label="授權碼" dense outlined style="width: 150px; background-color: white;" />
-            <OInput :name="`payments[${idx}].receiptNumber`" inside-label="簽單號" dense outlined style="background-color: white;" />
+            <OInput :readonly="readonly" :name="`payments[${idx}].authorisationCode`" inside-label="授權碼" dense outlined style="width: 150px; background-color: white;" />
+            <OInput :readonly="readonly" :name="`payments[${idx}].receiptNumber`" inside-label="簽單號" dense outlined style="background-color: white;" />
           </div>
         </div>
       </div>
-      <div class="multi-payment__actions">
+      <div v-if="!readonly" class="multi-payment__actions">
         <QBtn label="增加付款方式" icon="add" flat dense :disable="selectedMethods.length === methodOptions.length" @click="addPayment" />
       </div>
     </div>
