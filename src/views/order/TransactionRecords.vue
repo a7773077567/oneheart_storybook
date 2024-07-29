@@ -74,22 +74,17 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '金額/點數',
     align: 'left',
-    field: ({ type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point }) => {
-      let amount = 0;
+    field: ({ type, amount, ticketGained, paidPointGained, giftPointGained }) => {
       switch (type) {
         case TransactionTypes.門診費用:
-          amount = calcReceiptAmount(Medical);
-          break;
+          return `$${amount}`;
         case TransactionTypes.團課券購買:
-          amount = calcReceiptAmount(voucher);
-          break;
+          return `${ticketGained} 張 / $${amount}`;
         case TransactionTypes.點數交易:
-          amount = calcReceiptAmount(point);
-          break;
+          return `${paidPointGained + giftPointGained} 堂/ $${amount}`;
         default:
           amount = 0;
       }
-      return `$ ${amount}`;
     },
   },
   {
