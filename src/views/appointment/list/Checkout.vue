@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
+import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
 import { ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref } from 'vue';
-import { checkGender } from '@/utils/helpers';
+import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
-
-type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
-type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const props = defineProps<{
   scheduleId: string;
 }>();
 
-const paymentComposition = ref<InstanceType<typeof PaymentComposition> | null>(null);
+type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
+type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
+
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 
@@ -51,7 +50,7 @@ const receiptData = computed(() => {
     { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
-    { name: 'amount', label: '金額', value: paymentComposition.value?.calcReceiptAmount(payments.value) },
+    { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },
     { name: 'declaration', label: '健保申報', value: '無' },
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
@@ -93,18 +92,8 @@ async function onCheckout() {
       </template>
     </CheckTable>
 
-    <div class="actions">
-      <div class="actions__amount">
-        <p>交易總金額：</p>
-        <QInput v-model.number="totalAmount" type="number" outlined dense style="width: 120px;" />
-        <span>元</span>
-      </div>
-
-      <div class="actions__checkout">
-        <QBtn label="結帳" outline style="width: 150px; font-size: 16px" @click="isReceiptDialogOpen = true" />
-      </div>
-    </div>
-    <PaymentComposition ref="paymentComposition" v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
+    <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
+    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
   </div>
 </template>
 
@@ -114,23 +103,6 @@ async function onCheckout() {
   flex-direction: column;
   gap: 30px;
   width: 676px;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  border: 1px solid #000;
-  &__amount {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    > p {
-      font-weight: 600;
-    }
-  }
 }
 
 .slot-padding {

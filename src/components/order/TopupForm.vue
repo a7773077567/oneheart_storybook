@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
-import { usePointsStore } from '@/stores';
+import { useClientStore, usePointsStore } from '@/stores';
 import { pointsPlan } from '@/const/points';
 import { PointTypes } from '@/const/general';
 
@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const pointsStore = usePointsStore();
+const clientStore = useClientStore();
 const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
@@ -48,6 +49,8 @@ const planOptions = computed(() => {
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
+
+  clientStore.targetClient = client;
 
   setFieldValue('clientId', client.id);
   setFieldValue('clientName', client.name);

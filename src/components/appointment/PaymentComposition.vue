@@ -1,25 +1,27 @@
 <script setup lang="ts">
 import type { Checkout } from '@/api';
-import { PaymentMethod, PaymentMethods } from '@/const/appointment';
+import { PaymentMethod } from '@/const/appointment';
 import { useFieldArray, useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
 
 type Payment = Checkout['multiChannelPay'][number];
-type Option = Record<string, any> & { label: string;value: any };
+interface Option {
+  label: string;
+  value: any;
+}
+interface GroupOption extends Option {
+  points: number;
+}
 
 const props = defineProps<{
   modelValue: Payment[];
   methodOptions: Option[];
-  groupOptions: Option[];
+  groupOptions?: GroupOption[];
 }>();
 
 const emit = defineEmits<{
   'update:modelValue': [value: Payment[]];
 }>();
-
-defineExpose({
-  calcReceiptAmount,
-});
 
 const { values } = useForm<{ payments: Payment[] }>({
   initialValues: {
@@ -57,7 +59,7 @@ watch(values, () => {
 const selectedMethods = computed(() => values.payments.map(payment => payment.payMethod));
 const selectedGroup = ref();
 
-function updateSelectedGroup(group: (typeof props.groupOptions)[number], field: any) {
+function updateSelectedGroup(group: GroupOption, field: any) {
   selectedGroup.value = group;
   update(+field.key, { ...field.value, clientGroupId: selectedGroup.value.value });
 }
@@ -89,16 +91,16 @@ function showExtra(method: number) {
   return method === PaymentMethod['堂數'] || method === PaymentMethod['信用卡'];
 }
 
-function calcReceiptAmount(payments: Payment[]) {
-  const total = payments.reduce((acc, { payMethod, amount }) => {
-    const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
-    if (!paymentDetail.calcInReceipt || amount === null) {
-      return acc;
-    }
-    return acc += amount;
-  }, 0);
-  return total;
-}
+// function calcReceiptAmount(payments: Payment[]) {
+//   const total = payments.reduce((acc, { payMethod, amount }) => {
+//     const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
+//     if (!paymentDetail.calcInReceipt || amount === null) {
+//       return acc;
+//     }
+//     return acc += amount;
+//   }, 0);
+//   return total;
+// }
 </script>
 
 <template>

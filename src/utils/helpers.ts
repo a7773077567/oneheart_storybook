@@ -1,4 +1,8 @@
 import { Cookies } from 'quasar';
+import type { Checkout } from '@/api';
+import { PaymentMethods } from '@/const/appointment';
+
+type Payment = Checkout['multiChannelPay'][number];
 
 interface AllCookies {
   firstToken: string;
@@ -62,4 +66,15 @@ export function checkGender(id: string | null) {
     return null;
   }
   return id.slice(1, 2) === '1' ? { name: 'male', label: '男' } : { name: 'female', label: '女' };
+}
+
+export function calcReceiptAmount(payments: Payment[]) {
+  const total = payments.reduce((acc, { payMethod, amount }) => {
+    const paymentDetail = Object.values(PaymentMethods).find(item => item.identifier === payMethod)!;
+    if (!paymentDetail.calcInReceipt || amount === null) {
+      return acc;
+    }
+    return acc += amount;
+  }, 0);
+  return total;
 }
