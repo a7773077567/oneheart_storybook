@@ -1,7 +1,7 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
-import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { PaymentTypes, PointTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { getPayments, getSinglePayment } from '@/api';
 import type { MedicalPaymentRecord, PaymentQuery, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
 import dayjs from 'dayjs';
@@ -72,7 +72,7 @@ const cols: QTableProps['columns'] = [
   {
     name: 'amount',
     required: true,
-    label: '金額/點數',
+    label: '堂(張)數 / 金額',
     align: 'left',
     field: ({ type, amount, ticketGained, paidPointGained, giftPointGained }) => {
       switch (type) {
@@ -153,21 +153,21 @@ const isReceiptDialogOpen = ref(false);
 const space = ref<string | undefined>();
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay } = await getSinglePayment(paymentId);
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName } = await getSinglePayment(paymentId);
   let amount = 0;
-
+  let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
     case TransactionTypes.門診費用:
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-
+      extraFields = [{ name: 'amount', label: '總額', value: amount }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }];
       break;
     case TransactionTypes.團課券購買:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
-
+      extraFields = [{ name: 'groupClassName', label: '課堂名稱', value: groupClassName }, { name: 'amount', label: '金額', value: amount }];
       break;
     case TransactionTypes.點數交易:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: amount }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得點數', value: paidPointGained }, { name: 'giftPointGained', label: '贈送點數', value: giftPointGained }];
       break;
     default:
       amount = 0;
@@ -178,13 +178,9 @@ async function checkReceipt(paymentId: number) {
     { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
-    { name: 'amount', label: '總額', value: amount },
-    { name: 'declaration', label: '健保申報', value: '無' },
-    { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' },
-    { name: 'userName', label: '治療師', value: userShift?.user?.name },
-    { name: 'points', label: '點數', value: '' }, // 複合式結帳的點數怎麼顯示？
-    { name: 'date', label: '日期', value: date },
+    ...extraFields,
   ];
+
   isReceiptDialogOpen.value = true;
 }
 
@@ -194,7 +190,8 @@ const showDetail = ref(false);
 async function checkPaymentDetail(val: any) {
   showDetail.value = true;
   targetPaymentDetails.value = val;
-  await getSinglePayment(val.id);
+  const data = await getSinglePayment(val.id);
+  targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
 }
 
 function onPrint() {

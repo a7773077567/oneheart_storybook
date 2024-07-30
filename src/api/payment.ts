@@ -1,5 +1,5 @@
 import { api } from '@/utils/api';
-import type { PaymentTypes, TransactionTypes } from '@/const/general';
+import type { PaymentTypes, PointTypes, TransactionTypes } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
 import type { UserShift } from './shift';
@@ -16,45 +16,78 @@ interface BasicPaymentRecord {
 // 門診結帳
 export interface MedicalPaymentRecord extends BasicPaymentRecord {
   clientSchedulePaymentMultiChannelPay: {
-    payMethod: number;
-    usedPoint: number;
     amount: number;
     authorisationCode: null | string;
+    detail: string;
+    payMethod: number;
+    pointUsed: number;
     receiptNumber: null | string;
     ticketUsed: number;
+    clientGroupId: null;
   }[];
   groupClassTicketPaymentMultiChannelPay: null;
+  groupClassName: null;
+  paidPointGained: null;
+  pointPaymentClientGroupName: null;
+  pointPaymentClientGroupType: null;
+  pointPaymentPlan: null;
+  pointUsed: number;
   pointPaymentMultiChannelPay: null;
   type: TransactionTypes.門診費用;
+  ticketGained: null;
+  giftPointGained: null;
 }
 
 // 點數購買
 export interface PointsPaymentRecord extends BasicPaymentRecord {
   clientSchedulePaymentMultiChannelPay: null;
   groupClassTicketPaymentMultiChannelPay: null;
+  giftPointGained: number;
+  groupClassName: null;
   pointPaymentMultiChannelPay: {
-    payMethod: number;
     amount: number;
     authorisationCode: null | string;
+    detail: string;
+    payMethod: number;
     receiptNumber: null | string;
+    pointUsed: null;
+    ticketUsed: null;
+    clientGroupId: null;
   }[];
-  type: TransactionTypes.點數交易;
   paidPointGained: number;
-  giftPointGained: number;
+  pointPaymentClientGroupName: string;
+  pointPaymentClientGroupType: PointTypes;
+  pointPaymentPlan: string;
+  pointUsed: null;
+  type: TransactionTypes.點數交易;
+
 }
 
 // 團課券購買
 export interface VoucherPaymentRecord extends BasicPaymentRecord {
   clientSchedulePaymentMultiChannelPay: null;
+  giftPointGained: null;
+  groupClassName: string;
   groupClassTicketPaymentMultiChannelPay: {
-    payMethod: number;
     amount: number;
     authorisationCode: null | string;
+    detail: string;
+    payMethod: number;
     receiptNumber: null | string;
+    pointUsed: null;
+    ticketUsed: null;
+    clientGroupId: null;
   }[];
+
+  paidPointGained: null;
+  pointPaymentClientGroupName: null;
+  pointPaymentClientGroupType: null;
   pointPaymentMultiChannelPay: null;
+  pointPaymentPlan: null;
+  pointUsed: null;
   ticketGained: number;
   type: TransactionTypes.團課券購買;
+
 }
 
 export interface PaymentQuery {
@@ -74,7 +107,7 @@ export async function getPayments(params?: PaymentQuery) {
 }
 
 // 單一交易記錄
-type PaymentDetail = (MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord) & { client: Client; userShift: UserShift | null };
+export type PaymentDetail = (MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord) & { client: Client; userShift: UserShift | null };
 export async function getSinglePayment(paymentId: number) {
   const { data } = await api.get<PaymentDetail>(`payments/${paymentId}`);
   return data;

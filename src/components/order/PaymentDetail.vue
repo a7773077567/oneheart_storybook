@@ -2,17 +2,11 @@
 import { computed } from 'vue';
 import { PaymentMethods } from '@/const/appointment';
 import { CheckTable, PaymentComposition } from '@/components/appointment';
-import type { MedicalPaymentRecord, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
-import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
-
-type PaymentDetail = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
+import type { PaymentDetail } from '@/api';
+import { PointTypes, ShiftType, TransactionTypes } from '@/const/general';
 
 const props = defineProps<{
-  detail: MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord ;
-}>();
-
-defineEmits<{
-  (e: 'update:modelValue', val: PaymentDetail): void;
+  detail: PaymentDetail ;
 }>();
 
 const methodOptions = computed(() => Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier })));
@@ -25,15 +19,15 @@ const purchaseDetail = computed<CheckTableData>(() => {
       return [
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
-        { key: 'type', value: '', label: '項目' },
-        { key: 'userName', value: '', label: '治療師' },
+        { key: 'type', value: data.userShift?.type ? ShiftType[data.userShift.type] : '', label: '項目' },
+        { key: 'userName', value: data.userShift?.user.name ?? '', label: '治療師' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
     case TransactionTypes.團課券購買:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
-        { key: 'classId', value: '', label: '團課名稱' },
+        { key: 'classId', value: data.groupClassName, label: '團課名稱' },
         { key: 'ticketGained', value: `${data.ticketGained} 張`, label: '數量' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
@@ -42,16 +36,16 @@ const purchaseDetail = computed<CheckTableData>(() => {
       return [
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
-        { key: 'pointType', value: '', label: '類別' },
-        { key: 'groupName', value: '', label: '群組' },
-        { key: 'plan', value: '', label: '方案' },
+        { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
+        { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
+        { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
         { key: 'paidPointGained', value: `${data.paidPointGained} 堂`, label: '點堂' },
         { key: 'giftPointGained', value: `${data.giftPointGained} 堂`, label: '贈堂' },
-        { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
   }
 });
 
+type CompositionPayment = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const paymentDetail = computed(() => {
   switch (props.detail.type) {
     case TransactionTypes.團課券購買:
@@ -79,8 +73,8 @@ const paymentDetail = computed(() => {
           </div>
         </template>
       </CheckTable>
-
-      <PaymentComposition readonly :model-value="paymentDetail as PaymentDetail" :method-options="methodOptions" />
+      <!-- @vue-ignore -->
+      <PaymentComposition readonly :model-value="paymentDetail as CompositionPayment" :method-options="methodOptions" />
 
       <div class="payment_detail__sum">
         <p>交易總金額：</p>
