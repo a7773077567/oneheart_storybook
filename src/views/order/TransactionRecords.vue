@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
 import { PaymentTypes, PointTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { getPayments, getSinglePayment } from '@/api';
@@ -113,6 +113,7 @@ const schema = z.object({
   date: z.object({ from: z.string(), to: z.string() }),
   nameOrPhone: z.string().nullable().optional(),
 });
+
 const { handleSubmit, values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: {
@@ -124,30 +125,37 @@ const { handleSubmit, values } = useForm({
 });
 
 const onSubmit = handleSubmit((values) => {
-  getRecordList(extractValidQuery({
-    page: paging.value.modelValue,
-    startDate: values?.date?.from,
-    endDate: values?.date?.to,
+  getRecordList({
+    page: 1, // 重新從第一頁搜尋
+    date: values.date,
     nameOrPhone: values.nameOrPhone ?? '',
-  }));
+  });
 });
 
-async function getRecordList(query: Partial<PaymentQuery>) {
-  const { data, meta } = await getPayments(extractValidQuery(query));
+type Query = z.infer<typeof schema> & { page: number };
+async function getRecordList(query: Query) {
+  const _query = {
+    page: query.page ?? 1,
+    startDate: query.date.from,
+    endDate: query.date.to,
+    ...(query.nameOrPhone ? { nameOrPhone: query.nameOrPhone } : {}),
+  };
+  const { data, meta } = await getPayments(_query);
   rows.value = data;
+
   paging.value = { max: meta!.pageCount, modelValue: meta!.page };
 }
 
-function extractValidQuery(query: Partial<PaymentQuery>) {
-  return {
-    page: query.page ?? 1,
-    startDate: query?.startDate ?? dayjs().startOf('month').format('YYYY-MM-DD'),
-    endDate: query?.endDate ?? dayjs().endOf('month').format('YYYY-MM-DD'),
-    ...(query.nameOrPhone ? { nameOrPhone: query.nameOrPhone } : {}),
-  };
-}
+watch(() => paging.value.modelValue, async (page) => {
+  getRecordList({ page, date: values.date as Query['date'], ...(values.nameOrPhone && { nameOrPhone: values.nameOrPhone }) });
+});
 
-getRecordList({});
+getRecordList({
+  page: 1,
+  date: { from: dayjs().startOf('month').format('YYYY-MM-DD'), to: dayjs().endOf('month').format('YYYY-MM-DD') },
+});
+
+// receipt
 const receiptData = ref<ReceiptData>([]);
 const isReceiptDialogOpen = ref(false);
 const space = ref<string | undefined>();
@@ -212,13 +220,11 @@ function onPrint() {
         <QBtn outline label="搜尋" @click="onSubmit" />
       </div>
     </div>
-
     <div class="flex justify-end q-py-md">
       <QPagination
         v-model="paging.modelValue"
         :max="paging.max"
         input
-        @update:model-value="getRecordList({ page: $event, ...values.date, ...(values.nameOrPhone && { nameOrPhone: values.nameOrPhone }) })"
       />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>

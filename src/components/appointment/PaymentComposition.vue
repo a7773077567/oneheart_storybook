@@ -142,8 +142,13 @@ function showExtra(method: number) {
         </div>
         <div v-if="showExtra(field.value.payMethod)" class="payment__extra">
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
-            <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="groupOption => updateSelectedGroup(groupOption, field)" />
-            <p class="group__label">剩餘堂數：<span>{{ selectedGroup?.points }}</span></p>
+            <template v-if="!readonly">
+              <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="groupOption => updateSelectedGroup(groupOption, field)" />
+              <p class="group__label">剩餘堂數：<span>{{ selectedGroup?.points }}</span></p>
+            </template>
+            <template v-else>
+              <OInput readonly :name="`payments[${idx}].clientGroupName`" inside-label="群組" dense outlined style="background-color: white;" />
+            </template>
           </div>
           <div v-else-if="field.value.payMethod === PaymentMethod['信用卡']" class="credit-card">
             <OInput :readonly="readonly" :name="`payments[${idx}].authorisationCode`" inside-label="授權碼" dense outlined style="width: 150px; background-color: white;" />

@@ -23,7 +23,7 @@ export interface MedicalPaymentRecord extends BasicPaymentRecord {
     pointUsed: number;
     receiptNumber: null | string;
     ticketUsed: number;
-    clientGroupId: null;
+    clientGroupName: null;
   }[];
   groupClassTicketPaymentMultiChannelPay: null;
   groupClassName: null;
@@ -52,7 +52,7 @@ export interface PointsPaymentRecord extends BasicPaymentRecord {
     receiptNumber: null | string;
     pointUsed: null;
     ticketUsed: null;
-    clientGroupId: null;
+    clientGroupName: null;
   }[];
   paidPointGained: number;
   pointPaymentClientGroupName: string;
@@ -76,7 +76,7 @@ export interface VoucherPaymentRecord extends BasicPaymentRecord {
     receiptNumber: null | string;
     pointUsed: null;
     ticketUsed: null;
-    clientGroupId: null;
+    clientGroupName: null;
   }[];
 
   paidPointGained: null;
