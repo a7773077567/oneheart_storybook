@@ -153,7 +153,7 @@ async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
     errMsg = getMultipleErrorMessages(resMsg);
   }
   else {
-    errMsg = ErrorMessages.get(resMsg) ?? '未知的錯誤';
+    errMsg = ErrorMessages.get(resMsg) ?? resMsg;
   }
   await dialogPromise(errMsg);
 
@@ -172,6 +172,6 @@ function dialogPromise(message: string) {
 function getMultipleErrorMessages(msgArr: string[]) {
   return msgArr.map((item) => {
     const msg = ErrorMessages.get(item);
-    return msg ? `<p>${msg}</p>` : '<p>未知的錯誤</p>';
+    return msg ? `<p>${msg}</p>` : `<p>${item}</p>`;
   }).join('');
 }
