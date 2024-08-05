@@ -20,6 +20,7 @@ interface DataItem {
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
+  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -83,14 +84,14 @@ function pasteHistory(history: HistoryChiefComplaint) {
           <div v-for="(item, itemIdx) in items" :key="itemIdx" class="input">
             <div class="input__label">
               <span>{{ item.label }}</span>
-              <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="stateOfHistoryDialog = true" />
+              <QIcon v-if="item.showCopyBtn && !readonly" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="stateOfHistoryDialog = true" />
             </div>
-            <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
+            <OInput :readonly="readonly" :name="item.name" type="textarea" class="input__item" hide-bottom-space />
           </div>
         </div>
       </div>
     </div>
-    <div class="form__actions">
+    <div v-if="!readonly" class="form__actions">
       <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
