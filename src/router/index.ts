@@ -1,41 +1,78 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useUserStore } from '@/stores';
+import { useAppointmentStore, useUserStore } from '@/stores';
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/login/Login.vue'),
-    beforeEnter: loginGuard,
-    meta: {
-      requiredAuth: false,
-    },
-  },
-  {
-    path: '/forget',
-    name: 'forget',
-    component: () => import('@/views/login/Forget.vue'),
-    redirect: { name: 'email' },
+    redirect: { name: 'userLogin' },
     children: [
       {
-        path: 'email',
-        name: 'email',
-        component: () => import('@/views/login/Email.vue'),
+        path: 'user-login',
+        name: 'userLogin',
+        component: () => import('@/views/login/UserLogin.vue'),
+        beforeEnter: loginGuard,
+      },
+      {
+        path: 'space-login',
+        name: 'spaceLogin',
+        component: () => import('@/views/login/SpaceLogin.vue'),
         meta: {
-          requireAuth: false,
+          requiredAuth: true,
         },
       },
       {
-        path: 'confirm',
-        name: 'confirm',
-        component: () => import('@/views/login/Confirm.vue'),
-        meta: {
-          requireAuth: false,
-        },
-        props: route => ({ userId: route.query.id }),
+        path: 'activate',
+        name: 'activate',
+        component: () => import('@/views/login/Activate.vue'),
+        children: [
+          {
+            path: 'email',
+            name: 'activateEmail',
+            component: () => import('@/views/login/ActivateEmail.vue'),
+            meta: {
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'password',
+            name: 'activatePassword',
+            component: () => import('@/views/login/ActivatePassword.vue'),
+            meta: {
+              requiredAuth: true,
+            },
+          },
+        ],
+      },
+      {
+        path: 'forget',
+        name: 'forget',
+        component: () => import('@/views/login/Forget.vue'),
+        redirect: { name: 'email' },
+        beforeEnter: loginGuard,
+        children: [
+          {
+            path: 'email',
+            name: 'email',
+            component: () => import('@/views/login/Email.vue'),
+            meta: {
+              requireAuth: false,
+            },
+          },
+          {
+            path: 'confirm',
+            name: 'confirm',
+            component: () => import('@/views/login/Confirm.vue'),
+            meta: {
+              requireAuth: false,
+            },
+            props: route => ({ token: route.query.token }),
+          },
+        ],
       },
     ],
   },
+
   {
     path: '/',
     name: 'layout',
@@ -70,7 +107,6 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               label: '個人設定',
               requiredAuth: true,
-
             },
           },
         ],
@@ -78,6 +114,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/appointment',
         name: 'appointment',
+        component: () => import('@/views/appointment/Appointment.vue'),
         redirect: { name: 'appointmentList' },
         meta: {
           label: '客戶預約',
@@ -87,16 +124,48 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'list',
             name: 'appointmentList',
-            component: () => import('@/views/appointment/List.vue'),
+            component: () => import('@/views/appointment/list/IndexView.vue'),
+            redirect: { name: 'appointmentListCalendar' },
             meta: {
               label: '預約列表',
               requiredAuth: true,
             },
+            children: [
+              {
+                path: 'calendar',
+                name: 'appointmentListCalendar',
+                component: () => import('@/views/appointment/list/CalendarView.vue'),
+                meta: {
+                  label: '列表',
+                  requiredAuth: true,
+                },
+              },
+              {
+                path: 'info/:scheduleId',
+                name: 'appointmentListInfo',
+                component: () => import('@/views/appointment/list/InfoView.vue'),
+                meta: {
+                  label: '預約資料',
+                  requiredAuth: true,
+                },
+                props: true,
+              },
+              {
+                path: 'checkout/:scheduleId',
+                name: 'appointmentListCheckout',
+                component: () => import('@/views/appointment/list/Checkout.vue'),
+                meta: {
+                  label: '結帳',
+                  requiredAuth: true,
+                },
+                props: true,
+              },
+            ],
           },
           {
             path: 'booking',
             name: 'appointmentBooking',
-            component: () => import('@/views/appointment/Booking.vue'),
+            component: () => import('@/views/appointment/BookingView.vue'),
             meta: {
               label: '預約',
               requiredAuth: true,
@@ -105,11 +174,31 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'current-query',
             name: 'appointmentCurrentQuery',
-            component: () => import('@/views/appointment/CurrentQuery.vue'),
+            component: () => import('@/views/appointment/currentQuery/IndexView.vue'),
+            redirect: { name: 'appointmentCurrentQueryList' },
             meta: {
               label: '查詢預約',
               requiredAuth: true,
             },
+            children: [
+              {
+                path: 'list',
+                name: 'appointmentCurrentQueryList',
+                component: () => import('@/views/appointment/currentQuery/ListView.vue'),
+                meta: {
+                  requiredAuth: true,
+                },
+              },
+              {
+                path: 'rearrange',
+                name: 'appointmentCurrentQueryRearrange',
+                component: () => import('@/views/appointment/currentQuery/RearrangeView.vue'),
+                meta: {
+                  requiredAuth: true,
+                },
+                beforeEnter: rearrangeGuard,
+              },
+            ],
           },
           {
             path: 'history-query',
@@ -130,6 +219,45 @@ export const routes: RouteRecordRaw[] = [
           label: '客戶管理',
           requiredAuth: true,
         },
+        redirect: { name: 'clientList' },
+        children: [
+          {
+            path: 'list',
+            name: 'clientList',
+            component: () => import('@/views/client/ClientList.vue'),
+            meta: {
+              label: '客戶總表',
+              requiredAuth: true,
+            },
+            children: [
+              {
+                path: 'info/:clientId',
+                name: 'clientInfo',
+                component: () => import('@/views/client/ClientInfo.vue'),
+                props: true,
+                meta: {
+                  customLabel: true,
+                  label: '客戶編號',
+                  requiredAuth: true,
+                  notShownInSidebar: true,
+                },
+                beforeEnter: (to) => {
+                  to.meta.label = `客戶編號 - ${to.params.clientId}`;
+                  return true;
+                },
+              },
+            ],
+          },
+          {
+            path: 'add',
+            name: 'clientAdding',
+            component: () => import('@/views/client/ClientAdd.vue'),
+            meta: {
+              label: '新增客戶',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
         path: '/store',
@@ -145,14 +273,44 @@ export const routes: RouteRecordRaw[] = [
         name: 'order',
         component: () => import('@/views/order/Order.vue'),
         meta: {
-          label: '訂單與付款',
+          label: '交易管理',
           requiredAuth: true,
         },
+        redirect: { name: 'pointsTopup' },
+        children: [
+          {
+            path: 'points-topup',
+            name: 'pointsTopup',
+            component: () => import('@/views/order/PointsTopup.vue'),
+            meta: {
+              label: '點數儲值',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'group-class-voucher',
+            name: 'GroupClassVoucher',
+            component: () => import('@/views/order/GroupClassVoucher.vue'),
+            meta: {
+              label: '功能性團課券',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'transaction-records',
+            name: 'transactionRecords',
+            component: () => import('@/views/order/TransactionRecords.vue'),
+            meta: {
+              label: '查詢交易紀錄',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
-        path: '/schedule',
-        name: 'schedule',
-        redirect: { name: 'scheduleList' },
+        path: '/shift',
+        name: 'shift',
+        redirect: { name: 'shiftList' },
         meta: {
           label: '排班',
           requiredAuth: true,
@@ -160,26 +318,34 @@ export const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'list',
-            name: 'scheduleList',
-            component: () => import('@/views/schedule/List.vue'),
+            name: 'shiftList',
+            component: () => import('@/views/shift/List.vue'),
             meta: {
               label: '班表列表 ',
               requiredAuth: true,
             },
           },
           {
-            path: 'shift',
-            name: 'scheduleShift',
-            component: () => import('@/views/schedule/Shift.vue'),
+            path: 'template',
+            name: 'shiftTemplate',
+            component: () => import('@/views/shift/Template.vue'),
             meta: {
               label: '新增班別',
               requiredAuth: true,
             },
           },
           {
+            path: 'group-template',
+            name: 'groupShiftTemplate',
+            component: () => import('@/views/shift/GroupTemplate.vue'),
+            meta: {
+              label: '新增團課',
+            },
+          },
+          {
             path: 'query',
-            name: 'scheduleQuery',
-            component: () => import('@/views/schedule/Query.vue'),
+            name: 'shiftQuery',
+            component: () => import('@/views/shift/Query.vue'),
             meta: {
               label: '查詢班表',
               requiredAuth: true,
@@ -188,13 +354,57 @@ export const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        path: '/staff',
-        name: 'staff',
-        component: () => import('@/views/staff/Staff.vue'),
+        path: '/user',
+        name: 'user',
+        component: () => import('@/views/user/UserView.vue'),
+        redirect: { name: 'userList' },
         meta: {
           label: '人員設定',
           requiredAuth: true,
         },
+        children: [
+          {
+            path: 'list',
+            name: 'userList',
+            component: () => import('@/views/user/ListView.vue'),
+            children: [
+              {
+                path: 'edit',
+                name: 'userEdition',
+                component: () => import('@/views/user/EditView.vue'),
+                props: route => ({ userId: route.query.userId }),
+                meta: {
+                  label: '編輯',
+                  requiredAuth: true,
+                  notShownInSidebar: true,
+                },
+              },
+            ],
+            meta: {
+              label: '人員總表',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'add',
+            name: 'userAdding',
+            component: () => import('@/views/user/AddView.vue'),
+            meta: {
+              label: '人員新增',
+              requiredAuth: true,
+            },
+          },
+          // {
+          //   path: 'list/edit',
+          //   name: 'userEdition',
+          //   component: () => import('@/views/user/EditView.vue'),
+          //   meta: {
+          //     label: '編輯',
+          //     requiredAuth: true,
+          //     notShownInSidebar: true,
+          //   },
+          // },
+        ],
       },
       {
         path: '/gym',
@@ -221,6 +431,7 @@ router.beforeEach(async (to) => {
   if (!needAuth) {
     return;
   }
+
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) {
     return { name: 'login' };
@@ -242,6 +453,13 @@ async function loginGuard() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     return { name: 'home' };
+  }
+}
+
+function rearrangeGuard() {
+  const appointmentStore = useAppointmentStore();
+  if (!appointmentStore.targetClientScheduleNotStarted) {
+    router.push({ name: 'appointmentCurrentQuery' });
   }
 }
 

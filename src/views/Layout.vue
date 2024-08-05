@@ -1,8 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { RouterView } from 'vue-router';
+import { ref, watch } from 'vue';
+import { RouterView, useRouter } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
+import { useUserStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { spaceLogin } from '@/api/user';
+import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
+
+const userStore = useUserStore();
+const { userInfo, currentSpaceId } = storeToRefs(userStore);
+const router = useRouter();
+
+const spaceOptions = userInfo.value!.spaces.map(({ name, id }) => {
+  return { label: name, value: id };
+});
+currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
+
+watch(currentSpaceId, async (newSpaceId) => {
+  const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
+  setCookie('secondToken', accessToken);
+  setCookie('lastSpaceId', newSpaceId);
+  router.push({ name: 'home' });
+}, { immediate: true });
+
+function optionDisable(option: any): boolean {
+  return option.value === currentSpaceId.value;
+}
 
 const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
@@ -10,18 +34,26 @@ const drawerOpen = ref(true);
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
 }
+
+function logout() {
+  removeCookie('firstToken');
+  removeCookie('secondToken');
+  removeCookie('lastSpaceId');
+  router.go(0);
+}
 </script>
 
 <template>
   <QLayout view="hHh LpR lFf">
-    <QHeader elevated class="bg-primary text-white q-px-sm q-pt-sm" height-hint="98">
+    <QHeader elevated class="bg-white text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
       <QToolbar>
         <QBtn dense flat round icon="menu" @click="toggleDrawer" />
-        <QAvatar class="q-ml-lg">
-          <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-        </QAvatar>
+        <img src="/images/one-heart.png" class="q-ml-md" style="display: block; height: 45px;">
         <QSpace />
-        <Avatar />
+        <div class="row q-gutter-lg items-center">
+          <QSelect v-model="currentSpaceId" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
+          <Avatar @log-out="logout" />
+        </div>
       </QToolbar>
       <QTabs>
         <QRouteTab
@@ -34,8 +66,8 @@ function toggleDrawer() {
     </QHeader>
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
-      <QPage padding>
-        <Breadcrumbs class="q-mb-lg" />
+      <QPage class="q-py-md q-px-lg">
+        <Breadcrumbs class="gutter--sm breadcrumb" />
         <RouterView />
       </QPage>
     </QPageContainer>
@@ -43,5 +75,24 @@ function toggleDrawer() {
 </template>
 
 <style lang="scss" scoped>
-
+:deep(.space-selector) {
+  .q-field__control {
+    min-height: fit-content;
+  }
+  .q-field__native {
+    min-height: fit-content;
+    padding: 4.5px 38px;
+    background-color: #ddd;
+    border-radius: 15px 15px 0 0;
+  }
+}
+main.q-page {
+  height: calc(100vh - 106px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  > *:not(.breadcrumb) {
+    overflow: auto;
+  }
+}
 </style>

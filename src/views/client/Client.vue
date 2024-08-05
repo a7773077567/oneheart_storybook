@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main>Client</main>
+  <RouterView />
 </template>
 
 <style lang="scss" scoped>

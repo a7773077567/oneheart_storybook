@@ -1,0 +1,80 @@
+<script setup lang="ts">
+import { useField } from 'vee-validate';
+import type { ShiftColors } from '@/api/shift';
+
+interface Props {
+  colors: string[] | typeof ShiftColors ;
+  modelValue?: string;
+  name?: string;
+  disable?: boolean;
+  label?: string;
+}
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  'update:modelValue': [model: string];
+}>();
+
+const { value: fieldValue, setValue } = useField<string>(() => props.name || 'field');
+
+function updateModel(color: string) {
+  if (props.disable) {
+    return;
+  }
+  setValue(color);
+  emit('update:modelValue', fieldValue.value);
+}
+</script>
+
+<template>
+  <div class="color-picker" :style="{ cursor: disable ? 'not-allowed' : 'pointer' }">
+    <div class="color-picker__label">
+      {{ label }}
+    </div>
+    <div class="color-picker__body">
+      <span
+        v-for="(color, idx) in colors"
+        :key="idx"
+        class="color-picker__item"
+        :class="{ 'color-picker__item--active': color === fieldValue }"
+        :style="{ background: color, cursor: disable ? 'not-allowed' : 'pointer', opacity: disable ? '0.6' : '1' }"
+        @click="() => updateModel(color)"
+      />
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.color-picker {
+  &__label {
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 12px;
+  }
+  &__item {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    &::before {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 0 2px white;
+      border-radius: 50%;
+      scale: 0;
+      transition: 120ms scale ease-in-out;
+    }
+    &--active::before {
+      scale: 1;
+    }
+  }
+}
+</style>

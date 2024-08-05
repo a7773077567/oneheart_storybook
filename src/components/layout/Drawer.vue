@@ -13,12 +13,13 @@ const drawerOpen = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
 });
-const { currentRoute, currentMatched } = useLayoutRoute();
+const { currentMatched } = useLayoutRoute();
+
 const drawerItems = computed(() => currentMatched.value[0].children);
 </script>
 
 <template>
-  <QDrawer v-if="drawerItems?.length" v-model="drawerOpen" show-if-above side="left" :width="200" class="bg-grey-3 q-pl-md">
+  <QDrawer v-if="drawerItems?.length" v-model="drawerOpen" show-if-above side="left" :width="220" class="bg-white text-black q-pl-md shadow-5">
     <QScrollArea class="fit">
       <QList>
         <QItem
@@ -26,7 +27,7 @@ const drawerItems = computed(() => currentMatched.value[0].children);
           :key="idx"
           v-ripple
           clickable
-          :active="currentRoute === item.name"
+          :active="currentMatched[1].name === item.name"
           active-class="drawer-item--active"
           class="drawer-item"
           @click="$router.push({ name: item.name })"
@@ -45,7 +46,7 @@ const drawerItems = computed(() => currentMatched.value[0].children);
   border-radius: 30px 0 0 30px;
   color: #000;
   &--active {
-    background: #fff;
+    background: #ddd;
   }
 }
 </style>

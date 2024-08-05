@@ -13,14 +13,16 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@anatine/zod-mock": "^3.13.3",
     "@azure/msal-browser": "^3.10.0",
     "@quasar/extras": "^1.16.9",
+    "@quasar/quasar-ui-qcalendar": "^4.0.0-beta.19",
     "@vee-validate/zod": "^4.12.5",
     "axios": "^1.6.5",
     "dayjs": "^1.11.10",
+    "konva": "^9.3.6",
     "pinia": "^2.1.7",
     "quasar": "^2.14.2",
+    "radash": "^12.1.0",
     "vee-validate": "^4.12.5",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",

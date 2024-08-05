@@ -46,7 +46,8 @@ summary,
 time,
 mark,
 audio,
-video {
+video,
+fieldset {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -92,7 +93,7 @@ pre {
   white-space: pre-wrap;
 }
 
-*::-webkit-scrollbar {
-  display: none;
-}
+// *::-webkit-scrollbar {
+//   display: none;
+// }
 
