@@ -10,6 +10,7 @@ import { useQuasar } from 'quasar';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
+  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -48,6 +49,7 @@ const onSubmit = handleSubmit(async (val) => {
           <span>備註</span>
         </div>
         <OInput
+          :readonly="readonly"
           name="note"
           type="textarea"
           class="input__item"
@@ -55,7 +57,7 @@ const onSubmit = handleSubmit(async (val) => {
         />
       </div>
     </div>
-    <div class="flex justify-end">
+    <div v-if="!readonly" class="flex justify-end">
       <QBtn
         label="儲存"
         style="width: 100px"

@@ -11,6 +11,7 @@ import { extractUuidFromS3Url } from '@/utils/helpers';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
+  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -60,7 +61,7 @@ const onSubmit = handleSubmit(async (formValue) => {
     <div class="form__body">
       <div class="row q-gutter-xl">
         <div class="column q-gutter-md">
-          <OFile v-model="staticAttachments" label="靜態足壓檔案" multiple />
+          <OFile v-if="!readonly" v-model="staticAttachments" label="靜態足壓檔案" multiple />
           <div class="preview_files">
             <OPreview
               v-for="(attachment, idx) in staticDisplayAttachments" :key="attachment.name"
@@ -70,7 +71,7 @@ const onSubmit = handleSubmit(async (formValue) => {
           </div>
         </div>
         <div class="column q-gutter-md">
-          <OFile v-model="dynamicAttachments" label="動態足壓檔案" multiple />
+          <OFile v-if="!readonly" v-model="dynamicAttachments" label="動態足壓檔案" multiple />
           <div class="preview_files">
             <OPreview
               v-for="(attachment, idx) in dynamicDisplayAttachments" :key="attachment.name"
@@ -81,10 +82,10 @@ const onSubmit = handleSubmit(async (formValue) => {
         </div>
       </div>
       <InputBox label="備註" label-weight="400">
-        <OInput name="note" type="textarea" />
+        <OInput :readonly="readonly" name="note" type="textarea" />
       </InputBox>
     </div>
-    <div class="form__actions">
+    <div v-if="!readonly" class="form__actions">
       <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
   </div>

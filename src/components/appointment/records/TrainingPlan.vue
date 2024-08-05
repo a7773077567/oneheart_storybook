@@ -13,6 +13,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
+  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -111,15 +112,18 @@ function deleteSet(delIdx: number) {
             :key="idx"
             class="records__val"
           >
-            <QBtn
-              v-if="oneSet.name === 'del'"
-              flat
-              round
-              icon="delete"
-              @click="deleteSet(recordIdx)"
-            />
+            <div v-if="oneSet.name === 'del'">
+              <QBtn
+                v-if="!readonly"
+                flat
+                round
+                icon="delete"
+                @click="deleteSet(recordIdx)"
+              />
+            </div>
             <OInput
               v-else
+              :readonly="readonly"
               :name="`trainingRecords[${recordIdx}].${oneSet.name}`"
               class="records__item"
               hide-bottom-space
@@ -127,7 +131,7 @@ function deleteSet(delIdx: number) {
           </div>
         </template>
       </fieldset>
-      <div>
+      <div v-if="!readonly">
         <QBtn flat label="新增下一列" icon="o_add" @click="addNewSet" />
       </div>
       <fieldset
@@ -139,6 +143,7 @@ function deleteSet(delIdx: number) {
           <span>{{ item.label }}</span>
         </div>
         <OInput
+          :readonly="readonly"
           :name="item.name"
           type="textarea"
           class="input__item"
@@ -146,7 +151,7 @@ function deleteSet(delIdx: number) {
         />
       </fieldset>
     </div>
-    <div class="form__actions">
+    <div v-if="!readonly" class="form__actions">
       <QBtn
         label="儲存"
         style="width: 100px"
