@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
@@ -7,6 +7,8 @@ import { useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { spaceLogin } from '@/api/user';
 import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
+import Logo from '/images/one-heart.png';
+import TestingLogo from '/images/development-one-heart.png';
 
 const userStore = useUserStore();
 const { userInfo, currentSpaceId } = storeToRefs(userStore);
@@ -41,16 +43,21 @@ function logout() {
   removeCookie('lastSpaceId');
   router.go(0);
 }
+
+const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : TestingLogo);
 </script>
 
 <template>
   <QLayout view="hHh LpR lFf">
     <QHeader elevated class="bg-white text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
-      <QToolbar>
-        <QBtn dense flat round icon="menu" @click="toggleDrawer" />
-        <img src="/images/one-heart.png" class="q-ml-md" style="display: block; height: 45px;">
+      <QToolbar style="flex-wrap:wrap; gap: 4px">
+        <div class="flex items-center no-wrap">
+          <QBtn dense flat round icon="menu" @click="toggleDrawer" />
+          <div style="height: 45px;"><img :src="logoUrl" style="height: 100%; width:100%; object-fit:contain"> </div>
+        </div>
+
         <QSpace />
-        <div class="row q-gutter-lg items-center">
+        <div class="row q-gutter-lg items-center q-ml-auto">
           <QSelect v-model="currentSpaceId" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
           <Avatar @log-out="logout" />
         </div>
