@@ -23,7 +23,7 @@ jobs:
       - name: add env file
         run: echo "${{ secrets.STAGING_ENV_FILE_CONTENT }}" > .env
       - name: Build the project
-        run: npm run build
+        run: npm run build-only -- --mode staging
       - name: GCP authentication
         uses: google-github-actions/auth@v0.8.1
         with:
