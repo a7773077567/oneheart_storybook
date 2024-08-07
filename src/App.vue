@@ -4,6 +4,8 @@ import { useUserStore } from '@/stores';
 
 useUserStore();
 
+console.log(import.meta.env.MODE);
+
 changeTitle();
 function changeTitle() {
   if (import.meta.env.MODE !== 'production') {
