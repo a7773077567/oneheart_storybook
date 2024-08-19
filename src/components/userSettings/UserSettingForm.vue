@@ -20,7 +20,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
 const state = computed(() => targetUser.value.state);
-const weightForOrderOptions = Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx }));
+const weightForOrderOptions = [...Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx })), { label: '99', value: 99 }];
 const roleIdOptions = [
   { label: '管理者', value: 1 },
   { label: '櫃檯', value: 2 },
