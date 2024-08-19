@@ -14,6 +14,7 @@ export interface ClientAssociation {
   id: number;
   name: string;
   phone: string;
+  gender: string;
   identityType: number;
   identityNumber: string;
   birthDate: string;
@@ -90,6 +91,11 @@ export async function replyMemo({ clientId, memoId }: { clientId: number; memoId
 // 建立客戶
 export async function createClient(params: ClientBasic) {
   await api.post('clients', params);
+}
+
+// 更新客戶
+export async function updateClient(clientId: string, data: any) {
+  await api.patch(`users/${clientId}`, data);
 }
 
 // 取得所有客戶

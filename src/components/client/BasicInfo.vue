@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { OInput } from '@/components/shared';
+import { OInput, OSelect } from '@/components/shared';
 import { computed, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useClientStore } from '@/stores';
@@ -16,6 +16,7 @@ const initialValues = computed(() => clientStore.targetClient ? pick(clientStore
 useForm({ initialValues });
 
 const isEdit = ref(false);
+const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));
 </script>
 
 <template>
@@ -25,36 +26,36 @@ const isEdit = ref(false);
         客戶編號
         #{{ clientId }}
       </QBadge>
-      <!-- <QBtn round :icon="isEdit ? 'o_save' : 'o_edit'" size="sm" @click="isEdit = !isEdit" /> -->
+      <QBtn round :icon="isEdit ? 'o_save' : 'o_edit'" size="sm" @click="isEdit = !isEdit" />
     </div>
     <div class="user-settings__form">
       <form class="client_basic_info_form row q-col-gutter-md" @submit.prevent>
-        <fieldset class="col-12 col-md-5">
+        <fieldset class="col-12 col-md-4">
           <span class="label">姓名</span>
-          <OInput name="name" hide-bottom-space :readonly="!isEdit" />
+          <OInput name="name" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
-        <fieldset class="col-12 col-md-5">
+        <fieldset class="col-12 col-md-4">
           <span class="label">電話</span>
-          <OInput name="phone" hide-bottom-space :readonly="!isEdit" />
+          <OInput name="phone" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
-        <fieldset class="col-12 col-md-2">
+        <fieldset class="col-12 col-md-4">
           <span class="label">性別</span>
-          <OInput name="gender" hide-bottom-space :readonly="!isEdit" />
+          <OSelect name="gender" hide-bottom-space :readonly="!isEdit" :options="genderOptions" class="col-grow" />
         </fieldset>
 
-        <fieldset class="col-12 col-md-5">
+        <fieldset class="col-12 col-md-4">
           <span class="label">身分證</span>
-          <OInput name="identityNumber" hide-bottom-space :readonly="!isEdit" />
+          <OInput name="identityNumber" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
 
-        <fieldset class="col-12 col-md-5">
+        <fieldset class="col-12 col-md-4">
           <span class="label">生日</span>
-          <OInput name="birthDate" hide-bottom-space :readonly="!isEdit" />
+          <OInput name="birthDate" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
 
         <fieldset class="col-12">
           <span class="label">地址</span>
-          <OInput name="address" hide-bottom-space :readonly="!isEdit" />
+          <OInput name="address" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">備註</span>
