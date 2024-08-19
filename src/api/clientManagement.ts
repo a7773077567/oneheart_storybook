@@ -10,25 +10,27 @@ export interface ClientsGetParams {
   take?: number;
 }
 
-export interface ClientAssociation {
-  id: number;
-  name: string;
-  phone: string;
+export type ClientAssociation = Pick<Client, 'id' | 'name' | 'phone' | 'gender' | 'identityType' | 'identityNumber' | 'birthDate'>;
+export interface Client {
+  address: string;
+  associations: ClientAssociation[];
+  birthDate: string;
+  email: string;
   gender: string;
+  id: number;
   identityType: number;
   identityNumber: string;
-  birthDate: string;
-}
-export interface Client extends ClientAssociation {
-  email: string;
   lineUserId: string;
   isVerifiedBySMS: boolean;
-  associations: ClientAssociation[];
   inBodyFiles: InbodyFile[];
   inBodyFileUrls: string[];
+  name: string;
+  note: string;
+  phone: string;
 }
 
 export type ClientBasic = Pick<Client, 'name' | 'email' | 'phone'>;
+export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note'>;
 
 interface InbodyFile {
   createdAt: string;
@@ -94,8 +96,8 @@ export async function createClient(params: ClientBasic) {
 }
 
 // 更新客戶
-export async function updateClient(clientId: string, data: any) {
-  await api.patch(`users/${clientId}`, data);
+export async function updateClient(clientId: string, data: Partial<ClientSettings>) {
+  await api.patch(`clients/${clientId}`, data);
 }
 
 // 取得所有客戶
