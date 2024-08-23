@@ -36,6 +36,12 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
       {{ stateLabel }}
     </p>
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
+
+    <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
+      <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
+      <p class="q-mb-xs">科別：{{ typeLabel }}</p>
+      <p class="note">{{ data.note ?? '-' }}</p>
+    </QTooltip>
   </div>
 </template>
 
@@ -74,5 +80,19 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
 
 *::-webkit-scrollbar {
   display: none;
+}
+</style>
+
+<style lang="scss">
+.q-tooltip {
+  font-size: 16px !important;
+  overflow: hidden;
+  .note {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
 }
 </style>

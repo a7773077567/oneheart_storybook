@@ -6,11 +6,13 @@ import { computed, ref } from 'vue';
 import { getDateLabel, getType } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
 import { useRouter } from 'vue-router';
+import { OInput, OMemberSearch } from '@/components/shared';
 
 interface Column<T> {
-  key: keyof T;
+  key: keyof T | string;
   label: string;
   mapFunc?: (target: T) => string;
+  slotName?: string;
 }
 
 interface TableData {
@@ -27,6 +29,8 @@ const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const isEmployeePrice = ref(false);
 const pickedClientId = ref<number | null>(null);
+const note = ref('');
+
 const clientTableData = computed(() => getTableData(appointmentStore.targetClient, [
   { key: 'name', label: '姓名' },
   { key: 'phone', label: '電話' },
@@ -36,28 +40,19 @@ const availableTableData = computed(() => getTableData(appointmentStore.targetAv
   { key: 'startTime', label: '時間', mapFunc: target => getDurationLabel(target.startTime, target.endTime) },
   { key: 'name', label: '項目', mapFunc: target => `${getType(target.type)}` },
   { key: 'user', label: '治療師', mapFunc: target => target.user.name },
+  { key: 'note', label: '備註', slotName: 'note' },
 ]));
-const phoneTableData = [
-  { key: '會員電話', value: '0900-000-011', slotName: 'phone' },
-];
-const chooseTableData = [
-  { key: '選擇會員', slotName: 'pick' },
-];
-
-function pickClient(client: Client) {
-  pickedClientId.value = client.id;
-  appointmentStore.targetClient = appointmentStore.clients.find(client => client.id === pickedClientId.value)!;
-}
 
 function getTableData<T extends Record<string, any>>(target: T | null, columns: Column<T>[]): TableData[] {
   if (!target) {
     return [];
   }
-  return columns.map(({ key, label, mapFunc }) => {
+  return columns.map(({ key, label, mapFunc, slotName }) => {
     const targetValue = target[key as keyof T];
     return {
       key: label,
       value: mapFunc ? mapFunc(target) : targetValue,
+      ...(slotName && { slotName }),
     };
   });
 }
@@ -77,6 +72,7 @@ async function appointment() {
       slotId: appointmentStore.targetAvailable.slotId ?? null,
       userShiftId: appointmentStore.targetAvailable.userShiftId,
       bookingClientIds: [appointmentStore.targetClient.id],
+      note: note.value ?? '',
     });
     await appointmentStore.getAvailable(appointmentStore.availableQuery!);
   }
@@ -93,6 +89,9 @@ async function appointment() {
   appointmentStore.resetTargetAppointmentState();
   emit('appointment');
 }
+
+// to refactor, need to get clients first
+appointmentStore.getClients();
 </script>
 
 <template>
@@ -107,32 +106,15 @@ async function appointment() {
         left-label
         class="self-start q-pa-sm"
       />
-      <OTable :data="phoneTableData">
-        <template #phone>
-          <div class="row justify-between items-center">
-            <QInput v-model="appointmentStore.clientPhone" dense hide-bottom-space borderless style="font-size: 18px;" />
-            <QBtn label="查詢" outline dense padding="3px 26px" @click="appointmentStore.getClients" />
-          </div>
-        </template>
-      </OTable>
-      <OTable v-if="appointmentStore.clients.length" :data="chooseTableData">
-        <template #pick>
-          <div class="row items-center q-gutter-sm">
-            <QBtn
-              v-for="(client, idx) in appointmentStore.clients"
-              :key="idx"
-              :label="client.name"
-              :class="{ active: pickedClientId === client.id }"
-              outline dense padding="3px 26px"
-              @click="() => pickClient(client)"
-            />
-          </div>
-        </template>
-      </OTable>
+      <OMemberSearch v-model="pickedClientId" placeholder="電話或姓名搜尋會員" @full-info="appointmentStore.targetClient = $event" />
       <template v-if="appointmentStore.targetClient">
         <span class="q-pa-sm">會員編號 {{ appointmentStore.targetClient.identityNumber || 1234567890 }} </span>
         <OTable :data="clientTableData" />
-        <OTable :data="availableTableData" />
+        <OTable :data="availableTableData">
+          <template #note>
+            <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
+          </template>
+        </OTable>
         <QBtn label="預約" class="self-end" outline dense padding="10px 46px" @click="appointment" />
       </template>
     </QCardSection>

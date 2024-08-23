@@ -147,6 +147,7 @@ export interface ClientSchedule {
   isBeenRearranged: boolean;
   isRearrangedClientSchedule: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
+  note: string;
 }
 
 export interface BookingItem {
@@ -193,6 +194,7 @@ export interface CreateAppointment {
   slotId: number | null;
   userShiftId: number;
   bookingClientIds: number[];
+  note?: string | null;
 }
 
 export interface AppointmentRearrangeReq {
@@ -259,15 +261,28 @@ export async function fetchTherapists(type: number) {
   return data;
 }
 
+/**
+ * 預約時段
+ * @param payload CreateAppointment
+ */
 export async function createAppointment(payload: CreateAppointment) {
   const { data } = await api.post<any, CreateAppointment>('appointments/appointment', payload);
   return data;
 }
 
+/**
+ * 取得可預約時段
+ * @param params
+ */
 export async function fetchAvailable(params: AvailableReq) {
   const { data } = await api.get<Available[]>('appointments/available', { params });
   return data;
 }
+
+/**
+ * 取得可預約改期的可預約時段
+ * @param params
+ */
 export async function fetchAvailableRearranged(params: AvailableRearrangedReq) {
   const { data } = await api.get<Available[]>('appointments/available-rearranged', { params });
   return data;
@@ -288,11 +303,19 @@ export async function fetchClientSchedulesHistories(params: ClientSchedulesHisto
   return data;
 }
 
+/**
+ * 取消客戶未開始排程
+ * @param clientScheduleId
+ */
 export async function cancelClientScheduleNotStarted(clientScheduleId: number) {
   const { data } = await api.post(`clientSchedules/${clientScheduleId}/cancel`);
   return data;
 }
 
+/**
+ * 取得客戶進行中排程
+ * @param date
+ */
 export async function fetchClientSchedulesInProgress(date: string) {
   const { data } = await api.get<ClientSchedule[]>('clientSchedules/in-progress', { params: { date } });
   return data;
@@ -303,6 +326,10 @@ export async function restoreClientSchedule(clientScheduleId: number) {
   return data;
 }
 
+/**
+ * 取得單一排程
+ * @param clientScheduleId
+ */
 export async function fetchClientSchedule(clientScheduleId: number) {
   const { data } = await api.get<ClientScheduleDetail>(`clientSchedules/${clientScheduleId}`);
   return data;
@@ -344,6 +371,13 @@ export async function fetchClientGroup(clientId: number) {
 export async function checkout(scheduleId: number, payload: Checkout) {
   const { data } = await api.post<any, Checkout>(`clientSchedules/${scheduleId}/checkout`, payload);
   return data;
+}
+
+/**
+ * 更新欄位備註
+ */
+export async function updateNote(clientScheduleId: number, note: string) {
+  await api.patch(`clientSchedules/${clientScheduleId}/update-note`, { note });
 }
 
 // ========== Schemas ==========

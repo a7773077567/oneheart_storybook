@@ -6,7 +6,15 @@ import { ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
 import { appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted } from '@/api/appointment';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { OInput } from '@/components/shared';
+import { type ClientScheduleDetail, updateNote } from '@/api';
+
+const props = defineProps<{
+  scheduleId: number;
+  scheduleDetail: ClientScheduleDetail;
+  readonly: boolean;
+}>();
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
@@ -23,6 +31,7 @@ const data = computed(() => [
   { label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
   { label: '地點', value: userShift.value.space?.name },
   { label: '醫師', value: userShift.value.user.name },
+  { label: '預約備註', value: schedule.value.note },
 ]);
 
 const states = computed(() => [
@@ -57,13 +66,24 @@ async function finishRecord() {
   await appointmentFinishRecord(schedule.value.id);
   await appointmentStore.getClientSchedule(schedule.value.id);
 }
+
+// 預約備註
+const note = ref(schedule.value.note);
+
+async function saveNote() {
+  if (!note.value)
+    return;
+
+  await updateNote(props.scheduleId, note.value);
+  $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
+}
 </script>
 
 <template>
   <div class="client-info">
     <div class="client-info__header">
       <p class="member-id">
-        <span>會員編號</span><span>201712879733</span>
+        <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
       </p>
     </div>
     <div class="client-info__body">
@@ -76,7 +96,15 @@ async function finishRecord() {
             {{ item.label }}
           </li>
           <li class="table__item">
-            {{ item.value }}
+            <template v-if="item.label === '預約備註'">
+              <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
+              <div class="q-mt-md flex justify-end">
+                <QBtn outline label="儲存" :disable="!note" @click="saveNote" />
+              </div>
+            </template>
+            <template v-else>
+              {{ item.value }}
+            </template>
           </li>
           <QSeparator color="black" class="table__separator" />
         </template>
@@ -95,16 +123,14 @@ async function finishRecord() {
       </div>
     </div>
     <div class="client-info__actions">
-      <div class="actions">
+      <div class="actions q-py-md">
         <div class="actions__rearrange">
           <QBtn label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
-          <QBtn label="取消預約" :disable="schedule.state > 2" outline style="width: 127px;" @click="cancelClientSchedule" />
+          <QBtn label="取消預約" :disable="schedule.state > 2" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         </div>
-        <div class="actions__checkin">
-          <QBtn v-if="scheduleState === '預約'" label="報到" outline style="width: 127px;" @click="checkIn" />
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" outline style="width: 127px;" @click="finishService" />
-          <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" outline style="width: 127px;" @click="finishRecord" />
-        </div>
+        <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
+        <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
+        <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" />
       </div>
     </div>
   </div>
@@ -162,7 +188,8 @@ async function finishRecord() {
   align-items: flex-end;
   &__rearrange {
     display: flex;
-    flex-direction: column;
+    // flex-direction: column;
+    align-items: center;
     gap: 10px;
   }
 }
