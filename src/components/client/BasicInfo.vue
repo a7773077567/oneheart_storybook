@@ -3,8 +3,8 @@ import { OInput, OSelect } from '@/components/shared';
 import { computed, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useClientStore } from '@/stores';
-import { pick } from 'radash';
-import { updateClient } from '@/api';
+import { omit, pick } from 'radash';
+import { type Client, updateClient } from '@/api';
 import { useQuasar } from 'quasar';
 
 const props = defineProps<{
@@ -14,7 +14,7 @@ const props = defineProps<{
 const clientStore = useClientStore();
 await clientStore.getClientInfo(+props.clientId);
 
-const initialValues = computed(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note']) : {});
+const initialValues = computed(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs']) : {});
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
 
 const isEdit = ref(false);
@@ -22,7 +22,8 @@ const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o 
 
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
-  await updateClient(props.clientId, value);
+  const apiValues = omit(value as Client, ['howToKnowUs']);
+  await updateClient(props.clientId, apiValues);
   isEdit.value = false;
   $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
 });
@@ -30,37 +31,35 @@ const onSubmit = handleSubmit(async (value) => {
 
 <template>
   <div>
-    <div class="q-mb-lg flex justify-between">
-      <QBadge color="blue" class="q-px-sm text-body1">
-        客戶編號
-        #{{ clientId }}
-      </QBadge>
-      <QBtn v-if="isEdit" round icon="o_save" size="sm" @click="onSubmit" />
-      <QBtn v-else round icon="o_edit" size="sm" @click="isEdit = true" />
-    </div>
-    <div class="user-settings__form">
+    <section class="user-settings__form q-mb-lg">
+      <div class="flex items-center justify-between q-mb-md">
+        <h3 class="subtitle">基本資料</h3>
+        <div>
+          <QBtn v-if="isEdit" color="black" label="儲存" class="q-px-lg" @click="onSubmit" />
+          <QBtn v-else color="black" label="編輯" class="q-px-lg" @click="isEdit = true" />
+        </div>
+      </div>
       <form class="client_basic_info_form row q-col-gutter-md" @submit.prevent>
-        <fieldset class="col-12 col-md-4">
+        <fieldset class="col-12 col-md-6">
           <span class="label">姓名</span>
           <OInput name="name" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
-        <fieldset class="col-12 col-md-4">
+        <fieldset class="col-12 col-md-6">
           <span class="label">電話</span>
           <OInput name="phone" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
-        <fieldset class="col-12 col-md-4">
+        <fieldset class="col-12 col-md-6">
           <span class="label">性別</span>
-          <OSelect name="gender" hide-bottom-space :readonly="!isEdit" :options="genderOptions" class="col-grow" />
+          <OSelect name="gender" hide-bottom-space :readonly="!isEdit" :options="genderOptions" class="col-grow" style="background:white" />
         </fieldset>
-
-        <fieldset class="col-12 col-md-4">
-          <span class="label">身分證</span>
-          <OInput name="identityNumber" hide-bottom-space :readonly="!isEdit" class="col-grow" />
-        </fieldset>
-
-        <fieldset class="col-12 col-md-4">
+        <fieldset class="col-12 col-md-6">
           <span class="label">生日</span>
           <OInput name="birthDate" hide-bottom-space :readonly="!isEdit" class="col-grow" />
+        </fieldset>
+
+        <fieldset class="col-12">
+          <span class="label">身分證</span>
+          <OInput name="identityNumber" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
 
         <fieldset class="col-12">
@@ -68,22 +67,37 @@ const onSubmit = handleSubmit(async (value) => {
           <OInput name="address" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
         <fieldset class="col-12">
+          <span class="label">從哪裡知道我們</span>
+          <OInput name="howToKnowUs" hide-bottom-space class="full-width" readonly />
+        </fieldset>
+        <fieldset class="col-12">
           <span class="label">備註</span>
           <OInput name="note" hide-bottom-space type="textarea" class="full-width" :readonly="!isEdit" />
         </fieldset>
       </form>
-    </div>
+    </section>
+
+    <!-- 1.1.2 task -->
+    <!-- <section>
+      <h3 class="subtitle q-mb-md">科別負責人員</h3>
+    </section> -->
   </div>
 </template>
 
 <style scoped lang="scss">
+.subtitle {
+  font-size: 16px;
+  font-weight: 700;
+}
 .client_basic_info_form {
   fieldset {
     display: flex;
     align-items: center;
     gap: 8px;
     > span.label {
-      width: 50px;
+      width: 90px;
+      text-align: right;
+      flex-shrink: 0;
     }
     .q-field {
       flex: 1;

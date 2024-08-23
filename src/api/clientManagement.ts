@@ -15,8 +15,9 @@ export interface Client {
   address: string;
   associations: ClientAssociation[];
   birthDate: string;
-  email: string;
+  email: string | null;
   gender: string;
+  howToKnowUs: string;
   id: number;
   identityType: number;
   identityNumber: string;
