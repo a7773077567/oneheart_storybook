@@ -78,8 +78,8 @@ const addInitialValues = computed(() => ({
 const editInitialValues = computed(() => ({
   name: targetUser.value.name,
   email: targetUser.value.email,
-  weightForOrder: weightForOrderOptions[0].value, // temporary
-  roleId: targetUser.value.role.id,
+  weightForOrder: targetUser.value.weightForOrder, // temporary
+  roleId: targetUser.value.role?.id,
   spaceIds: targetUser.value.spaces.map(space => space.id),
   description: targetUser.value.description,
   avatar: targetUser.value.avatarUrl,

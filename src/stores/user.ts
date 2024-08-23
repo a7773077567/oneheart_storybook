@@ -27,13 +27,13 @@ export const useUserStore = defineStore('user', {
       const set = new Set();
 
       return state.users.reduce((acc: SelectOption[], user) => {
-        const optionValue = user.role.id;
+        const optionValue = user?.role?.id;
         if (set.has(optionValue)) {
           return acc;
         }
         set.add(optionValue);
         const option = {
-          label: user.role.name,
+          label: user?.role?.name,
           value: optionValue,
         };
         acc.push(option);

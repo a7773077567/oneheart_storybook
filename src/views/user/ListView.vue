@@ -24,10 +24,10 @@ const cols: QTableProps['columns'] = [
   { name: 'email', label: '帳號', field: 'email', align: 'left' },
 ];
 const rows = computed(() => userStore.users
-  .filter(user => jobTitleFilter.value.includes(user.role.id))
+  .filter(user => jobTitleFilter.value.includes(user?.role?.id))
   .map(user => ({
     ...user,
-    jobTitle: user.role.name,
+    jobTitle: user?.role?.name,
     spaces: user.spaces.map(space => space.name).join(),
   })));
 </script>
