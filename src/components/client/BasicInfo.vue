@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { OInput, OSelect } from '@/components/shared';
+import { OInput, OMemberSearch, OSelect } from '@/components/shared';
 import { computed, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useClientStore } from '@/stores';
 import { omit, pick } from 'radash';
-import { type Client, updateClient } from '@/api';
+import { type Client, updateClient, updateIntroducer } from '@/api';
 import { useQuasar } from 'quasar';
 
 const props = defineProps<{
@@ -14,16 +14,23 @@ const props = defineProps<{
 const clientStore = useClientStore();
 await clientStore.getClientInfo(+props.clientId);
 
-const initialValues = computed(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs']) : {});
+const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer']) : {});
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
 
 const isEdit = ref(false);
 const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));
 
+// introducer
+const isIntroducerNull = computed(() => initialValues.value.introducer === null);
+
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
-  const apiValues = omit(value as Client, ['howToKnowUs']);
-  await updateClient(props.clientId, apiValues);
+  const apiValues = omit(value as Client, ['howToKnowUs', 'introducer']);
+  const fetch = [updateClient(props.clientId, apiValues)];
+  if (isIntroducerNull.value && !!value.introducer) {
+    fetch.push(updateIntroducer(+props.clientId, { introducerClientId: +value.introducer }));
+  }
+  await Promise.all(fetch);
   isEdit.value = false;
   $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
 });
@@ -35,7 +42,7 @@ const onSubmit = handleSubmit(async (value) => {
       <div class="flex items-center justify-between q-mb-md">
         <h3 class="subtitle">基本資料</h3>
         <div>
-          <QBtn v-if="isEdit" color="black" label="儲存" class="q-px-lg" @click="onSubmit" />
+          <QBtn v-if="isEdit" outlined label="儲存" class="q-px-lg" @click="onSubmit" />
           <QBtn v-else color="black" label="編輯" class="q-px-lg" @click="isEdit = true" />
         </div>
       </div>
@@ -65,6 +72,10 @@ const onSubmit = handleSubmit(async (value) => {
         <fieldset class="col-12">
           <span class="label">地址</span>
           <OInput name="address" hide-bottom-space :readonly="!isEdit" class="col-grow" />
+        </fieldset>
+        <fieldset class="col-12">
+          <span class="label">介紹人</span>
+          <OMemberSearch name="introducer" class="full-width" :readonly="!isEdit || !isIntroducerNull" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">從哪裡知道我們</span>

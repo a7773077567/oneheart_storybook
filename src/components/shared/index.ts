@@ -15,3 +15,4 @@ export { default as OFile } from './OFile.vue';
 export { default as OPreview } from './OPreview.vue';
 export { default as OConfirmDialog } from './OConfirmDialog.vue';
 export { default as ClientSearch } from './ClientSearch.vue';
+export { default as OMemberSearch } from './OMemberSearch.vue';

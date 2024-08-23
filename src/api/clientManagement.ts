@@ -25,6 +25,7 @@ export interface Client {
   isVerifiedBySMS: boolean;
   inBodyFiles: InbodyFile[];
   inBodyFileUrls: string[];
+  introducer: string | null;
   name: string;
   note: string;
   phone: string;
@@ -128,4 +129,11 @@ export async function getInbodyUploadUrl(clientId: number) {
 export async function getClientPayments(clientId: number) {
   const { data } = await api.get<PurchaseRecord[]>(`clients/${clientId}/payments`);
   return data;
+}
+
+/**
+ * 更新客戶的介紹者
+ */
+export async function updateIntroducer(clientId: number, body: { introducerClientId: number }) {
+  await api.patch(`clients/${clientId}/update-introducer`, body);
 }
