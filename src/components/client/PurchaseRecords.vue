@@ -44,16 +44,16 @@ const cols: QTableProps['columns'] = [
   {
     name: 'amount',
     required: true,
-    label: '金額/點數',
+    label: '金額/堂數',
     align: 'left',
     field: (row) => {
       switch (row.type) {
         case TransactionTypes.門診費用:
-          return row.payMethod === PaymentTypes.點數 ? row.usedPoint : row.amount;
+          return row.payMethod === PaymentTypes.堂數 ? row.usedPoint : row.amount;
         case TransactionTypes.團課券購買:
           return '-';
 
-        case TransactionTypes.點數交易:
+        case TransactionTypes.堂數交易:
         default:
           return row.amount;
       }

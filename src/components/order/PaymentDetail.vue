@@ -31,7 +31,7 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'ticketGained', value: `${data.ticketGained} 張`, label: '數量' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
-    case TransactionTypes.點數交易:
+    case TransactionTypes.堂數交易:
     default:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
@@ -50,7 +50,7 @@ const paymentDetail = computed(() => {
   switch (props.detail.type) {
     case TransactionTypes.團課券購買:
       return props.detail.groupClassTicketPaymentMultiChannelPay;
-    case TransactionTypes.點數交易:
+    case TransactionTypes.堂數交易:
       return props.detail.pointPaymentMultiChannelPay;
     case TransactionTypes.門診費用:
     default:

@@ -50,8 +50,8 @@ const receiptData = computed(() => {
     { name: 'group', label: '群組', value: groupName },
     { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },
     { name: 'planName', label: '方案', value: planName },
-    { name: 'pointGained', label: '取得點數', value: paidPointGained },
-    { name: 'giftPointGained', label: '贈送點數', value: giftPointGained },
+    { name: 'pointGained', label: '取得堂數', value: paidPointGained },
+    { name: 'giftPointGained', label: '贈送堂數', value: giftPointGained },
   ];
 });
 

@@ -13,7 +13,7 @@ const clientId = useRoute().params.clientId as string;
 const tabs = [
   { name: 'basicInfo', label: '客戶資料', component: BasicInfo },
   { name: 'associations', label: '常用人員', component: Associations },
-  { name: 'pointsGroup', label: '群組與點數', component: PointsGroup },
+  { name: 'pointsGroup', label: '群組與堂數', component: PointsGroup },
   { name: 'purchaseRecords', label: '消費歷程', component: PurchaseRecords },
   { name: 'inbodyRecords', label: '身體組成表', component: InbodyRecords },
   { name: 'groupClassVoucher', label: '團課券', component: GCVoucher },

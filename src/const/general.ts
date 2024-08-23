@@ -1,4 +1,4 @@
-// 點數群組
+// 堂數群組
 export enum PointTypes {
   '物理治療' = 1,
   '院長物理治療' = 2,
@@ -186,7 +186,7 @@ export const pointsGroupOptions = Object.keys(PointTypes).slice(4, 8).map(group 
 
 // 交易項目
 export enum TransactionTypes {
-  點數交易 = 1,
+  堂數交易 = 1,
   門診費用 = 2,
   團課券購買 = 3,
 }
@@ -198,7 +198,7 @@ export enum PaymentTypes {
   信用卡 = 3,
   LINEPay = 4,
   街口 = 5,
-  點數 = 6,
+  堂數 = 6,
   團課券 = 7,
   主管折扣 = 8,
   折價券 = 9,

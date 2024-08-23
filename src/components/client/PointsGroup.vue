@@ -128,7 +128,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
                 <div class="group_title_name">
                   {{ group.name }}
                 </div>
-                <span class="q-ml-md">點數</span>
+                <span class="q-ml-md">堂數</span>
                 <div class="group_title_points">
                   {{ group.points ?? 0 }}
                 </div>
@@ -150,7 +150,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
         </QExpansionItem>
       </template>
       <div v-else class="text-center">
-        無點數群組
+        無堂數群組
       </div>
     </QList>
   </div>

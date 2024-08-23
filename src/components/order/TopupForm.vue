@@ -100,14 +100,14 @@ function setDefaultVal(selectedId: number) {
         </div>
       </fieldset>
       <fieldset class="col-8">
-        <span class="field--key">點數群組</span>
+        <span class="field--key">堂數群組</span>
         <OSelect
           class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
           :virtual-scroll-item-size="50" :disable="!values.clientId" error-message=""
           @update:model-value="getPointGroup"
         />
         <div class="q-ml-md text-caption" style="min-width:98px">
-          點數類別：<span v-if="!!values.pointType" class="text-caption">
+          堂數類別：<span v-if="!!values.pointType" class="text-caption">
             {{ PointTypes[values.pointType] }}
           </span>
         </div>

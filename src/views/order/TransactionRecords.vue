@@ -62,7 +62,7 @@ const cols: QTableProps['columns'] = [
           return Medical.length > 1 ? '複合式結帳' : PaymentTypes[Medical[0].payMethod];
         case TransactionTypes.團課券購買:
           return voucher.length > 1 ? '複合式結帳' : PaymentTypes[voucher[0].payMethod];
-        case TransactionTypes.點數交易:
+        case TransactionTypes.堂數交易:
           return point.length > 1 ? '複合式結帳' : PaymentTypes[point[0].payMethod];
         default:
           return '';
@@ -80,7 +80,7 @@ const cols: QTableProps['columns'] = [
           return `$${amount}`;
         case TransactionTypes.團課券購買:
           return `${ticketGained} 張 / $${amount}`;
-        case TransactionTypes.點數交易:
+        case TransactionTypes.堂數交易:
           return `${paidPointGained + giftPointGained} 堂/ $${amount}`;
         default:
           amount = 0;
@@ -173,9 +173,9 @@ async function checkReceipt(paymentId: number) {
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
       extraFields = [{ name: 'groupClassName', label: '課堂名稱', value: groupClassName }, { name: 'amount', label: '金額', value: amount }];
       break;
-    case TransactionTypes.點數交易:
+    case TransactionTypes.堂數交易:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: amount }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得點數', value: paidPointGained }, { name: 'giftPointGained', label: '贈送點數', value: giftPointGained }];
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: amount }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得堂數', value: paidPointGained }, { name: 'giftPointGained', label: '贈送堂數', value: giftPointGained }];
       break;
     default:
       amount = 0;

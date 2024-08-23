@@ -283,7 +283,7 @@ export const routes: RouteRecordRaw[] = [
             name: 'pointsTopup',
             component: () => import('@/views/order/PointsTopup.vue'),
             meta: {
-              label: '點數儲值',
+              label: '堂數儲值',
               requiredAuth: true,
             },
           },

@@ -38,7 +38,7 @@ export interface MedicalPaymentRecord extends BasicPaymentRecord {
   giftPointGained: null;
 }
 
-// 點數購買
+// 堂數購買
 export interface PointsPaymentRecord extends BasicPaymentRecord {
   clientSchedulePaymentMultiChannelPay: null;
   groupClassTicketPaymentMultiChannelPay: null;
@@ -59,7 +59,7 @@ export interface PointsPaymentRecord extends BasicPaymentRecord {
   pointPaymentClientGroupType: PointTypes;
   pointPaymentPlan: string;
   pointUsed: null;
-  type: TransactionTypes.點數交易;
+  type: TransactionTypes.堂數交易;
 
 }
 

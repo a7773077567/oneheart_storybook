@@ -48,28 +48,28 @@ export interface GainPoint {
 
 export type EditGroupField = Pick<CreateGroupField, 'name' | 'memberClientIds'>;
 
-// 取得客戶點數群組
+// 取得客戶堂數群組
 export async function getClientPointGroup(clientId: number) {
   const { data } = await api.get<PointsGroup[]>(`/clients/${clientId}/clientGroups`);
   return data;
 }
 
-// 建立點數群組
+// 建立堂數群組
 export async function createPointGroup(param: CreateGroupField) {
   await api.post(`/clientGroups`, param);
 }
 
-// 更新點數群組
+// 更新堂數群組
 export async function updatePointGroup(clientGroupId: number, param: EditGroupField) {
   await api.put(`/clientGroups/${clientGroupId}`, param);
 }
 
-// 刪除點數群組
+// 刪除堂數群組
 export async function deletePointGroup(clientGroupId: number) {
   await api.delete(`/clientGroups/${clientGroupId}`);
 }
 
-// 儲值點數
+// 儲值堂數
 export async function gainPoint(param: GainPoint) {
   await api.post('clientGroups/gainPoint', param);
 }
