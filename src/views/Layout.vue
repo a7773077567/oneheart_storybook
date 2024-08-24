@@ -20,10 +20,14 @@ const spaceOptions = userInfo.value!.spaces.map(({ name, id }) => {
 currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
 
 watch(currentSpaceId, async (newSpaceId) => {
-  const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
-  setCookie('secondToken', accessToken);
-  setCookie('lastSpaceId', newSpaceId);
-  router.push({ name: 'home' });
+  const oriSpaceId = getCookie('lastSpaceId');
+
+  if (!oriSpaceId || newSpaceId !== +oriSpaceId) {
+    const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
+    setCookie('secondToken', accessToken);
+    setCookie('lastSpaceId', newSpaceId);
+    router.push({ name: 'home' });
+  }
 }, { immediate: true });
 
 function optionDisable(option: any): boolean {
