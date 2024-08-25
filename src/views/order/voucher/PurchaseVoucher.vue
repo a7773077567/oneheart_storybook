@@ -14,6 +14,20 @@ function cancelTopup() {
 </script>
 
 <template>
+  <!-- <QBreadcrumbs class="text-grey" active-color="purple">
+    <template #separator>
+      <QIcon
+        size="1.2em"
+        name="arrow_forward"
+        color="purple"
+      />
+    </template>
+
+    <QBreadcrumbsEl label="Home" icon="home" />
+    <QBreadcrumbsEl label="Components" icon="widgets" />
+    <QBreadcrumbsEl label="Breadcrumbs" icon="navigation" />
+  </QBreadcrumbs> -->
+
   <VoucherForm v-if="step === 1" @go-next="step = 2" @cancel="cancelTopup" />
   <VoucherPurchase v-else-if="step === 2" @go-back="step = 1" @cancel="cancelTopup" @finish="cancelTopup" />
 </template>

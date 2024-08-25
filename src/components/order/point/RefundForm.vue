@@ -37,6 +37,7 @@ const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
   pointsStore.topupDetail = { ...values, planName: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
+
   emit('goNext');
 });
 

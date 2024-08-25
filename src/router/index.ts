@@ -281,16 +281,16 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'points-topup',
             name: 'pointsTopup',
-            component: () => import('@/views/order/PointsTopup.vue'),
+            component: () => import('@/views/order/point/PointTransaction.vue'),
             meta: {
-              label: '堂數儲值',
+              label: '堂數儲值與退款',
               requiredAuth: true,
             },
           },
           {
             path: 'group-class-voucher',
             name: 'GroupClassVoucher',
-            component: () => import('@/views/order/GroupClassVoucher.vue'),
+            component: () => import('@/views/order/voucher/GroupClassVoucher.vue'),
             meta: {
               label: '功能性團課券',
               requiredAuth: true,
@@ -436,6 +436,8 @@ router.beforeEach(async (to) => {
   if (!isAuthenticated) {
     return { name: 'login' };
   }
+  console.log('before', to);
+  return true;
 });
 
 async function checkAuth() {
