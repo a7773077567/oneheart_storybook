@@ -112,8 +112,9 @@ async function getUserShifts() {
   <div class="shift-list">
     <Calendar
       v-model="selectedDate"
-      v-model:model-resources="shiftStore.users"
+      :model-resources="shiftStore.activeUsers"
       view="week"
+      @model-resources="shiftStore.users = $event"
       @change="onCalendarChange"
     >
       <template #day="{ scope: { resource, timestamp, isEditing } }">

@@ -103,9 +103,10 @@ function getDate() {
   <div class="booking-calendar">
     <ResourceCalendar
       v-model="selectedDate"
-      v-model:model-resources="appointmentStore.users"
+      v-model:model-resources="appointmentStore.activeUsers"
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
+      @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
         <QBtn label="重新查詢" outline dense padding="10px 24px" @click="requery" />

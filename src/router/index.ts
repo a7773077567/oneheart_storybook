@@ -436,7 +436,7 @@ router.beforeEach(async (to) => {
   if (!isAuthenticated) {
     return { name: 'login' };
   }
-  console.log('before', to);
+
   return true;
 });
 

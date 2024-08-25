@@ -22,6 +22,7 @@ export interface User {
   description: string;
   avatarUrl: string | null;
   weightForOrder: number;
+  type: 0 | 1;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;

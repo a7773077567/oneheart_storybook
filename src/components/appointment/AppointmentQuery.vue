@@ -17,7 +17,7 @@ const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
   initialValues: {
     userShiftType: typeOptions.value[0].value,
-    userIds: appointmentStore.users.map(user => user.id),
+    userIds: appointmentStore.activeUsers.map(user => user.value),
     date: dayjs().format('YYYY-MM-DD'),
     startTime: dayjs().startOf('day').format('HH:mm'),
     endTime: dayjs().endOf('day').format('HH:mm'),

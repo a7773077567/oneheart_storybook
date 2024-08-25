@@ -45,6 +45,15 @@ export const useShiftStore = defineStore('shift', {
         value: identifier,
       }));
     },
+    activeUsers: (state) => {
+      const { users } = state;
+      // todo, 櫃檯人員改用 enum
+      return users.filter(({ isSuspended, role }) => !isSuspended && role.name !== '櫃檯').map(member => ({
+        label: member.name,
+        value: member.id,
+        ...member,
+      }));
+    },
   },
   actions: {
     async getShiftTemplates() {

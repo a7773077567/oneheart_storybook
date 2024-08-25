@@ -59,9 +59,10 @@ function openBookingsBox(bookings: any) {
   <div class="calendar-view">
     <ResourceCalendar
       v-model="selectedDate"
-      v-model:model-resources="appointmentStore.users"
+      :model-resources="appointmentStore.activeUsers"
       :interval-start="8"
       :interval-count="15"
+      @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
         <div class="payment-indicator">

@@ -48,12 +48,13 @@ function getUserShifts() {
       <!-- <QBtn label="查詢班表" outline /> -->
     </div>
     <Calendar
-      v-model:modelResources="shiftStore.users"
       v-model="currentDate"
+      :model-resources="shiftStore.activeUsers"
       simple-mode
       view="day"
       :max-days="days"
       cell-width="114px"
+      @model-resources="shiftStore.users = $event"
     >
       <template #nav-right>
         <span class="text-h6">{{ `${duration.startDate}-${duration.endDate}` }}</span>
