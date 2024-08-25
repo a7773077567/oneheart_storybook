@@ -3,6 +3,6 @@
 
 <template>
   <div>
-    退款團課券
+    建置中
   </div>
 </template>
