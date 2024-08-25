@@ -11,6 +11,7 @@ const pointsStore = usePointsStore();
 
 function cancelTopup() {
   pointsStore.resetTopup();
+  currentStep.value = steps[0];
 }
 </script>
 

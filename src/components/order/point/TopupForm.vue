@@ -45,7 +45,7 @@ const showClientSearch = ref(false);
 const totalPoints = computed(() => (Number(values.paidPointGained ?? 0)) + (Number(values.giftPointGained ?? 0)));
 
 const planOptions = computed(() => {
-  return pointsPlan.filter(({ type }) => type === values?.pointType).map(({ name, id }) => ({ label: name, value: id }));
+  return pointsPlan.filter(({ type }) => type === values?.pointType || type === 'all').map(({ name, id }) => ({ label: name, value: id }));
 });
 
 function selectClient(selectList: Client[]) {

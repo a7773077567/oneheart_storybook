@@ -22,8 +22,8 @@ const currentStepCount = computed(() => props.steps.findIndex(step => step.key =
     </template>
     <template v-for="(step, stepCount) in steps" :key="step.key">
       <QBreadcrumbsEl>
-        <div class="o-steps__el">
-          <div class="icon" :class="{ 'o-steps__el--waiting': currentStepCount < stepCount }">{{ currentStepCount > stepCount ? '&check;' : stepCount + 1 }}</div>
+        <div class="o-steps__el" :class="{ 'o-steps__el--waiting': currentStepCount < stepCount }">
+          <div class="icon">{{ currentStepCount > stepCount ? '&check;' : stepCount + 1 }}</div>
           <span class="label">{{ step.label }}</span>
         </div>
       </QBreadcrumbsEl>
@@ -55,11 +55,17 @@ const currentStepCount = computed(() => props.steps.findIndex(step => step.key =
       font-weight: 700;
       display: flex;
       align-items: center;
+      color: black;
     }
 
-    &--waiting.icon {
-      background: white;
-      color: black;
+    &--waiting {
+      .icon {
+        background: white;
+        color: black;
+      }
+      .label {
+        color: #9e9e9e;
+      }
     }
   }
 

@@ -8,6 +8,7 @@ import { gainPoint } from '@/api';
 import { useQuasar } from 'quasar';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { PaymentMethods } from '@/const/appointment';
+import { PointPlan } from '@/const/points';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -31,7 +32,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
   { key: 'pointType', value: PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
-  { key: 'plan', value: pointsStore.topupDetail?.plan ?? '', label: '方案' },
+  { key: 'plan', value: pointsStore.topupDetail?.plan ? PointPlan[pointsStore.topupDetail.plan] : '', label: '方案' },
   { key: 'amount', value: `$ ${(pointsStore.topupDetail?.amount ?? 0)}`, label: '金額' },
   { key: 'paidPointGained', value: `${(pointsStore.topupDetail?.paidPointGained ?? 0)} 堂`, label: '點堂' },
   { key: 'giftPointGained', value: `${(pointsStore.topupDetail?.giftPointGained ?? 0)} 堂`, label: '贈堂' },
@@ -60,7 +61,8 @@ async function onCheckout() {
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
-  const hasEmptyPayAmount = multiChannelPay.some(item => !item.amount);
+
+  const hasEmptyPayAmount = multiChannelPay.some(item => item.amount === undefined);
   if (hasEmptyPayAmount) {
     $q.dialog({
       message: '所有支付方式的金額皆需填入',
@@ -79,8 +81,10 @@ async function onCheckout() {
 
   $q.dialog({
     message: '儲值成功',
-  }).onOk(() =>
-    emit('finish'),
+  }).onOk(() => {
+    isCheckoutOpen.value = false;
+    emit('finish');
+  },
   );
 }
 
