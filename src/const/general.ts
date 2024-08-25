@@ -206,3 +206,5 @@ export enum PaymentTypes {
   訂金 = 11,
   行銷活動 = 12,
 }
+
+export const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));

@@ -6,6 +6,7 @@ import { useClientStore } from '@/stores';
 import { omit, pick } from 'radash';
 import { type Client, updateClient, updateIntroducer } from '@/api';
 import { useQuasar } from 'quasar';
+import { genderOptions } from '@/const/general';
 
 const props = defineProps<{
   clientId: string;
@@ -18,7 +19,6 @@ const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ?
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
 
 const isEdit = ref(false);
-const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));
 
 // introducer
 const isIntroducerNull = computed(() => initialValues.value.introducer === null);
@@ -61,7 +61,7 @@ const onSubmit = handleSubmit(async (value) => {
         </fieldset>
         <fieldset class="col-12 col-md-6">
           <span class="label">生日</span>
-          <OInput name="birthDate" hide-bottom-space :readonly="!isEdit" class="col-grow" />
+          <OInput name="birthDate" hide-bottom-space :readonly="!isEdit" class="col-grow" date-mode />
         </fieldset>
 
         <fieldset class="col-12">

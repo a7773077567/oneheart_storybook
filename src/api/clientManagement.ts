@@ -31,7 +31,6 @@ export interface Client {
   phone: string;
 }
 
-export type ClientBasic = Pick<Client, 'name' | 'email' | 'phone'>;
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note'>;
 
 interface InbodyFile {
@@ -93,7 +92,7 @@ export async function replyMemo({ clientId, memoId }: { clientId: number; memoId
 }
 
 // 建立客戶
-export async function createClient(params: ClientBasic) {
+export async function createClient(params: ClientSettings & { introducerClientId: number }) {
   await api.post('clients', params);
 }
 
