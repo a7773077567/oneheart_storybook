@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { AppointmentAdder, AppointmentBox, AppointmentBoxRearranged } from '@/components/appointment';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
-import type { Available } from '@/api/appointment';
+import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
 
 const $q = useQuasar();
@@ -12,6 +12,13 @@ const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
+
+// handle calendar date change
+watch(selectedDate, async (newDate) => {
+  appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
+  await appointmentStore.getAvailable(appointmentStore.availableQuery);
+  appointmentStore.querySent = true;
+});
 
 onBeforeUnmount(() => {
   appointmentStore.resetAppointmentQueryState();
