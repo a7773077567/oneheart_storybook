@@ -61,7 +61,7 @@ const formItems: FormItem[] = [
   { label: '姓名', name: 'name', element: 'input', type: 'text' },
   { label: '權重', name: 'weightForOrder', element: 'select', options: weightForOrderOptions },
   { label: '職稱', name: 'roleId', element: 'select', options: roleIdOptions },
-  { label: '場館', name: 'spaceIds', element: 'select', options: spaceOptions, multiple: true, maxSelection: 1 },
+  { label: '場館', name: 'spaceIds', element: 'select', options: spaceOptions, multiple: true },
   { label: '帳號', name: 'email', element: 'input', type: 'text', fluid: true },
   { label: '描述', name: 'description', element: 'input', type: 'textarea', fluid: true },
 ];

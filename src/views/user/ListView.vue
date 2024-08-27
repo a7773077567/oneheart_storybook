@@ -20,7 +20,7 @@ const cols: QTableProps['columns'] = [
   { name: 'state', label: '開通', field: 'state', align: 'left' },
   { name: 'name', label: '姓名', field: 'name', align: 'left' },
   { name: 'jobTitle', label: '職稱', field: 'jobTitle', align: 'left' },
-  { name: 'spaces', label: '場館', field: 'spaces', align: 'left' },
+  { name: 'spaces', label: '場館', field: 'spaces', align: 'left', style: 'text-wrap:wrap; word-break: break-all' },
   { name: 'email', label: '帳號', field: 'email', align: 'left' },
 ];
 const rows = computed(() => userStore.users
