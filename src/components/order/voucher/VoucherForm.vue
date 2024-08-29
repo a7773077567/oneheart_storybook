@@ -14,7 +14,6 @@ const emit = defineEmits<{
 
 const voucherStore = useVoucherStore();
 const clientStore = useClientStore();
-voucherStore.getGroupClass();
 
 const pointsTopupSchema = z.object({
   clientName: z.string(),

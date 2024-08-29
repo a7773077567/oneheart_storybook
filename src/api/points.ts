@@ -30,22 +30,6 @@ export interface TopupDetail {
   receiptNumber: string | null; // 信用卡簽單號，如果payMethod!=信用卡，此欄位必為null
 }
 
-export interface GainPoint {
-  clientId: number;
-  clientGroupId: number;
-  plan: string;
-  paidPointGained: number;
-  giftPointGained: number;
-  amount: number;
-  multiChannelPay: {
-    payMethod: number;
-    amount: number | null;
-    authorisationCode: string | null;
-    receiptNumber: string | null;
-    details: string;
-  }[];
-}
-
 export type EditGroupField = Pick<CreateGroupField, 'name' | 'memberClientIds'>;
 
 // 取得客戶堂數群組
@@ -69,7 +53,28 @@ export async function deletePointGroup(clientGroupId: number) {
   await api.delete(`/clientGroups/${clientGroupId}`);
 }
 
+export interface GainPoint {
+  clientId: number;
+  clientGroupId: number;
+  plan: string;
+  paidPointGained: number;
+  giftPointGained: number;
+  amount: number;
+  multiChannelPay: {
+    payMethod: number;
+    amount: number | null;
+    authorisationCode: string | null;
+    receiptNumber: string | null;
+    details: string;
+  }[];
+}
 // 儲值堂數
 export async function gainPoint(param: GainPoint) {
   await api.post('clientGroups/gainPoint', param);
+}
+
+export type RefundPoint = Pick<GainPoint, 'clientId' | 'clientGroupId' | 'amount' | 'multiChannelPay'>;
+// 退還堂數
+export async function refundPoint(param: RefundPoint) {
+  await api.post('clientGroups/refundPoint', param);
 }

@@ -4,10 +4,10 @@ import { OInput } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { usePointsStore } from '@/stores';
 import { PointTypes } from '@/const/general';
-import type { Client, PointsGroup } from '@/api';
-import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
+import { type Client, type GroupClass, getClientVouchers } from '@/api';
+import type { RefundDetail } from '@/views/order/voucher/RefundVoucher.vue';
+import { useVoucherStore } from '@/stores';
 
 const props = defineProps<{
   modelValue: Partial<RefundDetail>;
@@ -19,7 +19,9 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: typeof props['modelValue']): void;
 }>();
 
-const pointsStore = usePointsStore();
+const voucherStore = useVoucherStore();
+voucherStore.getGroupClass();
+
 const pointRefundSchema = z.object({
   clientId: z.number(),
   client: z.object({
@@ -29,12 +31,11 @@ const pointRefundSchema = z.object({
     identityNumber: z.string(),
     gender: z.string(),
   }).nullable(),
-  clientGroupId: z.number(),
-  pointGroup: z.object({
+  groupClassId: z.number(),
+  groupClass: z.object({
     id: z.number(),
-    type: z.nativeEnum(PointTypes),
     name: z.string(),
-    points: z.number().nonnegative().gt(0, '退堂數量需大於0'),
+    useAbleGroupClassTickets: z.number().nonnegative().gt(0, '退券數量需大於0'),
   }).nullable(),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
 });
@@ -42,7 +43,7 @@ const pointRefundSchema = z.object({
 const initialValues = computed(() => ({
   ...props.modelValue,
   client: null,
-  pointGroup: null,
+  groupClass: null,
   amount: 0,
   multiChannelPay: [],
 }));
@@ -51,21 +52,23 @@ const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
-const classCounts = computed(() => values.pointGroup?.points);
+const classCounts = computed(() => values.groupClass?.useAbleGroupClassTickets);
 
 const onSubmit = handleSubmit(async (values) => {
   emit('update:modelValue', values);
   emit('goNext');
 });
 
-function getClientGroup() {
+const groupClassList = ref<object[]>([]);
+async function getClientGroup() {
   if (values.clientId) {
-    pointsStore.getPointGroupOptions(values.clientId);
+    const data = await getClientVouchers(values.clientId);
+    groupClassList.value = data.map(option => ({ label: option.name, value: option }));
   }
 }
 
-function setRefundClassAmount(pointGroup: PointsGroup) {
-  setFieldValue('clientGroupId', pointGroup.id);
+function setRefundClassAmount(groupClass: GroupClass) {
+  setFieldValue('groupClassId', groupClass.id);
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
@@ -85,17 +88,17 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
       </fieldset>
 
       <fieldset class="col-12">
-        <span class="field--key">堂數群組</span>
+        <span class="field--key">團課券</span>
         <OSelect
-          label="請選擇堂數群組"
-          class="field--val" name="pointGroup" :options="pointsStore.pointGroupOptions" hide-bottom-space
-          :virtual-scroll-item-size="50" :disable="!values.clientId" :error-message="errors.pointGroup"
+          label="請選擇團課券"
+          class="field--val" name="groupClass" :options="groupClassList" hide-bottom-space
+          :virtual-scroll-item-size="50" :disable="!values.clientId" :error-message="errors.groupClass"
           @update:model-value="setRefundClassAmount"
         />
       </fieldset>
 
       <fieldset class="col-12">
-        <span class="field--key">退回堂數</span>
+        <span class="field--key">退回券數</span>
         <div class="text-weight-medium"> {{ typeof classCounts === 'number' ? `${classCounts ?? 0} 堂` : '-' }} </div>
       </fieldset>
 

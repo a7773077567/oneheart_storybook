@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   rows: {
     name: string | undefined;
     label: string;
@@ -7,7 +7,12 @@ defineProps<{
   }[];
   spaceName?: string;
   hideCheckout?: boolean;
-}>();
+  title?: string;
+  confirmLabel?: string;
+}>(), {
+  title: '結帳確定',
+  confirmLabel: '確定結帳',
+});
 
 defineEmits<{
   (e: 'print'): void;
@@ -19,8 +24,10 @@ defineEmits<{
   <QCard class="q-py-md q-px-xl relative-position">
     <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 10px; right: 10px;" />
     <QCardSection class="q-pb-none no-print">
-      <div class="text-h6 text-center q-mb-md text-bold">結帳確定</div>
-      <div class="text-subtitle2 text-center">確定以現金方式支付，如確定無誤請按按鈕。</div>
+      <div class="text-h6 text-center q-mb-md text-bold">{{ title }}</div>
+      <slot name="subtitle">
+        <div class="text-subtitle2 text-center">確定以現金方式支付，如確定無誤請按按鈕。</div>
+      </slot>
     </QCardSection>
     <QCardSection>
       <div class="receipt">
@@ -39,10 +46,10 @@ defineEmits<{
         </div>
       </div>
     </QCardSection>
-    <QCardSection class="actions no-print">
-      <QBtn label="列印收據" color="black" @click="$emit('print')" />
-      <QBtn v-if="!hideCheckout" label="確定結帳" color="black" @click="$emit('checkout')" />
-    </QCardSection>
+    <QCardActions class="actions no-print">
+      <QBtn label="列印收據" outline @click="$emit('print')" />
+      <QBtn v-if="!hideCheckout" :label="confirmLabel" color="black" @click="$emit('checkout')" />
+    </QCardActions>
   </QCard>
 </template>
 
@@ -101,9 +108,9 @@ defineEmits<{
 }
 
 .actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  > .q-btn {
+    flex: 1;
+  }
 }
 
 @media print {

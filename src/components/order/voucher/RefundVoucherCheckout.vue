@@ -6,9 +6,9 @@ import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { useQuasar } from 'quasar';
 import { PaymentMethods } from '@/const/appointment';
-import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
+import type { RefundDetail } from '@/views/order/voucher/RefundVoucher.vue';
 import { useRouter } from 'vue-router';
-import { refundPoint } from '@/api';
+import { refundClassTicker } from '@/api';
 import { calcReceiptAmount } from '@/utils/helpers';
 
 const props = defineProps<{
@@ -32,37 +32,34 @@ const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
 
 const refundDetail = computed<CheckTableData>(() => {
-  const { client, pointGroup } = props.modelValue;
+  const { client, groupClass, amount } = props.modelValue;
   return [
     { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
     { key: 'name', value: client?.name ?? '', label: '姓名' },
     { key: 'phone', value: client?.phone ?? '', label: '電話' },
-    { key: 'pointType', value: pointGroup?.type ? PointTypes[pointGroup.type] : '', label: '類別' },
-    { key: 'groupName', value: pointGroup?.name ?? '', label: '群組' },
-    { key: 'classCounts', value: `${pointGroup?.points ?? 0} 堂`, label: '堂數' },
+    { key: 'classId', value: '瑜伽課', label: '團課名稱' },
+    { key: 'ticketGained', value: `${groupClass?.useAbleGroupClassTickets ?? 0} 張`, label: '數量' },
+    { key: 'amount', value: `$ ${(amount)}`, label: '金額' },
   ];
 });
 
 const $q = useQuasar();
 const receiptData = computed(() => {
-  const { client, pointGroup } = props.modelValue;
+  const { client, groupClass } = props.modelValue;
 
   return [
-    { name: 'name', label: '姓名', value: client?.name },
+    { name: 'name', label: '姓名', value: client?.name ?? '' },
     { name: 'gender', label: '性別', value: client?.gender ?? '' },
-    { name: 'id', label: '身分證字號', value: client?.identityNumber },
-    { name: 'birthDate', label: '出生年月日', value: client?.birthDate },
-    { name: 'group', label: '類別', value: pointGroup?.type ? PointTypes[pointGroup.type] : '' },
-    { name: 'group', label: '群組', value: pointGroup?.name },
-    { name: 'planName', label: '項目', value: '退堂' },
-    { name: 'planName', label: '堂數', value: `${pointGroup?.points}堂` },
-    { name: 'amount', label: '退款金額', value: calcReceiptAmount(payments.value) },
+    { name: 'id', label: '身分證字號', value: client?.identityNumber ?? '' },
+    { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
+    { name: 'groupClassName', label: '課程名稱', value: groupClass?.name ?? '' },
+    { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },
   ];
 });
 
 const router = useRouter();
 async function onCheckout() {
-  const { clientId, clientGroupId, amount } = props.modelValue;
+  const { clientId, groupClassId, amount } = props.modelValue;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -73,9 +70,9 @@ async function onCheckout() {
     });
     return;
   }
-  await refundPoint({
+  await refundClassTicker({
     clientId,
-    clientGroupId,
+    groupClassId,
     amount,
     multiChannelPay,
   });
@@ -104,7 +101,7 @@ function onPrint() {
 </script>
 
 <template>
-  <div class="refund_point">
+  <div class="refund_voucher">
     <CheckTable :data="refundDetail">
       <template #date="{ data }">
         <div class="slot-padding">
@@ -124,9 +121,9 @@ function onPrint() {
     <QDialog v-model="isCheckoutOpen">
       <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @print="onPrint" @checkout="onCheckout">
         <template #subtitle>
-          <QCardSection horizontal class="justify-center q-py-sm">{{ modelValue.pointGroup?.name }}五福國中教師群組 | 院長物理治療{{ modelValue.pointGroup?.type }}</QCardSection>
+          <QCardSection horizontal class="justify-center q-py-sm">{{ modelValue.groupClass?.name }} </QCardSection>
           <QCardSection horizontal class="justify-center q-py-sm recipe_detail">
-            <div>退回堂數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.pointGroup?.points }} 堂</span></div>
+            <div>退款券數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.groupClass?.useAbleGroupClassTickets }} 堂</span></div>
             <div>退款金額 <span class="text-weight-medium text-h6"> $ {{ modelValue.amount }} 元</span></div>
           </QCardSection>
         </template>
@@ -136,7 +133,7 @@ function onPrint() {
 </template>
 
 <style scoped lang="scss">
-.refund_point {
+.refund_voucher {
   display: flex;
   flex-direction: column;
   gap: 20px;

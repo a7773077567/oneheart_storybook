@@ -45,7 +45,7 @@ export const usePointsStore = defineStore('points', {
     pointGroupOptions: (state) => {
       if (!state.targetClientPointGroup || state.targetClientPointGroup.length === 0)
         return [];
-      return state.targetClientPointGroup.map(({ id, name, type }) => ({ label: `${name} (${PointTypes[type]})`, value: { id, type, name } }));
+      return state.targetClientPointGroup.map(({ id, name, type, points }) => ({ label: `${name} (${PointTypes[type]})`, value: { id, type, name, points } }));
     },
   },
   actions: {

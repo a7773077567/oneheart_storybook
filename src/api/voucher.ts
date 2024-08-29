@@ -28,6 +28,8 @@ export interface PurchaseVoucher {
   }[];
 }
 
+export type RefundGroupClassTicket = Pick<PurchaseVoucher, 'clientId' | 'groupClassId' | 'amount' | 'multiChannelPay'>;
+
 export interface Voucher {
   id: number;
   space: Space;
@@ -40,7 +42,18 @@ export async function buyGroupClassTickets(param: PurchaseVoucher) {
   await api.post(`/groupClassTickets`, param);
 }
 
-// 移轉團課券
+/**
+ * 退款團課券
+ * 不用帶張數，後端會一次全部退掉該團課的券
+ * @param {object} param
+ * @param {number} param.clientId
+ * @param {number} param.groupClassId
+ * @param {number} param.amount
+ * @param {Array} param.multiChannelPay
+ */
+export async function refundClassTicker(param: RefundGroupClassTicket) {
+  await api.post(`/groupClassTickets/refund`, param);
+}
 
 // 客戶已購買的團課券
 export async function getClientVouchers(clientId: number) {
