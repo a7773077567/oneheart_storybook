@@ -9,15 +9,13 @@ import type { Client, PointsGroup, RefundPoint } from '@/api';
 const steps = [{ label: '填寫退款內容', key: 'form' }, { label: '選擇退款方式', key: 'checkout' }];
 const currentStep = ref(steps[0]);
 
-const pointsStore = usePointsStore();
-
-function cancelTopup() {
-  pointsStore.resetTopup();
-  currentStep.value = steps[0];
-}
-
 export type RefundDetail = RefundPoint & { client: Partial<Client> | null; pointGroup: Partial<PointsGroup> | null };
 const refundValues = ref<RefundDetail>({} as RefundDetail);
+
+function cancelTopup() {
+  currentStep.value = steps[0];
+  refundValues.value = {} as RefundDetail;
+}
 </script>
 
 <template>

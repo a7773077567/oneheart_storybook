@@ -32,7 +32,7 @@ const refundDetail = computed<CheckTableData>(() => {
     { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
     { key: 'name', value: client?.name ?? '', label: '姓名' },
     { key: 'phone', value: client?.phone ?? '', label: '電話' },
-    { key: 'classId', value: '瑜伽課', label: '團課名稱' },
+    { key: 'classId', value: groupClass?.name ?? '', label: '團課名稱' },
     { key: 'ticketGained', value: `${groupClass?.useAbleGroupClassTickets ?? 0} 張`, label: '數量' },
     { key: 'amount', value: `$ ${(amount)}`, label: '金額' },
   ];
