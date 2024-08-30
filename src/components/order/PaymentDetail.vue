@@ -24,6 +24,7 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
     case TransactionTypes.團課券購買:
+    case TransactionTypes.團課券退款:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
@@ -32,6 +33,7 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
     case TransactionTypes.堂數交易:
+    case TransactionTypes.堂數退款:
     default:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
@@ -39,7 +41,7 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
         { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
         { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
-        { key: 'paidPointGained', value: `${data.paidPointGained} 堂`, label: '點堂' },
+        { key: 'paidPointGained', value: `${data.paidPointGained} 堂`, label: '堂數' },
         { key: 'giftPointGained', value: `${data.giftPointGained} 堂`, label: '贈堂' },
       ];
   }
@@ -49,8 +51,10 @@ type CompositionPayment = InstanceType<typeof PaymentComposition>['$props']['mod
 const paymentDetail = computed(() => {
   switch (props.detail.type) {
     case TransactionTypes.團課券購買:
+    case TransactionTypes.團課券退款:
       return props.detail.groupClassTicketPaymentMultiChannelPay;
     case TransactionTypes.堂數交易:
+    case TransactionTypes.堂數退款:
       return props.detail.pointPaymentMultiChannelPay;
     case TransactionTypes.門診費用:
     default:
@@ -77,7 +81,7 @@ const paymentDetail = computed(() => {
       <PaymentComposition readonly :model-value="paymentDetail as CompositionPayment" :method-options="methodOptions" />
 
       <div class="payment_detail__sum">
-        <p>交易總金額：</p>
+        <p>{{ detail.type === TransactionTypes.堂數退款 || detail.type === TransactionTypes.團課券退款 ? '退款' : '交易' }}總金額：</p>
         <div class="amount">{{ detail.amount }}</div>
         <span>元</span>
       </div>

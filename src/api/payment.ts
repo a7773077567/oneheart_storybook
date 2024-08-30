@@ -59,7 +59,7 @@ export interface PointsPaymentRecord extends BasicPaymentRecord {
   pointPaymentClientGroupType: PointTypes;
   pointPaymentPlan: string;
   pointUsed: null;
-  type: TransactionTypes.堂數交易;
+  type: TransactionTypes.堂數交易 | TransactionTypes.堂數退款;
 
 }
 
@@ -86,7 +86,7 @@ export interface VoucherPaymentRecord extends BasicPaymentRecord {
   pointPaymentPlan: null;
   pointUsed: null;
   ticketGained: number;
-  type: TransactionTypes.團課券購買;
+  type: TransactionTypes.團課券購買 | TransactionTypes.團課券退款;
 
 }
 

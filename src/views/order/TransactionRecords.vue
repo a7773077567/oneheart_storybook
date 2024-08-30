@@ -61,8 +61,10 @@ const cols: QTableProps['columns'] = [
         case TransactionTypes.門診費用:
           return Medical.length > 1 ? '複合式結帳' : PaymentTypes[Medical[0].payMethod];
         case TransactionTypes.團課券購買:
+        case TransactionTypes.團課券退款:
           return voucher.length > 1 ? '複合式結帳' : PaymentTypes[voucher[0].payMethod];
         case TransactionTypes.堂數交易:
+        case TransactionTypes.堂數退款:
           return point.length > 1 ? '複合式結帳' : PaymentTypes[point[0].payMethod];
         default:
           return '';
@@ -80,8 +82,12 @@ const cols: QTableProps['columns'] = [
           return `$${amount}`;
         case TransactionTypes.團課券購買:
           return `${ticketGained} 張 / $${amount}`;
+        case TransactionTypes.團課券退款:
+          return `${ticketGained} 張 / $ -${amount}`;
         case TransactionTypes.堂數交易:
           return `${paidPointGained + giftPointGained} 堂/ $${amount}`;
+        case TransactionTypes.堂數退款:
+          return `${paidPointGained + giftPointGained} 堂/ $ -${amount}`;
         default:
           amount = 0;
       }
@@ -205,6 +211,8 @@ async function checkPaymentDetail(val: any) {
 function onPrint() {
   window.print();
 }
+
+const hasRecipeTypes = new Set([TransactionTypes.堂數交易, TransactionTypes.團課券購買, TransactionTypes.門診費用]);
 </script>
 
 <template>
@@ -228,9 +236,9 @@ function onPrint() {
       />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
-      <template #body-cell-attachment="{ value }">
-        <QTd>
-          <QBtn v-if="!!value" flat round icon="o_description" @click="checkReceipt(value)" />
+      <template #body-cell-attachment="{ value, row }">
+        <QTd class="text-center">
+          <QBtn v-if="!!value && hasRecipeTypes.has(row.type)" flat round icon="o_description" @click="checkReceipt(value)" />
           <span v-else>-</span>
         </QTd>
       </template>
