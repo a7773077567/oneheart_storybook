@@ -15,6 +15,8 @@ const emit = defineEmits<{
 const voucherStore = useVoucherStore();
 const clientStore = useClientStore();
 
+voucherStore.getGroupClass();
+
 const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
@@ -82,6 +84,7 @@ function selectClient(selectList: Client[]) {
           class="field--val" name="groupClassId" :options="voucherStore.groupClassOptions" hide-bottom-space :virtual-scroll-item-size="50"
           error-message=""
         />
+        <p v-if="voucherStore.groupClassOptions.length === 0" class="q-ml-md">目前無可購買團課</p>
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">

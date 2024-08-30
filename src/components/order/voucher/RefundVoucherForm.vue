@@ -19,9 +19,6 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: typeof props['modelValue']): void;
 }>();
 
-const voucherStore = useVoucherStore();
-voucherStore.getGroupClass();
-
 const pointRefundSchema = z.object({
   clientId: z.number(),
   client: z.object({
