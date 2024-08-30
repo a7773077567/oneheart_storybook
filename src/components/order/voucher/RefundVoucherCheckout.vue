@@ -1,15 +1,12 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
-import { useUserStore } from '@/stores';
+import { CheckTable, PaymentComposition } from '@/components/appointment';
 import dayjs from 'dayjs';
-import { PointTypes } from '@/const/general';
 import { useQuasar } from 'quasar';
 import { PaymentMethods } from '@/const/appointment';
 import type { RefundDetail } from '@/views/order/voucher/RefundVoucher.vue';
 import { useRouter } from 'vue-router';
 import { refundClassTicker } from '@/api';
-import { calcReceiptAmount } from '@/utils/helpers';
 
 const props = defineProps<{
   modelValue: RefundDetail;
@@ -24,8 +21,6 @@ const emit = defineEmits<{
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
-
-const userStore = useUserStore();
 
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
@@ -44,19 +39,6 @@ const refundDetail = computed<CheckTableData>(() => {
 });
 
 const $q = useQuasar();
-const receiptData = computed(() => {
-  const { client, groupClass } = props.modelValue;
-
-  return [
-    { name: 'name', label: '姓名', value: client?.name ?? '' },
-    { name: 'gender', label: '性別', value: client?.gender ?? '' },
-    { name: 'id', label: '身分證字號', value: client?.identityNumber ?? '' },
-    { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
-    { name: 'groupClassName', label: '課程名稱', value: groupClass?.name ?? '' },
-    { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },
-  ];
-});
-
 const router = useRouter();
 async function onCheckout() {
   const { clientId, groupClassId, amount } = props.modelValue;
@@ -94,10 +76,6 @@ async function onCheckout() {
     emit('finish');
   });
 }
-
-function onPrint() {
-  window.print();
-}
 </script>
 
 <template>
@@ -119,15 +97,25 @@ function onPrint() {
       <QBtn color="red" size="md" label="確認退款結帳" class="q-px-lg" @click="isCheckoutOpen = true" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @print="onPrint" @checkout="onCheckout">
-        <template #subtitle>
-          <QCardSection horizontal class="justify-center q-py-sm">{{ modelValue.groupClass?.name }} </QCardSection>
-          <QCardSection horizontal class="justify-center q-py-sm recipe_detail">
-            <div>退款券數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.groupClass?.useAbleGroupClassTickets }} 堂</span></div>
+      <QCard class="relative-position" style="width:500px">
+        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 16px; right: 16px; z-index:999" />
+        <QCardSection class="row justify-center q-pa-md">
+          <div class="text-h6 text-center">確認退款</div>
+        </QCardSection>
+
+        <QCardSection class="q-px-md q-py-lg justify-center q-py-sm">
+          <p class="text-center q-mb-md text-h6 text-weight-regular">{{ modelValue.groupClass?.name }}</p>
+          <div class="recipe_detail flex justify-center">
+            <div>退款券數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.groupClass?.useAbleGroupClassTickets }} 張</span></div>
             <div>退款金額 <span class="text-weight-medium text-h6"> $ {{ modelValue.amount }} 元</span></div>
-          </QCardSection>
-        </template>
-      </Receipt>
+          </div>
+        </QCardSection>
+        <QSeparator />
+        <QCardActions class="q-pa-md">
+          <QBtn label="取消" class="col-grow" outline @click="isCheckoutOpen = false" />
+          <QBtn label="確認退款" class="col-grow" color="black" @click="onCheckout" />
+        </QCardActions>
+      </QCard>
     </QDialog>
   </div>
 </template>
@@ -159,6 +147,7 @@ function onPrint() {
   }
   :deep(.q-card__section) {
     .recipe_detail {
+      display: flex;
       gap: 16px;
       text-align: center;
       font-size: 20px;

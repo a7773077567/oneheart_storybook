@@ -1,7 +1,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
-import { useUserStore } from '@/stores';
+import { CheckTable, PaymentComposition } from '@/components/appointment';
 import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { useQuasar } from 'quasar';
@@ -9,7 +8,6 @@ import { PaymentMethods } from '@/const/appointment';
 import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
 import { useRouter } from 'vue-router';
 import { refundPoint } from '@/api';
-import { calcReceiptAmount } from '@/utils/helpers';
 
 const props = defineProps<{
   modelValue: RefundDetail;
@@ -24,8 +22,6 @@ const emit = defineEmits<{
 
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
-
-const userStore = useUserStore();
 
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
@@ -44,21 +40,6 @@ const refundDetail = computed<CheckTableData>(() => {
 });
 
 const $q = useQuasar();
-const receiptData = computed(() => {
-  const { client, pointGroup } = props.modelValue;
-
-  return [
-    { name: 'name', label: '姓名', value: client?.name },
-    { name: 'gender', label: '性別', value: client?.gender ?? '' },
-    { name: 'id', label: '身分證字號', value: client?.identityNumber },
-    { name: 'birthDate', label: '出生年月日', value: client?.birthDate },
-    { name: 'group', label: '類別', value: pointGroup?.type ? PointTypes[pointGroup.type] : '' },
-    { name: 'group', label: '群組', value: pointGroup?.name },
-    { name: 'planName', label: '項目', value: '退堂' },
-    { name: 'planName', label: '堂數', value: `${pointGroup?.points}堂` },
-    { name: 'amount', label: '退款金額', value: calcReceiptAmount(payments.value) },
-  ];
-});
 
 const router = useRouter();
 async function onCheckout() {
@@ -97,10 +78,6 @@ async function onCheckout() {
     emit('finish');
   });
 }
-
-function onPrint() {
-  window.print();
-}
 </script>
 
 <template>
@@ -122,15 +99,28 @@ function onPrint() {
       <QBtn color="red" size="md" label="確認退款結帳" class="q-px-lg" @click="isCheckoutOpen = true" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @print="onPrint" @checkout="onCheckout">
-        <template #subtitle>
-          <QCardSection horizontal class="justify-center q-py-sm">{{ modelValue.pointGroup?.name }}五福國中教師群組 | 院長物理治療{{ modelValue.pointGroup?.type }}</QCardSection>
-          <QCardSection horizontal class="justify-center q-py-sm recipe_detail">
-            <div>退回堂數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.pointGroup?.points }} 堂</span></div>
+      <QCard class="relative-position" style="width:500px">
+        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 16px; right: 16px; z-index:999" />
+        <QCardSection class="row justify-center q-pa-md">
+          <div class="text-h6 text-center">確認退款</div>
+        </QCardSection>
+
+        <QCardSection class="q-px-md q-py-lg justify-center q-py-sm">
+          <div class="recipe_detail flex justify-center q-mb-md">
+            <div class="text-h6 text-weight-regular">{{ modelValue.pointGroup?.name }} | {{ modelValue.pointGroup?.type ? PointTypes[modelValue.pointGroup?.type] : '' }}</div>
+          </div>
+
+          <div class="recipe_detail flex justify-center">
+            <div>退款堂數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.pointGroup?.points }} 堂</span></div>
             <div>退款金額 <span class="text-weight-medium text-h6"> $ {{ modelValue.amount }} 元</span></div>
-          </QCardSection>
-        </template>
-      </Receipt>
+          </div>
+        </QCardSection>
+        <QSeparator />
+        <QCardActions class="q-pa-md">
+          <QBtn label="取消" class="col-grow" outline @click="isCheckoutOpen = false" />
+          <QBtn label="確認退款" class="col-grow" color="black" @click="onCheckout" />
+        </QCardActions>
+      </QCard>
     </QDialog>
   </div>
 </template>
