@@ -55,8 +55,14 @@ export async function refundClassTicker(param: RefundGroupClassTicket) {
   await api.post(`/groupClassTickets/refund`, param);
 }
 
+// 客戶已註冊的團課券
+export async function getClientRegisteredVouchers(clientId: number) {
+  const { data } = await api.get<Voucher[]>(`/clients/${clientId}/registeredGroupClasses`);
+  return data;
+}
+
 // 客戶已購買的團課券
 export async function getClientVouchers(clientId: number) {
-  const { data } = await api.get<Voucher[]>(`/clients/${clientId}/registeredGroupClasses`);
+  const { data } = await api.get<Voucher[]>(`/clients/${clientId}/purchasedGroupClassTickets`);
   return data;
 }
