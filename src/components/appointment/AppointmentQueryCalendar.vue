@@ -141,7 +141,7 @@ function getDate() {
   font-weight: 500;
 }
 :deep(.q-calendar-resource__resource--interval) {
-  min-height: 116px !important;
+  min-height: 135px !important;
 }
 // Display the user block above the interval-item
 :deep(.q-calendar-resource__resource.q-calendar__sticky) {

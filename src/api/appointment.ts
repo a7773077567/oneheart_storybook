@@ -143,9 +143,11 @@ export interface ClientSchedule {
   bookedNumber: number;
   paymentState: number;
   state: number;
-  isValidForRestore: boolean;
   isBeenRearranged: boolean;
+  isEmployeePrice: boolean;
+  isFirstClientSchedule: boolean;
   isRearrangedClientSchedule: boolean;
+  isValidForRestore: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
   note: string;
 }

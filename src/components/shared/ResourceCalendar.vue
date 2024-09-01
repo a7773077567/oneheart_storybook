@@ -137,6 +137,6 @@ function getCalendarStyle() {
   font-weight: 500;
 }
 :deep(.q-calendar-resource__resource--interval) {
-  min-height: 116px !important;
+  min-height: 135px !important;
 }
 </style>

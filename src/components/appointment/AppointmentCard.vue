@@ -25,20 +25,22 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
 </script>
 
 <template>
-  <div class="booking-card">
+  <div class="booking-card" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
     <div class="booking-card__client">
-      客戶：{{ data.client.name }}
+      <div class="booking-card__client--val">客戶：{{ data.client.name }}</div>
+      <p class="booking-card__client--val">科別：{{ typeLabel }}</p>
     </div>
-    <p class="booking-card__type">
-      科別：{{ typeLabel }}
-    </p>
+    <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
     <p class="booking-card__state">
       {{ stateLabel }}
     </p>
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
     <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
-      <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
+      <div>
+        <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
+        <span v-if="data.isFirstClientSchedule">初診</span>
+      </div>
       <p class="q-mb-xs">科別：{{ typeLabel }}</p>
       <p class="note">{{ data.note ?? '-' }}</p>
     </QTooltip>
@@ -61,8 +63,14 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
   background-color: v-bind('cardBgc');
   border-radius: 10px;
   cursor: pointer;
+  position: relative;
   &__client {
     @include overflow;
+    &--val {
+      white-space: pre-wrap;
+      text-wrap: wrap;
+      word-break: break-all;
+    }
   }
   &__type {
     @include overflow;
@@ -75,6 +83,18 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
     font-weight: 700;
     color: v-bind('stateColor');
     background-color: #515050;
+  }
+  &__badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    content: '';
+    background: #515050;
+    color: white;
+    border-radius: 0 0 0 50%;
+    padding: 2px 4px;
+    font-weight: 600;
   }
 }
 

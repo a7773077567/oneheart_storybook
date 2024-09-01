@@ -24,14 +24,14 @@ const userShift = computed(() => schedule.value.userShift);
 const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 
 const data = computed(() => [
-  { label: '姓名', value: client.value.name },
-  { label: '電話', value: client.value.phone },
-  { label: '地址', value: '台中市西屯區青海路(mock data)' },
-  { label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
-  { label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
-  { label: '地點', value: userShift.value.space?.name },
-  { label: '醫師', value: userShift.value.user.name },
-  { label: '預約備註', value: schedule.value.note },
+  { key: 'name', label: '姓名', value: client.value.name },
+  { key: 'phone', label: '電話', value: client.value.phone },
+  { key: 'address', label: '地址', value: '台中市西屯區青海路(mock data)' },
+  { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
+  { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
+  { key: 'location', label: '地點', value: userShift.value.space?.name },
+  { key: 'doctor', label: '醫師', value: userShift.value.user.name },
+  { key: 'note', label: '預約備註', value: schedule.value.note },
 ]);
 
 const states = computed(() => [
@@ -104,6 +104,9 @@ async function saveNote() {
             </template>
             <template v-else>
               {{ item.value }}
+              <div v-if="scheduleDetail.isFirstClientSchedule && item.key === 'name'">
+                <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
+              </div>
             </template>
           </li>
           <QSeparator color="black" class="table__separator" />
@@ -192,5 +195,9 @@ async function saveNote() {
     align-items: center;
     gap: 10px;
   }
+}
+
+.table__item {
+  display: flex;
 }
 </style>
