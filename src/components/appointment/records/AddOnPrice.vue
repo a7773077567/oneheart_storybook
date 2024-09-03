@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ClientScheduleDetail } from '@/api';
+import { useQuasar } from 'quasar';
 
 defineProps<{
   scheduleId: number;
@@ -14,16 +15,19 @@ const addOnList = ref([
 ]);
 const addOnItems = computed(() => addOnList.value.filter(item => item.isAdded));
 
+const $q = useQuasar();
 function addItem(item: typeof addOnList.value[number]) {
   item.isAdded = true;
   // fetch api
   console.log(addOnItems.value);
+  $q.notify({ message: '加價服務添加成功', timeout: 200, position: 'top' });
 }
 
 function rmItem(item: typeof addOnList.value[number]) {
   item.isAdded = false;
   // fetch api
   console.log(addOnItems.value);
+  $q.notify({ message: '加價服務移除成功', timeout: 200, position: 'top' });
 }
 </script>
 
