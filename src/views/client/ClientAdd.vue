@@ -15,7 +15,7 @@ const newClientSchema = z.object({
   birthDate: z.string().optional(),
   address: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
-  introducerClientId: z.number({ required_error: '必填' }),
+  introducerClientId: z.number().nullable().optional(),
 });
 
 const { handleSubmit, resetForm } = useForm({
@@ -64,7 +64,7 @@ const onSubmit = handleSubmit(async (values) => {
         <OInput name="address" hide-bottom-space class="col-grow" />
       </fieldset>
       <fieldset class="col-12">
-        <span class="label">介紹人*</span>
+        <span class="label">介紹人</span>
         <OMemberSearch name="introducerClientId" class="full-width" />
       </fieldset>
       <fieldset class="col-12">
