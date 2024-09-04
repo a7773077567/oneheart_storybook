@@ -15,9 +15,12 @@ withDefaults(defineProps<{
 });
 
 defineEmits<{
-  (e: 'print'): void;
   (e: 'checkout'): void;
 }>();
+
+function print() {
+  window.print();
+}
 </script>
 
 <template>
@@ -47,7 +50,7 @@ defineEmits<{
       </div>
     </QCardSection>
     <QCardActions class="actions no-print">
-      <QBtn label="列印收據" outline @click="$emit('print')" />
+      <QBtn label="列印收據" outline @click="print" />
       <QBtn v-if="!hideCheckout" :label="confirmLabel" color="black" @click="$emit('checkout')" />
     </QCardActions>
   </QCard>
@@ -119,6 +122,9 @@ defineEmits<{
   }
   .q-card {
     box-shadow: none;
+  }
+  .receipt {
+    width: 8cm;
   }
 }
 </style>

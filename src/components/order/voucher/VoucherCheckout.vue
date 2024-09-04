@@ -72,10 +72,6 @@ async function onCheckout() {
     emit('finish'),
   );
 }
-
-function onPrint() {
-  window.print();
-}
 </script>
 
 <template>
@@ -96,7 +92,7 @@ function onPrint() {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" @checkout="onCheckout" @print="onPrint" />
+      <Receipt :rows="receiptData" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>

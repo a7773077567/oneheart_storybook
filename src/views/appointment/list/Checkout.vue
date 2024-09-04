@@ -65,10 +65,6 @@ const methodOptions = computed(() => {
     : options.filter(option => option.value !== PaymentMethod['團課卷']);
 });
 
-function onPrint() {
-  window.print();
-}
-
 async function onCheckout() {
   await checkout(scheduleId, {
     amount: totalAmount.value,
@@ -81,7 +77,7 @@ async function onCheckout() {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :space-name="spaceName" @print="onPrint" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :space-name="spaceName" @checkout="onCheckout" />
     </QDialog>
 
     <CheckTable :data="info">

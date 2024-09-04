@@ -87,10 +87,6 @@ async function onCheckout() {
   },
   );
 }
-
-function onPrint() {
-  window.print();
-}
 </script>
 
 <template>
@@ -110,7 +106,7 @@ function onPrint() {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @print="onPrint" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>

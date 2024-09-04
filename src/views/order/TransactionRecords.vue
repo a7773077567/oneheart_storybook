@@ -208,10 +208,6 @@ async function checkPaymentDetail(val: any) {
   targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
 }
 
-function onPrint() {
-  window.print();
-}
-
 const hasRecipeTypes = new Set([TransactionTypes.堂數交易, TransactionTypes.團課券購買, TransactionTypes.門診費用]);
 </script>
 
@@ -250,7 +246,7 @@ const hasRecipeTypes = new Set([TransactionTypes.堂數交易, TransactionTypes.
       </template>
     </QTable>
     <QDialog v-model="isReceiptDialogOpen">
-      <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" @print="onPrint" />
+      <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" />
     </QDialog>
     <QDialog v-model="showDetail">
       <PaymentDetail :detail="targetPaymentDetails" />
