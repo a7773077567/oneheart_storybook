@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
 import { PaymentMethods } from '@/const/appointment';
-import { CheckTable, PaymentComposition } from '@/components/appointment';
+import { AddOnTable, CheckTable, PaymentComposition } from '@/components/appointment';
 import type { PaymentDetail } from '@/api';
 import { PointTypes, ShiftType, TransactionTypes } from '@/const/general';
 
@@ -61,6 +61,18 @@ const paymentDetail = computed(() => {
       return props.detail.clientSchedulePaymentMultiChannelPay;
   }
 });
+
+const hasAddOn = computed(() => props.detail.type === TransactionTypes.門診費用 && props.detail.addOnServices.some(addOn => addOn.isAddOn));
+
+const addOns = computed(() => {
+  if (props.detail.type !== TransactionTypes.門診費用)
+    return [];
+
+  return [
+    { key: 'title', value: '加購服務', span: true, custom: false },
+    ...props.detail.addOnServices.filter(addOn => addOn.isAddOn).map(addOn => ({ key: 'item1', value: addOn.serviceName, label: '項目' })),
+  ];
+});
 </script>
 
 <template>
@@ -77,6 +89,9 @@ const paymentDetail = computed(() => {
           </div>
         </template>
       </CheckTable>
+
+      <AddOnTable v-if="hasAddOn" :data="addOns" />
+
       <!-- @vue-ignore -->
       <PaymentComposition readonly :model-value="paymentDetail as CompositionPayment" :method-options="methodOptions" />
 

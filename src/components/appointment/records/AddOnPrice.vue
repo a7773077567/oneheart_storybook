@@ -1,32 +1,29 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { ClientScheduleDetail } from '@/api';
+import { type ClientScheduleDetail, updateAddOnServices } from '@/api';
 import { useQuasar } from 'quasar';
 
-defineProps<{
+const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
   readonly: boolean;
 }>();
 
-const addOnList = ref([
-  { label: '儀器治療', value: 1, isAdded: true },
-  { label: '加時', value: 2, isAdded: false },
-]);
-const addOnItems = computed(() => addOnList.value.filter(item => item.isAdded));
+const addOnList = ref(
+  props.scheduleDetail.addOnServices.map((addOn, idx) => ({ label: addOn.serviceName, value: idx + 1, isAdded: addOn.isAddOn })),
+);
+const addOnResult = computed(() => addOnList.value.map(item => ({ serviceName: item.label, isAddOn: item.isAdded })));
 
 const $q = useQuasar();
-function addItem(item: typeof addOnList.value[number]) {
+async function addItem(item: typeof addOnList.value[number]) {
   item.isAdded = true;
-  // fetch api
-  console.log(addOnItems.value);
+  await updateAddOnServices(props.scheduleId, addOnResult.value);
   $q.notify({ message: '加價服務添加成功', timeout: 200, position: 'top' });
 }
 
-function rmItem(item: typeof addOnList.value[number]) {
+async function rmItem(item: typeof addOnList.value[number]) {
+  await updateAddOnServices(props.scheduleId, addOnResult.value);
   item.isAdded = false;
-  // fetch api
-  console.log(addOnItems.value);
   $q.notify({ message: '加價服務移除成功', timeout: 200, position: 'top' });
 }
 </script>

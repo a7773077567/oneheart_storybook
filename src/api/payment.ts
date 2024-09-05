@@ -3,6 +3,7 @@ import type { PaymentTypes, PointTypes, TransactionTypes } from '@/const/general
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
 import type { UserShift } from './shift';
+import type { AddOnService } from './appointment';
 
 interface BasicPaymentRecord {
   amount: number;
@@ -15,6 +16,7 @@ interface BasicPaymentRecord {
 
 // 門診結帳
 export interface MedicalPaymentRecord extends BasicPaymentRecord {
+  addOnServices: AddOnService[];
   clientSchedulePaymentMultiChannelPay: {
     amount: number;
     authorisationCode: null | string;

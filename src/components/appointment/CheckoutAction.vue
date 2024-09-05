@@ -25,7 +25,7 @@ const model = computed({
     </div>
 
     <div class="checkout-action__checkout">
-      <QBtn label="結帳" outline style="width: 150px; font-size: 16px" @click="$emit('checkout')" />
+      <QBtn label="結帳" color="black" style="width: 150px; font-size: 16px" @click="$emit('checkout')" />
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
+import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
 import { ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref } from 'vue';
@@ -18,7 +18,7 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 
-const { id: scheduleId, date: scheduleDate, client, userShift } = (appointmentStore.targetClientSchedule!);
+const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices } = (appointmentStore.targetClientSchedule!);
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
@@ -29,8 +29,14 @@ const info: CheckTableData = [
   { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
-  { key: 'type', value: shiftType.value?.label, label: '項目' },
-  { key: 'userName', value: userShift?.user.name, label: '治療師' },
+  { key: 'userName', value: userShift?.user.name, label: '治療師', span: true },
+  { key: 'type', value: shiftType.value?.label, label: '項目', span: true },
+];
+
+const hasAddOn = computed(() => addOnServices.some(addOn => addOn.isAddOn));
+const addOns: CheckTableData = [
+  { key: 'title', value: '加購服務', span: true, custom: false },
+  { key: 'item1', value: '儀器治療', label: '項目' },
 ];
 
 const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
@@ -87,6 +93,8 @@ async function onCheckout() {
         </div>
       </template>
     </CheckTable>
+
+    <AddOnTable v-if="hasAddOn" :data="addOns" />
 
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
     <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />

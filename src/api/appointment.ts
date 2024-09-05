@@ -130,6 +130,7 @@ export interface SportConsultation {
 }
 
 export interface ClientSchedule {
+  addOnServices: AddOnService[];
   id: number;
   clientId: number;
   client: Client;
@@ -249,6 +250,11 @@ export interface Checkout {
     groupClassTicketUsed: number | null;
     details: string;
   }[];
+}
+
+export interface AddOnService {
+  serviceName: string;
+  isAddOn: boolean;
 }
 
 // ========== Requests ==========
@@ -380,6 +386,14 @@ export async function checkout(scheduleId: number, payload: Checkout) {
  */
 export async function updateNote(clientScheduleId: number, note: string) {
   await api.patch(`clientSchedules/${clientScheduleId}/update-note`, { note });
+}
+
+/**
+ * 更新排程加購服務
+ * @param clientScheduleId
+ */
+export async function updateAddOnServices(clientScheduleId: number, addOnServices: AddOnService[]) {
+  await api.patch(`/clientSchedules/${clientScheduleId}/update-addOnServices`, { addOnServices });
 }
 
 // ========== Schemas ==========
