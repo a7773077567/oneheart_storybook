@@ -18,6 +18,8 @@ export const TherapyTypes = {
   sports: '運動諮詢',
   oneOnOne: '教練課',
   group: '團課',
+  physicalTrial: '物理治療體驗門診',
+  InternshipClinic: '新人實習門診',
 };
 
 // 場館類別
@@ -50,6 +52,8 @@ export enum ShiftType {
   教練課 = 9,
   運動諮詢 = 10,
   團課 = 11,
+  物理治療體驗門診 = 12,
+  新人實習門診 = 13,
 }
 
 type TabName = typeof TabNames[number];
@@ -179,6 +183,26 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
     showInOptions: false,
+  },
+  physicalTrial: {
+    identifier: ShiftType['物理治療體驗門診'],
+    name: 'physicalTrial',
+    label: '物理治療體驗門診',
+    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 200,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+  },
+  InternshipClinic: {
+    identifier: ShiftType['新人實習門診'],
+    name: 'physicalTherapy',
+    label: '新人實習門診',
+    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 200,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
   },
 };
 
