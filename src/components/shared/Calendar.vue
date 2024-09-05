@@ -78,7 +78,7 @@ function onChange(calendarDuration: ChangeParams) {
 
       <QBtn
         v-if="!simpleMode"
-        :label="isEditing ? '取消編輯' : '編輯'"
+        :label="isEditing ? '完成編輯' : '編輯'"
         outline
         style="width: 113px;"
         @click="isEditing = !isEditing"
