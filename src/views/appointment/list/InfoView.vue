@@ -73,7 +73,6 @@ function getRecordModules() {
           <Suspense>
             <component
               :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule"
-              :readonly="appointmentStore.targetClientSchedule?.state === 4"
             />
           </Suspense>
         </KeepAlive>

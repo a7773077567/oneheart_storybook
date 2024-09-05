@@ -13,7 +13,6 @@ import { type ClientScheduleDetail, updateNote } from '@/api';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 const $q = useQuasar();

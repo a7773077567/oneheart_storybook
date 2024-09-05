@@ -17,7 +17,6 @@ import { useQuasar } from 'quasar';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 const $q = useQuasar();
@@ -76,7 +75,6 @@ function pasteHistory(history: HistoryChiefComplaint) {
           />
         </div>
         <OInput
-          :readonly="readonly"
           :name="item.name"
           type="textarea"
           class="input__item"
@@ -84,7 +82,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
         />
       </div>
     </div>
-    <div v-if="!readonly" class="form__actions">
+    <div class="form__actions">
       <QBtn
         label="儲存"
         style="width: 100px"

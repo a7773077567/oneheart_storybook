@@ -10,7 +10,6 @@ import { useQuasar } from 'quasar';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -56,22 +55,22 @@ const onSubmit = handleSubmit(async (formValue) => {
     <form class="sleep_form_body">
       <fieldset>
         <legend>客戶問題描述</legend>
-        <OInput :readonly="readonly" name="customerProblemDescription" type="textarea" class="input__item" hide-bottom-space />
+        <OInput name="customerProblemDescription" type="textarea" class="input__item" hide-bottom-space />
       </fieldset>
       <fieldset>
         <legend>評估狀態</legend>
-        <OInput :readonly="readonly" name="assessmentStatus" type="textarea" class="input__item" hide-bottom-space />
+        <OInput name="assessmentStatus" type="textarea" class="input__item" hide-bottom-space />
       </fieldset>
       <fieldset>
         <legend>產品描述</legend>
-        <OInput :readonly="readonly" name="productDescription" type="textarea" class="input__item" hide-bottom-space />
+        <OInput name="productDescription" type="textarea" class="input__item" hide-bottom-space />
       </fieldset>
       <fieldset>
         <legend>備註</legend>
-        <OInput :readonly="readonly" name="note" type="textarea" class="input__item" hide-bottom-space />
+        <OInput name="note" type="textarea" class="input__item" hide-bottom-space />
       </fieldset>
       <fieldset>
-        <OFile v-if="!readonly" v-model="newAttachment" multiple label="選擇檔案" />
+        <OFile v-model="newAttachment" multiple label="選擇檔案" />
         <div class="preview_files">
           <OPreview
             v-for="(attachment, idx) in displayAttachments" :key="attachment.name"
@@ -81,7 +80,7 @@ const onSubmit = handleSubmit(async (formValue) => {
         </div>
       </fieldset>
     </form>
-    <div v-if="!readonly" class="sleep_form_action">
+    <div class="sleep_form_action">
       <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
   </div>

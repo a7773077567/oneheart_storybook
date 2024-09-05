@@ -8,7 +8,6 @@ import { useKonva } from '@/composables/konva';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 defineEmits<{
@@ -44,7 +43,7 @@ async function handleSave() {
 <template>
   <div class="consultation_attachment">
     <div class="settings">
-      <div v-if="!readonly" class="canvas_tools">
+      <div class="canvas_tools">
         <QBtn
           round
           icon="o_edit"
@@ -62,7 +61,7 @@ async function handleSave() {
           @click="mode = 'eraser'"
         />
       </div>
-      <QBtn v-if="!readonly" label="儲存" style="width: 100px" @click="handleSave" />
+      <QBtn label="儲存" style="width: 100px" @click="handleSave" />
     </div>
     <div id="container" ref="container" />
   </div>

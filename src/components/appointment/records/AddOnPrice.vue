@@ -6,7 +6,6 @@ import { useQuasar } from 'quasar';
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 const addOnList = ref(

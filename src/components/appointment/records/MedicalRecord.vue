@@ -18,7 +18,6 @@ interface DataItem {
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
-  readonly: boolean;
 }>();
 
 const appointmentStore = useAppointmentStore();
@@ -79,9 +78,9 @@ function pasteHistory(history: HistoryChiefComplaint) {
           <span>{{ item.label }}</span>
           <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="openHistoryDialog" />
         </div>
-        <OInput :readonly="readonly" :name="item.name" type="textarea" class="input__item" hide-bottom-space />
+        <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
       </div>
-      <OFile v-if="!readonly" v-model="newAttachment" label="選擇檔案" multiple />
+      <OFile v-model="newAttachment" label="選擇檔案" multiple />
       <div class="preview_files">
         <OPreview
           v-for="(attachment, idx) in displayAttachments" :key="attachment.name"
@@ -90,7 +89,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
         />
       </div>
     </div>
-    <div v-if="!readonly" class="form__actions">
+    <div class="form__actions">
       <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
