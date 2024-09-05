@@ -27,7 +27,7 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
 <template>
   <div class="booking-card" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
     <div class="booking-card__client">
-      <div class="booking-card__client--val">客戶：{{ data.client.name }}</div>
+      <div class="booking-card__client--val q-pr-sm">客戶：{{ data.client.name }}</div>
       <p class="booking-card__client--val">科別：{{ typeLabel }}</p>
     </div>
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
