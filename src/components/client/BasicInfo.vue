@@ -6,14 +6,14 @@ import { useClientStore } from '@/stores';
 import { omit, pick } from 'radash';
 import { type Client, updateClient, updateIntroducer } from '@/api';
 import { useQuasar } from 'quasar';
-import { genderOptions } from '@/const/general';
+import { ShiftType, genderOptions } from '@/const/general';
 
 const props = defineProps<{
   clientId: string;
 }>();
 
 const clientStore = useClientStore();
-await clientStore.getClientInfo(+props.clientId);
+await Promise.allSettled([clientStore.getClientInfo(+props.clientId), clientStore.getDepInChargeTherapist(+props.clientId)]);
 
 const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer']) : {});
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
@@ -34,6 +34,14 @@ const onSubmit = handleSubmit(async (value) => {
   isEdit.value = false;
   $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
 });
+
+const departmentTherapists = computed(() => [{
+  key: '科別',
+  val: '治療師',
+}, ...clientStore.inChargeUsers.map(therapist => ({
+  key: ShiftType[therapist.userShiftType],
+  val: therapist.inChargeUserName,
+}))]);
 </script>
 
 <template>
@@ -88,10 +96,19 @@ const onSubmit = handleSubmit(async (value) => {
       </form>
     </section>
 
-    <!-- 1.1.2 task -->
-    <!-- <section>
+    <section>
       <h3 class="subtitle q-mb-md">科別負責人員</h3>
-    </section> -->
+      <div class="department_list">
+        <div v-for="department in departmentTherapists" :key="department.key" class="row">
+          <div class="col-auto department_list__key">
+            {{ department.key }}
+          </div>
+          <div class="col department_list__val">
+            {{ department.val }}
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -116,6 +133,17 @@ const onSubmit = handleSubmit(async (value) => {
     .q-field.q-field--readonly {
       background: #e0e0e0;
     }
+  }
+}
+
+.department_list {
+  max-width: 600px;
+  .row > div {
+    padding: 10px;
+    border: 1px solid black;
+  }
+  &__key {
+    width: 250px;
   }
 }
 </style>

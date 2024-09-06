@@ -73,6 +73,11 @@ export interface PurchaseRecord {
   usedPoint: number | null;
 }
 
+export interface DepInChargeTherapist {
+  userShiftType: ShiftType;
+  inChargeUserName: string;
+}
+
 // 取得 memo
 export async function getMemos(clientId: number) {
   const { data } = await api.get<Memo[]>(`clients/${clientId}/memos`);
@@ -135,4 +140,12 @@ export async function getClientPayments(clientId: number) {
  */
 export async function updateIntroducer(clientId: number, body: { introducerClientId: number }) {
   await api.patch(`clients/${clientId}/update-introducer`, body);
+}
+
+/**
+ * 取得客戶各科別負責人
+ */
+export async function getDepInChargeTherapist(clientId: number) {
+  const { data } = await api.get<DepInChargeTherapist[]>(`clients/${clientId}/inChargeUsers`);
+  return data;
 }
