@@ -95,17 +95,20 @@ async function saveNote() {
             {{ item.label }}
           </li>
           <li class="table__item">
-            <template v-if="item.label === '預約備註'">
+            <div v-if="item.label === '預約備註'" class="column full-width">
               <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
-              <div class="q-mt-md flex justify-end">
+              <div class="q-mt-md flex justify-end q-ms-sm">
                 <QBtn outline label="儲存" :disable="!note" @click="saveNote" />
+              </div>
+            </div>
+            <template v-else-if="item.key === 'name'">
+              <a class="client_name" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ item.value }}</a>
+              <div v-if="scheduleDetail.isFirstClientSchedule">
+                <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
               </div>
             </template>
             <template v-else>
-              {{ item.value }}
-              <div v-if="scheduleDetail.isFirstClientSchedule && item.key === 'name'">
-                <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
-              </div>
+              <span>{{ item.value }}</span>
             </template>
           </li>
           <QSeparator color="black" class="table__separator" />
@@ -198,5 +201,12 @@ async function saveNote() {
 
 .table__item {
   display: flex;
+}
+
+.client_name {
+  cursor: pointer;
+  &:hover {
+    font-weight: 700;
+  }
 }
 </style>
