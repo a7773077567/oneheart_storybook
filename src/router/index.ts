@@ -89,6 +89,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '首頁',
           requiredAuth: true,
+          permission: true,
         },
         children: [
           {
@@ -119,6 +120,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '客戶預約',
           requiredAuth: true,
+          permission: true,
         },
         children: [
           {
@@ -218,6 +220,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '客戶管理',
           requiredAuth: true,
+          permission: true,
         },
         redirect: { name: 'clientList' },
         children: [
@@ -266,6 +269,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '商城',
           requiredAuth: true,
+          permission: false,
         },
       },
       {
@@ -275,6 +279,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '交易管理',
           requiredAuth: true,
+          permission: true,
         },
         redirect: { name: 'pointsTopup' },
         children: [
@@ -314,6 +319,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '排班',
           requiredAuth: true,
+          permission: true,
         },
         children: [
           {
@@ -361,6 +367,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '人員設定',
           requiredAuth: true,
+          permission: false,
         },
         children: [
           {
@@ -413,6 +420,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           label: '場館管理',
           requiredAuth: true,
+          permission: false,
         },
       },
 

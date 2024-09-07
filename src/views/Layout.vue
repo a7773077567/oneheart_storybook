@@ -37,6 +37,16 @@ function optionDisable(option: any): boolean {
 const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
 
+const permissionControlTabs = computed(() => {
+  // temporary control
+  const isAdminAccount = userInfo.value?.id === 16;
+
+  if (import.meta.env.MODE === 'production' && !isAdminAccount) {
+    return navTabs.value?.filter(route => route?.meta?.permission);
+  }
+  return navTabs.value;
+});
+
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
 }
@@ -68,7 +78,7 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
       </QToolbar>
       <QTabs>
         <QRouteTab
-          v-for="(tab, index) in navTabs"
+          v-for="(tab, index) in permissionControlTabs"
           :key="index"
           :to="{ name: tab.route }"
           :label="tab.label"

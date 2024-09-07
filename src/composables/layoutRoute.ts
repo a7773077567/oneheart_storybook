@@ -12,6 +12,7 @@ export function useLayoutRoute() {
     return routes.find(route => route.name === 'layout')?.children?.map(route => ({
       label: route.meta?.label as string,
       route: route.name,
+      ...route,
     }));
   },
   );
