@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import type { QTableProps } from 'quasar';
-import { useConfirm } from '@/composables/dialog';
+import { useDialog } from '@/composables/dialog';
 import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
 import { PointTypes, pointsGroupOptions } from '@/const/general';
 import { type CreateGroupField, type EditGroupField, type PointsGroup, createPointGroup, deletePointGroup, getClientPointGroup, updatePointGroup } from '@/api';
@@ -76,7 +76,7 @@ function clickCreateBtn() {
 }
 
 async function deleteGroup(delGroupId: number) {
-  const { onOk } = await useConfirm({ title: '確定刪除此群組', content: '一但刪除群組，則無法復原，如確認無誤請按確定。' });
+  const { onOk } = await useDialog({ type: 'confirm', title: '確定刪除此群組', message: '一但刪除群組，則無法復原，如確認無誤請按確定。' });
   onOk(async () => {
     await deletePointGroup(delGroupId);
     getGroupList();

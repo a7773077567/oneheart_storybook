@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
-import { CheckTable, PaymentComposition } from '@/components/appointment';
+import { computed, h, nextTick, ref } from 'vue';
+import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
 import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { useQuasar } from 'quasar';
@@ -8,6 +8,9 @@ import { PaymentMethods } from '@/const/appointment';
 import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
 import { useRouter } from 'vue-router';
 import { refundPoint } from '@/api';
+import { useUserStore } from '@/stores';
+import { calcReceiptAmount } from '@/utils/helpers';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{
   modelValue: RefundDetail;
@@ -23,6 +26,7 @@ const emit = defineEmits<{
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
+const userStore = useUserStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
@@ -39,8 +43,21 @@ const refundDetail = computed<CheckTableData>(() => {
   ];
 });
 
-const $q = useQuasar();
+// receipt
+const receiptData = computed(() => {
+  const { client, pointGroup } = props.modelValue;
+  return [
+    { name: 'name', label: '姓名', value: client?.name ?? '' },
+    { name: 'gender', label: '性別', value: client?.gender ?? '' },
+    { name: 'id', label: '身分證字號', value: client?.identityNumber ?? '' },
+    { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
+    { name: 'group', label: '群組', value: pointGroup?.name ?? '' },
+    { name: 'amount', label: '金額', value: `$${calcReceiptAmount(payments.value)}` },
+    { name: 'pointGained', label: '退款堂數', value: `${pointGroup?.points ?? 0}堂` },
+  ];
+});
 
+const $q = useQuasar();
 const router = useRouter();
 async function onCheckout() {
   const { clientId, clientGroupId, amount } = props.modelValue;
@@ -54,6 +71,7 @@ async function onCheckout() {
     });
     return;
   }
+
   await refundPoint({
     clientId,
     clientGroupId,
@@ -61,21 +79,23 @@ async function onCheckout() {
     multiChannelPay,
   });
 
-  $q.dialog({
+  const { onOk, onCancel } = await useDialog({
     title: '退款已完成',
-    message: '<div class="text-center q-pa-md"><span class="material-icons" style="color: #1D9E30; font-size: 64px">check_circle</span> <p class="q-y-sm">退款已完成，您可在「查詢交易紀錄」檢視此筆交易</p></div>',
-    html: true,
-    style: '480px',
-    ok: {
-      label: '我知道了',
-      color: 'black',
-      class: 'full-width',
-    },
-  }).onOk(() => {
-    router.push({ name: 'transactionRecords' });
+    message: '退款已完成，您可在「查詢交易紀錄」檢視此筆交易',
+    okLabel: '列印收據',
+    cancelLabel: '結束',
+  });
+
+  onOk(() => {
+    nextTick(() => {
+      // after success dialog close then do the print
+      window.print();
+      emit('finish');
+    });
   },
-  ).onCancel(() => {
-    emit('finish');
+  );
+  onCancel(() => {
+    router.push({ name: 'transactionRecords' });
   });
 }
 </script>
@@ -98,31 +118,10 @@ async function onCheckout() {
       <QBtn outline size="md" label="取消" class="q-px-lg q-mr-md" @click="$emit('cancel')" />
       <QBtn color="red" size="md" label="確認退款結帳" class="q-px-lg" @click="isCheckoutOpen = true" />
     </div>
-    <QDialog v-model="isCheckoutOpen">
-      <QCard class="relative-position" style="width:500px">
-        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 16px; right: 16px; z-index:999" />
-        <QCardSection class="row justify-center q-pa-md">
-          <div class="text-h6 text-center">確認退款</div>
-        </QCardSection>
-
-        <QCardSection class="q-px-md q-py-lg justify-center q-py-sm">
-          <div class="recipe_detail flex justify-center q-mb-md">
-            <div class="text-h6 text-weight-regular">{{ modelValue.pointGroup?.name }} | {{ modelValue.pointGroup?.type ? PointTypes[modelValue.pointGroup?.type] : '' }}</div>
-          </div>
-
-          <div class="recipe_detail flex justify-center">
-            <div>退款堂數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.pointGroup?.points }} 堂</span></div>
-            <div>退款金額 <span class="text-weight-medium text-h6"> $ {{ modelValue.amount }} 元</span></div>
-          </div>
-        </QCardSection>
-        <QSeparator />
-        <QCardActions class="q-pa-md">
-          <QBtn label="取消" class="col-grow" outline @click="isCheckoutOpen = false" />
-          <QBtn label="確認退款" class="col-grow" color="black" @click="onCheckout" />
-        </QCardActions>
-      </QCard>
-    </QDialog>
   </div>
+  <QDialog v-model="isCheckoutOpen">
+    <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @checkout="onCheckout" @close="isCheckoutOpen = false" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">

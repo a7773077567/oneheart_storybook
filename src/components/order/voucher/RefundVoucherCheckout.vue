@@ -1,12 +1,15 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
-import { CheckTable, PaymentComposition } from '@/components/appointment';
+import { computed, nextTick, ref } from 'vue';
+import { CheckTable, PaymentComposition, Receipt } from '@/components/appointment';
 import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 import { PaymentMethods } from '@/const/appointment';
 import type { RefundDetail } from '@/views/order/voucher/RefundVoucher.vue';
 import { useRouter } from 'vue-router';
 import { refundClassTicker } from '@/api';
+import { calcReceiptAmount } from '@/utils/helpers';
+import { useUserStore } from '@/stores';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{
   modelValue: RefundDetail;
@@ -22,6 +25,7 @@ const emit = defineEmits<{
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
+const userStore = useUserStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
@@ -35,6 +39,20 @@ const refundDetail = computed<CheckTableData>(() => {
     { key: 'classId', value: groupClass?.name ?? '', label: '團課名稱' },
     { key: 'ticketGained', value: `${groupClass?.useAbleGroupClassTickets ?? 0} 張`, label: '數量' },
     { key: 'amount', value: `$ ${(amount)}`, label: '金額' },
+  ];
+});
+
+// receipt
+const receiptData = computed(() => {
+  const { client, groupClass } = props.modelValue;
+  return [
+    { name: 'name', label: '姓名', value: client?.name ?? '' },
+    { name: 'gender', label: '性別', value: client?.gender ?? '' },
+    { name: 'id', label: '身分證字號', value: client?.identityNumber ?? '' },
+    { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
+    { name: 'groupClassName', label: '課程名稱', value: groupClass?.name ?? '' },
+    { name: 'amount', label: '金額', value: `$${calcReceiptAmount(payments.value)}` },
+    { name: 'pointGained', label: '張數', value: `${groupClass?.useAbleGroupClassTickets ?? 0}張` },
   ];
 });
 
@@ -59,21 +77,23 @@ async function onCheckout() {
     multiChannelPay,
   });
 
-  $q.dialog({
+  const { onOk, onCancel } = await useDialog({
     title: '退款已完成',
-    message: '<div class="text-center q-pa-md"><span class="material-icons" style="color: #1D9E30; font-size: 64px">check_circle</span> <p class="q-y-sm">退款已完成，您可在「查詢交易紀錄」檢視此筆交易</p></div>',
-    html: true,
-    style: '480px',
-    ok: {
-      label: '我知道了',
-      color: 'black',
-      class: 'full-width',
-    },
-  }).onOk(() => {
-    router.push({ name: 'transactionRecords' });
+    message: '退款已完成，您可在「查詢交易紀錄」檢視此筆交易',
+    okLabel: '列印收據',
+    cancelLabel: '結束',
+  });
+
+  onOk(() => {
+    // after success dialog close then do the print
+    nextTick(() => {
+      window.print();
+      emit('finish');
+    });
   },
-  ).onCancel(() => {
-    emit('finish');
+  );
+  onCancel(() => {
+    router.push({ name: 'transactionRecords' });
   });
 }
 </script>
@@ -96,26 +116,9 @@ async function onCheckout() {
       <QBtn outline size="md" label="取消" class="q-px-lg q-mr-md" @click="$emit('cancel')" />
       <QBtn color="red" size="md" label="確認退款結帳" class="q-px-lg" @click="isCheckoutOpen = true" />
     </div>
-    <QDialog v-model="isCheckoutOpen">
-      <QCard class="relative-position" style="width:500px">
-        <QIcon v-close-popup name="close" color="black" class="cursor-pointer absolute-right no-print" size="24px" style="top: 16px; right: 16px; z-index:999" />
-        <QCardSection class="row justify-center q-pa-md">
-          <div class="text-h6 text-center">確認退款</div>
-        </QCardSection>
 
-        <QCardSection class="q-px-md q-py-lg justify-center q-py-sm">
-          <p class="text-center q-mb-md text-h6 text-weight-regular">{{ modelValue.groupClass?.name }}</p>
-          <div class="recipe_detail flex justify-center">
-            <div>退款券數 <span class="text-weight-medium q-mr-md text-h6">{{ modelValue.groupClass?.useAbleGroupClassTickets }} 張</span></div>
-            <div>退款金額 <span class="text-weight-medium text-h6"> $ {{ modelValue.amount }} 元</span></div>
-          </div>
-        </QCardSection>
-        <QSeparator />
-        <QCardActions class="q-pa-md">
-          <QBtn label="取消" class="col-grow" outline @click="isCheckoutOpen = false" />
-          <QBtn label="確認退款" class="col-grow" color="black" @click="onCheckout" />
-        </QCardActions>
-      </QCard>
+    <QDialog v-model="isCheckoutOpen">
+      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @checkout="onCheckout" @close="isCheckoutOpen = false" />
     </QDialog>
   </div>
 </template>

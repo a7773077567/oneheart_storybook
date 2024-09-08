@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { OSteps } from '@/components/shared';
 import RefundForm from '@/components/order/point/RefundForm.vue';
 import RefundCheckout from '@/components/order/point/RefundCheckout.vue';
-import { usePointsStore } from '@/stores';
 import type { Client, PointsGroup, RefundPoint } from '@/api';
 
 const steps = [{ label: '填寫退款內容', key: 'form' }, { label: '選擇退款方式', key: 'checkout' }];

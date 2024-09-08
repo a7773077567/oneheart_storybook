@@ -9,6 +9,7 @@ withDefaults(defineProps<{
   hideCheckout?: boolean;
   title?: string;
   confirmLabel?: string;
+  hidePrint?: boolean; // to refactor, temporary solution for refund checkout
 }>(), {
   title: '結帳確定',
   confirmLabel: '確定結帳',
@@ -16,6 +17,7 @@ withDefaults(defineProps<{
 
 defineEmits<{
   (e: 'checkout'): void;
+  (e: 'close'): void;
 }>();
 
 function print() {
@@ -50,7 +52,8 @@ function print() {
       </div>
     </QCardSection>
     <QCardActions class="actions no-print">
-      <QBtn label="列印收據" outline @click="print" />
+      <QBtn v-if="hidePrint" label="返回編輯" outline @click="$emit('close')" />
+      <QBtn v-else label="列印收據" outline @click="print" />
       <QBtn v-if="!hideCheckout" :label="confirmLabel" color="black" @click="$emit('checkout')" />
     </QCardActions>
   </QCard>

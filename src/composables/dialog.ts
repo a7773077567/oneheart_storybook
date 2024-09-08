@@ -1,25 +1,12 @@
 import { Dialog } from 'quasar';
 import { OConfirmDialog } from '@/components/shared';
-import { ref } from 'vue';
 
-interface ConfirmParam {
-  title: string;
-  content: string;
-  okLabel?: string;
-  cancelLabel?: string;
-}
-export async function useConfirm({
-  title,
-  content,
-}: ConfirmParam) {
-  const modelValue = ref(true);
+export async function useDialog(dialogProps: InstanceType<typeof OConfirmDialog>['$props']) {
   const { onOk, onCancel, hide } = Dialog.create({
     component: OConfirmDialog,
     componentProps: {
-      title,
-      content,
+      ...dialogProps,
       persistent: true,
-      modelValue: modelValue.value,
     },
   });
 

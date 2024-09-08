@@ -1,12 +1,20 @@
 <script setup lang='ts'>
 import { useDialogPluginComponent } from 'quasar';
-import { ref } from 'vue';
 
-defineProps<{
-  modelValue: boolean;
+interface DialogProps {
   title: string;
-  content: string;
-}>();
+  message: string;
+  okLabel?: string;
+  cancelLabel?: string;
+  type?: 'confirm' | 'success';
+}
+
+withDefaults(defineProps<DialogProps>(), {
+  type: 'success',
+  okLabel: '確定',
+  cancelLabel: '取消',
+});
+
 defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
   (e: 'ok'): void;
@@ -23,23 +31,27 @@ function onOkClick() {
 </script>
 
 <template>
-  <QDialog ref="dialogRef" :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
+  <QDialog ref="dialogRef" :model-value="true" @update:model-value="$emit('update:modelValue', $event)">
     <QCard>
       <QCardSection class="row items-center q-pb-none">
-        <div class="text-h6">
+        <h3 class="text-h6 q-mx-auto">
           {{ title }}
-        </div>
-        <QSpace />
+        </h3>
         <QBtn v-close-popup icon="close" flat round dense @click="onDialogHide" />
       </QCardSection>
 
-      <QCardSection>
-        {{ content }}
+      <QCardSection class="q-px-lg">
+        <div v-if="type === 'success'" class="text-center q-py-md">
+          <span class="material-icons" style="color: #1D9E30; font-size: 64px">check_circle</span>
+        </div>
+        <p>{{ message }}</p>
       </QCardSection>
 
+      <hr>
+
       <QCardActions vertical class="q-pa-lg add_association_dialog__actions">
-        <QBtn label="確定" color="black" @click="onOkClick" />
-        <QBtn label="取消" @click="onDialogHide" />
+        <QBtn :label="cancelLabel" @click="onDialogHide" />
+        <QBtn :label="okLabel" color="black" @click="onOkClick" />
       </QCardActions>
     </QCard>
   </QDialog>
