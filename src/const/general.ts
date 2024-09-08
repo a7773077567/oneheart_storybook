@@ -55,10 +55,25 @@ export enum ShiftType {
   物理治療體驗門診 = 12,
   新人實習門診 = 13,
 }
+const ShiftTypeConst = {
+  物理諮詢門診: 1,
+  物理治療門診: 2,
+  足壓門診: 3,
+  營養門診: 4,
+  睡眠門診: 5,
+  院長評估門診: 6,
+  院長物理治療: 7,
+  營養諮詢門診: 8,
+  教練課: 9,
+  運動諮詢: 10,
+  團課: 11,
+  物理治療體驗門診: 12,
+  新人實習門診: 13,
+} as const;
 
 type TabName = typeof TabNames[number];
 interface Type {
-  identifier: number;
+  identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
   name: string;
   label: string;
   tabs: TabName[];

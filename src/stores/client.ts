@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
-import { type Client, type DepInChargeTherapist, getClientInfo, getDepInChargeTherapist, getInbodyUploadUrl, upload2awsS3, uploadInbodyFile } from '@/api';
+import { type Client, type DepInChargeTherapist, type MedicalHistory, type MedicalHistoryParams, getClientInfo, getDepInChargeTherapist, getInbodyUploadUrl, getMedicalHistory, upload2awsS3, uploadInbodyFile } from '@/api';
 
 interface State {
   targetClient: Client | null;
   inChargeUsers: DepInChargeTherapist[];
+  medicalHistory: MedicalHistory[];
 }
 
 export const useClientStore = defineStore('client', {
@@ -11,10 +12,10 @@ export const useClientStore = defineStore('client', {
     return {
       targetClient: null,
       inChargeUsers: [],
+      medicalHistory: [],
     };
   },
   getters: {
-
   },
   actions: {
     async getClientInfo(clientId: number) {
@@ -29,5 +30,8 @@ export const useClientStore = defineStore('client', {
       this.inChargeUsers = await getDepInChargeTherapist(clientId);
     },
     uploadInbodyFile,
+    async  getMedicalHistory(clientId: number, params: MedicalHistoryParams) {
+      this.medicalHistory = await getMedicalHistory(clientId, params);
+    },
   },
 });

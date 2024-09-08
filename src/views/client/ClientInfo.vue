@@ -2,7 +2,7 @@
 import { getClientInfo } from '@/api';
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { Associations, BasicInfo, GCVoucher, InbodyRecords, PointsGroup, PurchaseRecords } from '@/components/client';
+import { Associations, BasicInfo, GCVoucher, InbodyRecords, MedicalHistory, PointsGroup, PurchaseRecords } from '@/components/client';
 
 defineProps<{
   clientId: string;
@@ -13,6 +13,7 @@ const clientId = useRoute().params.clientId as string;
 const tabs = [
   { name: 'basicInfo', label: '客戶資料', component: BasicInfo },
   { name: 'associations', label: '常用人員', component: Associations },
+  { name: 'medicalHistory', label: '病歷歷程', component: MedicalHistory },
   { name: 'pointsGroup', label: '群組與堂數', component: PointsGroup },
   { name: 'purchaseRecords', label: '消費歷程', component: PurchaseRecords },
   { name: 'inbodyRecords', label: '身體組成表', component: InbodyRecords },

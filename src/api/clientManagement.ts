@@ -77,6 +77,19 @@ export interface DepInChargeTherapist {
   userShiftType: ShiftType;
   inChargeUserName: string;
 }
+export interface MedicalHistoryParams {
+  userShiftTypes: number[];
+}
+
+export interface MedicalHistory {
+  clientScheduleId: number;
+  date: string;
+  userShiftType: number;
+  chiefComplaint: string;
+  userName: string;
+  scheduleStartTime: string;
+  scheduleEndTime: string;
+}
 
 // 取得 memo
 export async function getMemos(clientId: number) {
@@ -147,5 +160,9 @@ export async function updateIntroducer(clientId: number, body: { introducerClien
  */
 export async function getDepInChargeTherapist(clientId: number) {
   const { data } = await api.get<DepInChargeTherapist[]>(`clients/${clientId}/inChargeUsers`);
+  return data;
+}
+export async function getMedicalHistory(clientId: number, params: MedicalHistoryParams) {
+  const { data } = await api.get<MedicalHistory[]>(`clients/${clientId}/clientSchedules-with-record-finished`, { params });
   return data;
 }
