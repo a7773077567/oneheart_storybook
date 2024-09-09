@@ -2,6 +2,7 @@
 import { ShiftType, Types } from '@/const/general';
 import { useClientStore } from '@/stores';
 import { computed, ref, watchEffect } from 'vue';
+import type { QTableProps } from 'quasar';
 
 const props = defineProps<{
   clientId: string;
@@ -20,11 +21,11 @@ watchEffect(async () => {
   );
 });
 
-const columns = [
+const columns: QTableProps['columns'] = [
   { name: 'date', field: 'date', label: '日期', align: 'left', style: 'width: 216px' },
   { name: 'typeName', field: 'typeName', label: '科別', align: 'left', style: 'width: 216px' },
   { name: 'chiefComplaint', field: 'chiefComplaint', label: '主訴', align: 'left' },
-  { name: 'chevron', field: 'chevron', align: 'left', style: 'width: 48px' },
+  { name: 'chevron', field: 'chevron', label: '', align: 'left', style: 'width: 48px' },
 ];
 
 const rows = computed(() => {
