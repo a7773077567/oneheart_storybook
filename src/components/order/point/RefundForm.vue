@@ -25,9 +25,9 @@ const pointRefundSchema = z.object({
   client: z.object({
     name: z.string(),
     phone: z.string(),
-    birthDate: z.string(),
-    identityNumber: z.string(),
-    gender: z.string(),
+    birthDate: z.string().nullable().optional(),
+    identityNumber: z.string().nullable().optional(),
+    gender: z.string().nullable().optional(),
   }).nullable(),
   clientGroupId: z.number(),
   pointGroup: z.object({
@@ -36,7 +36,7 @@ const pointRefundSchema = z.object({
     name: z.string(),
     points: z.number().nonnegative().gt(0, '退堂數量需大於0'),
   }).nullable(),
-  amount: z.preprocess(a => Number(a), z.number().nonnegative()),
+  amount: z.preprocess(a => Number(a), z.number().nonnegative('退款金額須大於0').gt(0, '退款金額須大於0')),
 });
 
 const initialValues = computed(() => ({

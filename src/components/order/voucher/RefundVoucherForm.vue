@@ -4,10 +4,8 @@ import { OInput } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { PointTypes } from '@/const/general';
 import { type Client, type GroupClass, getClientVouchers } from '@/api';
 import type { RefundDetail } from '@/views/order/voucher/RefundVoucher.vue';
-import { useVoucherStore } from '@/stores';
 
 const props = defineProps<{
   modelValue: Partial<RefundDetail>;
@@ -24,17 +22,17 @@ const pointRefundSchema = z.object({
   client: z.object({
     name: z.string(),
     phone: z.string(),
-    birthDate: z.string(),
-    identityNumber: z.string(),
-    gender: z.string(),
+    birthDate: z.string().nullable(),
+    identityNumber: z.string().nullable(),
+    gender: z.string().nullable(),
   }).nullable(),
   groupClassId: z.number(),
   groupClass: z.object({
     id: z.number(),
     name: z.string(),
-    useAbleGroupClassTickets: z.number().nonnegative().gt(0, '退券數量需大於0'),
+    useAbleGroupClassTickets: z.number().nonnegative().gt(0, '退券數量須大於0'),
   }).nullable(),
-  amount: z.preprocess(a => Number(a), z.number().nonnegative()),
+  amount: z.preprocess(a => Number(a), z.number().nonnegative('退款金額須大於0').gt(0, '退款金額須大於0')),
 });
 
 const initialValues = computed(() => ({
@@ -101,7 +99,7 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
 
       <fieldset class="col-12">
         <span class="field--key">退款金額</span>
-        <OInput type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
+        <OInput type="number" class="field--val" name="amount" placeholder="$" :error-message="errors.amount" />
       </fieldset>
     </form>
     <div class="q-my-lg flex">

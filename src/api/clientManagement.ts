@@ -12,15 +12,15 @@ export interface ClientsGetParams {
 
 export type ClientAssociation = Pick<Client, 'id' | 'name' | 'phone' | 'gender' | 'identityType' | 'identityNumber' | 'birthDate'>;
 export interface Client {
-  address: string;
+  address: string | null;
   associations: ClientAssociation[];
-  birthDate: string;
+  birthDate: string | null;
   email: string | null;
-  gender: string;
+  gender: string | null;
   howToKnowUs: string;
   id: number;
   identityType: number;
-  identityNumber: string;
+  identityNumber: string | null;
   lineUserId: string;
   isVerifiedBySMS: boolean;
   inBodyFiles: InbodyFile[];
