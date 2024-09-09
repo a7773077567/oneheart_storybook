@@ -167,21 +167,26 @@ const isReceiptDialogOpen = ref(false);
 const space = ref<string | undefined>();
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName } = await getSinglePayment(paymentId);
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained } = await getSinglePayment(paymentId);
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
     case TransactionTypes.門診費用:
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-      extraFields = [{ name: 'amount', label: '總額', value: amount }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }];
+      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }];
       break;
     case TransactionTypes.團課券購買:
+    case TransactionTypes.團課券退款:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
-      extraFields = [{ name: 'groupClassName', label: '課堂名稱', value: groupClassName }, { name: 'amount', label: '金額', value: amount }];
+      extraFields = [{ name: 'groupClassName', label: '課程名稱', value: groupClassName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'pointGained', label: '張數', value: `${ticketGained ?? 0}張` }];
       break;
     case TransactionTypes.堂數交易:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: amount }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得堂數', value: paidPointGained }, { name: 'giftPointGained', label: '贈送堂數', value: giftPointGained }];
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得堂數', value: `${paidPointGained}堂` }, { name: 'giftPointGained', label: '贈送堂數', value: `${giftPointGained}堂` }];
+      break;
+    case TransactionTypes.堂數退款:
+      amount = calcReceiptAmount(pointPaymentMultiChannelPay);
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '堂數', value: `${paidPointGained + giftPointGained}堂` }];
       break;
     default:
       amount = 0;
@@ -207,8 +212,6 @@ async function checkPaymentDetail(val: any) {
   const data = await getSinglePayment(val.id);
   targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
 }
-
-const hasRecipeTypes = new Set([TransactionTypes.堂數交易, TransactionTypes.團課券購買, TransactionTypes.門診費用]);
 </script>
 
 <template>
@@ -232,9 +235,9 @@ const hasRecipeTypes = new Set([TransactionTypes.堂數交易, TransactionTypes.
       />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
-      <template #body-cell-attachment="{ value, row }">
+      <template #body-cell-attachment="{ value }">
         <QTd class="text-center">
-          <QBtn v-if="!!value && hasRecipeTypes.has(row.type)" flat round icon="o_description" @click="checkReceipt(value)" />
+          <QBtn v-if="!!value" flat round icon="o_description" @click="checkReceipt(value)" />
           <span v-else>-</span>
         </QTd>
       </template>
