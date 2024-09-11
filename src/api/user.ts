@@ -92,11 +92,8 @@ export async function fetchUsers(spaceIds: number[]) {
 }
 
 export async function fetchUser(userId: number) {
-  // const {data} = await api.get<User>(`users/${userId}`)
-  // return data
-
-  const userStore = useUserStore();
-  return userStore.users.find(user => user.id === userId)!;
+  const { data } = await api.get<User>(`users/${userId}`);
+  return data;
 }
 
 export async function fetchUserInfo() {
