@@ -41,7 +41,7 @@ function dateOptions(date: any) {
       <OSelect name="userShiftType" label="選擇項目" :options="typeOptions" />
     </InputBox>
     <InputBox label="選擇治療師">
-      <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.userOptions" multiple />
+      <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.activeUsers" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" :options="dateOptions" />

@@ -1,5 +1,5 @@
 import type { User } from '@/api/user';
-import { fetchUsers } from '@/api/user';
+import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import { fetchAvailableClassesForGym, fetchGroupShiftTemplates, fetchShiftTemplates, fetchUserShift, fetchUserShifts } from '@/api/shift';
 import type { AvailableClassesForGym, GroupShiftTemplate, ShiftTemplate, UserShift, UserShiftsGet } from '@/api/shift';
 import { defineStore } from 'pinia';
@@ -47,8 +47,7 @@ export const useShiftStore = defineStore('shift', {
     },
     activeUsers: (state) => {
       const { users } = state;
-      // todo, 櫃檯人員改用 enum
-      return users.filter(({ isSuspended, role }) => !isSuspended && role.name !== '櫃檯').map(member => ({
+      return users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({
         label: member.name,
         value: member.id,
         ...member,

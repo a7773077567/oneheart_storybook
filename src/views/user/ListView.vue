@@ -4,11 +4,7 @@ import { useLayoutRoute } from '@/composables/layoutRoute';
 import type { QTableProps } from 'quasar';
 import { useUserStore } from '@/stores';
 import { computed, ref } from 'vue';
-
-enum State {
-  '未開通' = 1,
-  '開通' = 2,
-}
+import { AccountState, WorkState } from '@/api';
 
 const { currentRoute } = useLayoutRoute();
 const userStore = useUserStore();
@@ -17,7 +13,7 @@ await userStore.getUsers();
 const jobTitleFilter = ref(userStore.userJobTitleOptions.map(item => item.value));
 
 const cols: QTableProps['columns'] = [
-  { name: 'state', label: '開通', field: 'state', align: 'left' },
+  { name: 'state', label: '狀態', field: 'state', align: 'left', style: 'width: 100px' },
   { name: 'name', label: '姓名', field: 'name', align: 'left' },
   { name: 'jobTitle', label: '職稱', field: 'jobTitle', align: 'left' },
   { name: 'spaces', label: '場館', field: 'spaces', align: 'left', style: 'text-wrap:wrap; word-break: break-all' },
@@ -43,8 +39,15 @@ const rows = computed(() => userStore.users
           <template #body="props">
             <QTr :props="props">
               <QTd key="state" :props="props" auto-width>
-                <div class="row flex-center">
-                  <span class="state" :class="{ 'state--active': props.row.state === State['開通'] }" />
+                <div class="row items-center full-width">
+                  <template v-if="props.row.stateOfWork === WorkState['在職']">
+                    <span class="state" :class="{ 'state--active': props.row.state === AccountState['開通'] }" />
+                    <span>{{ AccountState[props.row.state] }}</span>
+                  </template>
+                  <template v-else>
+                    <span class="state" :class="props.row.stateOfWork === WorkState['停權'] ? 'state--banned' : 'state--resigned'" />
+                    <span>{{ WorkState[props.row.stateOfWork] }}</span>
+                  </template>
                 </div>
               </QTd>
               <QTd key="name" :props="props">
@@ -60,7 +63,6 @@ const rows = computed(() => userStore.users
                 <div class="row justify-between items-center">
                   <p>{{ props.row.email }}</p>
                   <div class="row q-gutter-sm flex-center">
-                    <span v-if="props.row.isSuspended" style="color: #E86969;">停權</span>
                     <QBtn icon="o_edit" flat round @click="() => $router.push({ name: 'userEdition', query: { userId: props.row.id } })" />
                   </div>
                 </div>
@@ -91,8 +93,15 @@ const rows = computed(() => userStore.users
   height: 10px;
   border-radius: 50%;
   background-color: #e86969;
+  margin-right: 8px;
   &--active {
     background-color: #91d0c1;
+  }
+  &--banned {
+    background-color: #f0a754;
+  }
+  &--resigned {
+    background-color: #b3b3b3;
   }
 }
 
