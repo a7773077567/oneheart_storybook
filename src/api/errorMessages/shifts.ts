@@ -7,6 +7,8 @@ const messages: [string, string][] = [
   ['maxClientsForCoachClass should not be empty or null', '請輸入教練課人數'],
   ['invalid shiftTemplate type for current space', '此場館無法新增此種班別'],
   ['Same type and name groupClass already exists', '此團課名稱已經存在'],
+  ['appointment system and registration system time interval overlap', '此時段已安排時間重疊的班別'],
+  ['Not able to create more groupClasses', '無法再安排其他團課'],
 ];
 
 export default messages;

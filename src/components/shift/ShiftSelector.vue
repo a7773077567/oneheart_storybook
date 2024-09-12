@@ -3,13 +3,13 @@ import type { GroupShiftTemplate, ShiftTemplate } from '@/api/shift';
 import { ShiftItem } from '@/components/shift';
 import { ref } from 'vue';
 
-interface Props {
+defineProps<{
   data: (ShiftTemplate | GroupShiftTemplate)[];
-}
-
-defineProps<Props>();
+  hintMessage: string;
+}>();
 const emit = defineEmits<{
   confirm: [shiftTemplate: ShiftTemplate | GroupShiftTemplate];
+  close: [];
 }>();
 
 const selectedTemplate = ref<ShiftTemplate | GroupShiftTemplate | null>(null);
@@ -24,28 +24,93 @@ function confirm() {
 </script>
 
 <template>
-  <QCard>
-    <QCardSection class="row flex-center relative-position q-py-sm ">
-      <div class="text-subtitle1 text-weight-bold">
-        選擇班別
+  <div class="shift-selector">
+    <div class="shift-selector__header">
+      <p class="title">選擇班別</p>
+      <QIcon name="close" size="24px" class="close" @click="$emit('close')" />
+    </div>
+    <QSeparator style="background-color: #79747E;" />
+    <div class="shift-selector__body">
+      <div class="shifts">
+        <ShiftItem
+          v-for="(item, idx) in data"
+          :key="idx"
+          :data="item"
+          :class="[selectedTemplate?.id === item.id ? 'shifts__item--active' : 'shifts__item']"
+          class=""
+          @click="() => selectShift(item)"
+        />
       </div>
-      <QIcon v-close-popup name="close" size="24px" class="absolute-right cursor-pointer" style="top:50%; translate: -16px -50%;" />
-    </QCardSection>
-    <QCardSection class="column q-gutter-md">
-      <ShiftItem
-        v-for="(item, idx) in data"
-        :key="idx"
-        :data="item"
-        :class="{ active: selectedTemplate?.id === item.id }"
-        @click="() => selectShift(item)"
-      />
-      <QBtn label="新增" class="self-center" outline style="width: 126px" @click="confirm" />
-    </QCardSection>
-  </QCard>
+      <p v-if="hintMessage" class="hint">{{ hintMessage }}</p>
+      <QBtn label="新增" outline class="confirm" @click="confirm" />
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-  .active {
-  background-color: #ddd;
+.shift-selector {
+  background-color: #fff;
+  &__header {
+    position: relative;
+    padding: 14px 0;
+  }
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 4px 20px;
+  }
+}
+
+.title {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  cursor: pointer;
+}
+
+.shifts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 400px;
+  overflow-y: scroll;
+  padding: 20px 16px 0;
+  transition: background-color 200ms ease;
+  &__item {
+    &:hover {
+      background-color: #ddd;
+    }
+    &--active {
+      @extend .shifts__item;
+      background-color: #ddd;
+    }
+  }
+}
+
+.hint {
+  padding-left: 20px;
+  color: #d81717;
+}
+.confirm {
+  width: 126px;
+  align-self: center;
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 </style>
