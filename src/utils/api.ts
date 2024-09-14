@@ -3,6 +3,7 @@ import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosReques
 import { Dialog } from 'quasar';
 import { getCookie } from '@/utils/helpers';
 import { ErrorMessages } from '@/api/errorMessages';
+import { ResponseErrorDialog } from '@/components/shared';
 
 // ========== Types ==========
 interface APIResponse<T, D = any> {
@@ -163,8 +164,11 @@ async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
 function dialogPromise(message: string) {
   return new Promise<void>((resolve) => {
     Dialog.create({
-      message,
-      html: true,
+      component: ResponseErrorDialog,
+      componentProps: {
+        message,
+        persistent: true,
+      },
     }).onOk(() => resolve());
   });
 }

@@ -14,10 +14,10 @@ export function getDurationLabel(startTime: string, endTime: string, isNotAvaila
   const [endHr] = endTime.split(':');
 
   if (!isNotAvailableTime) {
-    return `${amOrPm(+startHr)}${startTime}-${amOrPm(+endHr)}${endTime}`;
+    return `${amOrPm(+startHr)} ${startTime} - ${amOrPm(+endHr)} ${endTime}`;
   }
 
-  return `${startTime}-${endTime}`;
+  return `${startTime} - ${endTime}`;
 }
 
 export function getTimeDate(time: string) {

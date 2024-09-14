@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
-import { getType } from '@/utils/mappers';
+import { getTypeLabel } from '@/utils/mappers';
 import { computed } from 'vue';
 import { ScheduleStateMap } from '@/const/appointment';
 
@@ -29,7 +29,7 @@ const tableData = new Map([
   ['日期', () => currentData.value.date],
   ['時間', () => `${currentData.value.scheduleStartTime}-${currentData.value.scheduleEndTime}`],
   ['客戶', () => currentData.value.client.name],
-  ['科別', () => getType(currentData.value.userShift.type)],
+  ['科別', () => getTypeLabel(currentData.value.userShift.type)],
   ['治療師', () => currentData.value.userShift.user.name],
 ]);
 
@@ -37,7 +37,7 @@ const rearrangeTableData = new Map([
   ['日期', () => props.data.date],
   ['時間', () => `${props.data.scheduleStartTime}-${props.data.scheduleEndTime}`],
   ['客戶', () => props.data.client.name],
-  ['科別', () => getType(props.data.userShift.type)],
+  ['科別', () => getTypeLabel(props.data.userShift.type)],
   ['治療師', () => props.data.userShift.user.name],
 ]);
 </script>

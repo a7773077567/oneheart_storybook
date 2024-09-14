@@ -2,25 +2,35 @@
 import { useAppointmentStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
-import { ScheduleStateMap } from '@/const/appointment';
+import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted } from '@/api/appointment';
+import { adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted } from '@/api/appointment';
 import { computed, ref } from 'vue';
-import { OInput } from '@/components/shared';
+import { OInput, TimeDurationPicker } from '@/components/shared';
 import { type ClientScheduleDetail, updateNote } from '@/api';
+import { ClientInfoTable } from '@/components/appointment';
+import { getType } from '@/utils/mappers';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
+type Duration = InstanceType<typeof TimeDurationPicker>['$props']['modelValue'];
+
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
+const isEditingTime = ref(false);
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
 const client = computed(() => schedule.value.client);
 const userShift = computed(() => schedule.value.userShift);
 const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
+const canEditTime = computed(() => ScheduleStateMap.get(schedule.value.state)!.canEditTime && getType(userShift.value.type)?.canEditTime);
+const duration = computed(() => ({
+  start: schedule.value.scheduleStartTime,
+  end: schedule.value.scheduleEndTime,
+}));
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
@@ -30,7 +40,7 @@ const data = computed(() => [
   { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
   { key: 'location', label: '地點', value: userShift.value.space?.name },
   { key: 'doctor', label: '醫師', value: userShift.value.user.name },
-  { key: 'note', label: '預約備註', value: schedule.value.note },
+  { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
 ]);
 
 const states = computed(() => [
@@ -76,6 +86,27 @@ async function saveNote() {
   await updateNote(props.scheduleId, note.value);
   $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
 }
+
+async function updateTime({ start, end }: Duration) {
+  try {
+    await adjustScheduleTime(+props.scheduleId, {
+      startTime: start,
+      endTime: end,
+    });
+    await appointmentStore.getClientSchedule(+props.scheduleId);
+    $q.notify({ message: '時間已調整', timeout: 1000, position: 'top' });
+    isEditingTime.value = false;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
+function limitTimeOptions(hr: number, min: number) {
+  return min !== null
+    ? min % 5 === 0
+    : true;
+}
 </script>
 
 <template>
@@ -84,44 +115,40 @@ async function saveNote() {
       <p class="member-id">
         <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
       </p>
+      <QChip v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false" style="background-color: #F8C9CB;">未結帳</QChip>
     </div>
     <div class="client-info__body">
-      <ul class="table">
-        <template
-          v-for="(item, idx) in data"
-          :key="idx"
-        >
-          <li class="table__item">
-            {{ item.label }}
-          </li>
-          <li class="table__item">
-            <div v-if="item.label === '預約備註'" class="column full-width">
-              <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
-              <div class="q-mt-md flex justify-end q-ms-sm">
-                <QBtn outline label="儲存" :disable="!note" @click="saveNote" />
-              </div>
+      <ClientInfoTable :data="data">
+        <template #name="{ row }">
+          <div class="name">
+            <a class="name__label" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
+            <div v-if="scheduleDetail.isFirstClientSchedule">
+              <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
-            <template v-else-if="item.key === 'name'">
-              <a class="client_name" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ item.value }}</a>
-              <div v-if="scheduleDetail.isFirstClientSchedule">
-                <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
-              </div>
-            </template>
-            <template v-else>
-              <span>{{ item.value }}</span>
-            </template>
-          </li>
-          <QSeparator color="black" class="table__separator" />
+          </div>
         </template>
-      </ul>
+        <template #time="{ row }">
+          <div class="time">
+            <div class="time__input">
+              <p v-if="!isEditingTime">{{ row.value }}</p>
+              <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
+            </div>
+            <div class="time__actions">
+              <QBtn v-if="!isEditingTime" label="編輯" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+            </div>
+          </div>
+        </template>
+        <template #note>
+          <div class="note">
+            <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
+            <QBtn outline label="儲存" :disable="!note" class="note__btn" @click="saveNote" />
+          </div>
+        </template>
+      </ClientInfoTable>
     </div>
     <div class="client-info__caption">
       <div class="state">
-        <p
-          v-for="(state, idx) in states"
-          :key="idx"
-          class="state__item"
-        >
+        <p v-for="(state, idx) in states" :key="idx" class="state__item">
           <span>{{ state.label }}：</span>
           <span class="state__value">{{ state.value }}</span>
         </p>
@@ -145,6 +172,9 @@ async function saveNote() {
 .client-info {
   &__header {
     margin-bottom: 15px;
+    display: flex;
+    gap: 50px;
+    align-items: center;
   }
   &__caption {
     margin-bottom: 25px;
@@ -161,16 +191,30 @@ async function saveNote() {
   padding: 10px;
 }
 
-.table {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 25px;
-  &__item {
-    padding: 10px;
+.time {
+  display: flex;
+  gap: 10px;
+  &__input {
   }
-  &__separator {
-    grid-column: span 3;
-    margin-bottom: 15px;
+  &__actions {
+    display: flex;
+    flex-grow: 1;
+  }
+  &__actions-edit {
+    margin-left: auto;
+  }
+  &__actions-save {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  &__btn {
+    align-self: flex-end;
   }
 }
 
@@ -203,10 +247,13 @@ async function saveNote() {
   display: flex;
 }
 
-.client_name {
-  cursor: pointer;
-  &:hover {
-    font-weight: 700;
+.name {
+  height: 19.19px;
+  &__label {
+    cursor: pointer;
+    &:hover {
+      font-weight: 700;
+    }
   }
 }
 </style>

@@ -3,10 +3,9 @@ import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 
-interface Props {
+const props = defineProps<{
   scheduleId: string;
-}
-const props = defineProps<Props>();
+}>();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 const userShiftType = computed(() => appointmentStore.targetClientSchedule?.userShift.type);
@@ -47,33 +46,15 @@ function getRecordModules() {
 </script>
 
 <template>
-  <QTabs
-    v-model="currentTab"
-    align="left"
-    dense
-  >
-    <QTab
-      v-for="(tab, idx) in tabs"
-      :key="idx"
-      :name="tab.name"
-      :label="tab.label"
-    />
+  <QTabs v-model="currentTab" align="left" dense>
+    <QTab v-for="(tab, idx) in tabs" :key="idx" :name="tab.name" :label="tab.label" />
   </QTabs>
   <QCard flat bordered class="info">
-    <QTabPanels
-      v-model="currentTab"
-      animated
-    >
-      <QTabPanel
-        v-for="(tab, idx) in tabs"
-        :key="idx"
-        :name="tab.name"
-      >
+    <QTabPanels v-model="currentTab" animated>
+      <QTabPanel v-for="(tab, idx) in tabs" :key="idx" :name="tab.name">
         <KeepAlive>
           <Suspense>
-            <component
-              :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule"
-            />
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
           </Suspense>
         </KeepAlive>
       </QTabPanel>

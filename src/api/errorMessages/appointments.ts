@@ -5,6 +5,7 @@ const messages: [string, string][] = [
   ['client already in groupClass', '客戶已預約過此堂團課'],
   ['multiChannelPay sum is not equal to amount', '交易總金額不符'],
   ['ClientSchedule already checkout', '此交易已結帳完成'],
+  ['userShiftSlot is overlap with other userShiftSlot', '時間跟其他班別重疊'],
 ];
 
 export default messages;

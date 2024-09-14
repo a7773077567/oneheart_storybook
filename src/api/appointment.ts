@@ -257,6 +257,11 @@ export interface AddOnService {
   isAddOn: boolean;
 }
 
+export interface AdjustScheduleTimePayload {
+  startTime: string;
+  endTime: string;
+}
+
 // ========== Requests ==========
 
 export async function fetchTherapyTypes() {
@@ -394,6 +399,11 @@ export async function updateNote(clientScheduleId: number, note: string) {
  */
 export async function updateAddOnServices(clientScheduleId: number, addOnServices: AddOnService[]) {
   await api.patch(`/clientSchedules/${clientScheduleId}/update-addOnServices`, { addOnServices });
+}
+
+export async function adjustScheduleTime(clientScheduleId: number, payload: AdjustScheduleTimePayload) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-scheduleTime`, payload);
+  return data;
 }
 
 // ========== Schemas ==========
