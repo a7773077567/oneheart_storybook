@@ -249,6 +249,8 @@ function limitTimeOptions(hr: number, min: number) {
 
 .name {
   height: 19.19px;
+  display: flex;
+  align-items: center;
   &__label {
     cursor: pointer;
     &:hover {
