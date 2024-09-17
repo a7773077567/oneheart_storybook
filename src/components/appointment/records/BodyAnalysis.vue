@@ -1,34 +1,33 @@
 <script setup lang="ts">
 import type { ClientScheduleDetail } from '@/api';
+import dayjs from 'dayjs';
 import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-// const clientId = computed(() => props.scheduleDetail.clientId);
+const inBodies = computed(() => {
+  const { inBodyFileUrls, inBodyFiles } = props.scheduleDetail.client;
+  if (!inBodyFileUrls) {
+    return [];
+  }
+  return inBodyFileUrls.map((url, idx) => ({
+    url,
+    date: dayjs(inBodyFiles[idx].createdAt).format('YYYY/MM/DD'),
+  }));
+});
 </script>
 
 <template>
   <div class="body-analysis">
-    <div class="body-analysis__item">
+    <p v-if="!inBodies.length">無身體組成量測紀錄</p>
+    <div v-for="(inBody, idx) in inBodies" :key="idx" class="body-analysis__item">
       <div class="img">
-        <div class="img__date">
-          2024/04/25
-        </div>
+        <div class="img__date">{{ inBody.date }}</div>
         <div class="img__item">
-          <img src="https://i0.wp.com/www.yehclinic.com/wp-content/uploads/2019/12/inbody-2019-12-23-14.10.09.png?resize=496%2C698&ssl=1">
-        </div>
-      </div>
-      <div class="body-analysis__item">
-        <div class="img">
-          <div class="img__date">
-            2024/04/25
-          </div>
-          <div class="img__item">
-            <img src="https://i0.wp.com/www.yehclinic.com/wp-content/uploads/2019/12/inbody-2019-12-23-14.10.09.png?resize=496%2C698&ssl=1">
-          </div>
+          <img :src="inBody.url">
         </div>
       </div>
     </div>
@@ -45,5 +44,12 @@ defineProps<{
   display: flex;
   flex-direction: column;
   gap: 10px;
+  &__item {
+    max-width: 800px;
+    height: auto;
+    > img {
+      width: 100%;
+    }
+  }
 }
 </style>

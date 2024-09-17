@@ -25,7 +25,7 @@ const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
   { key: 'phone', label: '電話', value: client.value.phone },
-  { key: 'address', label: '地址', value: '台中市西屯區青海路(mock data)' },
+  { key: 'address', label: '地址', value: client.value.address ?? '無' },
   { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
   { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
   { key: 'location', label: '地點', value: userShift.value.space?.name },
