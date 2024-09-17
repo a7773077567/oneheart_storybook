@@ -22,6 +22,20 @@ defineEmits<{
 
 function print() {
   window.print();
+
+  // const printContents = document.querySelector('.receipt')!.innerHTML;
+  // const originalContents = document.body.innerHTML;
+  // document.body.innerHTML = printContents;
+  // window.print();
+  // document.body.innerHTML = originalContents;
+
+  // const printContent = document.querySelector('.receipt')!.innerHTML;
+  // const printWindow = window.open('', 'printWindow', 'height=auto, width=8cm')!;
+  // printWindow.document.write('<html><head>');
+  // printWindow.document.write(style);
+  // printWindow.document.write('</head><body>');
+  // printWindow.document.write(printContent);
+  // printWindow.document.write('</body></html>');
 }
 </script>
 
@@ -123,11 +137,23 @@ function print() {
   .no-print {
     display: none;
   }
+
   .q-card {
+    padding: 0 !important;
     box-shadow: none;
   }
+  .q-card__section {
+    padding: 0 !important;
+  }
   .receipt {
-    width: 8cm;
+    border: none;
+    padding: 0;
+    scale: (0.82);
+    transform-origin: top left;
+  }
+  @page {
+    margin: -3mm;
+    size: 80mm 115mm;
   }
 }
 </style>
