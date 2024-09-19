@@ -102,7 +102,7 @@ async function updateTime({ start, end }: Duration) {
   }
 }
 
-function limitTimeOptions(hr: number, min: number) {
+function limitTimeOptions(hr: number, min: number | null) {
   return min !== null
     ? min % 5 === 0
     : true;

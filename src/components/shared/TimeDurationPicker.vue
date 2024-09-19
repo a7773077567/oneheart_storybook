@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import { computed, ref, watch } from 'vue';
+import { QTime } from 'quasar';
 
 interface Duration {
   start: string;
   end: string;
-
 }
+
+type Options = InstanceType<typeof QTime>['$props']['options'];
 const props = defineProps<{
   modelValue: Duration;
-  options?: Function;
+  options?: Options;
 }>();
 
 const emit = defineEmits<{
