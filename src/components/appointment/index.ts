@@ -12,3 +12,4 @@ export { default as AppointmentCountCard } from './AppointmentCountCard.vue';
 export { default as PaymentComposition } from './PaymentComposition.vue';
 export { default as CheckoutAction } from './CheckoutAction.vue';
 export { default as AddOnTable } from './AddOnTable.vue';
+export { default as ClientInfoTable } from './ClientInfoTable.vue';

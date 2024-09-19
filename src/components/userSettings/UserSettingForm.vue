@@ -19,7 +19,7 @@ const $q = useQuasar();
 const router = useRouter();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
-const state = computed(() => targetUser.value.state);
+
 const weightForOrderOptions = [...Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx })), { label: '99', value: 99 }];
 const roleIdOptions = [
   { label: '管理者', value: 1 },
@@ -122,67 +122,36 @@ const onSubmit = handleSubmit(async (values) => {
     console.log(err);
   }
 });
-
-async function onSuspend() {
-  await suspendUser(+props.userId!, !targetUser.value.isSuspended);
-  await userStore.getUsers(); // temporary
-  await userStore.getUser(+props.userId!);
-  resetForm({ values: targetInitialValues.value });
-}
-
-async function onResend() {
-  try {
-    await resendActivateEmail(targetUser.value.id);
-    router.push({ name: 'activateEmail' });
-  }
-  catch (err) {
-    console.log(err);
-  }
-}
 </script>
 
 <template>
-  <div class="user-settings">
-    <div v-if="type === 'edit' " class="user-settings__header">
-      <div :class="[state === 1 ? 'state' : 'state--active']">
-        開通
-      </div>
-      <div v-if="targetUser.isSuspended" class="suspend">
-        停權中
-      </div>
-    </div>
-    <div class="user-settings__body">
-      <div class="user-settings__form">
-        <div class="form">
-          <div v-for="(input, idx) in formItems" :key="idx" :class="[input.fluid ? 'form__item--fluid' : 'form__item']">
-            <div class="input">
-              <div class="input__item--key">
-                {{ input.label }}
-              </div>
-              <div class="input__item--val">
-                <OInput v-if="input.element === 'input'" :type="input.type" :name="input.name" hide-bottom-space borderless :outlined="false" />
-                <OSelect v-else :name="input.name" :options="input.options" :multiple="input.multiple" :max-values="input.maxSelection" dense hide-bottom-space borderless :outlined="false" />
-              </div>
+  <div class="user-settings row q-col-gutter-md">
+    <div class="user-settings__form col-9">
+      <div class="form">
+        <div v-for="(input, idx) in formItems" :key="idx" :class="[input.fluid ? 'form__item--fluid' : 'form__item']">
+          <div class="input">
+            <div class="input__item--key">
+              {{ input.label }}
+            </div>
+            <div class="input__item--val">
+              <OInput v-if="input.element === 'input'" :type="input.type" :name="input.name" hide-bottom-space borderless :outlined="false" />
+              <OSelect v-else :name="input.name" :options="input.options" :multiple="input.multiple" :max-values="input.maxSelection" dense hide-bottom-space borderless :outlined="false" />
             </div>
           </div>
         </div>
-        <div class="user-settings__actions">
-          <div v-if="type === 'edit'" class="row q-gutter-md">
-            <QBtn v-if="targetUser.state === 1" label="重寄驗證信" outline style="width: 126px;" @click="onResend" />
-            <QBtn :label="targetUser.isSuspended ? '解除停權' : '停權'" outline style="width: 126px;" @click="onSuspend" />
-          </div>
-          <QBtn label="完成" outline style="width: 126px;" @click="onSubmit" />
-        </div>
       </div>
-      <div v-if="type === 'edit'" class="avatar">
-        <QAvatar size="120px">
-          <img :src="avatarPreviewUrl">
-        </QAvatar>
-        <div class="avatar__btn">
-          <div class="uploader">
-            <QFile v-model="avatarPreviewFile" class="uploader__file" />
-            <QBtn :label="targetUser.avatarUrl ? '更換照片' : '上傳照片'" outline class="uploader__btn" />
-          </div>
+      <div class="user-settings__actions">
+        <QBtn label="儲存" outline style="width: 126px;" @click="onSubmit" />
+      </div>
+    </div>
+    <div v-if="type === 'edit'" class="avatar col-3">
+      <QAvatar size="120px">
+        <img :src="avatarPreviewUrl">
+      </QAvatar>
+      <div class="avatar__btn">
+        <div class="uploader">
+          <QFile v-model="avatarPreviewFile" class="uploader__file" />
+          <QBtn :label="targetUser.avatarUrl ? '更換照片' : '上傳照片'" outline class="uploader__btn" />
         </div>
       </div>
     </div>
@@ -192,20 +161,12 @@ async function onResend() {
 <style lang="scss" scoped>
 .user-settings {
   padding: 20px 0;
-  &__header {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  &__body {
-    display: flex;
-    justify-content: space-between;
-    max-width: 804px;
-  }
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
   &__form {
-    width: 100%;
-    max-width: 556px;
+    // width: 100%;
+    // max-width: 556px;
     display: flex;
     flex-direction: column;
     gap: 45px;
@@ -213,6 +174,7 @@ async function onResend() {
   &__actions {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 }
 
@@ -272,6 +234,7 @@ async function onResend() {
 .avatar {
   display: flex;
   flex-direction: column;
+  align-items: center;
   &__btn {
     translate: 0 -12px;
     display: flex;

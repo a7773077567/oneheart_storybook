@@ -31,7 +31,7 @@ export interface Client {
   phone: string;
 }
 
-export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note'>;
+export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;
 
 interface InbodyFile {
   createdAt: string;

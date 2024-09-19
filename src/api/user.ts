@@ -9,20 +9,42 @@ export interface LoginRes {
 export interface Role {
   id: number;
   name: string;
-  type: number;
+  type: RoleType;
+}
+
+export enum AccountState {
+  開通 = 1,
+  未開通 = 2,
+}
+
+export enum WorkState {
+  在職 = 1,
+  停權 = 2,
+  離職 = 3,
+}
+
+export enum RoleType {
+  管理者 = 0,
+  '院長/副院長' = 1,
+  治療人員 = 2,
+  治療組長 = 3,
+  教練 = 4,
+  教練組長 = 5,
+  櫃檯 = 6,
+  櫃檯組長 = 7,
 }
 export interface User {
   id: number;
   name: string;
   email: string;
-  state: 1 | 2;
-  isSuspended: boolean;
+  state: AccountState;
+  stateOfWork: WorkState;
   role: Role;
   spaces: Space[];
   description: string;
   avatarUrl: string | null;
   weightForOrder: number;
-  type: 0 | 1;
+  type: RoleType;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;
@@ -92,11 +114,8 @@ export async function fetchUsers(spaceIds: number[]) {
 }
 
 export async function fetchUser(userId: number) {
-  // const {data} = await api.get<User>(`users/${userId}`)
-  // return data
-
-  const userStore = useUserStore();
-  return userStore.users.find(user => user.id === userId)!;
+  const { data } = await api.get<User>(`users/${userId}`);
+  return data;
 }
 
 export async function fetchUserInfo() {
@@ -122,4 +141,8 @@ export async function resendActivateEmail(userId: number) {
 export async function updatePassword(payload: { password: string }) {
   const { data } = await api.post(`users/update-password`, payload);
   return data;
+}
+
+export async function resignUser(userId: number, isResigned: boolean) {
+  await api.patch(`users/${userId}/resign`, { isResigned });
 }

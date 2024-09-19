@@ -16,9 +16,10 @@ const newClientSchema = z.object({
   address: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
   introducerClientId: z.number().nullable().optional(),
+  howToKnowUs: z.string().nullable().optional(),
 });
 
-const { handleSubmit, resetForm } = useForm({
+const { handleSubmit, resetForm, errors } = useForm({
   validationSchema: toTypedSchema(newClientSchema),
 });
 
@@ -32,6 +33,8 @@ const onSubmit = handleSubmit(async (values) => {
     resetForm();
   });
 });
+
+const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram', 'Youtube', 'Google map', '搜尋引擎'];
 </script>
 
 <template>
@@ -39,37 +42,41 @@ const onSubmit = handleSubmit(async (values) => {
     <form class="row q-col-gutter-md" @submit.prevent>
       <fieldset class="col-12 col-md-6">
         <span class="label">姓名*</span>
-        <OInput name="name" hide-bottom-space class="col-grow" />
+        <OInput name="name" hide-bottom-space class="col-grow" :error="!!errors.name" error-message="" />
       </fieldset>
       <fieldset class="col-12 col-md-6">
         <span class="label">電話*</span>
-        <OInput name="phone" hide-bottom-space class="col-grow" />
+        <OInput name="phone" hide-bottom-space class="col-grow" :error="!!errors.phone" error-message="" />
       </fieldset>
       <fieldset class="col-12 col-md-6">
         <span class="label">性別</span>
-        <OSelect name="gender" hide-bottom-space :options="genderOptions" class="col-grow" style="background:white" />
+        <OSelect name="gender" hide-bottom-space :options="genderOptions" class="col-grow" style="background:white" :error="!!errors.gender" error-message="" />
       </fieldset>
       <fieldset class="col-12 col-md-6">
         <span class="label">生日</span>
-        <OInput date-mode class="col-grow" name="birthDate" hide-bottom-space />
+        <OInput date-mode class="col-grow" name="birthDate" hide-bottom-space :error="!!errors.birthDate" error-message="" />
       </fieldset>
 
       <fieldset class="col-12">
         <span class="label">身分證</span>
-        <OInput name="identityNumber" hide-bottom-space class="col-grow" />
+        <OInput name="identityNumber" hide-bottom-space class="col-grow" :error="!!errors.identityNumber" error-message="" />
       </fieldset>
 
       <fieldset class="col-12">
         <span class="label">地址</span>
-        <OInput name="address" hide-bottom-space class="col-grow" />
+        <OInput name="address" hide-bottom-space class="col-grow" :error="!!errors.address" error-message="" />
       </fieldset>
       <fieldset class="col-12">
         <span class="label">介紹人</span>
         <OMemberSearch name="introducerClientId" class="full-width" />
       </fieldset>
       <fieldset class="col-12">
+        <span class="label">從哪裡知道我們</span>
+        <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" :error="!!errors.howToKnowUs" error-message="" />
+      </fieldset>
+      <fieldset class="col-12">
         <span class="label">備註</span>
-        <OInput name="note" hide-bottom-space type="textarea" class="full-width" />
+        <OInput name="note" hide-bottom-space type="textarea" class="full-width" :error="!!errors.note" error-message="" />
       </fieldset>
 
       <div class="new_client_form--actions">
@@ -87,7 +94,7 @@ const onSubmit = handleSubmit(async (values) => {
     align-items: center;
     gap: 8px;
     > span.label {
-      width: 60px;
+      width: 80px;
       text-align: right;
       flex-shrink: 0;
     }

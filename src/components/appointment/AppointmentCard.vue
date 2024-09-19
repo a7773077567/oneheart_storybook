@@ -37,6 +37,7 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
     <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
+      <p class="q-mb-xs text-bold">{{ `${data.scheduleStartTime}-${data.scheduleEndTime}` }}</p>
       <div>
         <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
         <span v-if="data.isFirstClientSchedule">初診</span>

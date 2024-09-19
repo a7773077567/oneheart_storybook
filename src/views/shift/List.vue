@@ -7,9 +7,12 @@ import type { CreateUserShift, UpdateUserShift, UserShiftTemplate } from '@/api/
 import dayjs from 'dayjs';
 import { useShiftStore, useUserStore } from '@/stores';
 import type { ChangeParams } from '@/components/shared/Calendar.vue';
+import { ErrorMessages } from '@/api/errorMessages';
+import { useQuasar } from 'quasar';
 
 const shiftStore = useShiftStore();
 const userStore = useUserStore();
+const $q = useQuasar();
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 const duration = ref({ startDate: '', endDate: '' });
@@ -20,6 +23,7 @@ const userIds = computed(() => shiftStore.users.map(user => user.id));
 const targetUserId = ref<number | null>(null);
 const targetUserShiftId = ref<number | null>(null);
 const targetShiftTemplates = computed(() => userStore.isGym ? shiftStore.shiftTemplatesForGym : shiftStore.shiftTemplates);
+const shiftSelectorHint = ref('');
 
 watch(duration, getUserShifts);
 
@@ -64,11 +68,20 @@ async function addUserShift(shiftTemplate: UserShiftTemplate) {
     };
   }
 
-  await createUserShift(payload);
-  await getUserShifts();
-  targetUserId.value = null;
-  targetDate.value = null;
-  isShiftSelectorOpen.value = false;
+  try {
+    await createUserShift(payload);
+    targetUserId.value = null;
+    targetDate.value = null;
+    isShiftSelectorOpen.value = false;
+    shiftSelectorHint.value = '';
+    await getUserShifts();
+  }
+  catch (err: any) {
+    const message = err.response.data.data.message;
+    const hint = ErrorMessages.get(message) ?? message;
+    shiftSelectorHint.value = hint;
+    $q.notify({ message: hint, position: 'top', timeout: 2000 });
+  }
 }
 
 async function onDeleteUserShift(userShiftId: number) {
@@ -106,6 +119,11 @@ async function getUserShifts() {
     userIds: userIds.value,
   });
 }
+
+function closeShiftSelector() {
+  isShiftSelectorOpen.value = false;
+  shiftSelectorHint.value = '';
+}
 </script>
 
 <template>
@@ -134,7 +152,7 @@ async function getUserShifts() {
       </template>
     </Calendar>
     <QDialog v-model="isShiftSelectorOpen" persistent>
-      <ShiftSelector :data="targetShiftTemplates" style="min-width: 336px;" @confirm="addUserShift" />
+      <ShiftSelector :data="targetShiftTemplates" :hint-message="shiftSelectorHint" style="min-width: 336px;" @confirm="addUserShift" @close="closeShiftSelector" />
     </QDialog>
     <QDialog v-model="isShiftEditorOpen" persistent>
       <ShiftEditor :data="shiftStore.targetUserShift" :shift-type-options="shiftStore.spaceShiftOptions" @cancel="isShiftEditorOpen = false" @confirm="onUpdateUserShift" />

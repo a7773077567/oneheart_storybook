@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
-import { getType } from '@/utils/mappers';
+import { getTypeLabel } from '@/utils/mappers';
 
 const appointmentStore = useAppointmentStore();
 const router = useRouter();
@@ -13,7 +13,7 @@ const { client, userShift, date, scheduleStartTime, scheduleEndTime } = appointm
 const infoData = new Map([
   ['姓名', () => client.name],
   ['電話', () => client.phone],
-  ['科別', () => getType(userShift.type)],
+  ['科別', () => getTypeLabel(userShift.type)],
   ['治療師', () => userShift.user.name],
   ['原預約日期', () => date],
   ['原預約時間', () => `${scheduleStartTime}-${scheduleEndTime}`],

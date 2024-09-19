@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, getUploadS3Url, upload2awsS3 } from '@/api';
 import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api';
-import { fetchUsers } from '@/api/user';
+import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
 import type { UserShift } from '@/api/shift';
@@ -84,8 +84,8 @@ export const useAppointmentStore = defineStore('appointment', {
     },
     activeUsers: (state) => {
       const { users } = state;
-      // todo, 櫃檯人員改用 enum
-      return users.filter(({ isSuspended, role }) => !isSuspended && role.name !== '櫃檯').map(member => ({
+
+      return users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({
         label: member.name,
         value: member.id,
         ...member,
