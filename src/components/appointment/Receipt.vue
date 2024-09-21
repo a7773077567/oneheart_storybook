@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { usePrintStore } from '@/stores/print';
+import { useRouter } from 'vue-router';
+
 withDefaults(defineProps<{
   rows: {
     name: string | undefined;
@@ -20,22 +23,13 @@ defineEmits<{
   (e: 'close'): void;
 }>();
 
-function print() {
-  window.print();
+const router = useRouter();
 
-  // const printContents = document.querySelector('.receipt')!.innerHTML;
-  // const originalContents = document.body.innerHTML;
-  // document.body.innerHTML = printContents;
-  // window.print();
-  // document.body.innerHTML = originalContents;
-
-  // const printContent = document.querySelector('.receipt')!.innerHTML;
-  // const printWindow = window.open('', 'printWindow', 'height=auto, width=8cm')!;
-  // printWindow.document.write('<html><head>');
-  // printWindow.document.write(style);
-  // printWindow.document.write('</head><body>');
-  // printWindow.document.write(printContent);
-  // printWindow.document.write('</body></html>');
+function goPrint() {
+  const printStore = usePrintStore();
+  const printContents = document.querySelector('.receipt')!.innerHTML;
+  printStore.data = printContents;
+  router.push({ name: 'receiptPrint' });
 }
 </script>
 
@@ -67,7 +61,7 @@ function print() {
     </QCardSection>
     <QCardActions class="actions no-print">
       <QBtn v-if="hidePrint" label="返回編輯" outline @click="$emit('close')" />
-      <QBtn v-else label="列印收據" outline @click="print" />
+      <QBtn v-else label="列印收據" outline @click="goPrint" />
       <QBtn v-if="!hideCheckout" :label="confirmLabel" color="black" @click="$emit('checkout')" />
     </QCardActions>
   </QCard>
@@ -130,30 +124,6 @@ function print() {
 .actions {
   > .q-btn {
     flex: 1;
-  }
-}
-
-@media print {
-  .no-print {
-    display: none;
-  }
-
-  .q-card {
-    padding: 0 !important;
-    box-shadow: none;
-  }
-  .q-card__section {
-    padding: 0 !important;
-  }
-  .receipt {
-    border: none;
-    padding: 0;
-    scale: (0.82);
-    transform-origin: top left;
-  }
-  @page {
-    margin: -3mm;
-    size: 80mm 115mm;
   }
 }
 </style>

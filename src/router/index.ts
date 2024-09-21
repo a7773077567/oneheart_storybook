@@ -426,7 +426,11 @@ export const routes: RouteRecordRaw[] = [
 
     ],
   },
-
+  {
+    path: '/receipt-print',
+    name: 'receiptPrint',
+    component: () => import('@/views/print/ReceiptPrintView.vue'),
+  },
 ];
 
 const router = createRouter({
