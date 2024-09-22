@@ -47,6 +47,10 @@ export const useShiftStore = defineStore('shift', {
     },
     activeUsers: (state) => {
       const { users } = state;
+      users.filter(({ stateOfWork, role }) => {
+        return stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯'];
+      });
+
       return users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({
         label: member.name,
         value: member.id,

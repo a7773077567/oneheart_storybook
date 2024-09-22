@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type CreateUser, type UpdateUser, createUser, fetchSpaces, getAvatarS3Info, resendActivateEmail, suspendUser, updateUser, uploadAvatar } from '@/api';
+import { type CreateUser, RoleType, createUser, fetchSpaces, updateUser, uploadAvatar } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
 import { useUserStore } from '@/stores';
@@ -22,8 +22,17 @@ const targetUser = computed(() => userStore.targetUser!);
 
 const weightForOrderOptions = [...Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx })), { label: '99', value: 99 }];
 const roleIdOptions = [
-  { label: '管理者', value: 1 },
-  { label: '櫃檯', value: 2 },
+  { label: '管理者', value: RoleType['系統管理者'] },
+  { label: '院長 ', value: RoleType['院長'] },
+  { label: '副院長 ', value: RoleType['副院長'] },
+  { label: '物理治療師組長 ', value: RoleType['物理治療師組長'] },
+  { label: '物理治療師 ', value: RoleType['物理治療師'] },
+  { label: '店長 ', value: RoleType['店長'] },
+  { label: '副店長 ', value: RoleType['副店長'] },
+  { label: '教練組長 ', value: RoleType['教練組長'] },
+  { label: '教練 ', value: RoleType['教練'] },
+  { label: '櫃檯組長 ', value: RoleType['櫃檯組長'] },
+  { label: '櫃檯 ', value: RoleType['櫃檯'] },
 ];
 const spaceOptions = spaces.map(space => ({ label: space.name, value: space.id }));
 const avatarPreviewFile = ref<File | null>();
