@@ -6,7 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
 import { useClientStore, usePointsStore } from '@/stores';
-import { pointsPlan } from '@/const/points';
+import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
 
 const emit = defineEmits<{
@@ -22,7 +22,7 @@ const pointsTopupSchema = z.object({
   clientPhone: z.string(),
   groupName: z.string(),
   clientGroupId: z.number(),
-  plan: z.number().min(1).nullable(),
+  plan: z.preprocess(a => Number(a), z.number().nonnegative()),
   pointType: z.nativeEnum(PointTypes),
   paidPointGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
@@ -36,7 +36,7 @@ const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = { ...values, planName: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
+  pointsStore.topupDetail = { ...values, planName: values.plan ? POINTS_PLAN[values.plan].name : '' };
 
   emit('goNext');
 });
@@ -45,7 +45,13 @@ const showClientSearch = ref(false);
 const totalPoints = computed(() => (Number(values.paidPointGained ?? 0)) + (Number(values.giftPointGained ?? 0)));
 
 const planOptions = computed(() => {
-  return pointsPlan.filter(({ type }) => type === values?.pointType || type === 'all').map(({ name, id }) => ({ label: name, value: id }));
+  const targetType = plansByType.find(({ type }) => type === values.pointType);
+
+  if (!targetType) {
+    return Object.keys(POINTS_PLAN).map(planId => ({ label: POINTS_PLAN[+planId].name, value: +planId }));
+  };
+
+  return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
 
 function selectClient(selectList: Client[]) {
@@ -67,10 +73,11 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
   setFieldValue('clientGroupId', group.id ?? '');
   setFieldValue('groupName', group.name ?? '');
   setFieldValue('pointType', group.type);
+  setFieldValue('plan', null);
 }
 
 function setDefaultVal(selectedId: number) {
-  const selectedPlan = pointsPlan.find(plan => plan.id === selectedId)!;
+  const selectedPlan = POINTS_PLAN[selectedId];
 
   setFieldValue('paidPointGained', selectedPlan?.paidPointGained);
   setFieldValue('giftPointGained', selectedPlan?.giftPointGained);

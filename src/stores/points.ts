@@ -28,7 +28,7 @@ const initialTopup = {
   clientGroupId: Number.NaN,
   pointType: Number.NaN,
   groupName: '',
-  plan: null,
+  plan: 8,
   planName: '',
   paidPointGained: 0,
   giftPointGained: 0,

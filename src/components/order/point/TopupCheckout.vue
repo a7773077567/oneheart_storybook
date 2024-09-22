@@ -8,7 +8,7 @@ import { gainPoint } from '@/api';
 import { useQuasar } from 'quasar';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { PaymentMethods } from '@/const/appointment';
-import { PointPlan } from '@/const/points';
+import { POINTS_PLAN } from '@/const/points';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -32,7 +32,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
   { key: 'pointType', value: PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
-  { key: 'plan', value: pointsStore.topupDetail?.plan ? PointPlan[pointsStore.topupDetail.plan] : '', label: '方案' },
+  { key: 'plan', value: pointsStore.topupDetail?.plan ? POINTS_PLAN[pointsStore.topupDetail.plan].name : '', label: '方案' },
   { key: 'amount', value: `$ ${(pointsStore.topupDetail?.amount ?? 0)}`, label: '金額' },
   { key: 'paidPointGained', value: `${(pointsStore.topupDetail?.paidPointGained ?? 0)} 堂`, label: '堂數' },
   { key: 'giftPointGained', value: `${(pointsStore.topupDetail?.giftPointGained ?? 0)} 堂`, label: '贈堂' },
