@@ -164,13 +164,13 @@ export async function getMedicalHistory(clientId: number, params: MedicalHistory
 }
 
 // 新增客戶關係人
-export type IdentityNumberType = 1 | 2;
+// export type IdentityNumberType = 1 | 2;
 export interface NewAssociation {
   name: string;
-  relationTypeName: string;
-  identityType: IdentityNumberType; // 身分證：1, 居留證:2
-  identityNumber: string;
-  birthDate: string;
+  relationTypeName?: string;
+  identityType?: number; // 身分證：1, 居留證:2
+  identityNumber?: string;
+  birthDate?: string;
   phone: string;
 }
 export async function addClientAssociation(clientId: number, data: NewAssociation) {

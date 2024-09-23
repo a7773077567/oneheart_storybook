@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useClientStore } from '@/stores';
 import type { QTableProps } from 'quasar';
+import AddAssociation from '@/components/client/AddAssociation.vue';
 
 const props = defineProps<{ clientId: string }>();
 
@@ -50,7 +51,9 @@ const showAdd = ref(false);
       <QBtn icon="o_add" label="新增常用人員" outline @click="showAdd = true" />
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered @row-click="(_, row) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })" />
-    <QDialog v-model="showAdd" class="add_association_dialog" persistent transition-show="scale" transition-hide="scale" />
+    <QDialog v-model="showAdd" class="add_association_dialog" persistent transition-show="scale" transition-hide="scale">
+      <AddAssociation :client-id="+clientId" @cancel="showAdd = false" @submit="clientStore.getClientInfo(+props.clientId)" />
+    </QDialog>
   </div>
 </template>
 
