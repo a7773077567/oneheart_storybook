@@ -148,16 +148,12 @@ export async function getClientPayments(clientId: number) {
   return data;
 }
 
-/**
- * 更新客戶的介紹者
- */
+// 更新客戶的介紹者
 export async function updateIntroducer(clientId: number, body: { introducerClientId: number }) {
   await api.patch(`clients/${clientId}/update-introducer`, body);
 }
 
-/**
- * 取得客戶各科別負責人
- */
+// 取得客戶各科別負責人
 export async function getDepInChargeTherapist(clientId: number) {
   const { data } = await api.get<DepInChargeTherapist[]>(`clients/${clientId}/inChargeUsers`);
   return data;
@@ -165,4 +161,18 @@ export async function getDepInChargeTherapist(clientId: number) {
 export async function getMedicalHistory(clientId: number, params: MedicalHistoryParams) {
   const { data } = await api.get<MedicalHistory[]>(`clients/${clientId}/clientSchedules-with-record-finished`, { params });
   return data;
+}
+
+// 新增客戶關係人
+export type IdentityNumberType = 1 | 2;
+export interface NewAssociation {
+  name: string;
+  relationTypeName: string;
+  identityType: IdentityNumberType; // 身分證：1, 居留證:2
+  identityNumber: string;
+  birthDate: string;
+  phone: string;
+}
+export async function addClientAssociation(clientId: number, data: NewAssociation) {
+  await api.post(`clients/${clientId}/associations`, data);
 }
