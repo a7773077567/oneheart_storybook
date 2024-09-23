@@ -11,7 +11,7 @@ const newClientSchema = z.object({
   name: z.string().min(1),
   phone: z.string().length(10, { message: '請輸入完整手機號碼' }).startsWith('09', { message: '請輸入台灣手機號碼' }),
   gender: z.string().optional(),
-  identityNumber: z.string().length(10, { message: '請輸入完整號碼' }).optional(),
+  identityNumber: z.string().optional(),
   birthDate: z.string().optional(),
   address: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
@@ -58,7 +58,7 @@ const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram
       </fieldset>
 
       <fieldset class="col-12">
-        <span class="label">身分證</span>
+        <span class="label">身分證/ <br> 居留證</span>
         <OInput name="identityNumber" hide-bottom-space class="col-grow" :error="!!errors.identityNumber" error-message="" />
       </fieldset>
 
