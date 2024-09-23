@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
+import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
 import { ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref } from 'vue';
@@ -18,7 +18,7 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 
-const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices } = (appointmentStore.targetClientSchedule!);
+const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice } = (appointmentStore.targetClientSchedule!);
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
@@ -78,6 +78,10 @@ async function onCheckout() {
   });
   router.push({ name: 'appointmentListCalendar' });
 }
+
+const priceTags = computed(() => {
+  return [{ label: '自動推薦優惠價格', value: isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
+});
 </script>
 
 <template>
@@ -95,6 +99,8 @@ async function onCheckout() {
     </CheckTable>
 
     <AddOnTable v-if="hasAddOn" :data="addOns" />
+
+    <PriceTags :list="priceTags" />
 
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
     <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />

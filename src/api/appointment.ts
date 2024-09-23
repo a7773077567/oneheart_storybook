@@ -149,6 +149,7 @@ export interface ClientSchedule {
   isFirstClientSchedule: boolean;
   isRearrangedClientSchedule: boolean;
   isValidForRestore: boolean;
+  isUsingAutoRecommend: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
   note: string;
 }
