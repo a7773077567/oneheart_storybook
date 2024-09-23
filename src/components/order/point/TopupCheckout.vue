@@ -56,6 +56,7 @@ const receiptData = computed(() => {
   ];
 });
 
+const isProceeding = ref(false);
 async function onCheckout() {
   const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
@@ -69,23 +70,29 @@ async function onCheckout() {
     });
     return;
   }
-  await gainPoint({
-    clientId,
-    clientGroupId,
-    plan: planName,
-    paidPointGained,
-    giftPointGained,
-    amount,
-    multiChannelPay,
-  });
+  isProceeding.value = true;
+  try {
+    await gainPoint({
+      clientId,
+      clientGroupId,
+      plan: planName,
+      paidPointGained,
+      giftPointGained,
+      amount,
+      multiChannelPay,
+    });
 
-  $q.dialog({
-    message: '儲值成功',
-  }).onOk(() => {
-    isCheckoutOpen.value = false;
-    emit('finish');
-  },
-  );
+    $q.dialog({
+      message: '儲值成功',
+    }).onOk(() => {
+      isCheckoutOpen.value = false;
+      emit('finish');
+    },
+    );
+  }
+  finally {
+    isProceeding.value = false;
+  }
 }
 </script>
 
@@ -106,7 +113,7 @@ async function onCheckout() {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :loading="isProceeding" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>
