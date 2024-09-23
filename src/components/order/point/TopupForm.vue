@@ -4,10 +4,13 @@ import { ClientSearch, OInput, OSelect } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import type { Client } from '@/api';
+import { createPointGroup } from '@/api';
+import type { Client, CreateGroupField } from '@/api';
 import { useClientStore, usePointsStore } from '@/stores';
 import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
+import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
+import { useQuasar } from 'quasar';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -83,6 +86,20 @@ function setDefaultVal(selectedId: number) {
   setFieldValue('giftPointGained', selectedPlan?.giftPointGained);
   setFieldValue('amount', selectedPlan?.price);
 }
+
+// 新增群組
+const showAddForm = ref(false);
+const newGroupInitVals = computed(() => ({ ...(values.clientId ? { adminClient: { name: values.clientName ?? '', phone: values.clientPhone ?? '', id: values.clientId } } : {}) }));
+
+const $q = useQuasar();
+async function createGroup(value: CreateGroupField) {
+  await createPointGroup(value);
+  $q.dialog({
+    message: '群組創建成功',
+  });
+  showAddForm.value = false;
+  values.clientId && pointsStore.getPointGroupOptions(values.clientId);
+}
 </script>
 
 <template>
@@ -110,14 +127,18 @@ function setDefaultVal(selectedId: number) {
       <fieldset class="col-8">
         <span class="field--key">堂數群組</span>
         <OSelect
+          :disable="!values.clientId"
           class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
-          :virtual-scroll-item-size="50" :disable="!values.clientId" error-message=""
+          :virtual-scroll-item-size="50" error-message=""
           @update:model-value="getPointGroup"
         />
         <div class="q-ml-md text-caption" style="min-width:98px">
           堂數類別：<span v-if="!!values.pointType" class="text-caption">
             {{ PointTypes[values.pointType] }}
           </span>
+        </div>
+        <div>
+          <QBtn outline label="新增群組" :disable="!values.clientId" @click="showAddForm = true" />
         </div>
       </fieldset>
       <fieldset class="col-8">
@@ -157,6 +178,9 @@ function setDefaultVal(selectedId: number) {
       <QBtn size="md" label="下一步" color="black" class="q-px-lg" @click="onSubmit" />
     </div>
   </div>
+  <QDialog v-model="showAddForm">
+    <PointsGroupForm type="add" :init-val="newGroupInitVals" @cancel="showAddForm = false" @create="createGroup" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">

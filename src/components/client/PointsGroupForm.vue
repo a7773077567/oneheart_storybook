@@ -79,7 +79,7 @@ function removeMember(delMember: Client) {
           <div class="label_divider">
             群長
           </div>
-          <GroupMemberField name="adminClient" :model-value="{ name: '123', phone: null, id: null }" hide-delete />
+          <GroupMemberField name="adminClient" hide-delete />
         </section>
         <section class="col-12">
           <div class="label_divider">
