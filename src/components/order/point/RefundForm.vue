@@ -36,7 +36,7 @@ const pointRefundSchema = z.object({
     name: z.string(),
     points: z.number().nonnegative().gt(0, '退堂數量需大於0'),
   }).nullable(),
-  amount: z.preprocess(a => Number(a), z.number().nonnegative('退款金額須大於0').gt(0, '退款金額須大於0')),
+  amount: z.number(),
 });
 
 const initialValues = computed(() => ({

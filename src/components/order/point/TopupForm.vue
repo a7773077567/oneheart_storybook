@@ -4,10 +4,13 @@ import { ClientSearch, OInput, OSelect } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import type { Client } from '@/api';
+import { createPointGroup } from '@/api';
+import type { Client, CreateGroupField } from '@/api';
 import { useClientStore, usePointsStore } from '@/stores';
-import { pointsPlan } from '@/const/points';
+import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
+import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
+import { useQuasar } from 'quasar';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -22,7 +25,7 @@ const pointsTopupSchema = z.object({
   clientPhone: z.string(),
   groupName: z.string(),
   clientGroupId: z.number(),
-  plan: z.number().min(1).nullable(),
+  plan: z.preprocess(a => Number(a), z.number().nonnegative()),
   pointType: z.nativeEnum(PointTypes),
   paidPointGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
@@ -36,7 +39,7 @@ const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = { ...values, planName: pointsPlan.find(plan => plan.id === values.plan)!.name ?? '' };
+  pointsStore.topupDetail = { ...values, planName: values.plan ? POINTS_PLAN[values.plan].name : '' };
 
   emit('goNext');
 });
@@ -45,7 +48,13 @@ const showClientSearch = ref(false);
 const totalPoints = computed(() => (Number(values.paidPointGained ?? 0)) + (Number(values.giftPointGained ?? 0)));
 
 const planOptions = computed(() => {
-  return pointsPlan.filter(({ type }) => type === values?.pointType || type === 'all').map(({ name, id }) => ({ label: name, value: id }));
+  const targetType = plansByType.find(({ type }) => type === values.pointType);
+
+  if (!targetType) {
+    return Object.keys(POINTS_PLAN).map(planId => ({ label: POINTS_PLAN[+planId].name, value: +planId }));
+  };
+
+  return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
 
 function selectClient(selectList: Client[]) {
@@ -67,14 +76,29 @@ function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
   setFieldValue('clientGroupId', group.id ?? '');
   setFieldValue('groupName', group.name ?? '');
   setFieldValue('pointType', group.type);
+  setFieldValue('plan', null);
 }
 
 function setDefaultVal(selectedId: number) {
-  const selectedPlan = pointsPlan.find(plan => plan.id === selectedId)!;
+  const selectedPlan = POINTS_PLAN[selectedId];
 
   setFieldValue('paidPointGained', selectedPlan?.paidPointGained);
   setFieldValue('giftPointGained', selectedPlan?.giftPointGained);
   setFieldValue('amount', selectedPlan?.price);
+}
+
+// 新增群組
+const showAddForm = ref(false);
+const newGroupInitVals = computed(() => ({ ...(values.clientId ? { adminClient: { name: values.clientName ?? '', phone: values.clientPhone ?? '', id: values.clientId } } : {}) }));
+
+const $q = useQuasar();
+async function createGroup(value: CreateGroupField) {
+  await createPointGroup(value);
+  $q.dialog({
+    message: '群組創建成功',
+  });
+  showAddForm.value = false;
+  values.clientId && pointsStore.getPointGroupOptions(values.clientId);
 }
 </script>
 
@@ -103,14 +127,18 @@ function setDefaultVal(selectedId: number) {
       <fieldset class="col-8">
         <span class="field--key">堂數群組</span>
         <OSelect
+          :disable="!values.clientId"
           class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
-          :virtual-scroll-item-size="50" :disable="!values.clientId" error-message=""
+          :virtual-scroll-item-size="50" error-message=""
           @update:model-value="getPointGroup"
         />
         <div class="q-ml-md text-caption" style="min-width:98px">
           堂數類別：<span v-if="!!values.pointType" class="text-caption">
             {{ PointTypes[values.pointType] }}
           </span>
+        </div>
+        <div>
+          <QBtn outline label="新增群組" :disable="!values.clientId" @click="showAddForm = true" />
         </div>
       </fieldset>
       <fieldset class="col-8">
@@ -150,6 +178,9 @@ function setDefaultVal(selectedId: number) {
       <QBtn size="md" label="下一步" color="black" class="q-px-lg" @click="onSubmit" />
     </div>
   </div>
+  <QDialog v-model="showAddForm">
+    <PointsGroupForm type="add" :init-val="newGroupInitVals" @cancel="showAddForm = false" @create="createGroup" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">

@@ -58,43 +58,53 @@ const receiptData = computed(() => {
 
 const $q = useQuasar();
 const router = useRouter();
+
+const isRefunding = ref(false);
 async function onCheckout() {
   const { clientId, groupClassId, amount } = props.modelValue;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
   const hasEmptyPayAmount = multiChannelPay.some(item => !item.amount);
-  if (hasEmptyPayAmount) {
+
+  // accept $0 refund
+  if (amount !== 0 && hasEmptyPayAmount) {
     $q.dialog({
       message: '所有支付方式的金額皆需填入',
     });
     return;
   }
-  await refundClassTicker({
-    clientId,
-    groupClassId,
-    amount,
-    multiChannelPay,
-  });
-
-  const { onOk, onCancel } = await useDialog({
-    title: '退款已完成',
-    message: '退款已完成，您可在「查詢交易紀錄」檢視此筆交易',
-    okLabel: '列印收據',
-    cancelLabel: '結束',
-  });
-
-  onOk(() => {
-    // after success dialog close then do the print
-    nextTick(() => {
-      window.print();
-      emit('finish');
+  isRefunding.value = true;
+  try {
+    await refundClassTicker({
+      clientId,
+      groupClassId,
+      amount,
+      multiChannelPay,
     });
-  },
-  );
-  onCancel(() => {
-    router.push({ name: 'transactionRecords' });
-  });
+
+    const { onOk, onCancel } = await useDialog({
+      title: '退款已完成',
+      message: '退款已完成，您可在「查詢交易紀錄」檢視此筆交易',
+      okLabel: '列印收據',
+      cancelLabel: '結束',
+    });
+
+    onOk(() => {
+    // after success dialog close then do the print
+      nextTick(() => {
+        window.print();
+        emit('finish');
+      });
+    },
+    );
+    onCancel(() => {
+      router.push({ name: 'transactionRecords' });
+    });
+  }
+  finally {
+    isRefunding.value = false;
+  }
 }
 </script>
 
@@ -118,7 +128,7 @@ async function onCheckout() {
     </div>
 
     <QDialog v-model="isCheckoutOpen">
-      <Receipt hide-print :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" @checkout="onCheckout" @close="isCheckoutOpen = false" />
+      <Receipt hide-print :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :loading="isRefunding" @checkout="onCheckout" @close="isCheckoutOpen = false" />
     </QDialog>
   </div>
 </template>

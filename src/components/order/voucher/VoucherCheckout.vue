@@ -46,6 +46,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
 ]);
 
 const $q = useQuasar();
+const isProceeding = ref(false);
 async function onCheckout() {
   const { clientId, groupClassId, ticketGained } = voucherStore.voucherDetail as PurchaseVoucher;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
@@ -58,19 +59,25 @@ async function onCheckout() {
     });
     return;
   }
-  await buyGroupClassTickets({
-    clientId,
-    groupClassId,
-    ticketGained,
-    amount: totalAmount.value,
-    multiChannelPay,
-  });
+  isProceeding.value = true;
+  try {
+    await buyGroupClassTickets({
+      clientId,
+      groupClassId,
+      ticketGained,
+      amount: totalAmount.value,
+      multiChannelPay,
+    });
 
-  $q.dialog({
-    message: '購買成功',
-  }).onOk(() =>
-    emit('finish'),
-  );
+    $q.dialog({
+      message: '購買成功',
+    }).onOk(() =>
+      emit('finish'),
+    );
+  }
+  finally {
+    isProceeding.value = false;
+  }
 }
 </script>
 
@@ -92,7 +99,7 @@ async function onCheckout() {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :is-loading="isProceeding" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>
