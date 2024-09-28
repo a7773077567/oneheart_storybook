@@ -152,6 +152,16 @@ export interface ClientSchedule {
   isUsingAutoRecommend: boolean;
   rearrangeClientSchedule: ClientSchedule | null;
   note: string;
+  clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
+}
+
+export interface ClientSchedulesModifyHistory {
+  modifyUserName: string;
+  modifyClientName: string;
+  modifyDateTime: string;
+  sequenceNumber: number;
+  beforeState: number;
+  afterState: number;
 }
 
 export interface BookingItem {

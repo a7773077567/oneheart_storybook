@@ -9,7 +9,7 @@ import { adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appoin
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { type ClientScheduleDetail, updateNote } from '@/api';
-import { ClientInfoTable } from '@/components/appointment';
+import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 
 const props = defineProps<{
@@ -112,10 +112,15 @@ function limitTimeOptions(hr: number, min: number | null) {
 <template>
   <div class="client-info">
     <div class="client-info__header">
-      <p class="member-id">
-        <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
-      </p>
-      <QChip v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false" style="background-color: #F8C9CB;">未結帳</QChip>
+      <div class="misc">
+        <p class="member-id">
+          <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
+        </p>
+        <div class="payment-state">
+          <QChip v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false" style="background-color: #F8C9CB;">未結帳</QChip>
+        </div>
+        <ScheduleModifyHistories :data="appointmentStore.scheduleModifyHistories" />
+      </div>
     </div>
     <div class="client-info__body">
       <ClientInfoTable :data="data">
@@ -172,9 +177,6 @@ function limitTimeOptions(hr: number, min: number | null) {
 .client-info {
   &__header {
     margin-bottom: 15px;
-    display: flex;
-    gap: 50px;
-    align-items: center;
   }
   &__caption {
     margin-bottom: 25px;
@@ -257,5 +259,10 @@ function limitTimeOptions(hr: number, min: number | null) {
       font-weight: 700;
     }
   }
+}
+
+.misc {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
 }
 </style>
