@@ -176,6 +176,20 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     price: 18700,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
+  25: {
+    name: '軍警消醫護5堂 $7500',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 7500,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+  },
+  26: {
+    name: '軍警消醫護10堂 $15000',
+    paidPointGained: 10,
+    giftPointGained: 0,
+    price: 15000,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+  },
 } as const;
 
 interface TypePlan {
@@ -185,7 +199,7 @@ interface TypePlan {
 
 }
 
-const physicalRelatedPlans = Array(16).fill(9).map((plan, idx) => plan + idx);
+const physicalRelatedPlans = Array(18).fill(9).map((plan, idx) => plan + idx);
 export const plansByType: TypePlan[] = [
   { id: 1, type: PointTypes.物理治療, plans: [1, 2, 8, ...physicalRelatedPlans] },
   { id: 2, type: PointTypes.院長物理治療, plans: [3, 4, 8, ...physicalRelatedPlans] },
@@ -218,3 +232,5 @@ export const plansByType: TypePlan[] = [
 // 22. 開幕復診10堂17500
 // 23. 開幕復診20堂34000
 // 24. 體態矯正方案18700
+// 25. 軍警消醫護5堂 $7500
+// 26. 軍警消醫護10堂 $15000
