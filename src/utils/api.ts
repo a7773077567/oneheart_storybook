@@ -80,6 +80,7 @@ const firstTokenList = [
   'clientGroups',
   'payments',
   'groupClassTickets',
+  'dottedSign',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
