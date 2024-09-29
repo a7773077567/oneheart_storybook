@@ -29,17 +29,19 @@ const cols: QTableProps['columns'] = [
 
 ];
 
-function getContract() {
-  console.log('getContract');
+function getContract(link: string | null) {
+  if (!link)
+    return;
+  window.open(link, '_blank');
 }
 </script>
 
 <template>
   <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
-    <template #body-cell-contractUrl>
-      <td class="flex items-center cursor-pointer" @click="getContract">
-        <span class="q-mr-sm filename">堂數儲值合約書 N 12345.pdf</span>
-        <QIcon name="o_attach_file" size="sm" />
+    <template #body-cell-contractUrl="{ row: { contractUrl: value } }">
+      <td class="flex items-center cursor-pointer" @click="getContract(value)">
+        <span class="q-mr-sm filename">合約書.pdf</span>
+        <QIcon v-if="!!value" name="o_attach_file" size="sm" />
       </td>
     </template>
   </QTable>
