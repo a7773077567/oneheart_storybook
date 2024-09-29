@@ -10,7 +10,6 @@ import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { PaymentMethods } from '@/const/appointment';
 import { POINTS_PLAN } from '@/const/points';
 
-
 const emit = defineEmits<{
   (e: 'cancel'): void;
   (e: 'goBack'): void;
@@ -78,16 +77,17 @@ async function onCheckout() {
     });
   }
   isProceeding.value = true;
-  await gainPoint({
-    clientId,
-    clientGroupId,
-    plan: planName,
-    paidPointGained,
-    giftPointGained,
-    amount,
-    multiChannelPay,
-    contractDottedsignTaskId: `${contractDottedsignTaskId}`,
-  });
+  try {
+    await gainPoint({
+      clientId,
+      clientGroupId,
+      plan: planName,
+      paidPointGained,
+      giftPointGained,
+      amount,
+      multiChannelPay,
+      contractDottedsignTaskId: `${contractDottedsignTaskId}`,
+    });
 
     $q.dialog({
       message: '儲值成功',
