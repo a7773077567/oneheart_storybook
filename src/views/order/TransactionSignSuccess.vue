@@ -1,16 +1,13 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
-import { pointsGroupOptions } from '@/const/general';
 
 const route = useRoute();
 const router = useRouter();
 
 const contractDetail = computed(() => {
-  console.log(route.query);
   let _payload = route.query.payload;
   if (_payload && typeof route.query.payload === 'string') {
-    console.log(JSON.parse(route.query.payload));
     return JSON.parse(route.query.payload);
   }
   return {};
@@ -28,36 +25,20 @@ function handleRedirect() {
         isSigned: 'true',
         content: JSON.stringify(contractDetail.value),
       } });
-    case 'groupClass':
+    case 'voucher':
       return router.push({ name: 'GroupClassVoucher', query: {
         isSigned: 'true',
-        content: contractDetail.value,
+        content: JSON.stringify(contractDetail.value),
       } });
       // todo, redirect 病歷單
     case 'newClient':
     default:
       return router.push({ name: 'GroupClassVoucher', query: {
         isSigned: 'true',
-        content: contractDetail.value,
+        content: JSON.stringify(contractDetail.value),
       } });
   }
 }
-
-// {
-//   "clientName": "Sherry",
-//   "clientId": 1,
-//   "clientPhone": "0978709231",
-//   "groupName": "測試群組",
-//   "clientGroupId": 8,
-//   "plan": 3,
-//   "pointType": 2,
-//   "paidPointGained": 5,
-//   "giftPointGained": 0,
-//   "amount": 14500,
-//   "planName": "14500元：5堂",
-//   "contractType": "point",
-//   "taskId": 3018465
-// }
 </script>
 
 <template>

@@ -7,6 +7,7 @@ import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
 import { PaymentMethods } from '@/const/appointment';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import type { VoucherDetail } from '@/stores/voucher';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -19,13 +20,21 @@ type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 
 const voucherStore = useVoucherStore();
 const clientStore = useClientStore();
-const totalAmount = ref<number>(0);
+const totalAmount = computed({
+  get: () => voucherStore.voucherDetail?.amount ?? 0,
+  set(amount) {
+    voucherStore.voucherDetail = {
+      ...voucherStore.voucherDetail as VoucherDetail,
+      amount: amount ?? 0,
+    };
+  },
+});
 const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;
-  const { identityNumber, birthDate } = clientStore.targetClient!;
+  const { identityNumber, birthDate } = clientStore.targetClient ?? { identityNumber: '', birthDate: '' };
   return [
     { name: 'name', label: '姓名', value: clientName },
     { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label ?? '' },
@@ -47,7 +56,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
 
 const $q = useQuasar();
 async function onCheckout() {
-  const { clientId, groupClassId, ticketGained } = voucherStore.voucherDetail as PurchaseVoucher;
+  const { clientId, groupClassId, ticketGained, contractDottedsignTaskId, amount } = voucherStore.voucherDetail as PurchaseVoucher;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -62,8 +71,9 @@ async function onCheckout() {
     clientId,
     groupClassId,
     ticketGained,
-    amount: totalAmount.value,
+    amount,
     multiChannelPay,
+    contractDottedsignTaskId: `${contractDottedsignTaskId}`,
   });
 
   $q.dialog({

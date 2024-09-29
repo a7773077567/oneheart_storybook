@@ -26,6 +26,7 @@ export interface PurchaseVoucher {
     receiptNumber: string | null;
     details: string;
   }[];
+  contractDottedsignTaskId: string; // todo, revise to type number
 }
 
 export type RefundGroupClassTicket = Pick<PurchaseVoucher, 'clientId' | 'groupClassId' | 'amount' | 'multiChannelPay'>;

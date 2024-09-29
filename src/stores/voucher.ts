@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
-import { type GroupClass, type PurchaseVoucher, fetchGroupShiftTemplates } from '@/api';
+import { type Client, type GroupClass, type PurchaseVoucher, fetchGroupShiftTemplates } from '@/api';
 
 interface State {
-  voucherDetail: Partial<VoucherDetail> | null;
+  voucherDetail: VoucherDetail | null;
   groupClassList: GroupClass[];
+  targetClient: null | Partial<Client>;
 }
 
 export interface VoucherDetail extends PurchaseVoucher {
@@ -17,6 +18,7 @@ export const useVoucherStore = defineStore('voucher', {
     return {
       voucherDetail: null,
       groupClassList: [],
+      targetClient: null,
     };
   },
   getters: {
