@@ -9,6 +9,7 @@ import { useQuasar } from 'quasar';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { PaymentMethods } from '@/const/appointment';
 import { PointPlan } from '@/const/points';
+import type { PointsPurchase } from '@/stores/points';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -30,7 +31,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
   { key: 'name', value: pointsStore.topupDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
-  { key: 'pointType', value: PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
+  { key: 'pointType', value: pointsStore.topupDetail.pointType && PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
   { key: 'plan', value: pointsStore.topupDetail?.plan ? PointPlan[pointsStore.topupDetail.plan] : '', label: '方案' },
   { key: 'amount', value: `$ ${(pointsStore.topupDetail?.amount ?? 0)}`, label: '金額' },
@@ -41,7 +42,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
 const $q = useQuasar();
 const receiptData = computed(() => {
   const { planName, paidPointGained, clientName, groupName, giftPointGained } = pointsStore.topupDetail;
-  const { identityNumber, birthDate } = clientStore.targetClient!;
+  const { identityNumber, birthDate } = clientStore.targetClient ?? { identityNumber: '', birthDate: '' };
 
   return [
     { name: 'name', label: '姓名', value: clientName },
@@ -57,7 +58,7 @@ const receiptData = computed(() => {
 });
 
 async function onCheckout() {
-  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount, contractDottedsignTaskId } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -69,6 +70,13 @@ async function onCheckout() {
     });
     return;
   }
+
+  if (!contractDottedsignTaskId) {
+    $q.dialog({
+      message: '合約尚未填寫完成',
+    });
+  }
+
   await gainPoint({
     clientId,
     clientGroupId,
@@ -77,6 +85,7 @@ async function onCheckout() {
     giftPointGained,
     amount,
     multiChannelPay,
+    contractDottedsignTaskId: `${contractDottedsignTaskId}`,
   });
 
   $q.dialog({

@@ -310,16 +310,7 @@ export const routes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
-          {
-            path: 'sign-success',
-            name: 'TransactionSignSuccess',
-            component: () => import('@/views/order/TransactionSignSuccess.vue'),
-            meta: {
-              label: '',
-              requiredAuth: false,
-              hide: true,
-            },
-          },
+
         ],
       },
       {
@@ -436,7 +427,16 @@ export const routes: RouteRecordRaw[] = [
 
     ],
   },
-
+  {
+    path: '/sign-success',
+    name: 'TransactionSignSuccess',
+    component: () => import('@/views/order/TransactionSignSuccess.vue'),
+    meta: {
+      label: '',
+      requiredAuth: false,
+      hide: true,
+    },
+  },
 ];
 
 const router = createRouter({

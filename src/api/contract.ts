@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 
-export enum ContractType {
+export enum ContractTypes {
   儲值治療類合約 = 1,
   儲值運動類合約 = 2,
   初診合約 = 3,
@@ -9,7 +9,7 @@ export enum ContractType {
 export interface ContractParam {
   redirectUrl: string;
   payloadJSONString: string;
-  type: ContractType;
+  type: ContractTypes;
 }
 
 export async function downloadContract(taskId: number) {

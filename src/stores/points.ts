@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
-import { type PointsGroup, type TopupDetail, getClientPointGroup } from '@/api';
+import { type Client, type PointsGroup, getClientPointGroup } from '@/api';
 import { PointTypes } from '@/const/general';
 
 interface State {
   topupDetail: PointsPurchase;
   targetClientPointGroup: PointsGroup[];
+  targetClient: Partial<Client> | null;
 }
 
-interface PointsPurchase {
+export interface PointsPurchase {
   clientId: number;
   clientName: string;
   clientPhone: string;
@@ -19,6 +20,7 @@ interface PointsPurchase {
   paidPointGained: number;
   giftPointGained: number;
   amount: number;
+  contractDottedsignTaskId: string | null;
 }
 
 const initialTopup = {
@@ -33,12 +35,14 @@ const initialTopup = {
   paidPointGained: 0,
   giftPointGained: 0,
   amount: 0,
+  contractDottedsignTaskId: null,
 };
 export const usePointsStore = defineStore('points', {
   state: (): State => {
     return {
       topupDetail: initialTopup,
       targetClientPointGroup: [],
+      targetClient: null,
     };
   },
   getters: {
