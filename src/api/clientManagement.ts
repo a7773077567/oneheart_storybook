@@ -2,6 +2,7 @@ import { api } from '@/utils/api';
 import type { User } from './user';
 import type { ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
+import type { ContractTypes } from './contract';
 
 export interface ClientsGetParams {
   nameOrPhone?: string;
@@ -94,6 +95,7 @@ export interface MedicalHistory {
 export interface ClientContract {
   data: string;
   contractUrl: string;
+  contractType: ContractTypes;
 }
 
 // 取得 memo
