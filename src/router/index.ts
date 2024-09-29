@@ -310,6 +310,7 @@ export const routes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+
         ],
       },
       {
@@ -430,6 +431,15 @@ export const routes: RouteRecordRaw[] = [
     path: '/receipt-print',
     name: 'receiptPrint',
     component: () => import('@/views/print/ReceiptPrintView.vue'),
+  },
+  {
+    path: '/sign-success',
+    name: 'TransactionSignSuccess',
+    component: () => import('@/views/order/TransactionSignSuccess.vue'),
+    meta: {
+      requiredAuth: false,
+      hide: true,
+    },
   },
 ];
 

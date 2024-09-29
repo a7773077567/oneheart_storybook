@@ -5,3 +5,4 @@ export { default as PurchaseRecords } from './PurchaseRecords.vue';
 export { default as InbodyRecords } from './InbodyRecords.vue';
 export { default as GCVoucher } from './GCVoucher.vue';
 export { default as MedicalHistory } from './MedicalHistory.vue';
+export { default as ContractList } from './ContractList.vue';

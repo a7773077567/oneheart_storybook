@@ -67,6 +67,7 @@ export interface GainPoint {
     receiptNumber: string | null;
     details: string;
   }[];
+  contractDottedsignTaskId: string;
 }
 // 儲值堂數
 export async function gainPoint(param: GainPoint) {

@@ -91,6 +91,11 @@ export interface MedicalHistory {
   scheduleEndTime: string;
 }
 
+export interface ClientContract {
+  data: string;
+  contractUrl: string;
+}
+
 // 取得 memo
 export async function getMemos(clientId: number) {
   const { data } = await api.get<Memo[]>(`clients/${clientId}/memos`);
@@ -175,4 +180,10 @@ export interface NewAssociation {
 }
 export async function addClientAssociation(clientId: number, data: NewAssociation) {
   await api.post(`clients/${clientId}/associations`, data);
+}
+
+// 取得客戶所有合約
+export async function getAllContract(clientId: number) {
+  const { data } = await api.get<ClientContract[]>(`clients/${clientId}/contracts`);
+  return data;
 }

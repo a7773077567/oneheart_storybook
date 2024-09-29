@@ -6,7 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { createPointGroup } from '@/api';
 import type { Client, CreateGroupField } from '@/api';
-import { useClientStore, usePointsStore } from '@/stores';
+import { usePointsStore } from '@/stores';
 import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
 import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
@@ -18,7 +18,6 @@ const emit = defineEmits<{
 }>();
 
 const pointsStore = usePointsStore();
-const clientStore = useClientStore();
 const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
@@ -39,7 +38,7 @@ const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = { ...values, planName: values.plan ? POINTS_PLAN[values.plan].name : '' };
+  pointsStore.topupDetail = { ...values, planName: values.plan ? POINTS_PLAN[values.plan].name : '', contractDottedsignTaskId: null };
 
   emit('goNext');
 });
@@ -60,7 +59,7 @@ const planOptions = computed(() => {
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
 
-  clientStore.targetClient = client;
+  pointsStore.targetClient = client;
 
   setFieldValue('clientId', client.id);
   setFieldValue('clientName', client.name);

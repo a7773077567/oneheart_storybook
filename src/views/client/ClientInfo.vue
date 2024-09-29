@@ -1,8 +1,7 @@
 <script setup lang='ts'>
-import { getClientInfo } from '@/api';
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { Associations, BasicInfo, GCVoucher, InbodyRecords, MedicalHistory, PointsGroup, PurchaseRecords } from '@/components/client';
+import { Associations, BasicInfo, ContractList, GCVoucher, InbodyRecords, MedicalHistory, PointsGroup, PurchaseRecords } from '@/components/client';
 
 defineProps<{
   clientId: string;
@@ -18,6 +17,7 @@ const tabs = [
   { name: 'purchaseRecords', label: '消費歷程', component: PurchaseRecords },
   { name: 'inbodyRecords', label: '身體組成表', component: InbodyRecords },
   { name: 'groupClassVoucher', label: '團課券', component: GCVoucher },
+  { name: 'contractList', label: '合約書', component: ContractList },
 ];
 const currentTab = ref(tabs[0].name);
 </script>
