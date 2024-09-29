@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
-import { useClientStore, useVoucherStore } from '@/stores';
+import { useVoucherStore } from '@/stores';
 import dayjs from 'dayjs';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
@@ -19,7 +19,6 @@ type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
   type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const voucherStore = useVoucherStore();
-const clientStore = useClientStore();
 const totalAmount = computed({
   get: () => voucherStore.voucherDetail?.amount ?? 0,
   set(amount) {
@@ -30,14 +29,14 @@ const totalAmount = computed({
   },
 });
 const payments = ref<Payments>([]);
-const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
+const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;
-  const { identityNumber, birthDate } = clientStore.targetClient ?? { identityNumber: '', birthDate: '' };
+  const { identityNumber, birthDate } = voucherStore.targetClient ?? { identityNumber: '', birthDate: '' };
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label ?? '' },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null)?.label ?? '' },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'groupClassName', label: '課程名稱', value: groupClassName },

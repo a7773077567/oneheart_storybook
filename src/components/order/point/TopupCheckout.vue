@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
-import { useClientStore, usePointsStore, useUserStore } from '@/stores';
+import { usePointsStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
@@ -21,7 +21,6 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const pointsStore = usePointsStore();
 const userStore = useUserStore();
-const clientStore = useClientStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
@@ -41,11 +40,11 @@ const purchaseDetail = computed<CheckTableData>(() => [
 const $q = useQuasar();
 const receiptData = computed(() => {
   const { planName, paidPointGained, clientName, groupName, giftPointGained } = pointsStore.topupDetail;
-  const { identityNumber, birthDate } = clientStore.targetClient ?? { identityNumber: '', birthDate: '' };
+  const { identityNumber, birthDate } = pointsStore.targetClient ?? { identityNumber: '', birthDate: '' };
 
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label ?? '' },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null)?.label ?? '' },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'group', label: '群組', value: groupName },
