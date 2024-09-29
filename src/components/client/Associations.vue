@@ -43,6 +43,11 @@ const cols: QTableProps['columns'] = [
 ];
 
 const showAdd = ref(false);
+
+async function handleAdd() {
+  showAdd.value = false;
+  await clientStore.getClientInfo(+props.clientId);
+}
 </script>
 
 <template>
@@ -52,7 +57,7 @@ const showAdd = ref(false);
     </div>
     <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered @row-click="(_, row) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })" />
     <QDialog v-model="showAdd" class="add_association_dialog" persistent transition-show="scale" transition-hide="scale">
-      <AddAssociation :client-id="+clientId" @cancel="showAdd = false" @submit="clientStore.getClientInfo(+props.clientId)" />
+      <AddAssociation :client-id="+clientId" @cancel="showAdd = false" @submit="handleAdd" />
     </QDialog>
   </div>
 </template>
