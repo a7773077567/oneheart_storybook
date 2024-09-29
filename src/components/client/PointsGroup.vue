@@ -7,6 +7,7 @@ import { PointTypes, pointsGroupOptions } from '@/const/general';
 import { type CreateGroupField, type EditGroupField, type PointsGroup, createPointGroup, deletePointGroup, getClientPointGroup, updatePointGroup } from '@/api';
 import { useQuasar } from 'quasar';
 import { useClientStore } from '@/stores';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   clientId: string;
@@ -130,7 +131,7 @@ async function editGroup(value: EditGroupField & { clientGroupId: number }) {
                 </div>
                 <span class="q-ml-md">堂數</span>
                 <div class="group_title_points">
-                  {{ group.points ?? 0 }}
+                  {{ showDecimal(group.points) ?? 0 }}
                 </div>
                 <span>點</span>
               </div>

@@ -78,3 +78,7 @@ export function calcReceiptAmount(payments: Pick<Payment, 'payMethod' | 'amount'
   }, 0);
   return total;
 }
+
+export function showDecimal(val: number, places: number = 2) {
+  return val.toFixed(places);
+}
