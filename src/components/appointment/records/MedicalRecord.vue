@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { type ClientScheduleDetail, type HistoryChiefComplaint, type MedicalRecord, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
+import { type ClientScheduleDetail, type MedicalRecord, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import { computed, ref } from 'vue';
 import { useAppointmentStore } from '@/stores';
-import { HistoryChiefComplaints } from '@/components/appointment';
+import { MedicalHistoryClipboard } from '@/components/appointment';
 import { pick } from 'radash';
 import { useQuasar } from 'quasar';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import { ScheduleStateMap } from '@/const/appointment';
+import { useNotify } from '@/composables/notify';
 
 interface DataItem {
   name: string;
@@ -28,7 +29,7 @@ const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const stateOfHistoryDialog = ref(false);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
-await appointmentStore.getHistoryChiefComplaints(recordId.value);
+await appointmentStore.getHistoryRecords(recordId.value);
 
 const data: DataItem[] = [
   { name: 'chiefComplaint', label: '主訴', showCopyBtn: true },
@@ -40,7 +41,7 @@ const data: DataItem[] = [
 ];
 
 const initialValues = computed<{ [key in keyof MedicalRecord]: MedicalRecord[key] }>(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'assessmentResults', 'treatmentPlan', 'treatmentNotes', 'forExerciseGroup', 'forFrontDesk', 'attachments']));
-const { handleSubmit, resetForm, setFieldValue, values } = useForm({ initialValues: initialValues.value });
+const { handleSubmit, resetForm, values, setValues } = useForm({ initialValues: initialValues.value });
 const displayAttachments = computed(() => values.attachments?.map((attUrl, idx) => ({ name: `attachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
 
 const newAttachment = ref([]);
@@ -54,7 +55,7 @@ const onSubmit = handleSubmit(async (formValue) => {
   }
 
   await updateClientSchedule(recordId.value, { ...formValue, attachments: [...formValue.attachments ?? [], ...fileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[] });
-  $q.notify({ message: '已存檔', timeout: 200 });
+  useNotify('已存檔');
 
   await appointmentStore.getClientSchedule(props.scheduleId);
   resetForm({ values: initialValues.value });
@@ -62,11 +63,6 @@ const onSubmit = handleSubmit(async (formValue) => {
 
 function openHistoryDialog() {
   stateOfHistoryDialog.value = true;
-}
-
-function pasteHistory(history: HistoryChiefComplaint) {
-  setFieldValue('chiefComplaint', history.chiefComplaint);
-  stateOfHistoryDialog.value = false;
 }
 
 async function finishRecord() {
@@ -79,6 +75,12 @@ async function finishRecord() {
     console.log(err);
   }
 }
+
+function selectRecord(record: Record<string, any>) {
+  setValues(record);
+  stateOfHistoryDialog.value = false;
+  useNotify('病例套用成功');
+}
 </script>
 
 <template>
@@ -90,7 +92,7 @@ async function finishRecord() {
       <div v-for="(item, idx) in data" :key="idx" class="input">
         <div class="input__label">
           <span>{{ item.label }}</span>
-          <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="openHistoryDialog" />
+          <QBtn v-if="item.showCopyBtn" icon="o_folder" label="歷史病例" size="12px" class="cursor-pointer q-pa-xs" flat style="color: #137AB3;" @click="openHistoryDialog" />
         </div>
         <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
       </div>
@@ -108,7 +110,7 @@ async function finishRecord() {
       <QBtn v-if="scheduleState === '完成服務'" label="病例完成" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
-      <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
+      <MedicalHistoryClipboard :data="appointmentStore.medicalHistoryRecords" @select="selectRecord" />
     </QDialog>
   </div>
 </template>

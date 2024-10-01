@@ -87,7 +87,55 @@ export interface MedicalRecord {
   forExerciseGroup: string; // 給運動組的建議
   forFrontDesk: string; // 給櫃檯的建議
   attachments: string[];
+
 }
+
+// TODO TBD
+// ========== HistoryRecords for all types  ==========
+export type HistoryRecord = MedicalHistoryRecord & OtherHistoryRecord;
+
+export interface OtherHistoryRecord {
+  userShiftType: 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+  record: {
+    pastHistory: string | null;
+    occupationType: any; // TODO TBD
+    exerciseHabits: string | null;
+    others: string | null;
+    clinicalObservation: string | null;
+    palpation: string | null;
+    movementAssessment: string | null;
+    problemSummary: string | null;
+    canvasAttachment: null;
+    attachments: any[]; // TODO TBD
+    note: string | null;
+    dynamicPressureAttachments: null; // TODO TBD
+    staticPressureAttachments: null; // TODO TBD
+    personalHealthStatus: string | null;
+    nutritionistAdvice: string | null;
+    customerProblemDescription: string | null;
+    assessmentStatus: string | null;
+    productDescription: string | null;
+    coachAdvice: string | null;
+    trainingRecords: string | null;
+    forMedicalGroup: string | null;
+    forClient: string | null;
+  };
+
+}
+
+export interface MedicalHistoryRecord {
+  userShiftType: 2;
+  record: {
+    assessmentResults: string | null;
+    chiefComplaint: string | null;
+    forExerciseGroup: string | null;
+    forFrontDesk: string | null;
+    treatmentNotes: string | null;
+    treatmentPlan: string | null;
+  };
+}
+
+// ========== HistoryRecords for all types  ==========
 
 export interface PhysicalConsultation {
   chiefComplaint: string; // 主訴
@@ -416,6 +464,14 @@ export async function updateAddOnServices(clientScheduleId: number, addOnService
 
 export async function adjustScheduleTime(clientScheduleId: number, payload: AdjustScheduleTimePayload) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-scheduleTime`, payload);
+  return data;
+}
+
+/**
+ * 取得相同科別歷史紀錄
+ */
+export async function fetchHistoryRecords(recordId: number) {
+  const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameUserShiftTypeHistoryRecords`);
   return data;
 }
 

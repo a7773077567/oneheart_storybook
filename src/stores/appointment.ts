@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getUploadS3Url, upload2awsS3 } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MedicalHistoryRecord } from '@/api';
 import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift, fetchUserShifts } from '@/api/shift';
@@ -31,6 +31,7 @@ interface State {
   targetClientGroup: ClientGroup[];
   appointmentCalendarInitOption: number[];
   userShifts: UserShift[];
+  historyRecords: HistoryRecord[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -57,6 +58,7 @@ export const useAppointmentStore = defineStore('appointment', {
     targetClientGroup: [],
     appointmentCalendarInitOption: [],
     userShifts: [],
+    historyRecords: [],
   }),
   getters: {
     userOptions(state) {
@@ -123,6 +125,23 @@ export const useAppointmentStore = defineStore('appointment', {
         const shiftsOfUser = userShifts.filter(shift => shift.userId === user.id);
         return { ...acc, [user.id]: shiftsOfUser };
       }, {} as Record<string, any>);
+    },
+    medicalHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { assessmentResults, chiefComplaint, forExerciseGroup, forFrontDesk, treatmentNotes, treatmentPlan, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: {
+            chiefComplaint: { label: '主訴', value: chiefComplaint },
+            assessmentResults: { label: '評估結果', value: assessmentResults },
+            treatmentPlan: { label: '治療計劃', value: treatmentPlan },
+            treatmentNotes: { label: '治療備註', value: treatmentNotes },
+            forExerciseGroup: { label: '給運動組的建議', value: forExerciseGroup },
+            forFrontDesk: { label: '給櫃檯的建議', value: forFrontDesk },
+          },
+        };
+      });
     },
   },
   actions: {
@@ -201,6 +220,10 @@ export const useAppointmentStore = defineStore('appointment', {
     async getShifts(params: UserShiftsGet) {
       const data = await fetchUserShifts(params);
       this.userShifts = data;
+    },
+    async getHistoryRecords(recordId: number) {
+      const data = await fetchHistoryRecords(recordId);
+      this.historyRecords = data;
     },
   },
 
