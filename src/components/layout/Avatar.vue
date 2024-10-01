@@ -8,7 +8,6 @@ defineEmits<{
 }>();
 
 const userStore = useUserStore();
-const { userInfo } = storeToRefs(userStore);
 const router = useRouter();
 
 function goUserSettings() {
@@ -18,15 +17,15 @@ function goUserSettings() {
 
 <template>
   <QAvatar class="cursor-pointer">
-    <img src="https://cdn.quasar.dev/img/avatar2.jpg">
+    <img :src="userStore?.userInfo?.avatarUrl ?? ''">
     <QMenu style="border-radius: 20px;">
       <QCard class="q-pa-md bg-grey-1" style="width: 270px">
         <QCardSection class="column flex-center q-gutter-sm q-pa-none">
           <span class="text-body2 text-grey-9">
-            {{ userInfo?.email }}
+            {{ userStore.userInfo?.email }}
           </span>
           <QAvatar size="80px">
-            <img src="https://cdn.quasar.dev/img/avatar2.jpg">
+            <img :src="userStore?.userInfo?.avatarUrl ?? ''">
           </QAvatar>
         </QCardSection>
         <QCardActions vertical>
