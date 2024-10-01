@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
-import { TherapyTypes, Types } from '@/const/general';
 import dayjs from 'dayjs';
 import { availableReqSchema } from '@/api/appointment';
 
@@ -30,9 +29,9 @@ const onSubmit = handleSubmit(async (values) => {
   appointmentStore.querySent = true;
 });
 
-function dateOptions(date: any) {
-  return date >= dayjs().format('YYYY/MM/DD');
-}
+// function dateOptions(date: any) {
+//   return date >= dayjs().format('YYYY/MM/DD');
+// }
 </script>
 
 <template>
@@ -44,7 +43,7 @@ function dateOptions(date: any) {
       <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.activeUsers" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
-      <DatePicker name="date" :options="dateOptions" />
+      <DatePicker name="date" />
     </InputBox>
     <InputBox label="選擇預約時間" class="gutter">
       <OTime name="startTime" now-btn />
