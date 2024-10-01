@@ -122,6 +122,7 @@ const onSubmit = handleSubmit(async (values) => {
       }).onOk(async () => {
         await userStore.getUsers(); // temporary
         await userStore.getUser(+props.userId!);
+        await userStore.getUserInfo();
 
         resetForm({ values: targetInitialValues.value });
       });
