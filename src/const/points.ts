@@ -213,7 +213,7 @@ interface TypePlan {
 
 }
 
-const physicalRelatedPlans = Array(18).fill(9).map((plan, idx) => plan + idx);
+const physicalRelatedPlans = Array(20).fill(9).map((plan, idx) => plan + idx);
 export const plansByType: TypePlan[] = [
   { id: 1, type: PointTypes.物理治療, plans: [1, 2, 8, ...physicalRelatedPlans] },
   { id: 2, type: PointTypes.院長物理治療, plans: [3, 4, 8, ...physicalRelatedPlans] },
