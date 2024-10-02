@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { AppointmentQueryItem } from '@/components/appointment';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -15,6 +15,8 @@ const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const shiftStore = useShiftStore();
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
+const isSearched = ref(false);
+const showNoResult = computed(() => isSearched.value && !appointmentStore.clientSchedulesNotStarted.length);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(ClientSchedulesNotStartedSchema),
@@ -28,6 +30,7 @@ const { handleSubmit } = useForm({
 
 const onSubmit = handleSubmit((values) => {
   const payload = removeNullishKeys(values);
+  isSearched.value = true;
   appointmentStore.clientSchedulesNotStartedQuery = payload;
   appointmentStore.getClientSchedulesNotStarted(payload);
 });
@@ -59,9 +62,7 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
           <span>客戶姓名</span>
           <OInput class="nav__input" name="name" hide-bottom-space />
         </div>
-        <p class="nav__item--end">
-          客戶電話與姓名可不填
-        </p>
+        <p class="nav__item--end">客戶電話與姓名可不填</p>
         <div class="nav__item">
           <span>選擇項目</span>
           <OSelect :options="typeOptions" class="nav__input" name="userShiftTypes" hide-bottom-space multiple map-options outlined style="width: 164px;" />
@@ -77,6 +78,10 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
       </div>
     </div>
     <div class="query__body">
+      <div v-if="showNoResult" class="no-result">
+        <QIcon name="o_warning" size="20px" style="color: #D81717;" />
+        <span>沒有資料</span>
+      </div>
       <AppointmentQueryItem
         v-for="(item, idx) in appointmentStore.clientSchedulesNotStarted"
         :key="idx"
@@ -117,6 +122,15 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
   }
   &__input {
     flex: 1 1 auto;
+  }
+}
+
+.no-result {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  > span {
+    color: #d81717;
   }
 }
 

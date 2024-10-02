@@ -8,3 +8,4 @@ export * from './points';
 export * from './payment';
 export * from './voucher';
 export * from './contract';
+export * from './dashboard';

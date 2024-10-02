@@ -102,6 +102,15 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: 'personal-appointments',
+            name: 'personalAppointments',
+            component: () => import('@/views/home/PersonalAppointments.vue'),
+            meta: {
+              label: '個人預約列表',
+              requiredAuth: true,
+            },
+          },
+          {
             path: 'user-settings',
             component: () => import('@/views/home/UserSettings.vue'),
             name: 'userSettings',
