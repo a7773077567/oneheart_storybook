@@ -156,14 +156,14 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
   22: {
-    name: '試營運：復診10堂$17500',
+    name: '試營運：複診10堂$17500',
     paidPointGained: 10,
     giftPointGained: 0,
     price: 17500,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
   23: {
-    name: '試營運：復診20堂$34000',
+    name: '試營運：複診20堂$34000',
     paidPointGained: 20,
     giftPointGained: 0,
     price: 34000,
@@ -188,6 +188,20 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     paidPointGained: 10,
     giftPointGained: 0,
     price: 15000,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+  },
+  27: {
+    name: 'winback能量治療五堂 $9500',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 9500,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+  },
+  28: {
+    name: 'winback能量治療十堂送一 $20000',
+    paidPointGained: 10,
+    giftPointGained: 1,
+    price: 20000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
 } as const;
@@ -228,9 +242,11 @@ export const plansByType: TypePlan[] = [
 // 18. 開幕初診10堂17000
 // 19. 開幕初診20堂33400
 // 20. 開幕複診單堂1900
-// 21. 開幕復診5堂9250
-// 22. 開幕復診10堂17500
-// 23. 開幕復診20堂34000
+// 21. 開幕複數5堂9250
+// 22. 開幕複診10堂17500
+// 23. 開幕複診20堂34000
 // 24. 體態矯正方案18700
 // 25. 軍警消醫護5堂 $7500
 // 26. 軍警消醫護10堂 $15000
+// 27. winback能量治療五堂 $9500
+// 28. winback能量治療十堂送一 $20000
