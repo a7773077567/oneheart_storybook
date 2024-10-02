@@ -146,6 +146,7 @@ export const useAppointmentStore = defineStore('appointment', {
     async getClientSchedulesInProgress(date: string) {
       const data = await fetchClientSchedulesInProgress(date);
       this.clientSchedulesInProgress = data;
+      return data;
     },
     async getClientSchedule(clientScheduleId: number) {
       const data = await fetchClientSchedule(clientScheduleId);
