@@ -79,41 +79,43 @@ function getCalendarStyle() {
         <div class="pad" style="width: 164px;" />
       </slot>
     </div>
-    <QCalendarResource
-      ref="calendar"
-      v-model="model"
-      v-model:model-resources="selectedResources"
-      resource-key="id"
-      resource-label="name"
-      :interval-start="intervalStart"
-      :interval-count="intervalCount"
-      :cell-width="125"
-      animated
-      bordered
-      :style="getCalendarStyle()"
-    >
-      <template #head-resources>
-        <div class="row flex-center full-width">
-          <span class="text-weight-bold">人員</span>
-        </div>
-      </template>
-      <template #resource-label="{ scope: { resource } }">
-        <div class="col-12">
-          <QChip>
-            <QAvatar v-if="resource.avatar">
-              <img
-
-                :src="resource.avatar"
-              >
-            </QAvatar>
-            {{ resource.name }}
-          </QChip>
-        </div>
-      </template>
-      <template #resource-intervals="{ scope }">
-        <slot name="intervals" :scope="scope" />
-      </template>
-    </QCalendarResource>
+    <div class="calendar__body">
+      <QCalendarResource
+        ref="calendar"
+        v-model="model"
+        v-model:model-resources="selectedResources"
+        resource-key="id"
+        resource-label="name"
+        :interval-start="intervalStart"
+        :interval-count="intervalCount"
+        :cell-width="125"
+        animated
+        bordered
+        :style="getCalendarStyle()"
+        style="height: 100%; max-height: fit-content"
+      >
+        <template #head-resources>
+          <div class="row flex-center full-width">
+            <span class="text-weight-bold">人員</span>
+          </div>
+        </template>
+        <template #resource-label="{ scope: { resource } }">
+          <div class="col-12">
+            <QChip>
+              <QAvatar v-if="resource.avatar">
+                <img
+                  :src="resource.avatar"
+                >
+              </QAvatar>
+              {{ resource.name }}
+            </QChip>
+          </div>
+        </template>
+        <template #resource-intervals="{ scope }">
+          <slot name="intervals" :scope="scope" />
+        </template>
+      </QCalendarResource>
+    </div>
   </div>
 </template>
 
@@ -125,6 +127,9 @@ function getCalendarStyle() {
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 10px;
+  }
+  &__body {
+    height: calc(100vh - 264px);
   }
 }
 
@@ -140,4 +145,8 @@ function getCalendarStyle() {
 :deep(.q-calendar-resource__resource--interval) {
   min-height: 135px !important;
 }
+
+// :deep(.q-calendar-resource__resource--row:last-child) {
+//   border-bottom: 1px solid #b2b2b2;
+// }
 </style>
