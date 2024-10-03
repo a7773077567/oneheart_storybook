@@ -9,6 +9,7 @@ import type { User } from '@/api/user';
 interface Props {
   modelValue: string;
   modelResources: User[];
+  initOptions?: number[];
   intervalStart?: number;
   intervalCount?: number;
 }
@@ -39,7 +40,7 @@ const options = computed(() => resources.value.map(({ id, name }) => ({
   label: name,
   value: id,
 })));
-const selected = ref(options.value.map(option => option.value));
+const selected = ref(props.initOptions ?? options.value.map(option => option.value));
 const selectedResources = computed(() => {
   return resources.value.filter(item => selected.value.includes(item.id));
 });

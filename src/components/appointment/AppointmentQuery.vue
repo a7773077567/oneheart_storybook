@@ -8,15 +8,15 @@ import { availableReqSchema } from '@/api/appointment';
 
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
-await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const shiftStore = useShiftStore();
+await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
   initialValues: {
     userShiftType: typeOptions.value[0].value,
-    userIds: appointmentStore.activeUsers.map(user => user.value),
+    userIds: [],
     date: dayjs().format('YYYY-MM-DD'),
     startTime: dayjs().startOf('day').format('HH:mm'),
     endTime: dayjs().endOf('day').format('HH:mm'),
@@ -24,7 +24,8 @@ const { handleSubmit } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  appointmentStore.availableQuery = values;
+  appointmentStore.appointmentCalendarInitOption = values.userIds!;
+  appointmentStore.availableQuery = { ...values, userIds: appointmentStore.activeUsers.map(user => user.id) };
   await appointmentStore.getAvailable(appointmentStore.availableQuery);
   appointmentStore.querySent = true;
 });

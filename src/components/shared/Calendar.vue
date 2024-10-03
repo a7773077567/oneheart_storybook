@@ -41,9 +41,9 @@ const options = computed(() => resources.value.map(({ id, name }) => ({
   label: name,
   value: id,
 })));
-const selected = ref(options.value.map(option => option.value));
+const selected = ref<number[]>([]);
 const selectedResources = computed(() => {
-  return resources.value.filter(item => selected.value.includes(item.id));
+  return resources.value.filter(resource => selected.value.includes(resource.id));
 });
 const isEditing = ref(false);
 

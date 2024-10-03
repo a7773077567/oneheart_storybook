@@ -410,7 +410,8 @@ export async function adjustScheduleTime(clientScheduleId: number, payload: Adju
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),
-  userIds: z.number().array().min(1, { message: '至少選擇1名治療師' }),
+  userIds: z.number().array().optional(),
+  // .min(1, { message: '至少選擇1名治療師' }),
   date: z.string(),
   startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
