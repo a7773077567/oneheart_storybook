@@ -7,7 +7,7 @@ export enum PointTypes {
 };
 
 export const TherapyTypes = {
-  // physicalConsultation: '物理諮詢門診',
+  physicalConsultation: '物理諮詢門診',
   physicalTherapy: '物理治療門診',
   footPressure: '足壓門診',
   nutrition: '營養門診',
@@ -83,20 +83,22 @@ export interface Type {
   showInOptions: boolean;
   pointType?: number;
   canEditTime: boolean;
+  hideInOptions?: boolean;
 }
 
 export const Types: Record<TypeName, Type> = {
-  // physicalConsultation: {
-  //   identifier: ShiftType['物理諮詢門診'],
-  //   name: 'physicalConsultation',
-  //   label: '物理諮詢門診',
-  //   tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo'],
-  //   canUsePoint: false,
-  //   calcAmount: () => 200,
-  //   spaceType: SpaceType['物理診所'],
-  //   showInOptions: true,
-  //   canEditTime: false,
-  // },
+  physicalConsultation: {
+    identifier: ShiftType['物理諮詢門診'],
+    name: 'physicalConsultation',
+    label: '物理諮詢門診',
+    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo'],
+    canUsePoint: false,
+    calcAmount: () => 200,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: false,
+    hideInOptions: true,
+  },
   physicalTherapy: {
     identifier: ShiftType['物理治療門診'],
     name: 'physicalTherapy',

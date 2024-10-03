@@ -36,11 +36,12 @@ export const useShiftStore = defineStore('shift', {
     },
     spaceShiftOptions() {
       const userStore = useUserStore();
+      const types = Object.values(Types).filter(item => !item.hideInOptions);
       if (userStore.currentSpace?.type === SpaceType['綜合']) {
-        return Object.values(Types).map(({ label, identifier }) => ({ label, value: identifier }));
+        return types.map(({ label, identifier }) => ({ label, value: identifier }));
       }
 
-      return Object.values(Types).filter(({ spaceType, showInOptions }) => spaceType === userStore.currentSpace?.type && showInOptions).map(({ label, identifier }) => ({
+      return types.filter(({ spaceType, showInOptions }) => spaceType === userStore.currentSpace?.type && showInOptions).map(({ label, identifier }) => ({
         label,
         value: identifier,
       }));
