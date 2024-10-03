@@ -6,6 +6,14 @@ import { useQuasar } from 'quasar';
 import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
 
+interface CalendarInterval {
+  available?: Available;
+  left: number;
+  width: number;
+  canBook: boolean;
+  index: number;
+}
+
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
@@ -26,13 +34,6 @@ onBeforeUnmount(() => {
   appointmentStore.resetTargetAppointmentState();
 });
 
-interface CalendarInterval {
-  available?: Available;
-  left: number;
-  width: number;
-  canBook: boolean;
-  index: number;
-}
 function getStyle(interval: CalendarInterval) {
   return {
     'position': 'absolute',
@@ -113,6 +114,7 @@ function getDate() {
       v-model:model-resources="appointmentStore.activeUsers"
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
+      :init-options="appointmentStore.appointmentCalendarInitOption"
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>

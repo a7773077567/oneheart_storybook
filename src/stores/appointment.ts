@@ -29,6 +29,7 @@ interface State {
   targetClientSchedule: ClientScheduleDetail | null;
   historyChiefComplaints: HistoryChiefComplaint[];
   targetClientGroup: ClientGroup[];
+  appointmentCalendarInitOption: number[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -53,6 +54,7 @@ export const useAppointmentStore = defineStore('appointment', {
     targetClientSchedule: null,
     historyChiefComplaints: [],
     targetClientGroup: [],
+    appointmentCalendarInitOption: [],
   }),
   getters: {
     userOptions(state) {
