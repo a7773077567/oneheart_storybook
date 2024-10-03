@@ -46,14 +46,18 @@ function getStyle(interval: CalendarInterval) {
 
 function getIntervals(scope: any): CalendarInterval[] {
   const userId = scope.resource.id;
-  const times = getTimesArray(appointmentStore.queryCalendarStyle.start!, appointmentStore.queryCalendarStyle.count!);
+  console.log('getIntervals', appointmentStore.queryCalendarStyle.start!);
+
+  const times = getTimesArray(appointmentStore.queryCalendarStyle.start! / 2, appointmentStore.queryCalendarStyle.count!, 30);
+  console.log('🚀  getIntervals  times:', times);
+
   const available = appointmentStore.available.filter(item => item.user.id === userId);
   const interval = times.map((time) => {
     const targetAvailable = available.find(item => item.startTime === time);
     if (!targetAvailable) {
       return {
         left: scope.timeStartPosX(time),
-        width: scope.timeDurationWidth(60),
+        width: scope.timeDurationWidth(30),
         canBook: false,
         index: 0,
       };
@@ -62,12 +66,12 @@ function getIntervals(scope: any): CalendarInterval[] {
     const start = getTimeDate(startTime);
     const end = getTimeDate(endTime);
     const duration = end.diff(start, 'm');
-    const isSlotType = targetAvailable.type === 2;
-    const durationWidth = isSlotType ? 60 : duration;
+    // const isSlotType = targetAvailable.type !== 11;
+    // const durationWidth = isSlotType ? duration : ;
     return {
       available: targetAvailable,
       left: scope.timeStartPosX(startTime),
-      width: scope.timeDurationWidth(durationWidth),
+      width: scope.timeDurationWidth(duration),
       canBook: true,
       index: 10,
     };
@@ -88,11 +92,17 @@ function afterAppointment() {
   });
 }
 
-function getTimesArray(start: number, count: number) {
+function getTimesArray(start: number, count: number, interval: number) {
+  const step = interval / 60;
   const array = [...Array(count).keys()];
+
   return array.map((item) => {
-    const offset = start + item;
-    return `${offset < 10 ? '0' : ''}${offset}:00`;
+    const offset = (start + item * step).toFixed(1);
+    const [hrUnit, minUnit] = offset.toString().split('.');
+    const hrStr = hrUnit.padStart(2, '0');
+    const minStr = `${+minUnit / 10 * 60}`.padEnd(2, '0');
+
+    return `${hrStr}:${minStr}`;
   });
 }
 
@@ -115,6 +125,7 @@ function getDate() {
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
       :init-options="appointmentStore.appointmentCalendarInitOption"
+      :interval-minutes="30"
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
