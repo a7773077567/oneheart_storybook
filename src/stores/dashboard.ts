@@ -19,7 +19,8 @@ export const useDashboardStore = defineStore('dashboard', {
           scheduleId: id,
           typeName: ShiftType[userShift.type],
           clientName: client.name,
-          phone: client.phone,
+          clientPhone: client.phone,
+          userName: userShift.user.name,
           time: `${scheduleStartTime}-${scheduleEndTime}`,
           date,
         };
