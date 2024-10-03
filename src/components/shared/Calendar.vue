@@ -85,49 +85,51 @@ function onChange(calendarDuration: ChangeParams) {
       />
       <slot v-else name="nav-right" />
     </div>
-    <QCalendarScheduler
-      ref="calendar"
-      v-model="model"
-      v-model:model-resources="selectedResources"
-      :view="view"
-      :max-days="maxDays"
-      :cell-width="cellWidth"
-      resource-key="id"
-      resource-label="name"
-      :resource-height="105"
-      animated
-      bordered
-      :style="{ '--calendar-border': '1px solid #B2B2B2' }"
-      @change="onChange"
-    >
-      <template #head-resources>
-        <div class="row flex-center full-width">
-          <span class="text-weight-bold">人員</span>
-        </div>
-      </template>
-      <template #head-day="{ scope: { timestamp } }">
-        <div class="row flex-center ">
-          <span class="text-weight-bold">{{ timestamp.day }}</span>
-          <span class="text-weight-bold">{{ getWeekDay(timestamp.weekday) }}</span>
-        </div>
-      </template>
-      <template #resource-label="{ scope: { resource } }">
-        <div class="col-12">
-          <QChip>
-            <QAvatar v-if="resource.avatar">
-              <img
-
-                :src="resource.avatar"
-              >
-            </QAvatar>
-            {{ resource.name }}
-          </QChip>
-        </div>
-      </template>
-      <template #day="{ scope }">
-        <slot name="day" :scope="{ ...scope, isEditing }" />
-      </template>
-    </QCalendarScheduler>
+    <div class="calendar__body">
+      <QCalendarScheduler
+        ref="calendar"
+        v-model="model"
+        v-model:model-resources="selectedResources"
+        :view="view"
+        :max-days="maxDays"
+        :cell-width="cellWidth"
+        resource-key="id"
+        resource-label="name"
+        :resource-height="105"
+        animated
+        bordered
+        :style="{ '--calendar-border': '1px solid #B2B2B2' }"
+        style="height: 100%; max-height: fit-content;"
+        @change="onChange"
+      >
+        <template #head-resources>
+          <div class="row flex-center full-width">
+            <span class="text-weight-bold">人員</span>
+          </div>
+        </template>
+        <template #head-day="{ scope: { timestamp } }">
+          <div class="row flex-center ">
+            <span class="text-weight-bold">{{ timestamp.day }}</span>
+            <span class="text-weight-bold">{{ getWeekDay(timestamp.weekday) }}</span>
+          </div>
+        </template>
+        <template #resource-label="{ scope: { resource } }">
+          <div class="col-12">
+            <QChip>
+              <QAvatar v-if="resource.avatar">
+                <img
+                  :src="resource.avatar"
+                >
+              </QAvatar>
+              {{ resource.name }}
+            </QChip>
+          </div>
+        </template>
+        <template #day="{ scope }">
+          <slot name="day" :scope="{ ...scope, isEditing }" />
+        </template>
+      </QCalendarScheduler>
+    </div>
   </div>
 </template>
 
@@ -138,6 +140,9 @@ function onChange(calendarDuration: ChangeParams) {
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 10px;
+  }
+  &__body {
+    height: calc(100vh - 264px);
   }
 }
 

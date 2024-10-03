@@ -91,4 +91,8 @@ function getUserShifts() {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+:deep(.calendar__body) {
+  height: calc(100vh - 329px);
+}
 </style>
