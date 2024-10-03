@@ -83,14 +83,16 @@ function calcAmount(date: string) {
       <QList v-if="targetSchedules.length" bordered separator>
         <QItem v-for="(item, idx) in targetSchedules" :key="idx" v-ripple clickable @click="$router.push({ name: 'appointmentListInfo', params: { scheduleId: item.scheduleId } })">
           <QItemSection>
-            <QItemLabel class="text-primary">{{ item.time }}</QItemLabel>
             <QItemLabel caption>{{ item.typeName }}</QItemLabel>
+            <QItemLabel class="text-primary"> {{ item.time }}</QItemLabel>
           </QItemSection>
           <QItemSection>
+            <QItemLabel caption>客戶名稱</QItemLabel>
             <QItemLabel>{{ item.clientName }}</QItemLabel>
           </QItemSection>
           <QItemSection>
-            <QItemLabel>{{ item.phone }}</QItemLabel>
+            <QItemLabel caption>客戶電話</QItemLabel>
+            <QItemLabel>{{ item.clientPhone }}</QItemLabel>
           </QItemSection>
         </QItem>
       </QList>
