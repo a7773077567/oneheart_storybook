@@ -37,6 +37,7 @@ function getBookings(scope: any) {
 
   return Object.values(bookingGroup).map((item) => {
     const isAllCheckout = item.every(el => el.paymentState === 2);
+
     return {
       bookings: item,
       left: scope.timeStartPosX(item[0].scheduleStartTime) + 10,
@@ -60,8 +61,10 @@ function openBookingsBox(bookings: any) {
     <ResourceCalendar
       v-model="selectedDate"
       :model-resources="appointmentStore.activeUsers"
-      :interval-start="8"
-      :interval-count="15"
+      :interval-start="16"
+      :interval-count="30"
+      :interval-minutes="30"
+      animated
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
