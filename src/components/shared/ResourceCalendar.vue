@@ -12,6 +12,7 @@ interface Props {
   initOptions?: number[];
   intervalStart?: number;
   intervalCount?: number;
+  intervalMinutes?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -88,6 +89,7 @@ function getCalendarStyle() {
         resource-label="name"
         :interval-start="intervalStart"
         :interval-count="intervalCount"
+        :interval-minutes="intervalMinutes"
         :cell-width="125"
         animated
         bordered
