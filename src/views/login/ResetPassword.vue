@@ -39,28 +39,30 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <p class="title gutter">
-    密碼修改
-  </p>
-  <OInput name="password" label="輸入新密碼" :type="showPwd ? 'text' : 'password'" class="gutter--sm">
-    <template #append>
-      <QIcon
-        :name="showPwd ? 'visibility_off' : 'visibility'"
-        class="cursor-pointer"
-        @click="showPwd = !showPwd"
-      />
-    </template>
-  </OInput>
-  <OInput name="confirmPassword" label="確認密碼" :type="showConfirm ? 'text' : 'password'" class="gutter--sm">
-    <template #append>
-      <QIcon
-        :name="showConfirm ? 'visibility_off' : 'visibility'"
-        class="cursor-pointer"
-        @click="showConfirm = !showConfirm"
-      />
-    </template>
-  </OInput>
-  <QBtn label="確定" unelevated color="black" @click="onSubmit" />
+  <BasicLayout>
+    <p class="title gutter">
+      密碼修改
+    </p>
+    <OInput name="password" label="輸入新密碼" :type="showPwd ? 'text' : 'password'" class="gutter--sm">
+      <template #append>
+        <QIcon
+          :name="showPwd ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="showPwd = !showPwd"
+        />
+      </template>
+    </OInput>
+    <OInput name="confirmPassword" label="確認密碼" :type="showConfirm ? 'text' : 'password'" class="gutter--sm">
+      <template #append>
+        <QIcon
+          :name="showConfirm ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="showConfirm = !showConfirm"
+        />
+      </template>
+    </OInput>
+    <QBtn label="確定" unelevated color="black" @click="onSubmit" />
+  </BasicLayout>
 </template>
 
 <style lang="scss" scoped>

@@ -30,10 +30,6 @@ async function onMicrosoftLogin() {
   goHome(() => microsoftLogin({ idToken }));
 }
 
-function forgotPassword() {
-  router.push({ name: 'forget' });
-}
-
 async function goHome(loginFunc: () => Promise<LoginRes>) {
   const { accessToken: firstToken } = await loginFunc();
   setCookie('firstToken', firstToken);
@@ -57,7 +53,7 @@ async function goHome(loginFunc: () => Promise<LoginRes>) {
         />
       </template>
     </OInput>
-    <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" @click="forgotPassword" />
+    <QBtn label="忘記密碼了嗎?" text-color="red-5" :ripple="false" flat dense class="self-start gutter" @click="$router.push({ name: 'resendForgotPasswordEmail' })" />
     <QBtn label="登入" unelevated color="black" class="gutter" @click="onBasicLogin" />
     <p class="separator gutter">
       或使用以下登入

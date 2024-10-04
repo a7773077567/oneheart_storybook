@@ -32,25 +32,27 @@ async function resentEmail() {
 </script>
 
 <template>
-  <div class="email">
-    <template v-if="!emailSent">
-      <p class="email__title">
-        請輸入註冊之電子郵件
-      </p>
-      <OInput name="email" label="Email" class="q-mb-md" />
-      <QBtn label="確認" unelevated color="black" @click="onSubmit" />
-    </template>
-    <template v-else>
-      <p class="email__title">
-        已發新設定至電子郵件
-      </p>
-      <p>
-        請檢查收件匣中的信件。點擊郵件中的連結以設定新的密碼。
-        <span v-if="!countdownDone">({{ countdownLeft }}s)</span>
-      </p>
-      <QBtn label="重發設定" unelevated color="black" :disable="!countdownDone" @click="resentEmail" />
-    </template>
-  </div>
+  <BasicLayout>
+    <div class="email">
+      <template v-if="!emailSent">
+        <p class="email__title">
+          請輸入註冊之電子郵件
+        </p>
+        <OInput name="email" label="Email" class="q-mb-md" />
+        <QBtn label="確認" unelevated color="black" @click="onSubmit" />
+      </template>
+      <template v-else>
+        <p class="email__title">
+          已發新設定至電子郵件
+        </p>
+        <p>
+          請檢查收件匣中的信件。點擊郵件中的連結以設定新的密碼。
+          <span v-if="!countdownDone">({{ countdownLeft }}s)</span>
+        </p>
+        <QBtn label="重發設定" unelevated color="black" :disable="!countdownDone" @click="resentEmail" />
+      </template>
+    </div>
+  </BasicLayout>
 </template>
 
 <style lang="scss" scoped>

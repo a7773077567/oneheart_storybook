@@ -113,7 +113,7 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     if (props.type === 'add') {
       await createUser(payload);
-      router.push({ name: 'activateEmail' });
+      router.push({ name: 'resendActivationEmail' });
     }
     else {
       await updateUser(targetUser.value.id, payload);
