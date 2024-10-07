@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { usePrintStore } from '@/stores/print';
 import { useRouter } from 'vue-router';
 
 withDefaults(defineProps<{
@@ -28,10 +27,9 @@ defineEmits<{
 const router = useRouter();
 
 function goPrint() {
-  const printStore = usePrintStore();
   const printContents = document.querySelector('.receipt')!.innerHTML;
-  printStore.data = printContents;
-  router.push({ name: 'receiptPrint' });
+  localStorage.setItem('printData', JSON.stringify(printContents));
+  window.open(router.resolve({ name: 'receiptPrint' }).href, '_black');
 }
 </script>
 
