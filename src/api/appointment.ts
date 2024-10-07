@@ -444,7 +444,7 @@ export type AvailableRearrangedReq = z.infer<typeof availableRearrangedSchema>;
 export const ClientSchedulesNotStartedSchema = z.object({
   phone: z.string().optional(),
   name: z.string().optional(),
-  userShiftTypes: z.number().array(),
+  userShiftTypes: z.number().array().min(1, '需至少選擇一個項目'),
   date: z.string(),
 });
 export type ClientSchedulesNotStartedReq = z.infer<typeof ClientSchedulesNotStartedSchema>;

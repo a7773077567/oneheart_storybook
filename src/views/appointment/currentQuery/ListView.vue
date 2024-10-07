@@ -23,7 +23,7 @@ const { handleSubmit } = useForm({
   initialValues: {
     phone: '',
     name: '',
-    userShiftTypes: typeOptions.value.map(option => option.value),
+    userShiftTypes: [],
     date: dayjs().format('YYYY-MM-DD'),
   },
 });
