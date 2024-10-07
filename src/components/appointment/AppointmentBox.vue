@@ -83,7 +83,7 @@ async function appointment() {
       userShiftId: appointmentStore.targetAvailable.userShiftId,
     };
     await createAppointmentRearrange(payload);
-    router.push({ name: 'appointmentCurrentQueryList' });
+    router.push({ name: 'appointmentOngoingQuery' });
     return;
   }
   appointmentStore.resetTargetAppointmentState();

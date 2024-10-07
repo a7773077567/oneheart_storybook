@@ -46,7 +46,7 @@ function cancelClientSchedule(clientScheduleId: number) {
 
 function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
   appointmentStore.targetClientScheduleNotStarted = clientSchedule;
-  router.push({ name: 'appointmentCurrentQueryRearrange' });
+  router.push({ name: 'appointmentOngoingRearrange' });
 }
 </script>
 

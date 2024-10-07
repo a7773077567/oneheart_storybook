@@ -1,6 +1,8 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { loginRoutes } from './login';
+import { homeRoutes } from './home';
+import { appointmentRoutes } from './appointment';
 
 export const routes: RouteRecordRaw[] = [
   ...loginRoutes,
@@ -13,146 +15,8 @@ export const routes: RouteRecordRaw[] = [
       requiredAuth: true,
     },
     children: [
-      {
-        path: '/home',
-        name: 'home',
-        redirect: { name: 'dashboard' },
-        meta: {
-          label: '首頁',
-          requiredAuth: true,
-          permission: true,
-        },
-        children: [
-          {
-            path: 'dashboard',
-            name: 'dashboard',
-            component: () => import('@/views/home/Dashboard.vue'),
-            meta: {
-              label: '儀表板',
-              requiredAuth: true,
-            },
-          },
-          {
-            path: 'personal-appointments',
-            name: 'personalAppointments',
-            component: () => import('@/views/home/PersonalAppointments.vue'),
-            meta: {
-              label: '個人預約列表',
-              requiredAuth: true,
-            },
-          },
-          {
-            path: 'user-settings',
-            component: () => import('@/views/home/UserSettings.vue'),
-            name: 'userSettings',
-            meta: {
-              label: '個人設定',
-              requiredAuth: true,
-            },
-          },
-        ],
-      },
-      {
-        path: '/appointment',
-        name: 'appointment',
-        component: () => import('@/views/appointment/Appointment.vue'),
-        redirect: { name: 'appointmentList' },
-        meta: {
-          label: '客戶預約',
-          requiredAuth: true,
-          permission: true,
-        },
-        children: [
-          {
-            path: 'list',
-            name: 'appointmentList',
-            component: () => import('@/views/appointment/list/IndexView.vue'),
-            redirect: { name: 'appointmentListCalendar' },
-            meta: {
-              label: '預約列表',
-              requiredAuth: true,
-            },
-            children: [
-              {
-                path: 'calendar',
-                name: 'appointmentListCalendar',
-                component: () => import('@/views/appointment/list/CalendarView.vue'),
-                meta: {
-                  label: '列表',
-                  requiredAuth: true,
-                },
-              },
-              {
-                path: 'info/:scheduleId',
-                name: 'appointmentListInfo',
-                component: () => import('@/views/appointment/list/InfoView.vue'),
-                meta: {
-                  label: '預約資料',
-                  requiredAuth: true,
-                },
-                props: true,
-              },
-              {
-                path: 'checkout/:scheduleId',
-                name: 'appointmentListCheckout',
-                component: () => import('@/views/appointment/list/Checkout.vue'),
-                meta: {
-                  label: '結帳',
-                  requiredAuth: true,
-                },
-                props: true,
-              },
-            ],
-          },
-          {
-            path: 'booking',
-            name: 'appointmentBooking',
-            component: () => import('@/views/appointment/BookingView.vue'),
-            meta: {
-              label: '預約',
-              requiredAuth: true,
-            },
-          },
-          {
-            path: 'current-query',
-            name: 'appointmentCurrentQuery',
-            component: () => import('@/views/appointment/currentQuery/IndexView.vue'),
-            redirect: { name: 'appointmentCurrentQueryList' },
-            meta: {
-              label: '查詢預約',
-              requiredAuth: true,
-            },
-            children: [
-              {
-                path: 'list',
-                name: 'appointmentCurrentQueryList',
-                component: () => import('@/views/appointment/currentQuery/ListView.vue'),
-                meta: {
-                  requiredAuth: true,
-                },
-              },
-              {
-                path: 'rearrange',
-                name: 'appointmentCurrentQueryRearrange',
-                component: () => import('@/views/appointment/currentQuery/RearrangeView.vue'),
-                meta: {
-                  requiredAuth: true,
-                },
-                beforeEnter: rearrangeGuard,
-              },
-            ],
-          },
-          {
-            path: 'history-query',
-            name: 'appointmentHistoryQuery',
-            component: () => import('@/views/appointment/HistoryQuery.vue'),
-            meta: {
-              label: '查詢紀錄',
-              requiredAuth: true,
-            },
-          },
-        ],
-      },
+      ...homeRoutes,
+      ...appointmentRoutes,
       {
         path: '/client',
         name: 'client',
@@ -410,13 +274,6 @@ async function checkAuth() {
   }
   catch {
     return false;
-  }
-}
-
-function rearrangeGuard() {
-  const appointmentStore = useAppointmentStore();
-  if (!appointmentStore.targetClientScheduleNotStarted) {
-    router.push({ name: 'appointmentCurrentQuery' });
   }
 }
 

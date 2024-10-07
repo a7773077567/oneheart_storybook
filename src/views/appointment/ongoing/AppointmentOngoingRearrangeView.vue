@@ -24,8 +24,8 @@ const { handleSubmit } = useForm({
   initialValues: {
     clientScheduleId: appointmentStore.targetClientScheduleNotStarted!.id,
     date: dayjs().format('YYYY-MM-DD'),
-    startTime: dayjs().startOf('day').format('HH:mm'),
-    endTime: dayjs().endOf('day').format('HH:mm'),
+    startTime: '09:00',
+    endTime: '21:00',
   },
 });
 
@@ -34,7 +34,7 @@ const onSubmit = handleSubmit(async (values) => {
   appointmentStore.rearrangeQuery = values;
   appointmentStore.querySent = true;
   appointmentStore.rearrangeMode = true;
-  router.push({ name: 'appointmentBooking' });
+  router.push({ name: 'appointmentBookingCalendar' });
 });
 </script>
 

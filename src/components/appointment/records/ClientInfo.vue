@@ -54,7 +54,7 @@ const states = computed(() => [
 
 function rearrangeClientSchedule() {
   appointmentStore.targetClientScheduleNotStarted = appointmentStore.targetClientSchedule;
-  router.push({ name: 'appointmentCurrentQueryRearrange' });
+  router.push({ name: 'appointmentOngoingRearrange' });
 }
 
 function cancelClientSchedule() {
