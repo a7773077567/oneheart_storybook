@@ -6,10 +6,13 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarMonth.sass';
 import { computed, ref } from 'vue';
 import { getWeekDay } from '@/utils/date';
 import { useDashboardStore } from '@/stores';
+import { useRoute, useRouter } from 'vue-router';
 
+const router = useRouter();
+const route = useRoute();
 const dashboardStore = useDashboardStore();
 const calendar = ref<QCalendarMonth | null>(null);
-const selectedDate = ref(today());
+const selectedDate = ref(route.query.date ?? today());
 const isMiniMode = ref(false);
 const targetSchedules = computed(() => {
   return dashboardStore.userPersonalSchedules.filter(item => item.date === selectedDate.value);
@@ -23,14 +26,10 @@ async function onChange(data: any) {
   await dashboardStore.getUserInProgressClientSchedules({ startDate: data.start, endDate: data.end });
 }
 
-function onClickDate(data: any) {
+function selectDate(data: any) {
   const date = data.scope.timestamp.date;
   selectedDate.value = date;
-}
-
-function onClickDay(data: any) {
-  const date = data.scope.timestamp.date;
-  selectedDate.value = date;
+  router.push({ query: { date } });
 }
 
 function calcAmount(date: string) {
@@ -63,8 +62,8 @@ function calcAmount(date: string) {
         :day-height="60"
         @mini-mode="onMiniMode"
         @change="onChange"
-        @click-date="onClickDate"
-        @click-day="onClickDay"
+        @click-date="selectDate"
+        @click-day="selectDate"
       >
         <template #day="{ scope }">
           <div v-if="calcAmount(scope.timestamp.date) > 0" class="day">

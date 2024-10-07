@@ -1,25 +1,31 @@
 <script setup lang="ts">
-import { usePrintStore } from '@/stores/print';
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
 
-const printStore = usePrintStore();
-const router = useRouter();
+const printData = ref(JSON.parse(localStorage.getItem('printData')!));
+window.addEventListener('afterprint', () => {
+  setTimeout(() => window.close());
+});
 
 onMounted(() => {
   window.print();
-  printStore.data = '';
-  router.back();
+  localStorage.removeItem('printData');
 });
 </script>
 
 <template>
   <div class="receipt-print">
-    <div class="receipt" v-html="printStore.data" />
+    <div class="receipt" v-html="printData" />
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+%cell-style {
+  border: 1px solid black;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 5px;
+}
+
 .receipt {
   display: flex;
   flex-direction: column;
@@ -50,6 +56,19 @@ onMounted(() => {
     img {
       width: 100%;
     }
+  }
+}
+
+.table {
+  width: 100%;
+  border: 1px solid black;
+  border-spacing: 3px;
+  border-collapse: separate;
+  th {
+    @extend %cell-style;
+  }
+  td {
+    @extend %cell-style;
   }
 }
 
