@@ -6,6 +6,7 @@ import type { User } from '@/api/user';
 import { fetchUserShift } from '@/api/shift';
 import type { UserShift } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
+import { ScheduleState } from '@/const/appointment';
 
 interface State {
   users: User[];
@@ -92,6 +93,19 @@ export const useAppointmentStore = defineStore('appointment', {
         value: member.id,
         ...member,
       }));
+    },
+    scheduleModifyHistories: (state) => {
+      const { targetClientSchedule } = state;
+      if (!targetClientSchedule) {
+        return [];
+      }
+      return targetClientSchedule.clientSchedulesModifyHistories.map((item) => {
+        return {
+          state: ScheduleState[item.afterState],
+          name: item.modifyUserName,
+          date: item.modifyDateTime,
+        };
+      });
     },
   },
   actions: {

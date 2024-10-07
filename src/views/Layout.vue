@@ -14,10 +14,10 @@ const userStore = useUserStore();
 const { userInfo, currentSpaceId } = storeToRefs(userStore);
 const router = useRouter();
 
-const spaceOptions = userInfo.value!.spaces.map(({ name, id }) => {
+const spaceOptions = userInfo.value?.spaces?.map(({ name, id }) => {
   return { label: name, value: id };
 });
-currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions[0].value;
+currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions?.[0].value ?? null;
 
 watch(currentSpaceId, async (newSpaceId) => {
   const oriSpaceId = getCookie('lastSpaceId');
@@ -40,11 +40,18 @@ const drawerOpen = ref(true);
 const permissionControlTabs = computed(() => {
   // temporary control
   const isAdminAccount = userInfo.value?.id === 16;
+  let _filteredPages = navTabs.value?.map((group) => {
+    if (group && group.children) {
+      return ({ ...group, children: group?.children?.filter(subpage => !subpage.meta?.hide) });
+    }
+    return group;
+  }) ?? [];
 
   if (import.meta.env.MODE === 'production' && !isAdminAccount) {
-    return navTabs.value?.filter(route => route?.meta?.permission);
+    return _filteredPages.filter(route => route?.meta?.permission);
   }
-  return navTabs.value;
+
+  return _filteredPages;
 });
 
 function toggleDrawer() {

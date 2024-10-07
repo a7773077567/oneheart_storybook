@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
-import { useClientStore, useVoucherStore } from '@/stores';
+import { useVoucherStore } from '@/stores';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -13,7 +13,6 @@ const emit = defineEmits<{
 }>();
 
 const voucherStore = useVoucherStore();
-const clientStore = useClientStore();
 
 voucherStore.getGroupClass();
 
@@ -33,10 +32,12 @@ const { handleSubmit, values, setFieldValue, resetForm } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  const groupClassName = voucherStore.groupClassList.find(item => values.groupClassId === item.id)?.name;
+  const groupClassName = voucherStore.groupClassList.find(item => values.groupClassId === item.id)?.name ?? '';
   voucherStore.voucherDetail = {
     ...values,
     groupClassName,
+    multiChannelPay: [],
+    contractDottedsignTaskId: '',
   };
 
   emit('goNext');
@@ -46,7 +47,7 @@ const showClientSearch = ref(false);
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
-  clientStore.targetClient = client;
+  voucherStore.targetClient = client;
 
   setFieldValue('clientId', client.id);
   setFieldValue('clientName', client.name);

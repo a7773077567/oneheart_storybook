@@ -60,7 +60,7 @@ const onSubmit = handleSubmit(async (formData) => {
         </fieldset>
         <fieldset class="col-12 col-md-6">
           <span class="label">暱稱</span>
-          <OInput name="nickname" hide-bottom-space :error="!!errors.relationTypeName" class="col-grow" />
+          <OInput name="relationTypeName" hide-bottom-space :error="!!errors.relationTypeName" class="col-grow" />
         </fieldset>
         <fieldset class="col-12 col-md-6">
           <span class="label">生日</span>

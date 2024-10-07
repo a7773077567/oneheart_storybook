@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
-import { useClientStore, usePointsStore, useUserStore } from '@/stores';
+import { usePointsStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
@@ -21,7 +21,6 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const pointsStore = usePointsStore();
 const userStore = useUserStore();
-const clientStore = useClientStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
@@ -30,7 +29,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
   { key: 'name', value: pointsStore.topupDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
-  { key: 'pointType', value: PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
+  { key: 'pointType', value: pointsStore.topupDetail.pointType && PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
   { key: 'plan', value: pointsStore.topupDetail?.plan ? POINTS_PLAN[pointsStore.topupDetail.plan].name : '', label: '方案' },
   { key: 'amount', value: `$ ${(pointsStore.topupDetail?.amount ?? 0)}`, label: '金額' },
@@ -41,11 +40,11 @@ const purchaseDetail = computed<CheckTableData>(() => [
 const $q = useQuasar();
 const receiptData = computed(() => {
   const { planName, paidPointGained, clientName, groupName, giftPointGained } = pointsStore.topupDetail;
-  const { identityNumber, birthDate } = clientStore.targetClient!;
+  const { identityNumber, birthDate } = pointsStore.targetClient ?? { identityNumber: '', birthDate: '' };
 
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber)?.label ?? '' },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null)?.label ?? '' },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'group', label: '群組', value: groupName },
@@ -58,7 +57,9 @@ const receiptData = computed(() => {
 
 const isProceeding = ref(false);
 async function onCheckout() {
-  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount } = pointsStore.topupDetail;
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount,
+    //  contractDottedsignTaskId #394 暫時移除簽約步驟
+  } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -70,6 +71,12 @@ async function onCheckout() {
     });
     return;
   }
+  // #394 暫時移除簽約步驟
+  // if (!contractDottedsignTaskId) {
+  //   $q.dialog({
+  //     message: '合約尚未填寫完成',
+  //   });
+  // }
   isProceeding.value = true;
   try {
     await gainPoint({
@@ -80,6 +87,7 @@ async function onCheckout() {
       giftPointGained,
       amount,
       multiChannelPay,
+      // contractDottedsignTaskId: `${contractDottedsignTaskId}`,
     });
 
     $q.dialog({

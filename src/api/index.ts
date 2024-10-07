@@ -7,5 +7,5 @@ export * from './userSettings';
 export * from './points';
 export * from './payment';
 export * from './voucher';
-// export * from './contract';
+export * from './contract';
 export * from './dashboard';
