@@ -57,7 +57,9 @@ const receiptData = computed(() => {
 
 const isProceeding = ref(false);
 async function onCheckout() {
-  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount, contractDottedsignTaskId } = pointsStore.topupDetail;
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount,
+    //  contractDottedsignTaskId #394 暫時移除簽約步驟
+  } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -69,12 +71,12 @@ async function onCheckout() {
     });
     return;
   }
-
-  if (!contractDottedsignTaskId) {
-    $q.dialog({
-      message: '合約尚未填寫完成',
-    });
-  }
+  // #394 暫時移除簽約步驟
+  // if (!contractDottedsignTaskId) {
+  //   $q.dialog({
+  //     message: '合約尚未填寫完成',
+  //   });
+  // }
   isProceeding.value = true;
   try {
     await gainPoint({
@@ -85,7 +87,7 @@ async function onCheckout() {
       giftPointGained,
       amount,
       multiChannelPay,
-      contractDottedsignTaskId: `${contractDottedsignTaskId}`,
+      // contractDottedsignTaskId: `${contractDottedsignTaskId}`,
     });
 
     $q.dialog({

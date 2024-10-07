@@ -56,7 +56,9 @@ const purchaseDetail = computed<CheckTableData>(() => [
 const $q = useQuasar();
 const isProceeding = ref(false);
 async function onCheckout() {
-  const { clientId, groupClassId, ticketGained, contractDottedsignTaskId, amount } = voucherStore.voucherDetail as PurchaseVoucher;
+  const { clientId, groupClassId, ticketGained, amount,
+    //  contractDottedsignTaskId #394 暫時移除簽約步驟
+  } = voucherStore.voucherDetail as PurchaseVoucher;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -75,7 +77,7 @@ async function onCheckout() {
       ticketGained,
       amount,
       multiChannelPay,
-      contractDottedsignTaskId: `${contractDottedsignTaskId}`,
+      // contractDottedsignTaskId: `${contractDottedsignTaskId}`,  #394 暫時移除簽約步驟
     });
 
     $q.dialog({

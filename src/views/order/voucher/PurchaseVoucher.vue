@@ -2,13 +2,18 @@
 import { ref } from 'vue';
 import VoucherForm from '@/components/order/voucher/VoucherForm.vue';
 import VoucherCheckout from '@/components/order/voucher/VoucherCheckout.vue';
-import VoucherSign from '@/components/order/voucher/VoucherSign.vue';
+
+// import VoucherSign from '@/components/order/voucher/VoucherSign.vue';
 import { useVoucherStore } from '@/stores';
 import { useRoute, useRouter } from 'vue-router';
 
 const voucherStore = useVoucherStore();
 
-const steps = [{ label: '填寫購買內容', key: 'form' }, { label: '合約書簽約', key: 'contract' }, { label: '選擇付款方式', key: 'checkout' }];
+const steps = [
+  { label: '填寫購買內容', key: 'form' },
+  // { label: '合約書簽約', key: 'contract' },  #394 暫時移除簽約步驟
+  { label: '選擇付款方式', key: 'checkout' },
+];
 const currentStep = ref(steps[0]);
 
 function cancelTopup() {
@@ -41,6 +46,6 @@ function finishPurchase() {
 <template>
   <OSteps :steps="steps" :current-step="currentStep" />
   <VoucherForm v-if="currentStep.key === 'form'" @go-next="currentStep = steps[1]" @cancel="cancelTopup" />
-  <VoucherSign v-else-if="currentStep.key === 'contract'" @go-next="currentStep = steps[2]" />
+  <!-- <VoucherSign v-else-if="currentStep.key === 'contract'" @go-next="currentStep = steps[2]" /> -->
   <VoucherCheckout v-else @cancel="cancelTopup" @finish="finishPurchase" />
 </template>
