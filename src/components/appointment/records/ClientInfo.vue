@@ -39,7 +39,7 @@ const data = computed(() => [
   { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
   { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
   { key: 'location', label: '地點', value: userShift.value.space?.name },
-  { key: 'doctor', label: '醫師', value: userShift.value.user.name },
+  { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
   { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
 ]);
 
