@@ -18,8 +18,8 @@ const { handleSubmit } = useForm({
     userShiftType: typeOptions.value[0].value,
     userIds: [],
     date: dayjs().format('YYYY-MM-DD'),
-    startTime: dayjs().startOf('day').format('HH:mm'),
-    endTime: dayjs().endOf('day').format('HH:mm'),
+    startTime: '09:00',
+    endTime: '21:00',
   },
 });
 
