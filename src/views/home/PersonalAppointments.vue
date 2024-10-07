@@ -12,7 +12,7 @@ const router = useRouter();
 const route = useRoute();
 const dashboardStore = useDashboardStore();
 const calendar = ref<QCalendarMonth | null>(null);
-const selectedDate = ref(route.query.date ?? today());
+const selectedDate = ref(route.query.date as string ?? today());
 const isMiniMode = ref(false);
 const targetSchedules = computed(() => {
   return dashboardStore.userPersonalSchedules.filter(item => item.date === selectedDate.value);
