@@ -2,13 +2,11 @@
 import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
-import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   scheduleId: string;
 }>();
 
-const router = useRouter();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 const userShiftType = computed(() => appointmentStore.targetClientSchedule?.userShift.type);
@@ -46,14 +44,10 @@ function getRecordModules() {
     }
   }
 }
-
-function goBack() {
-  router.back();
-}
 </script>
 
 <template>
-  <QBtn label="返回" icon="chevron_left" color="primary" flat style="width: fit-content; margin: 12px 0; padding: 4px 8px; " @click="goBack" />
+  <QBtn label="返回" icon="chevron_left" color="primary" flat style="width: fit-content; margin: 4px 0; padding: 4px 8px; " @click="$router.back" />
   <QTabs v-model="currentTab" align="left" dense>
     <QTab v-for="(tab, idx) in tabs" :key="idx" :name="tab.name" :label="tab.label" />
   </QTabs>
