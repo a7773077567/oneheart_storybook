@@ -66,12 +66,8 @@ function openBookingsBox(bookings: any) {
     >
       <template #nav-right>
         <div class="payment-indicator">
-          <div class="payment-indicator__item">
-            結帳
-          </div>
-          <div class="payment-indicator__item--unpaid">
-            未結帳
-          </div>
+          <div class="payment-indicator__item">結帳</div>
+          <div class="payment-indicator__item--unpaid">未結帳</div>
         </div>
       </template>
       <template #intervals="{ scope }">

@@ -31,6 +31,8 @@ const duration = computed(() => ({
   start: schedule.value.scheduleStartTime,
   end: schedule.value.scheduleEndTime,
 }));
+const isCheckedOut = computed(() => schedule.value.paymentState === 2);
+const beforeCheckIn = computed(() => schedule.value.state === 1);
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
@@ -160,14 +162,16 @@ function limitTimeOptions(hr: number, min: number | null) {
       </div>
     </div>
     <div class="client-info__actions">
-      <div class="actions q-py-md">
-        <div class="actions__rearrange">
-          <QBtn label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
-          <QBtn label="取消預約" :disable="schedule.state > 2" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
+      <div class="actions">
+        <QBtn v-if="!isCheckedOut && !beforeCheckIn" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
+        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+        <QBtn class="actions__item--cancel" label="取消預約" :disable="schedule.state > 2" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
+        <div class="actions__item--space" />
+        <div class="actions__item--toggler">
+          <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
+          <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" />
         </div>
-        <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
-        <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
-        <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" />
       </div>
     </div>
   </div>
@@ -179,7 +183,7 @@ function limitTimeOptions(hr: number, min: number | null) {
     margin-bottom: 15px;
   }
   &__caption {
-    margin-bottom: 25px;
+    margin-bottom: 16px;
   }
   &__actions {
     // display: flex;
@@ -196,11 +200,12 @@ function limitTimeOptions(hr: number, min: number | null) {
 .time {
   display: flex;
   gap: 10px;
+  align-items: center;
+  justify-content: space-between;
   &__input {
   }
   &__actions {
-    display: flex;
-    flex-grow: 1;
+    // flex-grow: 1;
   }
   &__actions-edit {
     margin-left: auto;
@@ -233,15 +238,29 @@ function limitTimeOptions(hr: number, min: number | null) {
   }
 }
 
+// .actions {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: flex-end;
+//   &__rearrange {
+//     display: flex;
+//     // flex-direction: column;
+//     align-items: center;
+//     gap: 10px;
+//   }
+// }
+
 .actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  &__rearrange {
-    display: flex;
-    // flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  column-gap: 16px;
+  row-gap: 16px;
+  padding: 0 0 16px 0;
+  &__item {
+    &--checkout {
+      grid-column: 1 / 5;
+      justify-self: end;
+    }
   }
 }
 
