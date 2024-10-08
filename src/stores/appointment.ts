@@ -78,7 +78,7 @@ export const useAppointmentStore = defineStore('appointment', {
       const { startTime, endTime } = targetQuery!;
       const start = getTimeDate(startTime);
       const end = getTimeDate(endTime);
-      const count = Math.ceil(end.diff(start, 'm') / 30);
+      const count = Math.ceil(end.diff(start, 'm') / 60);
 
       return {
         start: start.get('h'),

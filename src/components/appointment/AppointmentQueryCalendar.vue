@@ -46,16 +46,14 @@ function getStyle(interval: CalendarInterval) {
 
 function getIntervals(scope: any): CalendarInterval[] {
   const userId = scope.resource.id;
-  const times = getTimesArray(appointmentStore.queryCalendarStyle.start!, appointmentStore.queryCalendarStyle.count!, 30);
-  console.log('🚀  getIntervals  times:', times);
-
+  const times = getTimesArray(appointmentStore.queryCalendarStyle.start!, appointmentStore.queryCalendarStyle.count!);
   const available = appointmentStore.available.filter(item => item.user.id === userId);
   const interval = times.map((time) => {
     const targetAvailable = available.find(item => item.startTime === time);
     if (!targetAvailable) {
       return {
         left: scope.timeStartPosX(time),
-        width: scope.timeDurationWidth(30),
+        width: scope.timeDurationWidth(60),
         canBook: false,
         index: 0,
       };
@@ -90,17 +88,11 @@ function afterAppointment() {
   });
 }
 
-function getTimesArray(start: number, count: number, interval: number) {
-  const step = interval / 60;
+function getTimesArray(start: number, count: number) {
   const array = [...Array(count).keys()];
-
   return array.map((item) => {
-    const offset = (start + item * step).toFixed(1);
-    const [hrUnit, minUnit] = offset.toString().split('.');
-    const hrStr = hrUnit.padStart(2, '0');
-    const minStr = `${+minUnit / 10 * 60}`.padEnd(2, '0');
-
-    return `${hrStr}:${minStr}`;
+    const offset = start + item;
+    return `${offset < 10 ? '0' : ''}${offset}:00`;
   });
 }
 
@@ -123,7 +115,6 @@ function getDate() {
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
       :init-options="appointmentStore.appointmentCalendarInitOption"
-      :interval-minutes="30"
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>

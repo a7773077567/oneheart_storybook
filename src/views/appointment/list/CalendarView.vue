@@ -60,10 +60,8 @@ function openBookingsBox(bookings: any) {
     <ResourceCalendar
       v-model="selectedDate"
       :model-resources="appointmentStore.activeUsers"
-      :interval-start="16"
-      :interval-count="30"
-      :interval-minutes="30"
-      animated
+      :interval-start="8"
+      :interval-count="15"
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
