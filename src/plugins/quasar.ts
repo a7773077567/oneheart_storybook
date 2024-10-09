@@ -1,5 +1,5 @@
 import type { App } from 'vue';
-import { Cookies, Dialog, Notify, Quasar } from 'quasar';
+import { Cookies, Dialog, Loading, Notify, Quasar } from 'quasar';
 import quasarLang from 'quasar/lang/zh-TW';
 
 export default {
@@ -10,6 +10,7 @@ export default {
         Cookies,
         Notify,
         Dialog,
+        Loading,
       },
     });
   },
