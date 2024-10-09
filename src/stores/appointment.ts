@@ -79,13 +79,6 @@ export const useAppointmentStore = defineStore('appointment', {
       const start = getTimeDate(startTime);
       const end = getTimeDate(endTime);
 
-<<<<<<< HEAD
-      console.log('🚀  queryCalendarStyle  start:', start.format('HH:mm'));
-      console.log('🚀  queryCalendarStyle  end:', end.format('HH:mm'));
-      console.log(end.diff(start, 'm'));
-
-=======
->>>>>>> hotfix/appointment
       const count = Math.ceil(end.diff(start, 'm') / 30);
 
       return {
