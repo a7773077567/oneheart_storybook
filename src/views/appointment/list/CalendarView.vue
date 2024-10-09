@@ -5,7 +5,9 @@ import dayjs from 'dayjs';
 import { AppointmentCard, AppointmentCountCard } from '@/components/appointment';
 import { useRouter } from 'vue-router';
 import type { ClientSchedule } from '@/api';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
@@ -14,7 +16,11 @@ const isBookingsBoxOpen = ref(false);
 const bookingsInBox = ref<any[]>();
 
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
-watchEffect(() => appointmentStore.getClientSchedulesInProgress(selectedDate.value));
+watchEffect(async () => {
+  $q.loading.show();
+  await appointmentStore.getClientSchedulesInProgress(selectedDate.value);
+  $q.loading.hide();
+});
 
 function getStyle(item: any) {
   return {

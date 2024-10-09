@@ -81,6 +81,9 @@ function calcAmount(date: string) {
     <div class="personal-appointments__list">
       <QList v-if="targetSchedules.length" bordered separator>
         <QItem v-for="(item, idx) in targetSchedules" :key="idx" v-ripple clickable @click="$router.push({ name: 'appointmentListInfo', params: { scheduleId: item.scheduleId } })">
+          <QItemSection thumbnail>
+            <QChip color="grey-8" text-color="white" class="q-ma-none">{{ item.spaceName }}</QChip>
+          </QItemSection>
           <QItemSection>
             <QItemLabel caption>{{ item.typeName }}</QItemLabel>
             <QItemLabel class="text-primary"> {{ item.time }}</QItemLabel>
@@ -166,5 +169,10 @@ function calcAmount(date: string) {
 
 :deep(.q-calendar-month__day--label) {
   border-radius: 3px;
+}
+
+:deep(.q-item__section--thumbnail) {
+  margin: 0 !important;
+  padding: 0;
 }
 </style>

@@ -6,6 +6,7 @@ const messages: [string, string][] = [
   ['multiChannelPay sum is not equal to amount', '交易總金額不符'],
   ['ClientSchedule already checkout', '此交易已結帳完成'],
   ['userShiftSlot is overlap with other userShiftSlot', '時間跟其他班別重疊'],
+  ['StartTime and EndTime can not edit at same time', '開始時間跟結束時間不可同時編輯'],
 ];
 
 export default messages;

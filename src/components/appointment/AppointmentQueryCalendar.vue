@@ -46,10 +46,14 @@ function getStyle(interval: CalendarInterval) {
 
 function getIntervals(scope: any): CalendarInterval[] {
   const userId = scope.resource.id;
+<<<<<<< HEAD
   console.log('getIntervals', appointmentStore.queryCalendarStyle.start!);
 
   const times = getTimesArray(appointmentStore.queryCalendarStyle.start! / 2, appointmentStore.queryCalendarStyle.count!, 30);
   console.log('🚀  getIntervals  times:', times);
+=======
+  const times = getTimesArray(appointmentStore.queryCalendarStyle.start! / 2, appointmentStore.queryCalendarStyle.count!, 30);
+>>>>>>> hotfix/appointment
 
   const available = appointmentStore.available.filter(item => item.user.id === userId);
   const interval = times.map((time) => {

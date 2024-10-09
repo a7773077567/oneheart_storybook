@@ -7,6 +7,7 @@ import { computed, ref } from 'vue';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   scheduleId: string;
@@ -15,6 +16,7 @@ const props = defineProps<{
 type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
+const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 
@@ -72,10 +74,12 @@ const methodOptions = computed(() => {
 });
 
 async function onCheckout() {
+  $q.loading.show({ delay: 0 });
   await checkout(scheduleId, {
     amount: totalAmount.value,
     multiChannelPay: payments.value,
   });
+  $q.loading.hide();
   router.push({ name: 'appointmentListCalendar' });
 }
 

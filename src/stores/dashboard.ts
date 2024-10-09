@@ -23,6 +23,7 @@ export const useDashboardStore = defineStore('dashboard', {
           userName: userShift.user.name,
           time: `${scheduleStartTime}-${scheduleEndTime}`,
           date,
+          spaceName: userShift.space.name,
         };
       });
     },

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { Dialog } from 'quasar';
+import { Dialog, Loading } from 'quasar';
 import { getCookie } from '@/utils/helpers';
 import { ErrorMessages } from '@/api/errorMessages';
 import { ResponseErrorDialog } from '@/components/shared';
@@ -157,6 +157,8 @@ async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
   else {
     errMsg = ErrorMessages.get(resMsg) ?? resMsg;
   }
+
+  Loading.hide();
   await dialogPromise(errMsg);
 
   return Promise.reject(error);
