@@ -121,13 +121,13 @@ export enum ScheduleState {
 }
 
 export const ScheduleStateMap = new Map([
-  [1, { name: 'appointment', label: '預約', canEditTime: true, cardStyle: { color: '#FFFFFF' } }],
-  [2, { name: 'checkIn', label: '報到', canEditTime: true, cardStyle: { color: '#88F2D8' } }],
-  [3, { name: 'serviceDone', label: '完成服務', canEditTime: true, cardStyle: { color: '#E86969' } }],
-  [4, { name: 'recordDone', label: '病例完成', canEditTime: false, cardStyle: { color: '#FFFFFF' }, queryStyle: { bgc: '#D9D9D9', color: '#49454F' } }],
-  [5, { name: 'appointmentCanceled', label: '預約取消', canEditTime: false, queryStyle: { bgc: '#E86969', color: '#FFFFFF' } }],
-  [6, { name: 'appointmentRearranged', label: '預約改期', canEditTime: false, queryStyle: { bgc: '#91D0C1', color: '#FFFFFF' } }],
-  [7, { name: 'appointment', label: '刪除', canEditTime: false }],
+  [1, { name: 'appointment', label: '預約', canEditTime: true, canCheckout: false, cardStyle: { color: '#FFFFFF' } }],
+  [2, { name: 'checkIn', label: '報到', canEditTime: true, canCheckout: true, cardStyle: { color: '#88F2D8' } }],
+  [3, { name: 'serviceDone', label: '完成服務', canEditTime: true, canCheckout: true, cardStyle: { color: '#E86969' } }],
+  [4, { name: 'recordDone', label: '病例完成', canEditTime: false, canCheckout: true, cardStyle: { color: '#FFFFFF' }, queryStyle: { bgc: '#D9D9D9', color: '#49454F' } }],
+  [5, { name: 'appointmentCanceled', label: '預約取消', canEditTime: false, canCheckout: false, queryStyle: { bgc: '#E86969', color: '#FFFFFF' } }],
+  [6, { name: 'appointmentRearranged', label: '預約改期', canEditTime: false, canCheckout: false, queryStyle: { bgc: '#91D0C1', color: '#FFFFFF' } }],
+  [7, { name: 'appointment', label: '刪除', canEditTime: false, canCheckout: false }],
 ]);
 
 export const SchedulePaymentMap = new Map([

@@ -32,7 +32,8 @@ const duration = computed(() => ({
   end: schedule.value.scheduleEndTime,
 }));
 const isCheckedOut = computed(() => schedule.value.paymentState === 2);
-const beforeCheckIn = computed(() => schedule.value.state === 1);
+const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
+// const beforeCheckIn = computed(() => schedule.value.state === 1);
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
@@ -163,7 +164,7 @@ function limitTimeOptions(hr: number, min: number | null) {
     </div>
     <div class="client-info__actions">
       <div class="actions">
-        <QBtn v-if="!isCheckedOut && !beforeCheckIn" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
+        <QBtn v-if="!isCheckedOut && canCheckout" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
         <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
         <QBtn class="actions__item--cancel" label="取消預約" :disable="schedule.state > 2" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
