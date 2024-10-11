@@ -96,9 +96,7 @@ const priceTags = computed(() => {
 
     <CheckTable :data="info">
       <template #date="{ data }">
-        <div class="slot-padding">
-          {{ data.value }}
-        </div>
+        <div class="slot-padding">{{ data.value }}</div>
       </template>
     </CheckTable>
 
@@ -106,6 +104,7 @@ const priceTags = computed(() => {
 
     <PriceTags :list="priceTags" />
 
+    <pre>{{ payments }}</pre>
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
     <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
   </div>
