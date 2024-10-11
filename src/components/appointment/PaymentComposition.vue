@@ -69,7 +69,7 @@ const selectedGroup = ref();
 
 function updateSelectedGroup(group: GroupOption, field: any) {
   selectedGroup.value = group;
-  update(+field.key, { ...field.value, clientGroupId: selectedGroup.value.value });
+  update(+field.key, { ...field.value, clientGroupId: selectedGroup.value.value, amount: null });
 }
 
 function addPayment() {
@@ -143,7 +143,7 @@ function showExtra(method: number) {
         <div v-if="showExtra(field.value.payMethod)" class="payment__extra">
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
             <template v-if="!readonly">
-              <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="groupOption => updateSelectedGroup(groupOption, field)" />
+              <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="(groupOption: GroupOption) => updateSelectedGroup(groupOption, field)" />
               <p class="group__label">剩餘堂數：<span>{{ selectedGroup?.points }}</span></p>
             </template>
             <template v-else>
