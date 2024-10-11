@@ -3,8 +3,8 @@ import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClient
 import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint } from '@/api';
 import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
-import { fetchUserShift } from '@/api/shift';
-import type { UserShift } from '@/api/shift';
+import { fetchUserShift, fetchUserShifts } from '@/api/shift';
+import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
 
@@ -30,6 +30,7 @@ interface State {
   historyChiefComplaints: HistoryChiefComplaint[];
   targetClientGroup: ClientGroup[];
   appointmentCalendarInitOption: number[];
+  userShifts: UserShift[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -55,6 +56,7 @@ export const useAppointmentStore = defineStore('appointment', {
     historyChiefComplaints: [],
     targetClientGroup: [],
     appointmentCalendarInitOption: [],
+    userShifts: [],
   }),
   getters: {
     userOptions(state) {
@@ -107,6 +109,20 @@ export const useAppointmentStore = defineStore('appointment', {
           date: item.modifyDateTime,
         };
       });
+    },
+    resourceLabels: (state) => {
+      const { users, userShifts } = state;
+
+      const activeUsers = users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({
+        label: member.name,
+        value: member.id,
+        ...member,
+      }));
+
+      return activeUsers.reduce((acc, user) => {
+        const shiftsOfUser = userShifts.filter(shift => shift.userId === user.id);
+        return { ...acc, [user.id]: shiftsOfUser };
+      }, {} as Record<string, any>);
     },
   },
   actions: {
@@ -181,6 +197,10 @@ export const useAppointmentStore = defineStore('appointment', {
     async getClientGroup(clientId: number) {
       const data = await fetchClientGroup(clientId);
       this.targetClientGroup = data;
+    },
+    async getShifts(params: UserShiftsGet) {
+      const data = await fetchUserShifts(params);
+      this.userShifts = data;
     },
   },
 

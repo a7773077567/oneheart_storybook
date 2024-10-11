@@ -2,7 +2,7 @@
 import { ref, watchEffect } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
-import { AppointmentCard, AppointmentCountCard } from '@/components/appointment';
+import { AppointmentCard, AppointmentCountCard, ResourceLabel } from '@/components/appointment';
 import { useRouter } from 'vue-router';
 import type { ClientSchedule } from '@/api';
 import { useQuasar } from 'quasar';
@@ -19,6 +19,7 @@ const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
 watchEffect(async () => {
   $q.loading.show();
   await appointmentStore.getClientSchedulesInProgress(selectedDate.value);
+  await appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.activeUsers.map(item => item.id) });
   $q.loading.hide();
 });
 
@@ -99,6 +100,9 @@ function openBookingsBox(bookings: any) {
           />
         </template>
       </template>
+      <template #resource-label="{ scope }">
+        <ResourceLabel :name="scope.resource.name" :shifts="appointmentStore.resourceLabels[scope.resource.id]" />
+      </template>
     </ResourceCalendar>
     <QDialog v-model="isBookingsBoxOpen">
       <div class="bookings-box">
@@ -154,5 +158,11 @@ function openBookingsBox(bookings: any) {
     top: 10px;
     cursor: pointer;
   }
+}
+
+:deep(.q-calendar-resource__resource--text) {
+  height: 100%;
+  flex-grow: 1;
+  padding: 0 !important;
 }
 </style>
