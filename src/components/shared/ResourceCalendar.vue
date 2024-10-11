@@ -101,17 +101,17 @@ function getCalendarStyle() {
             <span class="text-weight-bold">人員</span>
           </div>
         </template>
-        <template #resource-label="{ scope: { resource } }">
-          <div class="col-12">
-            <QChip>
-              <QAvatar v-if="resource.avatar">
-                <img
-                  :src="resource.avatar"
-                >
-              </QAvatar>
-              {{ resource.name }}
-            </QChip>
-          </div>
+        <template #resource-label="{ scope }">
+          <slot name="resource-label" :scope="scope">
+            <div class="col-12">
+              <QChip>
+                <QAvatar v-if="scope.resource.avatar">
+                  <img :src="scope.resource.avatar">
+                </QAvatar>
+                {{ scope.resource.name }}
+              </QChip>
+            </div>
+          </slot>
         </template>
         <template #resource-intervals="{ scope }">
           <slot name="intervals" :scope="scope" />

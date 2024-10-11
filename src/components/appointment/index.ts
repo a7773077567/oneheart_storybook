@@ -15,3 +15,4 @@ export { default as AddOnTable } from './AddOnTable.vue';
 export { default as ClientInfoTable } from './ClientInfoTable.vue';
 export { default as PriceTags } from './PriceTags.vue';
 export { default as ScheduleModifyHistories } from './ScheduleModifyHistories.vue';
+export { default as ResourceLabel } from './list/ResourceLabel.vue';
