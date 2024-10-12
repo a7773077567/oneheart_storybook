@@ -204,6 +204,13 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     price: 20000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
+  29: {
+    name: '教練課5堂 $8000',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 80000,
+    for: [PointTypes.教練課],
+  },
 } as const;
 
 interface TypePlan {
@@ -218,7 +225,7 @@ export const plansByType: TypePlan[] = [
   { id: 1, type: PointTypes.物理治療, plans: [1, 2, 8, ...physicalRelatedPlans] },
   { id: 2, type: PointTypes.院長物理治療, plans: [3, 4, 8, ...physicalRelatedPlans] },
   { id: 3, type: PointTypes.營養, plans: [5, 8, ...physicalRelatedPlans] },
-  { id: 4, type: PointTypes.教練課, plans: [6, 7, 8, ...physicalRelatedPlans] },
+  { id: 4, type: PointTypes.教練課, plans: [6, 7, 8, ...physicalRelatedPlans, 29] },
 ];
 
 // 方案總表
@@ -250,3 +257,4 @@ export const plansByType: TypePlan[] = [
 // 26. 軍警消醫護10堂 $15000
 // 27. winback能量治療五堂 $9500
 // 28. winback能量治療十堂送一 $20000
+// 29. 教練課5堂 $8000

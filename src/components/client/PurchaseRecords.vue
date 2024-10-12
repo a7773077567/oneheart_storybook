@@ -39,7 +39,20 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '支付方式',
     align: 'left',
-    field: row => PaymentTypes[row.payMethod],
+    field: ({ type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point }) => {
+      switch (type) {
+        case TransactionTypes.門診費用:
+          return Medical.length > 1 ? '複合式結帳' : PaymentTypes[Medical[0].payMethod];
+        case TransactionTypes.團課券購買:
+        case TransactionTypes.團課券退款:
+          return voucher.length > 1 ? '複合式結帳' : PaymentTypes[voucher[0].payMethod];
+        case TransactionTypes.堂數交易:
+        case TransactionTypes.堂數退款:
+          return point.length > 1 ? '複合式結帳' : PaymentTypes[point[0].payMethod];
+        default:
+          return '';
+      }
+    },
   },
   {
     name: 'amount',
