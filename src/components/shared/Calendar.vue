@@ -20,6 +20,7 @@ interface Props {
   view: string;
   maxDays?: number | string;
   cellWidth?: string;
+  resourceWidth: number;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
@@ -49,6 +50,13 @@ const isEditing = ref(false);
 
 function onChange(calendarDuration: ChangeParams) {
   emit('change', calendarDuration);
+}
+
+function getCalendarStyle() {
+  return {
+    '--calendar-border': '1px solid #B2B2B2',
+    ...(props.resourceWidth && { '--calendar-resources-width': `${props.resourceWidth}px` }),
+  };
 }
 </script>
 
@@ -96,9 +104,10 @@ function onChange(calendarDuration: ChangeParams) {
         resource-key="id"
         resource-label="name"
         :resource-height="105"
+        :resource-width="resourceWidth"
         animated
         bordered
-        :style="{ '--calendar-border': '1px solid #B2B2B2' }"
+        :style="getCalendarStyle()"
         style="height: 100%; max-height: fit-content;"
         @change="onChange"
       >

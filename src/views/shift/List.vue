@@ -131,6 +131,7 @@ function closeShiftSelector() {
     <Calendar
       v-model="selectedDate"
       :model-resources="shiftStore.activeUsers"
+      :resource-width="200"
       view="week"
       @model-resources="shiftStore.users = $event"
       @change="onCalendarChange"
