@@ -76,6 +76,7 @@ function openBookingsBox(bookings: any) {
       :interval-start="16"
       :interval-count="30"
       :interval-minutes="30"
+      :resource-width="180"
       animated
       @model-resources="appointmentStore.users = $event"
     >

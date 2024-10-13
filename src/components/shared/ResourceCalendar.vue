@@ -13,6 +13,7 @@ interface Props {
   intervalStart?: number;
   intervalCount?: number;
   intervalMinutes?: number;
+  resourceWidth?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,6 +50,7 @@ const selectedResources = computed(() => {
 function getCalendarStyle() {
   return {
     '--calendar-border': '1px solid #B2B2B2',
+    ...(props.resourceWidth && { '--calendar-resources-width': `${props.resourceWidth}px` }),
   };
 }
 </script>
