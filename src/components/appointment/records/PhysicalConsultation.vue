@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { HistoryChiefComplaints } from '@/components/appointment';
-import { type ClientScheduleDetail, type HistoryChiefComplaint, type PhysicalConsultation, updateClientSchedule } from '@/api/appointment';
+import { type ClientScheduleDetail, type HistoryChiefComplaint, type PhysicalConsultation, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import { computed, ref } from 'vue';
 import { useAppointmentStore } from '@/stores';
 import { pick } from 'radash';
 import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
+import { ScheduleStateMap } from '@/const/appointment';
 
 interface DataItem {
   title: string;
@@ -22,8 +23,10 @@ const props = defineProps<{
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-const appointmentStore = useAppointmentStore();
 const $q = useQuasar();
+const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 await appointmentStore.getHistoryChiefComplaints(recordId.value);
 const stateOfHistoryDialog = ref(false);
@@ -33,7 +36,7 @@ const initialValues = computed(() => pick(props.scheduleDetail.record, ['chiefCo
 const { handleSubmit, setFieldValue, resetForm } = useForm({ initialValues: initialValues.value });
 const onSubmit = handleSubmit(async (formValue) => {
   await updateClientSchedule(recordId.value, formValue);
-  $q.notify({ message: '已存檔', timeout: 200 });
+  $q.notify({ message: '已存檔', timeout: 2000 });
 
   await appointmentStore.getClientSchedule(props.scheduleId);
   resetForm({ values: initialValues.value });
@@ -67,6 +70,17 @@ function pasteHistory(history: HistoryChiefComplaint) {
   setFieldValue('chiefComplaint', history.chiefComplaint);
   stateOfHistoryDialog.value = false;
 }
+
+async function finishRecord() {
+  try {
+    await appointmentFinishRecord(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '病例已完成', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
@@ -92,6 +106,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
     </div>
     <div class="form__actions">
       <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
+      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
       <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />

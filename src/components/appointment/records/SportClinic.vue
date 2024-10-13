@@ -7,12 +7,14 @@ import {
   type ClientScheduleDetail,
   type HistoryChiefComplaint,
   type SportConsultation,
+  appointmentFinishRecord,
   updateClientSchedule,
 } from '@/api';
 import { useForm } from 'vee-validate';
 import { pick } from 'radash';
 import { HistoryChiefComplaints } from '@/components/appointment';
 import { useQuasar } from 'quasar';
+import { ScheduleStateMap } from '@/const/appointment';
 
 const props = defineProps<{
   scheduleId: number;
@@ -24,6 +26,8 @@ const recordId = computed(
   () => props.scheduleDetail.medicalAndTrainingRecordId,
 );
 const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 await appointmentStore.getHistoryChiefComplaints(recordId.value);
 
 const date = computed(() =>
@@ -55,6 +59,17 @@ function pasteHistory(history: HistoryChiefComplaint) {
   setFieldValue('chiefComplaint', history.chiefComplaint);
   stateOfHistoryDialog.value = false;
 }
+
+async function finishRecord() {
+  try {
+    await appointmentFinishRecord(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '病例已完成', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
@@ -83,12 +98,8 @@ function pasteHistory(history: HistoryChiefComplaint) {
       </div>
     </div>
     <div class="form__actions">
-      <QBtn
-        label="儲存"
-        style="width: 100px"
-        :disable="!meta.dirty"
-        @click="onSubmit"
-      />
+      <QBtn label="儲存" style="width: 127px" outline :disable="!meta.dirty" @click="onSubmit" />
+      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">
@@ -113,7 +124,7 @@ function pasteHistory(history: HistoryChiefComplaint) {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 15px;
+    gap: 20px;
   }
 }
 

@@ -35,7 +35,7 @@ async function handleSave() {
 
   if (canvasJson) {
     await updateClientSchedule(recordId.value, { canvasAttachment: canvasJson });
-    $q.notify({ message: '已存檔！', timeout: 200 });
+    $q.notify({ message: '已存檔！', timeout: 2000 });
   }
 }
 </script>

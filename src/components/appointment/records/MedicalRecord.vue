@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { type ClientScheduleDetail, type HistoryChiefComplaint, type MedicalRecord, updateClientSchedule } from '@/api/appointment';
+import { type ClientScheduleDetail, type HistoryChiefComplaint, type MedicalRecord, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import { computed, ref } from 'vue';
 import { useAppointmentStore } from '@/stores';
 import { HistoryChiefComplaints } from '@/components/appointment';
@@ -8,6 +8,7 @@ import { pick } from 'radash';
 import { useQuasar } from 'quasar';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import dayjs from 'dayjs';
+import { ScheduleStateMap } from '@/const/appointment';
 
 interface DataItem {
   name: string;
@@ -20,8 +21,10 @@ const props = defineProps<{
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-const appointmentStore = useAppointmentStore();
 const $q = useQuasar();
+const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const stateOfHistoryDialog = ref(false);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
@@ -65,6 +68,17 @@ function pasteHistory(history: HistoryChiefComplaint) {
   setFieldValue('chiefComplaint', history.chiefComplaint);
   stateOfHistoryDialog.value = false;
 }
+
+async function finishRecord() {
+  try {
+    await appointmentFinishRecord(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '病例已完成', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
@@ -90,7 +104,8 @@ function pasteHistory(history: HistoryChiefComplaint) {
       </div>
     </div>
     <div class="form__actions">
-      <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
+      <QBtn label="儲存" outline style="width: 127px" @click="onSubmit" />
+      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
       <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
@@ -112,7 +127,8 @@ function pasteHistory(history: HistoryChiefComplaint) {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 15px;
+    gap: 20px;
+    padding: 24px 0;
   }
 }
 

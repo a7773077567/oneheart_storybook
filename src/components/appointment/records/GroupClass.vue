@@ -2,18 +2,21 @@
 // 團課單
 import { computed } from 'vue';
 import dayjs from 'dayjs';
-import { type ClientScheduleDetail, updateClientSchedule } from '@/api';
+import { type ClientScheduleDetail, appointmentFinishRecord, updateClientSchedule } from '@/api';
 import { useForm } from 'vee-validate';
 import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
+import { ScheduleStateMap } from '@/const/appointment';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
-const appointmentStore = useAppointmentStore();
 const $q = useQuasar();
+const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 const recordId = computed(
   () => props.scheduleDetail.medicalAndTrainingRecordId,
 );
@@ -31,10 +34,21 @@ const { handleSubmit, meta } = useForm({
 
 const onSubmit = handleSubmit(async (val) => {
   await updateClientSchedule(recordId.value, val);
-  $q.notify({ message: '已存檔', timeout: 200 });
+  $q.notify({ message: '已存檔', timeout: 2000 });
 
   await appointmentStore.getClientSchedule(props.scheduleId);
 });
+
+async function finishRecord() {
+  try {
+    await appointmentFinishRecord(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '病例已完成', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
@@ -55,13 +69,15 @@ const onSubmit = handleSubmit(async (val) => {
         />
       </div>
     </div>
-    <div class="flex justify-end">
+    <div class="flex column  items-end q-gutter-md">
       <QBtn
         label="儲存"
-        style="width: 100px"
+        style="width: 127px"
+        outline
         :disable="!meta.dirty"
         @click="onSubmit"
       />
+      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
   </div>
 </template>

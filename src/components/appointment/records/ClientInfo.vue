@@ -67,17 +67,29 @@ function cancelClientSchedule() {
 }
 
 async function checkIn() {
-  await appointmentCheckIn(schedule.value.id);
-  await appointmentStore.getClientSchedule(schedule.value.id);
+  try {
+    await appointmentCheckIn(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '已報到', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
 async function finishService() {
-  await appointmentFinishService(schedule.value.id);
-  await appointmentStore.getClientSchedule(schedule.value.id);
+  try {
+    await appointmentFinishService(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '已完成服務', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
-async function finishRecord() {
-  await appointmentFinishRecord(schedule.value.id);
-  await appointmentStore.getClientSchedule(schedule.value.id);
-}
+// async function finishRecord() {
+//   await appointmentFinishRecord(schedule.value.id);
+//   await appointmentStore.getClientSchedule(schedule.value.id);
+// }
 
 // 預約備註
 const note = ref(schedule.value.note);
@@ -87,7 +99,7 @@ async function saveNote() {
     return;
 
   await updateNote(props.scheduleId, note.value);
-  $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
+  $q.notify({ message: '已存檔！', timeout: 2000, position: 'center' });
 }
 
 async function updateTime({ start, end }: Duration) {
@@ -97,7 +109,7 @@ async function updateTime({ start, end }: Duration) {
       endTime: end,
     });
     await appointmentStore.getClientSchedule(+props.scheduleId);
-    $q.notify({ message: '時間已調整', timeout: 1000, position: 'top' });
+    $q.notify({ message: '時間已調整', timeout: 2000, position: 'top' });
     isEditingTime.value = false;
   }
   catch (err) {
@@ -171,7 +183,7 @@ function limitTimeOptions(hr: number, min: number | null) {
         <div class="actions__item--toggler">
           <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
           <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
-          <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" />
+          <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
         </div>
       </div>
     </div>

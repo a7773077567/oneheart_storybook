@@ -3,10 +3,11 @@ import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import { useForm } from 'vee-validate';
 import { computed, ref } from 'vue';
-import { type ClientScheduleDetail, updateClientSchedule } from '@/api/appointment';
+import { type ClientScheduleDetail, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import dayjs from 'dayjs';
 import { pick } from 'radash';
 import { extractUuidFromS3Url } from '@/utils/helpers';
+import { ScheduleStateMap } from '@/const/appointment';
 
 const props = defineProps<{
   scheduleId: number;
@@ -14,6 +15,8 @@ const props = defineProps<{
 }>();
 
 const appointmentStore = useAppointmentStore();
+const schedule = computed(() => appointmentStore.targetClientSchedule!);
+const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 const $q = useQuasar();
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
@@ -45,11 +48,22 @@ const onSubmit = handleSubmit(async (formValue) => {
     staticPressureAttachments: [...formValue.staticPressureAttachments ?? [], ...staticFileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[],
     dynamicPressureAttachments: [...formValue.dynamicPressureAttachments ?? [], ...dynamicFileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[],
   });
-  $q.notify({ message: '已存檔', timeout: 200 });
+  $q.notify({ message: '已存檔', timeout: 2000 });
 
   await appointmentStore.getClientSchedule(props.scheduleId);
   resetForm({ values: initialValues.value });
 });
+
+async function finishRecord() {
+  try {
+    await appointmentFinishRecord(schedule.value.id);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    $q.notify({ message: '病例已完成', timeout: 2000, position: 'top' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
@@ -81,11 +95,12 @@ const onSubmit = handleSubmit(async (formValue) => {
         </div>
       </div>
       <InputBox label="備註" label-weight="400">
-        <OInput name="note" type="textarea" />
+        <OInput name="note" type="textarea" style="width: 100%;" />
       </InputBox>
     </div>
     <div class="form__actions">
-      <QBtn label="儲存" style="width: 100px" @click="onSubmit" />
+      <QBtn label="儲存" style="width: 127px" @click="onSubmit" />
+      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
   </div>
 </template>
