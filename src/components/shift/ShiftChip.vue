@@ -74,7 +74,7 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
 <style lang="scss" scoped>
 .shift-chip {
   width: 90px;
-  height: 40px;
+  min-height: 40px;
   padding: 3px;
   border-radius: 5px;
   background-color: v-bind('bgc');
