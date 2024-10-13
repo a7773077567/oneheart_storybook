@@ -20,7 +20,7 @@ interface Props {
   view: string;
   maxDays?: number | string;
   cellWidth?: string;
-  resourceWidth: number;
+  resourceWidth?: number;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
