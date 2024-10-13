@@ -44,3 +44,11 @@ export function combineTime(duration: number[]): Duration {
     endTime: endTime.format('HH:mm'),
   };
 }
+
+export function getDuration(startTime: string, endTime: string, unit: dayjs.QUnitType | dayjs.OpUnitType) {
+  const [startHr, startMin] = startTime.split(':');
+  const [endHr, endMin] = endTime.split(':');
+  const startTimeDate = dayjs({ h: +startHr, m: +startMin });
+  const endTimeDate = dayjs({ h: +endHr, m: +endMin });
+  return endTimeDate.diff(startTimeDate, unit);
+}

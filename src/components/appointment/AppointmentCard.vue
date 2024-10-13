@@ -53,7 +53,7 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
 }
 
 .booking-card {
-  max-width: 105px;
+  // max-width: 105px;
   display: flex;
   flex-direction: column;
   gap: 4px;

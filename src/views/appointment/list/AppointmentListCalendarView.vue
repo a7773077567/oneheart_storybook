@@ -6,6 +6,7 @@ import { AppointmentCard, AppointmentCountCard, ResourceLabel } from '@/componen
 import { useRouter } from 'vue-router';
 import type { ClientSchedule } from '@/api';
 import { useQuasar } from 'quasar';
+import { getDuration } from '@/utils/date';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -43,12 +44,16 @@ function getBookings(scope: any) {
   }, {} as Record<string, ClientSchedule[]>);
 
   return Object.values(bookingGroup).map((item) => {
+    const { scheduleStartTime, scheduleEndTime } = item[0];
     const isAllCheckout = item.every(el => el.paymentState === 2);
+    const duration = getDuration(scheduleStartTime, scheduleEndTime, 'm');
+    const durationWidth = scope.timeDurationWidth(duration) - 20;
+    const cardMinWidth = 105;
 
     return {
       bookings: item,
-      left: scope.timeStartPosX(item[0].scheduleStartTime) + 10,
-      width: scope.timeDurationWidth(60),
+      left: scope.timeStartPosX(scheduleStartTime) + 10,
+      width: durationWidth - 20 > cardMinWidth ? durationWidth : cardMinWidth,
       top: 10,
       count: item.length,
       isAllCheckout,

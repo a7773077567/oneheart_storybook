@@ -13,7 +13,7 @@ defineProps<{
 
 <style lang="scss" scoped>
 .appointment-count-card {
-  max-width: 105px;
+  // max-width: 105px;
   height: 96px;
   display: flex;
   justify-content: center;
