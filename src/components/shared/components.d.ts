@@ -16,6 +16,7 @@ declare module '@vue/runtime-core' {
     OCheckbox: typeof import('@/components/shared')['OCheckbox']
     OFile: typeof import('@/components/shared')['OFile']
     OPreview: typeof import('@/components/shared')['OPreview']
+    AllOptionSelect: typeof import('@/components/shared')['AllOptionSelect']
   }
 }
 

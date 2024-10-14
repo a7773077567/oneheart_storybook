@@ -19,3 +19,4 @@ export { default as OMemberSearch } from './OMemberSearch.vue';
 export { default as OSteps } from './OSteps.vue';
 export { default as TimeDurationPicker } from './TimeDurationPicker.vue';
 export { default as ResponseErrorDialog } from './ResponseErrorDialog.vue';
+export { default as AllOptionSelect } from './AllOptionSelect.vue';

@@ -6,6 +6,7 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarScheduler.sass';
 import { computed, ref } from 'vue';
 import { getWeekDay } from '@/utils/date';
 import type { User } from '@/api/user';
+import AllOptionSelect from './AllOptionSelect.vue';
 
 export interface ChangeParams {
   start: string;
@@ -63,17 +64,10 @@ function getCalendarStyle() {
 <template>
   <div class="calendar">
     <div class="calendar__nav">
-      <OSelect
+      <AllOptionSelect
         v-model="selected"
-        name="employee"
+        label="治療師"
         :options="options"
-        multiple
-        emit-value
-        map-options
-        dense
-        outlined
-        hide-bottom-space
-        style="width: 164px;"
       />
       <div v-if="!simpleMode" class="column items-center q-gutter-md">
         <DatePicker v-model="model" />
