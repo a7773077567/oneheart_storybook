@@ -63,7 +63,7 @@ const displayValue = computed(() =>
     ? `所有${props.label}`
     : model.value.length === 0
       ? ''
-      : props.options?.filter(option => model.value.includes(option.value)).map(option => option.label));
+      : props.options?.filter(option => model.value.includes(option.value)).map(option => option.label).join());
 </script>
 
 <template>
