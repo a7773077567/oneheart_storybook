@@ -75,11 +75,20 @@ const methodOptions = computed(() => {
 
 async function onCheckout() {
   $q.loading.show({ delay: 0 });
-  await checkout(scheduleId, {
-    amount: totalAmount.value,
-    multiChannelPay: payments.value,
-  });
-  $q.loading.hide();
+  try {
+    await checkout(scheduleId, {
+      amount: totalAmount.value,
+      multiChannelPay: payments.value,
+    });
+    $q.notify({ message: '已結帳', timeout: 2000, position: 'top', color: 'positive' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
+
   router.push({ name: 'appointmentListCalendar' });
 }
 
