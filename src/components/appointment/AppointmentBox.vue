@@ -67,12 +67,15 @@ async function appointment() {
     return;
   }
   if (!appointmentStore.rearrangeMode) {
+    const { targetAvailable, targetClient } = appointmentStore;
+    const { userShiftId, startTime, endTime } = targetAvailable;
     await createAppointment({
       isEmployeePrice: isEmployeePrice.value,
-      slotId: appointmentStore.targetAvailable.slotId ?? null,
-      userShiftId: appointmentStore.targetAvailable.userShiftId,
-      bookingClientIds: [appointmentStore.targetClient.id],
+      userShiftId,
+      bookingClientIds: [targetClient.id],
       note: note.value ?? '',
+      startTime,
+      endTime,
     });
     await appointmentStore.getAvailable(appointmentStore.availableQuery!);
   }

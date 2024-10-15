@@ -205,10 +205,11 @@ export interface Available {
 
 export interface CreateAppointment {
   isEmployeePrice: boolean;
-  slotId: number | null;
   userShiftId: number;
   bookingClientIds: number[];
   note?: string | null;
+  startTime: string;
+  endTime: string;
 }
 
 export interface AppointmentRearrangeReq {

@@ -21,7 +21,6 @@ await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 
-// handle calendar date change
 watch(selectedDate, async (newDate) => {
   appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
   await appointmentStore.getAvailable(appointmentStore.availableQuery);
