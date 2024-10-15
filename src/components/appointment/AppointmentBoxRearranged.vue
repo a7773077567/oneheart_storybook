@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import { getDateLabel, getTypeLabel } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
 import { useRouter } from 'vue-router';
+import { useNotify } from '@/composables/notify';
 
 interface Column<T> {
   key?: keyof T;
@@ -65,14 +66,22 @@ async function appointment() {
   if (!appointmentStore.targetAvailable) {
     return;
   }
+  const { targetClientScheduleNotStarted, targetAvailable } = appointmentStore;
+  const { userShiftId, startTime, endTime } = targetAvailable;
+  try {
+    await createAppointmentRearrange({
+      clientScheduleId: targetClientScheduleNotStarted!.id,
+      userShiftId,
+      startTime,
+      endTime,
+    });
 
-  const payload = {
-    clientScheduleId: appointmentStore.targetClientScheduleNotStarted!.id,
-    slotId: appointmentStore.targetAvailable.slotId,
-    userShiftId: appointmentStore.targetAvailable.userShiftId,
-  };
-  await createAppointmentRearrange(payload);
-  router.push({ name: 'appointmentBookingCalendar' });
+    router.push({ name: 'appointmentListCalendar' });
+    useNotify('改期成功');
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
 </script>
 

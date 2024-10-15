@@ -7,6 +7,7 @@ import { getDateLabel, getTypeLabel } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
 import { useRouter } from 'vue-router';
 import { OInput, OMemberSearch } from '@/components/shared';
+import { useNotify } from '@/composables/notify';
 
 interface Column<T> {
   key: keyof T | string;
@@ -77,16 +78,26 @@ async function appointment() {
       startTime,
       endTime,
     });
-    await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+    // await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+    router.push({ name: 'appointmentListCalendar' });
+    useNotify('預約成功');
   }
   else {
-    const payload = {
-      clientScheduleId: appointmentStore.targetClientScheduleNotStarted!.id,
-      slotId: appointmentStore.targetAvailable.slotId,
-      userShiftId: appointmentStore.targetAvailable.userShiftId,
-    };
-    await createAppointmentRearrange(payload);
-    router.push({ name: 'appointmentOngoingQuery' });
+    const { targetClientScheduleNotStarted, targetAvailable } = appointmentStore;
+    const { userShiftId, startTime, endTime } = targetAvailable;
+    try {
+      await createAppointmentRearrange({
+        clientScheduleId: targetClientScheduleNotStarted!.id,
+        userShiftId,
+        startTime,
+        endTime,
+      });
+      router.push({ name: 'appointmentListCalendar' });
+      useNotify('改期成功');
+    }
+    catch (err) {
+      console.log(err);
+    }
     return;
   }
   appointmentStore.resetTargetAppointmentState();
