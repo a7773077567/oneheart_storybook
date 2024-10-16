@@ -89,7 +89,7 @@ async function onCheckout() {
     $q.loading.hide();
   }
 
-  router.push({ name: 'appointmentListCalendar' });
+  router.push({ name: 'appointmentListCalendar', query: { date: scheduleDate } });
 }
 
 const priceTags = computed(() => {

@@ -6,18 +6,23 @@ import { toTypedSchema } from '@vee-validate/zod';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
 import { getTypeLabel } from '@/utils/mappers';
+import { computed } from 'vue';
 
 const appointmentStore = useAppointmentStore();
 const router = useRouter();
-const { client, userShift, date, scheduleStartTime, scheduleEndTime } = appointmentStore.targetClientScheduleNotStarted!;
-const infoData = new Map([
-  ['姓名', () => client.name],
-  ['電話', () => client.phone],
-  ['科別', () => getTypeLabel(userShift.type)],
-  ['治療師', () => userShift.user.name],
-  ['原預約日期', () => date],
-  ['原預約時間', () => `${scheduleStartTime}-${scheduleEndTime}`],
-]);
+
+const infoData = computed (() => {
+  const { client, userShift, date, scheduleStartTime, scheduleEndTime } = appointmentStore.targetClientScheduleNotStarted!;
+
+  return new Map([
+    ['姓名', () => client.name],
+    ['電話', () => client.phone],
+    ['科別', () => getTypeLabel(userShift.type)],
+    ['治療師', () => userShift.user.name],
+    ['原預約日期', () => date],
+    ['原預約時間', () => `${scheduleStartTime}-${scheduleEndTime}`],
+  ]);
+});
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(availableRearrangedSchema),

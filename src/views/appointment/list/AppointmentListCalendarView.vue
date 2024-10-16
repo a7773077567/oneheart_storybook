@@ -3,20 +3,21 @@ import { ref, watchEffect } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { AppointmentCard, AppointmentCountCard, ResourceLabel } from '@/components/appointment';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { ClientSchedule } from '@/api';
 import { useQuasar } from 'quasar';
 import { getDuration } from '@/utils/date';
 
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const isBookingsBoxOpen = ref(false);
 const bookingsInBox = ref<any[]>();
 
-const selectedDate = ref(dayjs().format('YYYY-MM-DD'));
+const selectedDate = ref(route.query.date as string ?? dayjs().format('YYYY-MM-DD'));
 watchEffect(async () => {
   $q.loading.show();
   await Promise.all([

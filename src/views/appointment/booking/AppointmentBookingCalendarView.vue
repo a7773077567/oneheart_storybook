@@ -5,6 +5,7 @@ import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
+import { onBeforeRouteLeave } from 'vue-router';
 
 interface CalendarInterval {
   available?: Available;
@@ -27,7 +28,7 @@ watch(selectedDate, async (newDate) => {
   appointmentStore.querySent = true;
 });
 
-onBeforeUnmount(() => {
+onBeforeRouteLeave(() => {
   appointmentStore.resetAppointmentQueryState();
   appointmentStore.resetClientSchedulesNotStartedState();
   appointmentStore.resetTargetAppointmentState();

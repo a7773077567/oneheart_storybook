@@ -76,7 +76,7 @@ async function appointment() {
       endTime,
     });
 
-    router.push({ name: 'appointmentListCalendar' });
+    router.push({ name: 'appointmentListCalendar', query: { date: targetAvailable.date } });
     useNotify('改期成功');
   }
   catch (err) {
