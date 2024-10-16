@@ -29,7 +29,7 @@ export const loginRoutes: RouteRecordRaw[] = [
     name: 'activateUser',
     component: () => import('@/views/login/ActivateUser.vue'),
     meta: {
-      requiredAuth: true,
+      requiredAuth: false,
     },
   },
   {
