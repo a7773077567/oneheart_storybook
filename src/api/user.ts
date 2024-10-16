@@ -13,8 +13,8 @@ export interface Role {
 }
 
 export enum AccountState {
-  開通 = 1,
-  未開通 = 2,
+  未開通 = 1,
+  開通 = 2,
 }
 
 export enum WorkState {
