@@ -5,6 +5,7 @@ import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
+import { useRouter } from 'vue-router';
 
 interface CalendarInterval {
   available?: Available;
@@ -15,6 +16,7 @@ interface CalendarInterval {
 }
 
 const $q = useQuasar();
+const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
@@ -106,6 +108,7 @@ function getTimesArray(start: number, count: number, interval: number) {
 function requery() {
   appointmentStore.resetAppointmentQueryState();
   appointmentStore.querySent = false;
+  router.push({ name: 'appointmentBookingQuery' });
 }
 
 function getDate() {
