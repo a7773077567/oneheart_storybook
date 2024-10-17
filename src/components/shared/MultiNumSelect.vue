@@ -49,7 +49,7 @@ function updateModel(idx: number, val: number) {
           dense
           :disable="disable"
           class="multiple-select__item"
-          @update:model-value="val => updateModel(idx, val)"
+          @update:model-value="(val:number) => updateModel(idx, val)"
         />
         <span v-if="!!item.label">{{ item.label }}</span>
       </template>
