@@ -67,7 +67,7 @@ const onSubmit = handleSubmit.withControlled((values) => {
       <MultiNumSelect name="duration" :items="DurationItems" disable label="時間" class="gutter" />
       <div v-show="showNotAvailableTimes" class="not-available">
         <div v-for="(field, idx) in fields" :key="field.key" class="not-available__item">
-          <MultiNumSelect v-model="field.value" :label="`不可預約時間${idx === 0 ? '' : idx}`" name="notAvailableTimes" :items="DurationItems" class="not-available__select" />
+          <MultiNumSelect v-model="field.value" :label="`不可預約時間${idx === 0 ? '' : idx}`" :items="DurationItems" class="not-available__select" />
           <QBtn icon="o_delete" flat round class="not-available__delete" @click="remove(idx)" />
         </div>
         <QBtn label="新增不可預約時間" icon="add" dense flat @click="push([0, 0, 0, 0])" />
