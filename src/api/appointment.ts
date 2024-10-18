@@ -203,18 +203,20 @@ export interface Available {
   appointmentStatus: AppointmentStatus | null;
 }
 
-export interface CreateAppointment {
+export interface CreateAppointmentPayload {
   isEmployeePrice: boolean;
-  slotId: number | null;
   userShiftId: number;
   bookingClientIds: number[];
   note?: string | null;
+  startTime: string;
+  endTime: string;
 }
 
-export interface AppointmentRearrangeReq {
+export interface CreateAppointmentRearrangePayload {
   clientScheduleId: number;
-  slotId: number;
   userShiftId: number;
+  startTime: string;
+  endTime: string;
 }
 
 export interface ClientScheduleDetail extends ClientSchedule {
@@ -289,8 +291,8 @@ export async function fetchTherapists(type: number) {
  * 預約時段
  * @param payload CreateAppointment
  */
-export async function createAppointment(payload: CreateAppointment) {
-  const { data } = await api.post<any, CreateAppointment>('appointments/appointment', payload);
+export async function createAppointment(payload: CreateAppointmentPayload) {
+  const { data } = await api.post<any, CreateAppointmentPayload>('appointments/appointment', payload);
   return data;
 }
 
@@ -312,8 +314,8 @@ export async function fetchAvailableRearranged(params: AvailableRearrangedReq) {
   return data;
 }
 
-export async function createAppointmentRearrange(payload: AppointmentRearrangeReq) {
-  const { data } = await api.post<any, AppointmentRearrangeReq>('appointments/appointment-rearrange', payload);
+export async function createAppointmentRearrange(payload: CreateAppointmentRearrangePayload) {
+  const { data } = await api.post<any, CreateAppointmentRearrangePayload>('appointments/appointment-rearrange', payload);
   return data;
 }
 

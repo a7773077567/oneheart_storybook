@@ -11,6 +11,7 @@ import { OInput, TimeDurationPicker } from '@/components/shared';
 import { type ClientScheduleDetail, updateNote } from '@/api';
 import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
+import { useNotify } from '@/composables/notify';
 
 const props = defineProps<{
   scheduleId: number;
@@ -61,8 +62,15 @@ function cancelClientSchedule() {
   $q.dialog({
     message: '是否確定要取消預約？',
   }).onOk(async () => {
-    await cancelClientScheduleNotStarted(schedule.value.id);
-    await appointmentStore.getClientSchedule(schedule.value.id);
+    try {
+      await cancelClientScheduleNotStarted(schedule.value.id);
+      await appointmentStore.getClientSchedule(schedule.value.id);
+      router.push({ name: 'appointmentListCalendar' });
+      useNotify('取消預約成功');
+    }
+    catch (err) {
+      console.log(err);
+    }
   });
 }
 

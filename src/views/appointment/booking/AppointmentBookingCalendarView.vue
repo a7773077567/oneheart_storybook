@@ -5,7 +5,7 @@ import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 
 interface CalendarInterval {
   available?: Available;
@@ -23,14 +23,13 @@ await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 
-// handle calendar date change
 watch(selectedDate, async (newDate) => {
   appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
   await appointmentStore.getAvailable(appointmentStore.availableQuery);
   appointmentStore.querySent = true;
 });
 
-onBeforeUnmount(() => {
+onBeforeRouteLeave(() => {
   appointmentStore.resetAppointmentQueryState();
   appointmentStore.resetClientSchedulesNotStartedState();
   appointmentStore.resetTargetAppointmentState();

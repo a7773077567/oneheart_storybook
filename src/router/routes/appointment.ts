@@ -108,7 +108,13 @@ export const appointmentRoutes: RouteRecordRaw[] = [
               label: '預約改期',
               requiredAuth: true,
             },
-            beforeEnter: rearrangeGuard,
+            beforeEnter: () => {
+              const router = useRouter();
+              const appointmentStore = useAppointmentStore();
+              if (!appointmentStore.targetClientScheduleNotStarted) {
+                router.push({ name: 'appointmentOngoingQuery' });
+              }
+            },
           },
         ],
       },
@@ -124,11 +130,3 @@ export const appointmentRoutes: RouteRecordRaw[] = [
     ],
   },
 ];
-
-function rearrangeGuard() {
-  const router = useRouter();
-  const appointmentStore = useAppointmentStore();
-  if (!appointmentStore.targetClientScheduleNotStarted) {
-    router.push({ name: 'appointmentCurrentQuery' });
-  }
-}
