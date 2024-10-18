@@ -22,14 +22,16 @@ export interface Client {
   id: number;
   identityType: number;
   identityNumber: string | null;
-  lineUserId: string;
   isVerifiedBySMS: boolean;
-  inBodyFiles: InbodyFile[];
+  introducer: Pick<Client, 'associations' | 'email' | 'id' | 'inBodyFiles' | 'introducer' | 'lineUserId' | 'name' | 'phone' | 'relationTypeName' >;
   inBodyFileUrls: string[];
-  introducer: string | null;
+  inBodyFiles: InbodyFile[];
+  lineUserId: string;
+  liffIntroducerName: string | null;
   name: string;
   note: string;
   phone: string;
+  relationTypeName: string | null;
 }
 
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;

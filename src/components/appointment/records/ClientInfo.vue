@@ -38,6 +38,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
+  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '' },
   { key: 'phone', label: '電話', value: client.value.phone },
   { key: 'address', label: '地址', value: client.value.address ?? '無' },
   { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
@@ -152,6 +153,21 @@ function limitTimeOptions(hr: number, min: number | null) {
             <a class="name__label" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
+            </div>
+          </div>
+        </template>
+        <template #liffIntroducerName="{ row }">
+          <div class="liffIntroducerName">
+            <div class="liffIntroducerName__value">客戶填寫 - <div>{{ row.value }}</div></div>
+            <div class="liffIntroducerName__value">
+              後台綁定
+              <template v-if="!client.introducer">
+                <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">
+                  介紹人未綁定
+                </QBadge>
+                <a class="liffIntroducerName__link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
+              </template>
+              <div v-else>{{ client.introducer }}</div>
             </div>
           </div>
         </template>
@@ -304,5 +320,22 @@ function limitTimeOptions(hr: number, min: number | null) {
 .misc {
   display: grid;
   grid-template-columns: auto 1fr auto;
+}
+
+.liffIntroducerName {
+  display: flex;
+  gap: 20px;
+  > div + div {
+    margin-left: 26px;
+  }
+  &__value {
+    display: flex;
+    align-items: center;
+  }
+  &__link {
+    color: #1a7ab3;
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 </style>

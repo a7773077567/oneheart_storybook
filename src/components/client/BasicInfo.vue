@@ -15,7 +15,7 @@ const props = defineProps<{
 const clientStore = useClientStore();
 await Promise.allSettled([clientStore.getClientInfo(+props.clientId), clientStore.getDepInChargeTherapist(+props.clientId)]);
 
-const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer']) : {});
+const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer', 'liffIntroducerName']) : {});
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
 
 const isEdit = ref(false);
@@ -25,7 +25,7 @@ const isIntroducerNull = computed(() => initialValues.value.introducer === null)
 
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
-  const apiValues = omit(value as Client, ['howToKnowUs', 'introducer']);
+  const apiValues = omit(value as Client, ['howToKnowUs', 'introducer', 'liffIntroducerName']);
   const fetch = [updateClient(props.clientId, apiValues)];
   if (isIntroducerNull.value && !!value.introducer) {
     fetch.push(updateIntroducer(+props.clientId, { introducerClientId: +value.introducer }));
@@ -48,7 +48,12 @@ const departmentTherapists = computed(() => [{
   <div>
     <section class="user-settings__form q-mb-lg">
       <div class="flex items-center justify-between q-mb-md">
-        <h3 class="subtitle">基本資料</h3>
+        <div class="flex items-center gap-2">
+          <h3 class="subtitle">基本資料</h3>
+          <QBadge v-if="!clientStore.targetClient?.introducer" color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">
+            未綁定
+          </QBadge>
+        </div>
         <div>
           <QBtn v-if="isEdit" outlined label="儲存" class="q-px-lg" @click="onSubmit" />
           <QBtn v-else color="black" label="編輯" class="q-px-lg" @click="isEdit = true" />
@@ -82,12 +87,16 @@ const departmentTherapists = computed(() => [{
           <OInput name="address" hide-bottom-space :readonly="!isEdit" class="col-grow" />
         </fieldset>
         <fieldset class="col-12">
-          <span class="label">介紹人</span>
-          <OMemberSearch name="introducer" class="full-width" :readonly="!isEdit || !isIntroducerNull" />
-        </fieldset>
-        <fieldset class="col-12">
           <span class="label">從哪裡知道我們</span>
           <OInput name="howToKnowUs" hide-bottom-space class="full-width" readonly />
+        </fieldset>
+        <fieldset class="col-12">
+          <span class="label">客戶填寫的介紹人</span>
+          <OMemberSearch name="liffIntroducerName" class="full-width" readonly />
+        </fieldset>
+        <fieldset class="col-12">
+          <span class="label">後台綁定的介紹人</span>
+          <OMemberSearch name="introducer" class="full-width" :readonly="!isEdit" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">備註</span>
