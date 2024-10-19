@@ -38,7 +38,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
-  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '' },
+  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
   { key: 'phone', label: '電話', value: client.value.phone },
   { key: 'address', label: '地址', value: client.value.address ?? '無' },
   { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
@@ -167,7 +167,7 @@ function limitTimeOptions(hr: number, min: number | null) {
                 </QBadge>
                 <a class="liffIntroducerName__link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
               </template>
-              <div v-else>{{ client.introducer }}</div>
+              <div v-else> - {{ client.introducer }}</div>
             </div>
           </div>
         </template>
