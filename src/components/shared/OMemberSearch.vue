@@ -21,7 +21,7 @@ const { value, errorMessage } = useField<number>(() => props?.name ?? '', props.
 });
 
 const options = ref<Client[]>([]);
-fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({ name, id, ...others }) => ({ name: `${name} (會員編號#${id})`, id, ...others })));
+fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({ name, id, phone, ...others }) => ({ name: `${name} (會員編號#${id}) - ${phone}`, id, phone, ...others })));
 
 async function filterFn(val: string) {
   const { data } = await fetchClients({ nameOrPhone: val });
