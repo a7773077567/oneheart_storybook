@@ -158,7 +158,7 @@ function limitTimeOptions(hr: number, min: number | null) {
         </template>
         <template #liffIntroducerName="{ row }">
           <div class="liffIntroducerName">
-            <div class="liffIntroducerName__value">客戶填寫 - <div>{{ row.value }}</div></div>
+            <div class="liffIntroducerName__value">客戶填寫 - &ensp;<div>{{ row.value }}</div></div>
             <div class="liffIntroducerName__value">
               後台綁定
               <template v-if="!client.introducer">
