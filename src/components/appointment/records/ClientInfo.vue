@@ -150,7 +150,7 @@ function limitTimeOptions(hr: number, min: number | null) {
       <ClientInfoTable :data="data">
         <template #name="{ row }">
           <div class="name">
-            <a class="name__label" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
+            <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
@@ -165,9 +165,12 @@ function limitTimeOptions(hr: number, min: number | null) {
                 <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">
                   介紹人未綁定
                 </QBadge>
-                <a class="liffIntroducerName__link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
+                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
               </template>
-              <div v-else> - {{ client.introducer }}</div>
+              <template v-else>
+                - &ensp;
+                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: client.introducer.id } })">{{ client.introducer.name }}</a>
+              </template>
             </div>
           </div>
         </template>
@@ -225,6 +228,12 @@ function limitTimeOptions(hr: number, min: number | null) {
   &__actions {
     // display: flex;
     // justify-content: flex-end;
+  }
+
+  .link {
+    color: #1a7ab3;
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 
@@ -309,12 +318,6 @@ function limitTimeOptions(hr: number, min: number | null) {
   height: 19.19px;
   display: flex;
   align-items: center;
-  &__label {
-    cursor: pointer;
-    &:hover {
-      font-weight: 700;
-    }
-  }
 }
 
 .misc {
@@ -331,11 +334,6 @@ function limitTimeOptions(hr: number, min: number | null) {
   &__value {
     display: flex;
     align-items: center;
-  }
-  &__link {
-    color: #1a7ab3;
-    text-decoration: underline;
-    cursor: pointer;
   }
 }
 </style>
