@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
 import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
-import { getPayments, getSinglePayment } from '@/api';
+import { deletePayment, getPayments, getSinglePayment } from '@/api';
 import type { MedicalPaymentRecord, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
@@ -238,7 +238,16 @@ function openCancelConfirm(data: (typeof rows.value)[number]) {
 }
 
 async function cancelTransaction() {
-  console.log('fetch cancel api');
+  if (!cancelDetail.value.id)
+    return;
+
+  await deletePayment(cancelDetail.value.id);
+  await getRecordList({
+    page: paging.value.modelValue, // 重新從第一頁搜尋
+    date: values.date as Query['date'],
+    nameOrPhone: values.nameOrPhone ?? '',
+  });
+  showCancelConfirm.value = false;
 }
 </script>
 
@@ -262,11 +271,11 @@ async function cancelTransaction() {
         input
       />
     </div>
-    <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
+    <QTable :columns="cols" :rows="rows" row-key="id" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
       <template #body-cell-cancel="{ value, row }">
         <QTd class="text-center">
           <template v-if="row.type === TransactionTypes['門診費用']">
-            <span v-if="!!value">已刪除{{ value }}</span>
+            <span v-if="!!value">已刪除</span>
             <QBtn v-else flat color="blue" label="刪除交易" @click="openCancelConfirm(row)" />
           </template>
         </QTd>
