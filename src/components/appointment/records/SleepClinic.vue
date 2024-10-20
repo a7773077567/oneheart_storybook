@@ -96,7 +96,7 @@ async function finishRecord() {
     </form>
     <div class="sleep_form_action">
       <QBtn label="儲存" style="width: 127px" @click="onSubmit" />
-      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
+      <QBtn v-if="scheduleState === '完成服務'" label="病例完成" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
   </div>
 </template>
