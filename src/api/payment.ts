@@ -114,3 +114,8 @@ export async function getSinglePayment(paymentId: number) {
   const { data } = await api.get<PaymentDetail>(`payments/${paymentId}`);
   return data;
 }
+
+// 刪除單一交易紀錄
+export async function deletePayment(paymentId: number) {
+  await api.delete(`payments/${paymentId}`);
+}

@@ -71,7 +71,9 @@ function selectClient(selectList: Client[]) {
   pointsStore.getPointGroupOptions(client.id);
 }
 
-function getPointGroup(group: { name: string; id: number; type: PointTypes }) {
+const remainingPoints = ref(0);
+function getPointGroup(group: { name: string; id: number; type: PointTypes; points: number }) {
+  remainingPoints.value = group.points;
   setFieldValue('clientGroupId', group.id ?? '');
   setFieldValue('groupName', group.name ?? '');
   setFieldValue('pointType', group.type);
@@ -112,8 +114,7 @@ async function createGroup(value: CreateGroupField) {
 
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
       <fieldset class="col-11 col-md-8">
-        <span class="field--key">客戶</span>
-        <OInput readonly class="field--val" name="clientName" hide-bottom-space :virtual-scroll-item-size="50" />
+        <OInput inside-label="客戶" readonly class="field--val" name="clientName" hide-bottom-space :virtual-scroll-item-size="50" />
         <div class="q-ml-md">
           <QBadge color="black" class="q-px-sm text-body1">
             會員編號：
@@ -124,52 +125,50 @@ async function createGroup(value: CreateGroupField) {
         </div>
       </fieldset>
       <fieldset class="col-8">
-        <span class="field--key">堂數群組</span>
-        <OSelect
-          :disable="!values.clientId"
-          class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
-          :virtual-scroll-item-size="50" error-message=""
-          @update:model-value="getPointGroup"
-        />
-        <div class="q-ml-md text-caption" style="min-width:98px">
-          堂數類別：<span v-if="!!values.pointType" class="text-caption">
-            {{ PointTypes[values.pointType] }}
-          </span>
-        </div>
-        <div>
-          <QBtn outline label="新增群組" :disable="!values.clientId" @click="showAddForm = true" />
+        <div class="full-width row items-start">
+          <div class="col-8">
+            <OSelect
+              label="堂數群組"
+              :disable="!values.clientId"
+              class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
+              :virtual-scroll-item-size="50" error-message=""
+              @update:model-value="getPointGroup"
+            />
+            <p class="q-mt-md q-ml-sm">
+              剩餘堂數： {{ remainingPoints }} 堂
+            </p>
+          </div>
+          <QBtn class="col-auto q-ml-md" outline label="新增群組" :disable="!values.clientId" @click="showAddForm = true" />
         </div>
       </fieldset>
       <fieldset class="col-8">
-        <span class="field--key">方案</span>
         <OSelect
+          label="方案"
           class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50"
           error-message="" @update:model-value="setDefaultVal"
         />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">
-          <span class="field--key">堂數</span>
           <OInput
+            inside-label="堂數"
             type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量"
             error-message=""
           />
         </fieldset>
         <fieldset class="col-6 col-md-3">
-          <span class="field--key">贈堂</span>
-          <OInput type="number" class="field--val" name="giftPointGained" hide-bottom-space placeholder="數量" />
+          <OInput inside-label="贈堂" type="number" class="field--val" name="giftPointGained" hide-bottom-space placeholder="數量" />
         </fieldset>
         <fieldset class="col-12 col-md-2">
-          <span class="field--key">總數：</span>
           <QInput
+            label="總數"
             type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable
             readonly
           />
         </fieldset>
       </div>
       <fieldset class="col-8">
-        <span class="field--key">金額</span>
-        <OInput type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
+        <OInput inside-label="金額" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
       </fieldset>
     </form>
     <div class="q-my-lg flex">

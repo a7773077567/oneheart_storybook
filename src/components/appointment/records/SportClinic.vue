@@ -99,7 +99,7 @@ async function finishRecord() {
     </div>
     <div class="form__actions">
       <QBtn label="儲存" style="width: 127px" outline :disable="!meta.dirty" @click="onSubmit" />
-      <QBtn v-if="scheduleState === '完成服務'" label="完成病例" color="primary" style="width: 127px;" @click="finishRecord" />
+      <QBtn v-if="scheduleState === '完成服務'" 病例完成 color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">

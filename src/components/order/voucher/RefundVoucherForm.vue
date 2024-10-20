@@ -75,17 +75,16 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
   <div class="points_topup">
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
       <fieldset class="col-12">
-        <span class="field--key">客戶</span>
         <OMemberSearch
+          label="客戶"
           name="clientId" placeholder="搜尋電話或姓名" class="full-width" @update:model-value="getClientGroup"
           @full-info="selectClient"
         />
       </fieldset>
 
       <fieldset class="col-12">
-        <span class="field--key">團課券</span>
         <OSelect
-          label="請選擇團課券"
+          label="團課券"
           class="field--val" name="groupClass" :options="groupClassList" hide-bottom-space
           :virtual-scroll-item-size="50" :disable="!values.clientId" :error-message="errors.groupClass"
           @update:model-value="setRefundClassAmount"
@@ -98,8 +97,7 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
       </fieldset>
 
       <fieldset class="col-12">
-        <span class="field--key">退款金額</span>
-        <OInput type="number" class="field--val" name="amount" placeholder="$" :error-message="errors.amount" />
+        <OInput inside-label="退款金額" type="number" class="field--val" name="amount" placeholder="$" :error-message="errors.amount" />
       </fieldset>
     </form>
     <div class="q-my-lg flex">

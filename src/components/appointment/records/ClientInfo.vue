@@ -38,6 +38,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
+  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
   { key: 'phone', label: '電話', value: client.value.phone },
   { key: 'address', label: '地址', value: client.value.address ?? '無' },
   { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
@@ -149,9 +150,27 @@ function limitTimeOptions(hr: number, min: number | null) {
       <ClientInfoTable :data="data">
         <template #name="{ row }">
           <div class="name">
-            <a class="name__label" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
+            <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
+            </div>
+          </div>
+        </template>
+        <template #liffIntroducerName="{ row }">
+          <div class="liffIntroducerName">
+            <div class="liffIntroducerName__value">客戶填寫 - &ensp;<div>{{ row.value }}</div></div>
+            <div class="liffIntroducerName__value">
+              後台綁定
+              <template v-if="!client.introducer">
+                <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">
+                  介紹人未綁定
+                </QBadge>
+                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
+              </template>
+              <template v-else>
+                - &ensp;
+                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: client.introducer.id } })">{{ client.introducer.name }}</a>
+              </template>
             </div>
           </div>
         </template>
@@ -209,6 +228,12 @@ function limitTimeOptions(hr: number, min: number | null) {
   &__actions {
     // display: flex;
     // justify-content: flex-end;
+  }
+
+  .link {
+    color: #1a7ab3;
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 
@@ -293,16 +318,22 @@ function limitTimeOptions(hr: number, min: number | null) {
   height: 19.19px;
   display: flex;
   align-items: center;
-  &__label {
-    cursor: pointer;
-    &:hover {
-      font-weight: 700;
-    }
-  }
 }
 
 .misc {
   display: grid;
   grid-template-columns: auto 1fr auto;
+}
+
+.liffIntroducerName {
+  display: flex;
+  gap: 20px;
+  > div + div {
+    margin-left: 26px;
+  }
+  &__value {
+    display: flex;
+    align-items: center;
+  }
 }
 </style>

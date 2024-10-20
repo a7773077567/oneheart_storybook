@@ -1,9 +1,9 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
-import { PaymentTypes, PointTypes, ShiftType, TransactionTypes } from '@/const/general';
-import { getPayments, getSinglePayment } from '@/api';
-import type { MedicalPaymentRecord, PaymentQuery, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
+import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { deletePayment, getPayments, getSinglePayment } from '@/api';
+import type { MedicalPaymentRecord, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
 import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { Receipt } from '@/components/appointment';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
+import CancelOrder from '@/components/order/CancelOrder.vue';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -20,7 +21,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '日期',
     align: 'left',
-    style: 'width:1px',
+    style: row => `width:1px; ${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: row => row.date,
   },
   {
@@ -28,6 +29,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '場館',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: row => row.spaceName,
   },
   {
@@ -35,6 +37,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '會員編號',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: row => row.clientId,
   },
   {
@@ -42,6 +45,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '項目',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: row => TransactionTypes[row.type],
   },
   {
@@ -49,6 +53,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '會員姓名',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: row => row.clientName,
   },
   {
@@ -56,6 +61,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '支付方式',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: ({ type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point }) => {
       switch (type) {
         case TransactionTypes.門診費用:
@@ -76,6 +82,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '堂(張)數 / 金額',
     align: 'left',
+    style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
     field: ({ type, amount, ticketGained, paidPointGained, giftPointGained }) => {
       switch (type) {
         case TransactionTypes.門診費用:
@@ -92,6 +99,13 @@ const cols: QTableProps['columns'] = [
           amount = 0;
       }
     },
+  },
+  {
+    name: 'cancel',
+    required: true,
+    label: '',
+    align: 'left',
+    field: row => row.isDeleted,
   },
   {
     name: 'attachment',
@@ -212,6 +226,29 @@ async function checkPaymentDetail(val: any) {
   const data = await getSinglePayment(val.id);
   targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
 }
+
+const showCancelConfirm = ref(false);
+const cancelDetail = ref();
+
+function openCancelConfirm(data: (typeof rows.value)[number]) {
+  console.log(data);
+  const { amount, clientId, clientName, date, id } = data;
+  cancelDetail.value = { amount, clientId, clientName, date, id };
+  showCancelConfirm.value = true;
+}
+
+async function cancelTransaction() {
+  if (!cancelDetail.value.id)
+    return;
+
+  await deletePayment(cancelDetail.value.id);
+  await getRecordList({
+    page: paging.value.modelValue, // 重新從第一頁搜尋
+    date: values.date as Query['date'],
+    nameOrPhone: values.nameOrPhone ?? '',
+  });
+  showCancelConfirm.value = false;
+}
 </script>
 
 <template>
@@ -234,7 +271,15 @@ async function checkPaymentDetail(val: any) {
         input
       />
     </div>
-    <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
+    <QTable :columns="cols" :rows="rows" row-key="id" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
+      <template #body-cell-cancel="{ value, row }">
+        <QTd class="text-center">
+          <template v-if="row.type === TransactionTypes['門診費用']">
+            <span v-if="!!value">已刪除</span>
+            <QBtn v-else flat color="blue" label="刪除交易" @click="openCancelConfirm(row)" />
+          </template>
+        </QTd>
+      </template>
       <template #body-cell-attachment="{ value }">
         <QTd class="text-center">
           <QBtn v-if="!!value" flat round icon="o_description" @click="checkReceipt(value)" />
@@ -253,6 +298,9 @@ async function checkPaymentDetail(val: any) {
     </QDialog>
     <QDialog v-model="showDetail">
       <PaymentDetail :detail="targetPaymentDetails" />
+    </QDialog>
+    <QDialog v-model="showCancelConfirm">
+      <CancelOrder :data="cancelDetail" @cancel="showCancelConfirm = false" @confirm="cancelTransaction" />
     </QDialog>
   </div>
 </template>

@@ -68,8 +68,7 @@ function selectClient(selectList: Client[]) {
 
     <form class="row q-col-gutter-md voucher_form" @submit.prevent>
       <fieldset class="col-11 col-md-8">
-        <span class="field--key">客戶</span>
-        <OInput readonly class="field--val" name="clientName" hide-bottom-space :virtual-scroll-item-size="50" />
+        <OInput inside-label="客戶" readonly class="field--val" name="clientName" hide-bottom-space :virtual-scroll-item-size="50" />
         <div class="q-ml-md">
           <QBadge color="black" class="q-px-sm text-body1">
             會員編號：
@@ -80,8 +79,8 @@ function selectClient(selectList: Client[]) {
         </div>
       </fieldset>
       <fieldset class="col-8">
-        <span class="field--key">團課課程</span>
         <OSelect
+          label="團課課程"
           class="field--val" name="groupClassId" :options="voucherStore.groupClassOptions" hide-bottom-space :virtual-scroll-item-size="50"
           error-message=""
         />
@@ -89,16 +88,15 @@ function selectClient(selectList: Client[]) {
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">
-          <span class="field--key">堂數</span>
           <OInput
+            inside-label="堂數"
             type="number" class="field--val" name="ticketGained" hide-bottom-space placeholder="數量"
             error-message=""
           />
         </fieldset>
       </div>
       <fieldset class="col-8">
-        <span class="field--key">金額</span>
-        <OInput type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
+        <OInput inside-label="金額" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
       </fieldset>
     </form>
     <div class="q-my-lg flex">
