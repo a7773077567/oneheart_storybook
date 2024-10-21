@@ -38,6 +38,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
+  { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
   { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
   { key: 'phone', label: '電話', value: client.value.phone },
   { key: 'address', label: '地址', value: client.value.address ?? '無' },
@@ -155,6 +156,10 @@ function limitTimeOptions(hr: number, min: number | null) {
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
           </div>
+        </template>
+        <template #lineId="{ row }">
+          <div v-if="row.value">{{ row.value }}</div>
+          <QBadge v-else color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">LINE 未綁定</QBadge>
         </template>
         <template #liffIntroducerName="{ row }">
           <div class="liffIntroducerName">

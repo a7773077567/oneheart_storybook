@@ -48,11 +48,14 @@ const departmentTherapists = computed(() => [{
   <div>
     <section class="user-settings__form q-mb-lg">
       <div class="flex items-center justify-between q-mb-md">
-        <div class="flex items-center gap-2">
+        <div class="row items-center q-gutter-md">
           <h3 class="subtitle">基本資料</h3>
-          <QBadge v-if="!clientStore.targetClient?.introducer" color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">
-            未綁定
-          </QBadge>
+          <div class="line-id">
+            <span>LINE ID</span>
+            <span v-if="clientStore.targetClient?.lineUserId">{{ clientStore.targetClient?.lineUserId }}</span>
+            <QBadge v-else color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">LINE 未綁定</QBadge>
+          </div>
+          <QBadge v-if="!clientStore.targetClient?.introducer" color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">介紹人未綁定</QBadge>
         </div>
         <div>
           <QBtn v-if="isEdit" outlined label="儲存" class="q-px-lg" @click="onSubmit" />
@@ -154,5 +157,10 @@ const departmentTherapists = computed(() => [{
   &__key {
     width: 250px;
   }
+}
+
+.line-id {
+  display: flex;
+  gap: 12px;
 }
 </style>
