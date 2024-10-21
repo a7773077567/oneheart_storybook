@@ -78,8 +78,8 @@ async function appointment() {
       startTime,
       endTime,
     });
-    // await appointmentStore.getAvailable(appointmentStore.availableQuery!);
-    router.push({ name: 'appointmentListCalendar', query: { date: targetAvailable.date } });
+    await appointmentStore.getAvailable(appointmentStore.availableQuery!);
+    // router.push({ name: 'appointmentListCalendar', query: { date: targetAvailable.date } });
     useNotify('預約成功');
   }
   else {

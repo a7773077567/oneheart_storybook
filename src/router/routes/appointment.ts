@@ -78,6 +78,11 @@ export const appointmentRoutes: RouteRecordRaw[] = [
               label: '選擇可預約時間',
               requireAuth: true,
             },
+            beforeEnter: (to, from) => {
+              if (!from.name) {
+                return { name: 'appointmentBookingQuery' };
+              }
+            },
           },
         ],
       },
