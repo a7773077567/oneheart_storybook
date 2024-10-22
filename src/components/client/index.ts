@@ -1,6 +1,8 @@
 export { default as BasicInfo } from './BasicInfo.vue';
 export { default as Associations } from './Associations.vue';
-export { default as PointsGroup } from './PointsGroup.vue';
+export { default as PointsGroup } from './pointsGroup/PointsGroup.vue';
+export { default as GroupList } from './pointsGroup/GroupList.vue';
+export { default as PointsGroupForm } from './pointsGroup/PointsGroupForm.vue';
 export { default as PurchaseRecords } from './PurchaseRecords.vue';
 export { default as InbodyRecords } from './InbodyRecords.vue';
 export { default as GCVoucher } from './GCVoucher.vue';

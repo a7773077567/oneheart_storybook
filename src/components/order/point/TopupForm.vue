@@ -9,7 +9,7 @@ import type { Client, CreateGroupField } from '@/api';
 import { usePointsStore } from '@/stores';
 import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
-import PointsGroupForm from '@/components/client/PointsGroupForm.vue';
+import PointsGroupForm from '@/components/client/pointsGroup/PointsGroupForm.vue';
 import { useQuasar } from 'quasar';
 
 const emit = defineEmits<{

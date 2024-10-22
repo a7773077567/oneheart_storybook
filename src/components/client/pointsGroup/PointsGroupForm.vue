@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { ClientSearch, OInput, OSelect } from '@/components/shared';
 import { useForm } from 'vee-validate';
 import { PointTypes, pointsGroupOptions } from '@/const/general';
-import GroupMemberField from './GroupMemberField.vue';
+import GroupMemberField from '../GroupMemberField.vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import z from 'zod';
 import type { Client, CreateGroupField, EditGroupField, PointsGroup } from '@/api';
