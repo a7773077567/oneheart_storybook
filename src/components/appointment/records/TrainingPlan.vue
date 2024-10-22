@@ -60,6 +60,9 @@ const schema = object({
     intensity_Sets: string().min(1),
     notes: string().min(1),
   }).required()),
+  forMedicalGroup: string().nullable(),
+  forFrontDesk: string().nullable(),
+  forClient: string().nullable(),
 }).required();
 
 const oneRecord = { exercise: '', weight: '', reps: '', intensity_Sets: '', notes: '' };
@@ -75,6 +78,7 @@ const { handleSubmit, setFieldValue, values, meta } = useForm({
 
 const onSubmit = handleSubmit(async (formValue) => {
   const { trainingRecords, ...otherFields } = formValue;
+
   await updateClientSchedule(recordId.value, { ...otherFields, trainingRecords: trainingRecords.filter(record => Object.keys(record).length > 0) } as Partial<Record>);
   $q.notify({ message: '已存檔', timeout: 200 });
 
