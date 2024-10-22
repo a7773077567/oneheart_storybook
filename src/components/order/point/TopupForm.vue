@@ -32,7 +32,7 @@ const pointsTopupSchema = z.object({
 });
 
 const initialValues = computed(() => pointsStore.topupDetail);
-const { handleSubmit, values, resetField, setFieldValue, resetForm } = useForm({
+const { handleSubmit, values, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(pointsTopupSchema),
   initialValues: initialValues.value,
 });
@@ -60,12 +60,13 @@ function selectClient(selectList: Client[]) {
   const client = selectList[0];
 
   pointsStore.targetClient = client;
+  if (values.clientGroupId) {
+    resetForm();
+  }
 
   setFieldValue('clientId', client.id);
   setFieldValue('clientName', client.name);
   setFieldValue('clientPhone', client.phone);
-
-  resetField('clientGroupId');
 
   showClientSearch.value = false;
   pointsStore.getPointGroupOptions(client.id);

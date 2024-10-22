@@ -43,7 +43,7 @@ const initialValues = computed(() => ({
   multiChannelPay: [],
 }));
 
-const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm({
+const { handleSubmit, resetForm, values, setFieldValue, meta, errors, resetField } = useForm({
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
@@ -67,6 +67,10 @@ function setRefundClassAmount(groupClass: GroupClass) {
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
+  if (values.groupClassId) {
+    resetField('groupClassId');
+    resetField('groupClass');
+  }
   setFieldValue('client', { name, phone, identityNumber, birthDate, gender });
 }
 </script>

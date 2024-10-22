@@ -47,7 +47,7 @@ const initialValues = computed(() => ({
   multiChannelPay: [],
 }));
 
-const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm({
+const { handleSubmit, resetForm, resetField, values, setFieldValue, meta, errors } = useForm({
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
@@ -69,6 +69,10 @@ function setRefundClassAmount(pointGroup: PointsGroup) {
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
+  if (values.clientGroupId) {
+    resetField('clientGroupId');
+    resetField('pointGroup');
+  }
   setFieldValue('client', { name, phone, identityNumber, birthDate, gender });
 }
 </script>
@@ -79,7 +83,10 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
       <fieldset class="col-12">
         <OMemberSearch
           label="客戶"
-          name="clientId" placeholder="搜尋電話或姓名" class="full-width" @update:model-value="getClientGroup"
+          name="clientId"
+          placeholder="搜尋電話或姓名"
+          class="full-width"
+          @update:model-value="getClientGroup"
           @full-info="selectClient"
         />
       </fieldset>
