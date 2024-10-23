@@ -47,7 +47,7 @@ const initialValues = computed(() => ({
   multiChannelPay: [],
 }));
 
-const { handleSubmit, resetForm, resetField, values, setFieldValue, meta, errors } = useForm({
+const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm({
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
@@ -59,6 +59,10 @@ const onSubmit = handleSubmit(async (values) => {
 });
 
 function getClientGroup() {
+  if (values.clientGroupId) {
+    resetForm();
+  }
+
   if (values.clientId) {
     pointsStore.getPointGroupOptions(values.clientId);
   }
@@ -69,10 +73,6 @@ function setRefundClassAmount(pointGroup: PointsGroup) {
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
-  if (values.clientGroupId) {
-    resetField('clientGroupId');
-    resetField('pointGroup');
-  }
   setFieldValue('client', { name, phone, identityNumber, birthDate, gender });
 }
 </script>
@@ -86,6 +86,7 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
           name="clientId"
           placeholder="搜尋電話或姓名"
           class="full-width"
+          error-message=""
           @update:model-value="getClientGroup"
           @full-info="selectClient"
         />

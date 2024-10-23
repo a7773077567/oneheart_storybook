@@ -61,12 +61,13 @@ function selectClient(selectList: Client[]) {
 
   pointsStore.targetClient = client;
   if (values.clientGroupId) {
-    resetForm();
+    resetForm({ values: { ...initialValues.value, clientId: client.id, clientName: client.name, clientPhone: client.phone } });
   }
-
-  setFieldValue('clientId', client.id);
-  setFieldValue('clientName', client.name);
-  setFieldValue('clientPhone', client.phone);
+  else {
+    setFieldValue('clientId', client.id);
+    setFieldValue('clientName', client.name);
+    setFieldValue('clientPhone', client.phone);
+  }
 
   showClientSearch.value = false;
   pointsStore.getPointGroupOptions(client.id);

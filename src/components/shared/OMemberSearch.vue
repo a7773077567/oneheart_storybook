@@ -12,7 +12,7 @@ interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
 }
 const props = defineProps<Props>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'fullInfo', val: Client | null): void;
 }>();
 
@@ -33,6 +33,12 @@ const fullInfo = computed(() => {
     return null;
   return options.value.find(o => o.id === value.value) ?? null;
 });
+
+function handleUpdate(v: null | typeof value) {
+  if (v) {
+    emit('fullInfo', fullInfo.value);
+  }
+}
 </script>
 
 <template>
@@ -54,6 +60,6 @@ const fullInfo = computed(() => {
     :input-debounce="500"
     style="background:white"
     @input-value="filterFn"
-    @update:model-value="$emit('fullInfo', fullInfo)"
+    @update:model-value="handleUpdate"
   />
 </template>
