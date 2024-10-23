@@ -43,7 +43,7 @@ const initialValues = computed(() => ({
   multiChannelPay: [],
 }));
 
-const { handleSubmit, resetForm, values, setFieldValue, meta, errors, resetField } = useForm({
+const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm({
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
@@ -56,6 +56,10 @@ const onSubmit = handleSubmit(async (values) => {
 
 const groupClassList = ref<object[]>([]);
 async function getClientGroup() {
+  if (values.groupClassId) {
+    resetForm();
+  }
+
   if (values.clientId) {
     const data = await getClientVouchers(values.clientId);
     groupClassList.value = data.map(option => ({ label: option.name, value: option }));
@@ -67,10 +71,6 @@ function setRefundClassAmount(groupClass: GroupClass) {
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
-  if (values.groupClassId) {
-    resetField('groupClassId');
-    resetField('groupClass');
-  }
   setFieldValue('client', { name, phone, identityNumber, birthDate, gender });
 }
 </script>
@@ -81,8 +81,13 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
       <fieldset class="col-12">
         <OMemberSearch
           label="客戶"
-          name="clientId" placeholder="搜尋電話或姓名" class="full-width" @update:model-value="getClientGroup"
+          name="clientId"
+          placeholder="搜尋電話或姓名"
+          class="full-width"
+          error-message=""
+          @update:model-value="getClientGroup"
           @full-info="selectClient"
+          @clear="resetForm"
         />
       </fieldset>
 

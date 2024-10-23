@@ -81,7 +81,6 @@ const firstTokenList = [
   'resend-activation-email',
   'clientGroups',
   'payments',
-  'groupClassTickets',
   'dottedSign',
 ];
 
@@ -89,6 +88,8 @@ function checkClientFirstToken(url: string, method: string) {
   const clientExclusionList = [
     'memos',
     'addInbodyFiles',
+    'gainPoint',
+    'refundPoint',
   ];
   const inExclusion = clientExclusionList.some(item => url.includes(item));
   const isMemos = url.includes('memos');
