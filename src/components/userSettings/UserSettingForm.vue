@@ -31,7 +31,6 @@ const roleIdOptions = [
   { label: '副店長 ', value: RoleType['副店長'] },
   { label: '教練組長 ', value: RoleType['教練組長'] },
   { label: '教練 ', value: RoleType['教練'] },
-  { label: '櫃檯組長 ', value: RoleType['櫃檯組長'] },
   { label: '櫃檯 ', value: RoleType['櫃檯'] },
 ];
 const spaceOptions = spaces.map(space => ({ label: space.name, value: space.id }));

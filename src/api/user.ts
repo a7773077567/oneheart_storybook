@@ -33,8 +33,7 @@ export enum RoleType {
   副店長 = 7,
   教練組長 = 8,
   教練 = 9,
-  櫃檯組長 = 10,
-  櫃檯 = 11,
+  櫃檯 = 10,
 }
 export interface User {
   id: number;
