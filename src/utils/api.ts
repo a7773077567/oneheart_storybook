@@ -80,7 +80,6 @@ const firstTokenList = [
   'clients',
   'resend-activation-email',
   'clientGroups',
-  'payments',
   'dottedSign',
 ];
 
