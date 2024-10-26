@@ -50,6 +50,7 @@ const initialValues = computed<{
     'forMedicalGroup',
     'forFrontDesk',
     'forClient',
+    'note',
   ]);
 });
 
