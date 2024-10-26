@@ -39,6 +39,7 @@ const trainingPlanFields = [
   { name: 'forMedicalGroup', label: '給治療組的建議' },
   { name: 'forFrontDesk', label: '給櫃檯的建議' },
   { name: 'forClient', label: '給客戶的建議' },
+  { name: 'note', label: '備註' },
 ];
 
 const initialValues = computed<{
@@ -63,6 +64,7 @@ const schema = object({
   forMedicalGroup: string().nullable(),
   forFrontDesk: string().nullable(),
   forClient: string().nullable(),
+  note: string().nullable(),
 }).required();
 
 const oneRecord = { exercise: '', weight: '', reps: '', intensity_Sets: '', notes: '' };
@@ -86,7 +88,7 @@ const onSubmit = handleSubmit(async (formValue) => {
 });
 
 function addNewSet() {
-  setFieldValue('trainingRecords', [...(values.trainingRecords ?? [oneRecord]), oneRecord]);
+  setFieldValue('trainingRecords', values.trainingRecords ? [...values.trainingRecords, oneRecord] : [oneRecord]);
 }
 
 function deleteSet(delIdx: number) {
