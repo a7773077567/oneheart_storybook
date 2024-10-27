@@ -25,6 +25,7 @@ watch(currentSpaceId, async (newSpaceId) => {
   if (!oriSpaceId || newSpaceId !== +oriSpaceId) {
     const { accessToken } = await spaceLogin({ spaceId: newSpaceId! });
     setCookie('secondToken', accessToken);
+    removeCookie('lastSpaceId');
     setCookie('lastSpaceId', newSpaceId);
     router.push({ name: 'home' });
   }
