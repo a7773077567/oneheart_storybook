@@ -28,11 +28,20 @@ const { handleSubmit } = useForm({
   },
 });
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   const payload = removeNullishKeys(values);
   isSearched.value = true;
   appointmentStore.clientSchedulesNotStartedQuery = payload;
-  appointmentStore.getClientSchedulesNotStarted(payload);
+  try {
+    $q.loading.show();
+    await appointmentStore.getClientSchedulesNotStarted(payload);
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 function cancelClientSchedule(clientScheduleId: number) {

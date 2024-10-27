@@ -24,9 +24,18 @@ const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 
 watch(selectedDate, async (newDate) => {
-  appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
-  await appointmentStore.getAvailable(appointmentStore.availableQuery);
-  appointmentStore.querySent = true;
+  try {
+    appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
+    $q.loading.show();
+    await appointmentStore.getAvailable(appointmentStore.availableQuery);
+    appointmentStore.querySent = true;
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 onBeforeRouteLeave(() => {
