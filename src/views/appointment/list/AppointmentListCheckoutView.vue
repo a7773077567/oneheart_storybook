@@ -3,7 +3,7 @@ import { useAppointmentStore } from '@/stores';
 import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
 import { ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
@@ -94,6 +94,14 @@ async function onCheckout() {
 
 const priceTags = computed(() => {
   return [{ label: '自動推薦優惠價格', value: isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
+});
+
+// set amount to $0 when payment method is 堂數
+watch(payments, (chosenPayments) => {
+  const includePointPayment = chosenPayments.some(pay => pay.payMethod === PaymentMethod['堂數']);
+  if (includePointPayment && totalAmount.value !== 0) {
+    totalAmount.value = 0;
+  }
 });
 </script>
 

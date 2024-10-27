@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
 import { usePointsStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
@@ -7,7 +7,7 @@ import { PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
 import { useQuasar } from 'quasar';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
-import { PaymentMethods } from '@/const/appointment';
+import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { POINTS_PLAN } from '@/const/points';
 
 const emit = defineEmits<{
@@ -102,6 +102,14 @@ async function onCheckout() {
     isProceeding.value = false;
   }
 }
+
+// set amount to $0 when payment method is 堂數
+watch(payments, (chosenPayments) => {
+  const includePointPayment = chosenPayments.some(pay => pay.payMethod === PaymentMethod['堂數']);
+  if (includePointPayment && pointsStore.topupDetail.amount !== 0) {
+    pointsStore.topupDetail.amount = 0;
+  }
+});
 </script>
 
 <template>
