@@ -37,7 +37,7 @@ const rows = computed(() => {
       chiefComplaint,
       clientScheduleId,
     };
-  });
+  }).reverse();
 });
 
 function getFilterOptions() {
@@ -52,7 +52,7 @@ function getFilterOptions() {
       <QSelect v-model="currentFilter" emit-value map-options outlined dense :options="getFilterOptions()" style="width: fit-content;" />
     </div>
     <div class="medical-history__body">
-      <QTable :columns="columns" :rows="rows" separator="cell" hide-pagination flat bordered>
+      <QTable :columns="columns" :rows="rows" :rows-per-page-options="[10]" separator="cell" flat bordered>
         <template #body-cell-chevron="tableProps">
           <QTd :props="tableProps">
             <QBtn icon="chevron_right" flat round @click="$router.push({ name: 'appointmentListInfo', params: { scheduleId: tableProps.row.clientScheduleId } })" />
