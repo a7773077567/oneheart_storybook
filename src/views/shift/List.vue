@@ -111,13 +111,22 @@ function onCalendarChange(calendarDuration: ChangeParams) {
 }
 
 async function getUserShifts() {
-  if (userStore.isGym) {
-    await shiftStore.getAvailableClassesForGym();
+  try {
+    $q.loading.show();
+    if (userStore.isGym) {
+      await shiftStore.getAvailableClassesForGym();
+    }
+    await shiftStore.getUserShifts({
+      ...duration.value,
+      userIds: userIds.value,
+    });
   }
-  await shiftStore.getUserShifts({
-    ...duration.value,
-    userIds: userIds.value,
-  });
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 }
 
 function closeShiftSelector() {

@@ -19,12 +19,19 @@ const bookingsInBox = ref<any[]>();
 
 const selectedDate = ref(route.query.date as string ?? dayjs().format('YYYY-MM-DD'));
 watchEffect(async () => {
-  $q.loading.show();
-  await Promise.all([
-    appointmentStore.getClientSchedulesInProgress(selectedDate.value),
-    appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.activeUsers.map(item => item.id) }),
-  ]);
-  $q.loading.hide();
+  try {
+    $q.loading.show();
+    await Promise.all([
+      appointmentStore.getClientSchedulesInProgress(selectedDate.value),
+      appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.activeUsers.map(item => item.id) }),
+    ]);
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 function getStyle(item: any) {

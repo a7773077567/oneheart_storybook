@@ -24,15 +24,25 @@ const { handleSubmit } = useForm({
     phone: '',
     name: '',
     userShiftTypes: [],
-    date: dayjs().format('YYYY-MM-DD'),
+    startDate: dayjs().format('YYYY-MM-DD'),
+    endDate: dayjs().format('YYYY-MM-DD'),
   },
 });
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   const payload = removeNullishKeys(values);
   isSearched.value = true;
   appointmentStore.clientSchedulesNotStartedQuery = payload;
-  appointmentStore.getClientSchedulesNotStarted(payload);
+  try {
+    $q.loading.show();
+    await appointmentStore.getClientSchedulesNotStarted(payload);
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 function cancelClientSchedule(clientScheduleId: number) {
@@ -62,14 +72,18 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
           <span>客戶姓名</span>
           <OInput class="nav__input" name="name" hide-bottom-space />
         </div>
-        <p class="nav__item--end">客戶電話與姓名可不填</p>
+        <p class="nav__item--hint">客戶電話與姓名可不填</p>
         <div class="nav__item">
           <span>選擇項目</span>
           <OSelect :options="typeOptions" class="nav__input" name="userShiftTypes" hide-bottom-space multiple map-options outlined style="width: 164px;" />
         </div>
         <div class="nav__item">
-          <span>預約日期</span>
-          <OInput class="nav__input" name="date" hide-bottom-space date-mode />
+          <span>開始日期</span>
+          <OInput class="nav__input" name="startDate" hide-bottom-space date-mode />
+        </div>
+        <div class="nav__item">
+          <span>結束日期</span>
+          <OInput class="nav__input" name="endDate" hide-bottom-space date-mode />
         </div>
         <div class="nav__item--end">
           <QBtn label="查詢預約" style="width: 126px;height: 40px;" outline @click="onSubmit" />
@@ -105,7 +119,7 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
 .nav {
   width: fit-content;
   display: grid;
-  grid-template-columns: repeat(2, 281px) auto;
+  grid-template-columns: repeat(3, 281px) auto;
   align-items: center;
   column-gap: 24px;
   row-gap: 20px;
@@ -118,6 +132,10 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
       @extend .nav__item;
       justify-self: end;
       padding-left: 30px;
+    }
+    &--hint {
+      @extend .nav__item;
+      grid-column: 3 / 5;
     }
   }
   &__input {

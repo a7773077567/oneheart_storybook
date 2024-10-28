@@ -6,7 +6,9 @@ import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
@@ -28,9 +30,19 @@ const { handleSubmit } = useForm({
 const onSubmit = handleSubmit(async (values) => {
   appointmentStore.appointmentCalendarInitOption = values.userIds!;
   appointmentStore.availableQuery = { ...values, userIds: appointmentStore.activeUsers.map(user => user.id) };
-  await appointmentStore.getAvailable(appointmentStore.availableQuery);
-  appointmentStore.querySent = true;
-  router.push({ name: 'appointmentBookingCalendar' });
+
+  try {
+    $q.loading.show();
+    await appointmentStore.getAvailable(appointmentStore.availableQuery);
+    appointmentStore.querySent = true;
+    await router.push({ name: 'appointmentBookingCalendar' });
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 // function dateOptions(date: any) {

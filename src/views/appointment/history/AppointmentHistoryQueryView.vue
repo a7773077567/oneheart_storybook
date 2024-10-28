@@ -7,7 +7,9 @@ import dayjs from 'dayjs';
 import { useForm } from 'vee-validate';
 import { AppointmentQueryItem } from '@/components/appointment';
 import { removeNullishKeys } from '@/utils/helpers';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 const shiftStore = useShiftStore();
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
@@ -24,7 +26,16 @@ const { handleSubmit } = useForm({
 const onSubmit = handleSubmit(async (values) => {
   appointmentStore.clientSchedulesHistoriesQuery = values;
   const payload = removeNullishKeys(values);
-  await appointmentStore.getClientSchedulesHistories(payload);
+  try {
+    $q.loading.show();
+    await appointmentStore.getClientSchedulesHistories(payload);
+  }
+  catch (err) {
+    console.log(err);
+  }
+  finally {
+    $q.loading.hide();
+  }
 });
 
 async function onRestore(id: number) {

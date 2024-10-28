@@ -25,7 +25,7 @@ fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({
 
 async function filterFn(val: string) {
   const { data } = await fetchClients({ nameOrPhone: val });
-  options.value = data.map(({ name, id, ...others }) => ({ name: `${name} (會員編號#${id})`, id, ...others }));
+  options.value = data.map(({ name, id, phone, ...others }) => ({ name: `${name} (會員編號#${id}) - ${phone}`, id, phone, ...others }));
 }
 
 const fullInfo = computed(() => {
