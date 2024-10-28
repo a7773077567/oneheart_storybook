@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import dayjs from 'dayjs';
+import 'dayjs/locale/zh-tw';
 import { useField } from 'vee-validate';
 
 interface MultiRange { from: string; to: string };
@@ -22,7 +23,7 @@ const currentDate = computed<string>(() => {
   if (props.range && fieldValue.value && ('from' in (fieldValue.value as object)) && 'to' in (fieldValue.value as object))
     return `${dayjs((fieldValue.value as MultiRange)?.from).format('YYYY年M月D日') ?? dayjs()} - ${dayjs((fieldValue.value as MultiRange)?.to ?? dayjs()).format('YYYY年M月D日')}`;
 
-  return fieldValue.value ? dayjs(fieldValue.value as string).format('YYYY年M月D日') : '';
+  return fieldValue.value ? dayjs(fieldValue.value as string).locale('zh-tw').format('YYYY年M月D日 ddd') : '';
 });
 </script>
 
