@@ -23,7 +23,7 @@ const pointsStore = usePointsStore();
 const userStore = useUserStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
-const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
+const methodOptions = Object.values(PaymentMethods).filter(({ forPointPurchasing }) => forPointPurchasing).map(({ label, identifier }) => ({ label, value: identifier }));
 
 const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },

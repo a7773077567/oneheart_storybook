@@ -29,7 +29,7 @@ const totalAmount = computed({
   },
 });
 const payments = ref<Payments>([]);
-const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
+const methodOptions = Object.values(PaymentMethods).filter(({ forGroupTicketPurchasing }) => forGroupTicketPurchasing).map(({ label, identifier }) => ({ label, value: identifier }));
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;

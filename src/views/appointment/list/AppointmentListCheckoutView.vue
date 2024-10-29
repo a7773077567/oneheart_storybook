@@ -67,7 +67,7 @@ const receiptData = computed(() => {
 
 const isReceiptDialogOpen = ref(false);
 const methodOptions = computed(() => {
-  const options = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
+  const options = Object.values(PaymentMethods).filter(({ forCheckout }) => forCheckout).map(({ label, identifier }) => ({ label, value: identifier }));
   return appointmentStore.targetClientSchedule?.userShift.type === ShiftType['團課']
     ? options.filter(option => option.value === PaymentMethod['團課卷'])
     : options.filter(option => option.value !== PaymentMethod['團課卷']);
