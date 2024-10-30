@@ -22,6 +22,12 @@ const isEdit = ref(false);
 
 // introducer
 const isIntroducerNull = computed(() => initialValues.value.introducer === null);
+const showNoIntroducerRemind = computed(() => {
+  if (clientStore.targetClient?.howToKnowUs !== '朋友推薦' && clientStore.targetClient?.howToKnowUs !== '家人推薦')
+    return false;
+
+  return !clientStore.targetClient?.introducer?.id;
+});
 
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
@@ -55,7 +61,7 @@ const departmentTherapists = computed(() => [{
             <span v-if="clientStore.targetClient?.lineUserId">{{ clientStore.targetClient?.lineUserId }}</span>
             <QBadge v-else color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">LINE 未綁定</QBadge>
           </div>
-          <QBadge v-if="!clientStore.targetClient?.introducer" color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">介紹人未綁定</QBadge>
+          <QBadge v-if="showNoIntroducerRemind" color="red-1" text-color="red-10" class="text-weight-bold q-ml-md">介紹人未綁定</QBadge>
         </div>
         <div>
           <QBtn v-if="isEdit" outlined label="儲存" class="q-px-lg" @click="onSubmit" />
