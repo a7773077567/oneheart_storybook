@@ -21,9 +21,9 @@ const { handleSubmit } = useForm({ initialValues: initialValues.value });
 const isEdit = ref(false);
 
 // introducer
-const isIntroducerNull = computed(() => initialValues.value.introducer === null);
+const isByRecommemd = computed(() => clientStore.targetClient?.howToKnowUs === '朋友推薦' || clientStore.targetClient?.howToKnowUs === '家人推薦');
 const showNoIntroducerRemind = computed(() => {
-  if (clientStore.targetClient?.howToKnowUs !== '朋友推薦' && clientStore.targetClient?.howToKnowUs !== '家人推薦')
+  if (!isByRecommemd.value)
     return false;
 
   return !clientStore.targetClient?.introducer?.id;
@@ -33,7 +33,8 @@ const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
   const apiValues = omit(value as Client, ['howToKnowUs', 'introducer', 'liffIntroducerName']);
   const fetch = [updateClient(props.clientId, apiValues)];
-  if (isIntroducerNull.value && !!value.introducer) {
+  const isIntroducerNull = initialValues.value.introducer === null;
+  if (isIntroducerNull && !!value.introducer) {
     fetch.push(updateIntroducer(+props.clientId, { introducerClientId: +value.introducer }));
   }
   await Promise.all(fetch);
@@ -99,7 +100,7 @@ const departmentTherapists = computed(() => [{
           <span class="label">從哪裡知道我們</span>
           <OInput name="howToKnowUs" hide-bottom-space class="full-width" readonly />
         </fieldset>
-        <fieldset class="col-12">
+        <fieldset v-if="isByRecommemd" class="col-12">
           <span class="label">客戶填寫的介紹人</span>
           <OMemberSearch name="liffIntroducerName" class="full-width" readonly />
         </fieldset>
