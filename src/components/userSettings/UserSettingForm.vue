@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type CreateUser, RoleType, createUser, fetchSpaces, updateUser, uploadAvatar } from '@/api';
+import { RoleType, createUser, createUserSchema, fetchSpaces, updateUser, uploadAvatar } from '@/api';
+import type { CreateUser } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
 import { useUserStore } from '@/stores';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import { omit } from 'radash';
 import { useRouter } from 'vue-router';
+import { toTypedSchema } from '@vee-validate/zod';
 
 const props = defineProps<{
   type: 'add' | 'edit';
@@ -42,6 +44,8 @@ const avatarPreviewUrl = computed(() => {
   return URL.createObjectURL(avatarPreviewFile.value);
 });
 
+const classOptions = Array(7).fill(1).map((level, idx) => ({ label: `S${level + idx}`, value: level + idx }));
+
 interface Input {
   element: 'input';
   label: string;
@@ -69,7 +73,8 @@ const formItems: FormItem[] = [
   { label: '姓名', name: 'name', element: 'input', type: 'text' },
   { label: '權重', name: 'weightForOrder', element: 'select', options: weightForOrderOptions },
   { label: '職稱', name: 'roleId', element: 'select', options: roleIdOptions },
-  { label: '場館', name: 'spaceIds', element: 'select', options: spaceOptions, multiple: true },
+  { label: '初診等級', name: 'jobClass', element: 'select', options: classOptions },
+  { label: '場館', name: 'spaceIds', element: 'select', options: spaceOptions, multiple: true, fluid: true },
   { label: '帳號', name: 'email', element: 'input', type: 'text', fluid: true },
   { label: '描述', name: 'description', element: 'input', type: 'textarea', fluid: true },
 ];
@@ -81,6 +86,7 @@ const addInitialValues = computed(() => ({
   roleId: roleIdOptions[0].value,
   spaceIds: [spaceOptions[0].value],
   description: '',
+  jobClass: null,
 }));
 
 const editInitialValues = computed(() => ({
@@ -91,11 +97,13 @@ const editInitialValues = computed(() => ({
   spaceIds: targetUser.value.spaces.map(space => space.id),
   description: targetUser.value.description,
   avatar: targetUser.value.avatarUrl,
+  jobClass: targetUser.value.jobClass,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
 const { handleSubmit, resetForm } = useForm<CreateUser>({
   initialValues: targetInitialValues.value,
+  validationSchema: toTypedSchema(createUserSchema),
 });
 const onSubmit = handleSubmit(async (values) => {
   let avatarUuid = null;

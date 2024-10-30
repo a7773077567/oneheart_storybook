@@ -1,6 +1,7 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
 import { upload2awsS3 } from './upload';
+import { RoleType } from './user';
 
 interface Space {
   id: number;
@@ -9,14 +10,26 @@ interface Space {
 }
 
 export const createUserSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
+  name: z.string().min(1),
+  email: z.string().email('請輸入正確格式的email'),
   weightForOrder: z.number(),
   description: z.string(),
   roleId: z.number(),
   spaceIds: z.number().array(),
   avatar: z.string().nullish(),
-});
+  jobClass: z.number().nullish(),
+})
+  .refine((data) => {
+    // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
+    if (data.roleId === RoleType['物理治療師'] || data.roleId === RoleType['院長'] || data.roleId === RoleType['副院長']) {
+      return !!data.jobClass;
+    }
+    return true;
+  }, {
+    message: '初診等級必填',
+    path: ['jobClass'], // path of error
+  });
+
 export type CreateUser = z.infer<typeof createUserSchema>;
 // export type UpdateUser = Required<CreateUser>;
 export type UpdateUser = CreateUser;
