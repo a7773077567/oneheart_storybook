@@ -90,7 +90,7 @@ function disableOption(opt: { label: string; value: any }) {
 }
 
 function getAmountLabel(method: number) {
-  return [PaymentMethod['主管折扣'], PaymentMethod['折價券'], PaymentMethod['抵用券'], PaymentMethod['訂金']].includes(method)
+  return [PaymentMethod['主管折扣'], PaymentMethod['折價券'], PaymentMethod['抵用券'], PaymentMethod['訂金'], PaymentMethod.唯心點數].includes(method)
     ? '折抵'
     : '金額';
 }

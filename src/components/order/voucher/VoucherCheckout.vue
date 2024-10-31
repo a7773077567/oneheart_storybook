@@ -1,11 +1,11 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
 import { useVoucherStore } from '@/stores';
 import dayjs from 'dayjs';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
-import { PaymentMethods } from '@/const/appointment';
+import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import type { VoucherDetail } from '@/stores/voucher';
 
@@ -29,7 +29,7 @@ const totalAmount = computed({
   },
 });
 const payments = ref<Payments>([]);
-const methodOptions = Object.values(PaymentMethods).map(({ label, identifier }) => ({ label, value: identifier }));
+const methodOptions = Object.values(PaymentMethods).filter(({ forGroupTicketPurchasing }) => forGroupTicketPurchasing).map(({ label, identifier }) => ({ label, value: identifier }));
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;
@@ -90,6 +90,14 @@ async function onCheckout() {
     isProceeding.value = false;
   }
 }
+
+// set amount to $0 when payment method is 堂數
+watch(payments, (chosenPayments) => {
+  const includePointPayment = chosenPayments.some(pay => pay.payMethod === PaymentMethod['堂數']);
+  if (includePointPayment && totalAmount.value !== 0) {
+    totalAmount.value = 0;
+  }
+});
 </script>
 
 <template>
@@ -101,7 +109,6 @@ async function onCheckout() {
         </div>
       </template>
     </CheckTable>
-
     <CheckoutAction v-model="totalAmount" @checkout="isCheckoutOpen = true" />
     <PaymentComposition v-model="payments" :method-options="methodOptions" />
 

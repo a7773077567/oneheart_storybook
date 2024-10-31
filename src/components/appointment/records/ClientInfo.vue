@@ -132,6 +132,8 @@ function limitTimeOptions(hr: number, min: number | null) {
     ? min % 5 === 0
     : true;
 }
+
+const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友推薦' || client.value.howToKnowUs === '家人推薦') && !client.value.liffIntroducerName);
 </script>
 
 <template>
@@ -163,7 +165,7 @@ function limitTimeOptions(hr: number, min: number | null) {
         </template>
         <template #liffIntroducerName="{ row }">
           <div class="liffIntroducerName">
-            <div class="liffIntroducerName__value">客戶填寫 - &ensp;<div>{{ row.value }}</div></div>
+            <div v-if="ifNoLiffIntroducer" class="liffIntroducerName__value">客戶填寫 - &ensp;<div>{{ row.value }}</div></div>
             <div class="liffIntroducerName__value">
               後台綁定
               <template v-if="!client.introducer">

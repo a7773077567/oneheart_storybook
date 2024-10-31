@@ -80,8 +80,6 @@ const firstTokenList = [
   'clients',
   'resend-activation-email',
   'clientGroups',
-  'payments',
-  'groupClassTickets',
   'dottedSign',
 ];
 
@@ -89,6 +87,8 @@ function checkClientFirstToken(url: string, method: string) {
   const clientExclusionList = [
     'memos',
     'addInbodyFiles',
+    'gainPoint',
+    'refundPoint',
   ];
   const inExclusion = clientExclusionList.some(item => url.includes(item));
   const isMemos = url.includes('memos');
@@ -107,6 +107,7 @@ function checkClientFirstToken(url: string, method: string) {
 // ========== Functions ==========
 function requestInterceptor(config: InternalAxiosRequestConfig) {
   const { url, method } = config;
+  console.log('🚀  requestInterceptor  url:', url);
 
   if (!url) {
     return config;

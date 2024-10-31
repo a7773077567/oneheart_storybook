@@ -28,7 +28,7 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const userStore = useUserStore();
 const isCheckoutOpen = ref(false);
 const payments = ref<Payments>([]);
-const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forPointAndGroup).map(({ label, identifier }) => ({ label, value: identifier }));
+const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forRefunding).map(({ label, identifier }) => ({ label, value: identifier }));
 
 const refundDetail = computed<CheckTableData>(() => {
   const { client, groupClass, amount } = props.modelValue;
