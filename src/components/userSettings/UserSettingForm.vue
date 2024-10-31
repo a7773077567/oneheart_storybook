@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RoleType, createUser, createUserSchema, fetchSpaces, updateUser, uploadAvatar } from '@/api';
 import type { CreateUser } from '@/api';
 import { useForm } from 'vee-validate';
@@ -101,7 +101,7 @@ const editInitialValues = computed(() => ({
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
-const { handleSubmit, resetForm } = useForm<CreateUser>({
+const { handleSubmit, resetForm, values, setFieldValue } = useForm<CreateUser>({
   initialValues: targetInitialValues.value,
   validationSchema: toTypedSchema(createUserSchema),
 });
@@ -137,6 +137,13 @@ const onSubmit = handleSubmit(async (values) => {
   }
   catch (err) {
     console.log(err);
+  }
+});
+
+// remove jobclass value is not 物理治療師, 院長, 副院長
+watch(() => values.roleId, (selectedRole) => {
+  if (selectedRole !== RoleType['物理治療師'] && selectedRole !== RoleType['院長'] && selectedRole !== RoleType['副院長']) {
+    setFieldValue('jobClass', null);
   }
 });
 </script>
