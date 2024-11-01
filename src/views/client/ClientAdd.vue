@@ -34,7 +34,7 @@ const onSubmit = handleSubmit(async (values) => {
   });
 });
 
-const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram', 'Youtube', 'Google map', '搜尋引擎', '實體活動', 'Threads'];
+const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram', 'Youtube', 'Google map', '搜尋引擎', '實體活動', 'Threads', '賴ki', 'Ruby'];
 </script>
 
 <template>
