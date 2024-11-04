@@ -93,7 +93,7 @@ async function onCheckout() {
 }
 
 const priceTags = computed(() => {
-  return [{ label: '自動推薦優惠價格', value: isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
+  return [{ label: '初診專案(自動推薦治療師)', value: isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
 });
 
 // set amount to $0 when payment method is 堂數
