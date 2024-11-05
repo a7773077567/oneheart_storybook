@@ -20,11 +20,9 @@ export { default as OSteps } from './OSteps.vue';
 export { default as TimeDurationPicker } from './TimeDurationPicker.vue';
 export { default as ResponseErrorDialog } from './ResponseErrorDialog.vue';
 export { default as AllOptionSelect } from './AllOptionSelect.vue';
-<<<<<<< HEAD
 export { default as CalendarMonth } from './CalendarMonth.vue';
 export { default as CalendarNavigation } from './CalendarNavigation.vue';
 export { default as CaseCompletionIndicator } from './CaseCompletionIndicator.vue';
-=======
 export { default as TwoColumnTable } from './TwoColumnTable.vue';
 export { default as GenericDialog } from './GenericDialog.vue';
->>>>>>> 12e0665 (feat(cash-drop): layout of cash-drop-view and cash-drop-records-view done)
+export { default as SimpleTable } from './SimpleTable.vue';

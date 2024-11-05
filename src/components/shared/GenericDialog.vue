@@ -7,6 +7,7 @@ withDefaults(defineProps<{
   confirmLabel?: string;
   cancelLabel?: string;
   fitContent?: boolean;
+  width?: string;
 }>(), {
   titleAlign: 'left',
   cancelLabel: '返回編輯',
@@ -21,7 +22,7 @@ defineEmits<{
 
 <template>
   <QDialog>
-    <div class="generic-dialog" :style="[fitContent && { 'max-width': 'fit-content' }]">
+    <div class="generic-dialog" :style="[fitContent && { 'max-width': 'fit-content' }, { width: width ?? undefined }, { 'min-width': width ?? undefined }]">
       <div class="generic-dialog__title">
         <slot name="title">{{ title }}</slot>
       </div>

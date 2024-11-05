@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { GenericDialog, TwoColumnTable } from '@/components/shared';
+import { HandoverOverall, HandoverTransactions } from '@/components/cashDrop';
+import type { SimpleTable } from '@/components/shared';
 
 const props = defineProps<{
   modelValue: boolean;
   mode: 'read' | 'edit';
-  details: InstanceType<typeof TwoColumnTable>['$props']['data'];
-  cashDropFunc?: () => Promise<any> ;
+  overallData: InstanceType<typeof HandoverOverall>['$props']['data'];
+  transactionRows: InstanceType<typeof SimpleTable>['$props']['rows'];
+  handoverFunc?: () => Promise<any>;
 }>();
 
 const emit = defineEmits<{
@@ -18,17 +20,17 @@ const model = computed({
   set: val => emit('update:modelValue', val),
 });
 
-const title = computed(() => props.mode === 'read' ? '投庫明細' : '確認投庫');
-const confirmLabel = computed(() => props.mode === 'read' ? '列印明細' : '確認投庫');
+const title = computed(() => props.mode === 'read' ? '交班明細' : '確認交班明細');
+const confirmLabel = computed(() => props.mode === 'read' ? '列印明細' : '確認交班');
 const confirmFunc = computed(() => props.mode === 'read' ? onPrint : onCashDrop);
 const isPrintOpen = ref(false);
 
 async function onCashDrop() {
-  if (!props.cashDropFunc) {
+  if (!props.handoverFunc) {
     return;
   }
   try {
-    await props.cashDropFunc();
+    await props.handoverFunc();
     isPrintOpen.value = true;
   }
   catch (err) {
@@ -43,25 +45,29 @@ function onPrint() {
 </script>
 
 <template>
-  <div class="cash-drop-details-dialog">
+  <div class="handover-details-dialog">
     <GenericDialog
       v-model="model"
       :title="title"
       :cancel-btn="mode === 'edit'"
       :confirm-label="confirmLabel"
-      persistent
-      fit-content
+      @cancel="$emit('update:modelValue', false)"
       @confirm="confirmFunc"
-      @cancel="model = false"
     >
       <template #body>
-        <div class="cash-drop-details">
-          <TwoColumnTable :data="details">
-            <template #date="{ data }">
-              <div style="padding: 10px;">{{ data.value }}</div>
-            </template>
-          </TwoColumnTable>
-          <div class="signature"><span>簽名</span></div>
+        <div class="details">
+          <div class="details__time">
+            <div class="datetime">2024-08-13  <span class="datetime__time">18:00-20:50</span></div>
+          </div>
+          <div class="details__overall">
+            <HandoverOverall :data="overallData" />
+          </div>
+          <div class="details__transactions">
+            <HandoverTransactions :rows="transactionRows" />
+          </div>
+          <div class="details__signature">
+            <div class="signature"><span>簽名</span></div>
+          </div>
         </div>
       </template>
     </GenericDialog>
@@ -75,12 +81,12 @@ function onPrint() {
       @hide="onPrint"
     >
       <template #title>
-        <p class="print-title">投庫紀錄已完成<br>請列印明細並簽名、完成投庫動作</p>
+        <p class="print-title">交班已完成<br>請列印明細並簽名、完成投庫動作</p>
       </template>
       <template #body>
         <div class="print-message">
           <img src="@/assets/images/cashDrop/success.png" alt="success">
-          <p>請記得將<b>簽名後的明細、應投入現金、發票及收據、作廢發票及收據、信用卡結帳單據</b>、其他單據一併放入夾鏈袋並投入金庫</p>
+          <p>請記得將<b>簽名後的明細、應投入現金、發票及收據、作廢發票及收據、信用卡結帳單據、其他單據</b>一併放入夾鏈袋並投入金庫</p>
         </div>
       </template>
     </GenericDialog>
@@ -88,11 +94,24 @@ function onPrint() {
 </template>
 
 <style lang="scss" scoped>
-.cash-drop-details {
+.details {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  &__signature {
+    align-self: flex-end;
+  }
 }
+.datetime {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  letter-spacing: 0.1px;
+  &__time {
+    font-weight: 500;
+  }
+}
+
 .signature {
   width: 334px;
   height: 45px;
@@ -116,28 +135,5 @@ function onPrint() {
   font-weight: 600;
   text-align: center;
   line-height: 36px;
-}
-
-@media print {
-  :global(.no-print) {
-    display: none;
-  }
-  :global(.generic-dialog) {
-    overflow: visible;
-  }
-  :global(.q-dialog__inner) {
-    top: initial;
-    bottom: initial;
-  }
-}
-</style>
-
-<style>
-@media print {
-  html,
-  body {
-    height: initial !important;
-    overflow: initial !important;
-  }
 }
 </style>
