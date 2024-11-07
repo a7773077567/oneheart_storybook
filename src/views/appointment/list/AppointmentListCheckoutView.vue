@@ -20,10 +20,11 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
-if (!appointmentStore.isSameClinicSchedule) {
+if (!appointmentStore.isSameSpaceClinicSchedule) {
   const { onOk, onCancel } = await useDialog({
     title: '系統提示',
     message: '此預約單並非此場館，無法進行此操作',
+    type: 'confirm',
   });
   onOk(() => router.push({ name: 'appointmentListCalendar' }));
   onCancel(() => router.push({ name: 'appointmentListCalendar' }));

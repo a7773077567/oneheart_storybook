@@ -144,7 +144,7 @@ export const useAppointmentStore = defineStore('appointment', {
         };
       });
     },
-    isSameClinicSchedule: (state) => {
+    isSameSpaceClinicSchedule: (state) => {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
