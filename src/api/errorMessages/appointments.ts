@@ -7,6 +7,9 @@ const messages: [string, string][] = [
   ['ClientSchedule already checkout', '此交易已結帳完成'],
   ['userShiftSlot is overlap with other userShiftSlot', '時間跟其他班別重疊'],
   ['StartTime and EndTime can not edit at same time', '開始時間跟結束時間不可同時編輯'],
+  ['cannot find medicalAndTrainingRecord', '此預約單並非此場館，無法進行此操作'],
+  ['ClientSchedule not found', '此預約單並非此場館，無法進行此操作'],
+  ['Schedule not found', '此預約單並非此場館，無法進行此操作'],
 ];
 
 export default messages;

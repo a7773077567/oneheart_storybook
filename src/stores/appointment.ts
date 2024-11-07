@@ -7,6 +7,7 @@ import { fetchUserShift, fetchUserShifts } from '@/api/shift';
 import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
+import { useUserStore } from './user';
 
 interface State {
   users: User[];
@@ -142,6 +143,10 @@ export const useAppointmentStore = defineStore('appointment', {
           },
         };
       });
+    },
+    isSameClinicSchedule: (state) => {
+      const userStore = useUserStore();
+      return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
   },
   actions: {

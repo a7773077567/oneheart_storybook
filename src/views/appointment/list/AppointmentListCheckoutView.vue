@@ -8,6 +8,7 @@ import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{
   scheduleId: string;
@@ -19,6 +20,14 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
+if (!appointmentStore.isSameClinicSchedule) {
+  const { onOk, onCancel } = await useDialog({
+    title: '系統提示',
+    message: '此預約單並非此場館，無法進行此操作',
+  });
+  onOk(() => router.push({ name: 'appointmentListCalendar' }));
+  onCancel(() => router.push({ name: 'appointmentListCalendar' }));
+}
 
 const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule } = (appointmentStore.targetClientSchedule!);
 
