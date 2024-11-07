@@ -29,7 +29,6 @@ const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const stateOfHistoryDialog = ref(false);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
-await appointmentStore.getHistoryRecords(recordId.value);
 
 const data: DataItem[] = [
   { name: 'chiefComplaint', label: '主訴', showCopyBtn: true },
@@ -61,7 +60,8 @@ const onSubmit = handleSubmit(async (formValue) => {
   resetForm({ values: initialValues.value });
 });
 
-function openHistoryDialog() {
+async function openHistoryDialog() {
+  await appointmentStore.getHistoryRecords(recordId.value);
   stateOfHistoryDialog.value = true;
 }
 
