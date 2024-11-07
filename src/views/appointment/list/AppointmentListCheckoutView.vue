@@ -8,6 +8,7 @@ import { calcReceiptAmount, checkGender } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{
   scheduleId: string;
@@ -19,8 +20,17 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
+if (!appointmentStore.isSameSpaceClinicSchedule) {
+  const { onOk, onCancel } = await useDialog({
+    title: '系統提示',
+    message: '此預約單並非此場館，無法進行此操作',
+    type: 'confirm',
+  });
+  onOk(() => router.push({ name: 'appointmentListCalendar' }));
+  onCancel(() => router.push({ name: 'appointmentListCalendar' }));
+}
 
-const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice } = (appointmentStore.targetClientSchedule!);
+const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule } = (appointmentStore.targetClientSchedule!);
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
@@ -93,7 +103,8 @@ async function onCheckout() {
 }
 
 const priceTags = computed(() => {
-  return [{ label: '自動推薦優惠價格', value: isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
+  const eligibleForFirst = shiftType.value.identifier !== ShiftType['教練課'] && shiftType.value.identifier !== ShiftType['運動諮詢'];
+  return [{ label: '初診專案(自動推薦治療師)', value: eligibleForFirst && isFirstClientSchedule && isUsingAutoRecommend }, { label: '員工價', value: isEmployeePrice }].filter(item => item.value).map(item => item.label);
 });
 
 // set amount to $0 when payment method is 堂數

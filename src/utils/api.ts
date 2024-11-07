@@ -4,6 +4,7 @@ import { Dialog, Loading } from 'quasar';
 import { getCookie } from '@/utils/helpers';
 import { ErrorMessages } from '@/api/errorMessages';
 import { ResponseErrorDialog } from '@/components/shared';
+import { useAppointmentStore } from '@/stores';
 
 // ========== Types ==========
 interface APIResponse<T, D = any> {
@@ -158,8 +159,12 @@ async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
   }
   else {
     errMsg = ErrorMessages.get(resMsg) ?? resMsg;
+    if (errMsg === '此預約單並非此場館，無法進行此操作') {
+      const appointmentStore = useAppointmentStore();
+      const spaceName = appointmentStore.targetClientSchedule?.userShift.space.name;
+      errMsg = `此功能僅能在${spaceName}操作`;
+    }
   }
-
   Loading.hide();
   await dialogPromise(errMsg);
 

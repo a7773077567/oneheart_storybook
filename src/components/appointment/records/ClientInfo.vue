@@ -210,9 +210,9 @@ const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友�
     </div>
     <div class="client-info__actions">
       <div class="actions">
-        <QBtn v-if="!isCheckedOut && canCheckout" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
-        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2" outline style="width: 127px;" @click="rearrangeClientSchedule" />
-        <QBtn class="actions__item--cancel" label="取消預約" :disable="schedule.state > 2" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
+        <QBtn v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
+        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+        <QBtn class="actions__item--cancel" label="取消預約" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
           <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />

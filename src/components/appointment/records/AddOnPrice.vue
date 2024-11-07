@@ -2,12 +2,14 @@
 import { computed, ref } from 'vue';
 import { type ClientScheduleDetail, updateAddOnServices } from '@/api';
 import { useQuasar } from 'quasar';
+import { useAppointmentStore } from '@/stores';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
+const appointmentStore = useAppointmentStore();
 const addOnList = ref(
   props.scheduleDetail.addOnServices.map((addOn, idx) => ({ label: addOn.serviceName, value: idx + 1, isAdded: addOn.isAddOn })),
 );
@@ -45,7 +47,7 @@ async function rmItem(item: typeof addOnList.value[number]) {
         </QItemSection>
         <QItemSection side>
           <QBtn v-if="addOn.isAdded" label="移除" icon="o_delete" outline class="q-px-lg" @click="rmItem(addOn)" />
-          <QBtn v-else label="添加" color="black" class="q-px-lg" @click="addItem(addOn)" />
+          <QBtn v-else label="添加" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="black" class="q-px-lg" @click="addItem(addOn)" />
         </QItemSection>
       </QItem>
     </QList>
