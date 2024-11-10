@@ -1,10 +1,11 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
-import { addClientAssociation } from '@/api';
+import { computed, ref } from 'vue';
+import { type Client, addClientAssociation } from '@/api';
 import { Field, useForm } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useQuasar } from 'quasar';
+import { OMemberSearch } from '@/components/shared';
 
 const props = defineProps<{
   clientId: number;
@@ -24,9 +25,33 @@ const newAssociationSchema = z.object({
   phone: z.string().length(10, { message: '請輸入完整手機號碼' }).startsWith('09', { message: '請輸入台灣手機號碼' }),
 });
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors, setFieldValue, values, resetForm } = useForm({
   validationSchema: toTypedSchema(newAssociationSchema),
 });
+const hasNameOrPhone = computed(() => !!values.name || !!values.phone);
+
+function selectClient(client: Client | null) {
+  if (!client)
+    return;
+
+  const fields = Object.keys(newAssociationSchema.shape);
+  type FieldName = keyof typeof newAssociationSchema.shape;
+  fields.forEach((field) => {
+    const val = client[field as keyof typeof client] as string | null;
+    if (field && val) {
+      setFieldValue(field as FieldName, val);
+    }
+  });
+}
+
+function createNewAccount(info: { name: string | null; phone: string | null }) {
+  if (!info.name && !info.phone)
+    return;
+
+  const fieldName = info.name ? 'name' : 'phone';
+  const fieldValue = info.name || info.phone;
+  setFieldValue(fieldName, fieldValue as string);
+}
 
 const $q = useQuasar();
 const isProceeding = ref(false);
@@ -50,26 +75,37 @@ const onSubmit = handleSubmit(async (formData) => {
     </QCardSection>
     <QCardSection class="q-px-lg">
       <form class="add_association_form__content row q-col-gutter-md" @submit.prevent>
-        <fieldset class="col-12 col-md-6">
-          <span class="label">姓名*</span>
-          <OInput name="name" hide-bottom-space :error="!!errors.name" error-message="" class="col-grow" />
+        <fieldset class="col-12">
+          <OMemberSearch
+            add-value
+            label="客戶姓名或電話*"
+            name="clientId"
+            placeholder="搜尋電話或姓名"
+            class="full-width"
+            error-message=""
+            @update:full-info="selectClient"
+            @add-value="createNewAccount"
+            @clear="resetForm({ values: { phone: '' } })"
+          >
+            <template #selected-item>
+              <span v-if="values.name">{{ values.name }}</span>
+            </template>
+          </OMemberSearch>
         </fieldset>
-        <fieldset class="col-12 col-md-6">
-          <span class="label">電話*</span>
-          <OInput name="phone" hide-bottom-space :error="!!errors.phone" error-message="" class="col-grow" />
-        </fieldset>
-        <fieldset class="col-12 col-md-6">
-          <span class="label">暱稱</span>
-          <OInput name="relationTypeName" hide-bottom-space :error="!!errors.relationTypeName" class="col-grow" />
-        </fieldset>
-        <fieldset class="col-12 col-md-6">
-          <span class="label">生日</span>
-          <OInput date-mode name="birthdate" hide-bottom-space :error="!!errors.birthDate" class="col-grow" />
-        </fieldset>
-        <fieldset class="col-12 col-md-6">
-          <span class="label">身份證/ <br> 居留證</span>
-          <OInput name="identityNumber" hide-bottom-space class="col-grow" />
-        </fieldset>
+        <template v-if="hasNameOrPhone">
+          <fieldset class="col-12">
+            <OInput inside-label="電話*" name="phone" hide-bottom-space :error="!!errors.phone" error-message="" class="col-grow" />
+          </fieldset>
+          <fieldset class="col-12">
+            <OInput inside-label="暱稱(非必填)" name="relationTypeName" hide-bottom-space :error="!!errors.relationTypeName" class="col-grow" />
+          </fieldset>
+          <fieldset class="col-12">
+            <OInput inside-label="生日(非必填)" date-mode name="birthDate" hide-bottom-space :error="!!errors.birthDate" class="col-grow" />
+          </fieldset>
+          <fieldset class="col-12">
+            <OInput inside-label="身分證/居留證(非必填)" name="identityNumber" hide-bottom-space class="col-grow" />
+          </fieldset>
+        </template>
       </form>
     </QCardSection>
     <QCardActions vertical class="q-pa-lg add_association_form__actions">
@@ -82,6 +118,9 @@ const onSubmit = handleSubmit(async (formData) => {
 <style scoped lang="scss">
 .add_association_form {
   max-width: 800px !important;
+  fieldset {
+    min-width: 432px;
+  }
   &__header {
     font-weight: 600;
   }
