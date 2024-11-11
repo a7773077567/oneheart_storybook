@@ -29,11 +29,13 @@ const { handleSubmit, errors, setFieldValue, values, resetForm } = useForm({
   validationSchema: toTypedSchema(newAssociationSchema),
 });
 const hasNameOrPhone = computed(() => !!values.name || !!values.phone);
+const isExistedClient = ref(false);
 
 function selectClient(client: Client | null) {
   if (!client)
     return;
 
+  isExistedClient.value = true;
   const fields = Object.keys(newAssociationSchema.shape);
   type FieldName = keyof typeof newAssociationSchema.shape;
   fields.forEach((field) => {
@@ -51,6 +53,11 @@ function createNewAccount(info: { name: string | null; phone: string | null }) {
   const fieldName = info.name ? 'name' : 'phone';
   const fieldValue = info.name || info.phone;
   setFieldValue(fieldName, fieldValue as string);
+}
+
+function clearClient() {
+  resetForm({ values: { phone: '' } });
+  isExistedClient.value = false;
 }
 
 const $q = useQuasar();
@@ -85,7 +92,7 @@ const onSubmit = handleSubmit(async (formData) => {
             error-message=""
             @update:full-info="selectClient"
             @add-value="createNewAccount"
-            @clear="resetForm({ values: { phone: '' } })"
+            @clear="clearClient"
           >
             <template #selected-item>
               <span v-if="values.name">{{ values.name }}</span>
@@ -94,16 +101,16 @@ const onSubmit = handleSubmit(async (formData) => {
         </fieldset>
         <template v-if="hasNameOrPhone">
           <fieldset class="col-12">
-            <OInput inside-label="電話*" name="phone" hide-bottom-space :error="!!errors.phone" error-message="" class="col-grow" />
+            <OInput :disable="isExistedClient" inside-label="電話*" name="phone" hide-bottom-space :error="!!errors.phone" error-message="" class="col-grow" />
           </fieldset>
           <fieldset class="col-12">
             <OInput inside-label="暱稱(非必填)" name="relationTypeName" hide-bottom-space :error="!!errors.relationTypeName" class="col-grow" />
           </fieldset>
           <fieldset class="col-12">
-            <OInput inside-label="生日(非必填)" date-mode name="birthDate" hide-bottom-space :error="!!errors.birthDate" class="col-grow" />
+            <OInput :disable="isExistedClient" inside-label="生日(非必填)" date-mode name="birthDate" hide-bottom-space :error="!!errors.birthDate" class="col-grow" />
           </fieldset>
           <fieldset class="col-12">
-            <OInput inside-label="身分證/居留證(非必填)" name="identityNumber" hide-bottom-space class="col-grow" />
+            <OInput :disable="isExistedClient" inside-label="身分證/居留證(非必填)" name="identityNumber" hide-bottom-space class="col-grow" />
           </fieldset>
         </template>
       </form>
