@@ -108,8 +108,6 @@ function checkClientFirstToken(url: string, method: string) {
 // ========== Functions ==========
 function requestInterceptor(config: InternalAxiosRequestConfig) {
   const { url, method } = config;
-  console.log('🚀  requestInterceptor  url:', url);
-
   if (!url) {
     return config;
   }

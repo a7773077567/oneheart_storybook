@@ -1,10 +1,10 @@
-import type { ClientSchedule } from '@/api';
-import { UserInProgressClientSchedules, type UserInProgressClientSchedulesParams } from '@/api/dashboard';
+import type { ClientSchedule, UserInProgressClientSchedule } from '@/api';
+import { type UserInProgressClientSchedulesParams, fetchUserInProgressClientSchedules } from '@/api/dashboard';
 import { ShiftType } from '@/const/general';
 import { defineStore } from 'pinia';
 
 interface State {
-  userInProgressClientSchedules: ClientSchedule[];
+  userInProgressClientSchedules: UserInProgressClientSchedule[];
 }
 
 export const useDashboardStore = defineStore('dashboard', {
@@ -30,7 +30,7 @@ export const useDashboardStore = defineStore('dashboard', {
   },
   actions: {
     async getUserInProgressClientSchedules(params: UserInProgressClientSchedulesParams) {
-      const data = await UserInProgressClientSchedules(params);
+      const data = await fetchUserInProgressClientSchedules(params);
       this.userInProgressClientSchedules = data;
     },
   },

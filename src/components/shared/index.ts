@@ -20,3 +20,6 @@ export { default as OSteps } from './OSteps.vue';
 export { default as TimeDurationPicker } from './TimeDurationPicker.vue';
 export { default as ResponseErrorDialog } from './ResponseErrorDialog.vue';
 export { default as AllOptionSelect } from './AllOptionSelect.vue';
+export { default as CalendarMonth } from './CalendarMonth.vue';
+export { default as CalendarNavigation } from './CalendarNavigation.vue';
+export { default as CaseCompletionIndicator } from './CaseCompletionIndicator.vue';
