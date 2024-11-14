@@ -20,6 +20,11 @@ export enum PaymentState {
   已結帳 = 2,
 }
 
+export enum ScheduleVisitState {
+  初診 = 1,
+  複診 = 2,
+}
+
 export const PaymentMethods = {
   cash: {
     identifier: PaymentMethod['現金'],

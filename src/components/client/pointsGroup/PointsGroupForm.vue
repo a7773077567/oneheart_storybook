@@ -107,7 +107,6 @@ function removeMember(delMember: Client) {
 <style scoped lang="scss">
 .points_group_form {
   max-width: 800px;
-
   form {
     fieldset {
       display: flex;
