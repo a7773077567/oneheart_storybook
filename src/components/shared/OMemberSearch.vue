@@ -113,6 +113,7 @@ function removeValue() {
         + 新增 {{ customValue }}
       </QItem>
     </template>
+    <!-- @ts-expect-error -->
     <template v-for="slotname in Object.keys($slots)" #[slotname]>
       <slot :name="slotname" />
     </template>
