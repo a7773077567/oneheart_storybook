@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { useAppointmentStore } from '@/stores';
+import { useAppointmentStore, useUserStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
+import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted } from '@/api/appointment';
+import { type ClientScheduleDetail, RoleType, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
-import { type ClientScheduleDetail, updateNote } from '@/api';
 import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
+import FirstScheduleForm from './FirstScheduleForm.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -22,6 +23,8 @@ type Duration = InstanceType<typeof TimeDurationPicker>['$props']['modelValue'];
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
+const userStore = useUserStore();
+
 const isEditingTime = ref(false);
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
 const client = computed(() => schedule.value.client);
@@ -38,6 +41,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
+  { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
   { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
   { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
   { key: 'phone', label: '電話', value: client.value.phone },
@@ -134,6 +138,17 @@ function limitTimeOptions(hr: number, min: number | null) {
 }
 
 const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友推薦' || client.value.howToKnowUs === '家人推薦') && !client.value.liffIntroducerName);
+
+// 初診狀態
+const hasFirstSchedulePermission = computed(() => userStore.userInfo?.role.type === RoleType['院長'] || userStore.userInfo?.role.type === RoleType['副院長'] || userStore.userInfo?.role.type === RoleType['系統管理者']);
+
+const isEditingFirstSchedule = ref(false);
+async function handleFirstScheduleChange(state: ScheduleVisitState) {
+  isEditingFirstSchedule.value = false;
+  await adjustFirstScheduleState({ clientScheduleId: +props.scheduleId, firstScheduleState: state });
+  useNotify('初診狀態編輯成功');
+  await appointmentStore.getClientSchedule(+props.scheduleId);
+}
 </script>
 
 <template>
@@ -156,6 +171,14 @@ const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友�
             <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
+            </div>
+          </div>
+        </template>
+        <template #isFirstClientSchedule="{ row }">
+          <div class="flex items-center justify-between">
+            <span>{{ row.value }}</span>
+            <div v-if="hasFirstSchedulePermission">
+              <QBtn round flat icon="edit" size="sm" @click="isEditingFirstSchedule = true" />
             </div>
           </div>
         </template>
@@ -188,7 +211,7 @@ const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友�
               <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
             </div>
             <div class="time__actions">
-              <QBtn v-if="!isEditingTime" label="編輯" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+              <QBtn v-if="!isEditingTime" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
         </template>
@@ -222,6 +245,9 @@ const ifNoLiffIntroducer = computed(() => (client.value.howToKnowUs === '朋友�
       </div>
     </div>
   </div>
+  <QDialog v-model="isEditingFirstSchedule">
+    <FirstScheduleForm :client-name="client.name" :init-val="schedule.isFirstClientSchedule" @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange" />
+  </QDialog>
 </template>
 
 <style lang="scss" scoped>

@@ -120,7 +120,7 @@ appointmentStore.getClients();
         left-label
         class="self-start q-pa-sm"
       />
-      <OMemberSearch v-model="pickedClientId" placeholder="電話或姓名搜尋會員" @full-info="appointmentStore.targetClient = $event" />
+      <OMemberSearch v-model="pickedClientId" placeholder="電話或姓名搜尋會員" @update:full-info="appointmentStore.targetClient = $event" />
       <template v-if="appointmentStore.targetClient">
         <span class="q-pa-sm">會員編號 {{ appointmentStore.targetClient.identityNumber || 1234567890 }} </span>
         <OTable :data="clientTableData" />

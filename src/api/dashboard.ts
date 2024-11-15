@@ -1,12 +1,23 @@
 import { api } from '@/utils/api';
-import type { ClientSchedule } from './appointment';
+import type { UserShift } from '@/api/shift';
+import type { Client } from '@/api/clientManagement';
 
 export interface UserInProgressClientSchedulesParams {
   startDate: string;
   endDate: string;
 }
 
-export async function UserInProgressClientSchedules(params: UserInProgressClientSchedulesParams) {
-  const { data } = await api.get<ClientSchedule[]>('dashboard/userSingleSpaceInProgressClientSchedules', { params });
+export interface UserInProgressClientSchedule {
+  id: number;
+  userShift: UserShift;
+  date: string;
+  scheduleStartTime: string;
+  scheduleEndTime: string;
+  client: Client;
+  state: number;
+}
+
+export async function fetchUserInProgressClientSchedules(params: UserInProgressClientSchedulesParams) {
+  const { data } = await api.get<UserInProgressClientSchedule[]>('/dashboard/userInProgressClientSchedules', { params });
   return data;
 }

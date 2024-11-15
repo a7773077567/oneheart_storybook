@@ -17,6 +17,7 @@ declare module '@vue/runtime-core' {
     OFile: typeof import('@/components/shared')['OFile']
     OPreview: typeof import('@/components/shared')['OPreview']
     AllOptionSelect: typeof import('@/components/shared')['AllOptionSelect']
+    CalendarMonth: typeof import('@/components/shared')['CalendarMonth']
   }
 }
 

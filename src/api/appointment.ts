@@ -2,6 +2,7 @@ import { api } from '@/utils/api';
 import { z } from 'zod';
 import type { Client, UserShift } from '@/api';
 import { getTimeDate } from '@/utils/date';
+import type { ScheduleVisitState } from '@/const/appointment';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -472,6 +473,14 @@ export async function adjustScheduleTime(clientScheduleId: number, payload: Adju
  */
 export async function fetchHistoryRecords(recordId: number) {
   const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameUserShiftTypeHistoryRecords`);
+  return data;
+}
+
+/**
+ * 更改病歷單初診狀態
+ */
+export async function adjustFirstScheduleState({ clientScheduleId, firstScheduleState }: { clientScheduleId: number; firstScheduleState: ScheduleVisitState }) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-firstScheduleState`, { firstScheduleState });
   return data;
 }
 

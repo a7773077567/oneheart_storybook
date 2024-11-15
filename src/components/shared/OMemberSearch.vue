@@ -9,23 +9,49 @@ interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
   name?: string;
   customRule?: any;
   placeholder?: string;
+  addValue?: boolean;
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'fullInfo', val: Client | null): void;
+  (e: 'update:fullInfo', val: Client | null): void;
+  (e: 'addValue', val: { name: string | null; phone: string | null }): void;
+  (e: 'clear', val: null): void;
 }>();
 
+const select = ref(null);
 const { value, errorMessage } = useField<number>(() => props?.name ?? '', props.customRule, {
   syncVModel: true, // Skipping update:modelValue emission definition by setting this config
 });
 
-const options = ref<Client[]>([]);
-fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({ name, id, phone, ...others }) => ({ name: `${name} (會員編號#${id}) - ${phone}`, id, phone, ...others })));
+type Option = Client & { label: string };
+const options = ref<Option[]>([]);
+fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({ name, id, phone, ...others }) => ({ label: `${name} (會員編號#${id}) - ${phone}`, id, phone, name, ...others })));
 
+const customValue = ref('');
+function isValidTaiwanMobileNumber(input: string) {
+  const taiwanMobileRegex = /^09\d{8}$/;
+  return taiwanMobileRegex.test(input) && /^\d+$/.test(input);
+}
+const isValidValue = computed(() => {
+  const startsWith09Regex = /^09/;
+  if (customValue.value && !startsWith09Regex.test(customValue.value))
+    return true;
+
+  return isValidTaiwanMobileNumber(customValue.value);
+});
+
+function removeZhuyin(input: string) {
+  // Match any Bopomofo (Zhuyin) characters in the Unicode range \u3105-\u312F
+  return input.replace(/[\u3105-\u312F]+/g, '');
+}
 async function filterFn(val: string) {
-  const { data } = await fetchClients({ nameOrPhone: val });
-  options.value = data.map(({ name, id, phone, ...others }) => ({ name: `${name} (會員編號#${id}) - ${phone}`, id, phone, ...others }));
+  const validValue = removeZhuyin(val);
+  if (val && select.value) {
+    customValue!.value = validValue;
+  }
+  const { data } = await fetchClients({ ...(!!val && { nameOrPhone: val }) });
+  options.value = data.map(({ name, id, phone, ...others }) => ({ label: `${name} (會員編號#${id}) - ${phone}`, id, phone, name, ...others }));
 }
 
 const fullInfo = computed(() => {
@@ -36,20 +62,33 @@ const fullInfo = computed(() => {
 
 function handleUpdate(v: null | typeof value) {
   if (v) {
-    emit('fullInfo', fullInfo.value);
+    emit('update:fullInfo', fullInfo.value);
   }
+}
+
+function addNewValue() {
+  if (!isValidValue.value)
+    return;
+
+  const isPhoneNumber = isValidTaiwanMobileNumber(customValue.value);
+  emit('addValue', isPhoneNumber ? { name: null, phone: customValue.value } : { name: customValue.value, phone: null });
+}
+
+function removeValue() {
+  emit('clear', null);
 }
 </script>
 
 <template>
   <QSelect
+    ref="select"
     v-model="value"
     :error="!!errorMessage"
     :error-message="errorMessage"
     :options="options"
     :placeholder="value ? '' : placeholder"
     option-value="id"
-    option-label="name"
+    option-label="label"
     use-input
     clearable
     dense
@@ -61,5 +100,21 @@ function handleUpdate(v: null | typeof value) {
     style="background:white"
     @input-value="filterFn"
     @update:model-value="handleUpdate"
-  />
+    @new-value="addNewValue"
+    @clear="removeValue"
+  >
+    <template v-if="addValue" #after-options>
+      <QItem class="items-center" :disable="!isValidValue" clickable @click="addNewValue">
+        + 新增 {{ customValue }}
+      </QItem>
+    </template>
+    <template v-if="addValue" #no-option>
+      <QItem class="items-center" :disable="!isValidValue" clickable @click="addNewValue">
+        + 新增 {{ customValue }}
+      </QItem>
+    </template>
+    <template v-for="slotname in Object.keys($slots)" #[slotname]>
+      <slot :name="slotname" />
+    </template>
+  </QSelect>
 </template>

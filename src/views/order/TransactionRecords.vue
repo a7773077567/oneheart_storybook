@@ -92,9 +92,9 @@ const cols: QTableProps['columns'] = [
         case TransactionTypes.團課券退款:
           return `${ticketGained} 張 / $ -${amount}`;
         case TransactionTypes.堂數交易:
-          return `${paidPointGained + giftPointGained} 堂/ $${amount}`;
+          return `${+paidPointGained + +giftPointGained} 堂/ $${amount}`;
         case TransactionTypes.堂數退款:
-          return `${paidPointGained + giftPointGained} 堂/ $ -${amount}`;
+          return `${+paidPointGained + +giftPointGained} 堂/ $ -${amount}`;
         default:
           amount = 0;
       }
@@ -231,7 +231,6 @@ const showCancelConfirm = ref(false);
 const cancelDetail = ref();
 
 function openCancelConfirm(data: (typeof rows.value)[number]) {
-  console.log(data);
   const { amount, clientId, clientName, date, id } = data;
   cancelDetail.value = { amount, clientId, clientName, date, id };
   showCancelConfirm.value = true;

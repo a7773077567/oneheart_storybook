@@ -86,7 +86,7 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
           class="full-width"
           error-message=""
           @update:model-value="getClientGroup"
-          @full-info="selectClient"
+          @update:full-info="selectClient"
           @clear="resetForm"
         />
       </fieldset>
