@@ -14,9 +14,7 @@ const route = useRoute();
 const dashboardStore = useDashboardStore();
 const selectedDate = ref(route.query.date as string ?? today());
 const isAppointmentDialogOpen = ref(false);
-const appointmentDialogData = computed(() => {
-  return getDaySchedules(selectedDate.value);
-});
+const appointmentDialogData = computed(() => getDaySchedules(selectedDate.value));
 
 async function onChange(data: ChangeParam) {
   try {

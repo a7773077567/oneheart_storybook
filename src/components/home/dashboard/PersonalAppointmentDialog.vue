@@ -26,6 +26,7 @@ const appointments = computed(() => {
 
     return {
       info: [
+        { name: 'space', label: '場館', value: `${userShift.space.name}` },
         { name: 'type', label: getTypeLabel(userShift.type), value: `${scheduleStartTime}-${scheduleEndTime}` },
         { name: 'name', label: '客戶姓名', value: client.name },
         { name: 'phone', label: '電話', value: client.phone },
@@ -74,7 +75,7 @@ const appointments = computed(() => {
 .dialog {
   background-color: #fff;
   width: 100%;
-  max-width: 640px;
+  max-width: 800px;
   max-height: 85vh;
   border-radius: 28px;
   &__header {
@@ -97,7 +98,7 @@ const appointments = computed(() => {
   padding: 4px 0;
   border-bottom: 1px solid rgba(219, 218, 231, 1);
   display: grid;
-  grid-template-columns: repeat(3, 1fr) 136px auto;
+  grid-template-columns: repeat(4, 1fr) 96px auto;
   align-items: center;
   @include mobile {
     grid-template-columns: 1fr auto;
@@ -108,17 +109,24 @@ const appointments = computed(() => {
   }
   &__item {
     padding: 8px 16px;
+    &--space {
+      @extend .appointment__item;
+    }
     &--type {
       @extend .appointment__item;
     }
     &--name {
       @extend .appointment__item;
+      @include mobile {
+        grid-column: 1 / 2;
+        grid-row: 3 / 4;
+      }
     }
     &--phone {
       @extend .appointment__item;
       @include mobile {
         grid-column: 1 / 2;
-        grid-row: 3 / 4;
+        grid-row: 4 / 5;
       }
     }
     &--badge {
