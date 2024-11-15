@@ -113,8 +113,11 @@ function removeValue() {
         + 新增 {{ customValue }}
       </QItem>
     </template>
-    <template v-for="slotname in Object.keys($slots) as string[]" #[slotname]>
-      <slot :name="slotname" />
+    <template #selected-item>
+      <slot name="selected-item" />
     </template>
+    <!-- <template v-for="slotname in Object.keys($slots) as string[]" #[slotname]>
+      <slot :name="slotname" />
+    </template> -->
   </QSelect>
 </template>
