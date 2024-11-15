@@ -7,6 +7,7 @@ import { useDashboardStore } from '@/stores';
 import { useRoute, useRouter } from 'vue-router';
 import type { ChangeParam, ClickDateParam, ClickDayParam } from '@/types/calendar';
 import { useQuasar } from 'quasar';
+import dayjs from 'dayjs';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -40,7 +41,14 @@ function selectDate(data: ClickDateParam | ClickDayParam) {
 }
 
 function getDaySchedules(date: string) {
-  return dashboardStore.userInProgressClientSchedules.filter(item => item.date === date);
+  return dashboardStore.userInProgressClientSchedules.filter(item => item.date === date).sort((a, b) => {
+    const [aHr, aMin] = a.scheduleStartTime.split(':');
+    const [bHr, bMin] = b.scheduleStartTime.split(':');
+    const aDate = dayjs({ h: aHr, m: aMin });
+    const bDate = dayjs({ h: bHr, m: bMin });
+
+    return aDate.isBefore(bDate) ? -1 : 1;
+  });
 }
 </script>
 
