@@ -484,6 +484,14 @@ export async function adjustFirstScheduleState({ clientScheduleId, firstSchedule
   return data;
 }
 
+/**
+ * 更改病歷單初診狀態
+ */
+export async function adjustEmployeePriceState({ clientScheduleId, isEmployeePrice }: { clientScheduleId: number; isEmployeePrice: boolean }) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-isEmployeePrice`, { isEmployeePrice });
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
   userShiftType: z.number({ required_error: '必填' }),
