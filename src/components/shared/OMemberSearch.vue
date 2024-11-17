@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useField } from 'vee-validate';
-import type { QSelectProps } from 'quasar';
+import type { QSelectProps, QSelectSlots } from 'quasar';
 import type { Optional } from '@/types/utilities';
 import { type Client, fetchClients } from '@/api';
 
@@ -113,11 +113,8 @@ function removeValue() {
         + 新增 {{ customValue }}
       </QItem>
     </template>
-    <template #selected-item>
-      <slot name="selected-item" />
-    </template>
-    <!-- <template v-for="slotname in Object.keys($slots) as string[]" #[slotname]>
+    <template v-for="(_, slotname) in ($slots as Readonly<QSelectSlots>)" #[slotname]>
       <slot :name="slotname" />
-    </template> -->
+    </template>
   </QSelect>
 </template>
