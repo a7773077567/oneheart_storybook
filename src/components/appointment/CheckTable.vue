@@ -17,7 +17,7 @@ defineProps<{
         <slot :name="item.key" :data="item" />
       </div>
       <div v-else class="cell">
-        <div class="cell__item">
+        <div class="cell__item text-no-wrap">
           {{ item.label }}：
         </div>
         <div class="cell__item">
