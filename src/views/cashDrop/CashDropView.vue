@@ -1,51 +1,34 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { CashDropDetailsDialog } from '@/components/cashDrop';
-import { useUserStore } from '@/stores';
-import dayjs from 'dayjs';
+import { useCashDropStore } from '@/stores/cashDrop';
+import { useDialog } from '@/composables/dialog';
+import { useNotify } from '@/composables/notify';
 
-const userStore = useUserStore();
-const nowCashRemaining = ref(6000);
-const cashDropAmount = ref(0);
-const cashDropTime = ref('');
-const isConfirmOpen = ref(false);
+const cashDropStore = useCashDropStore();
+const cashDropAmount = ref('');
+const isCashDropDetailDialogOpen = ref(false);
 
-const cashDropDetails = computed(() => [
-  { key: 'date', value: cashDropTime.value, span: true, custom: true },
-  { key: 'account', value: userStore.userInfo?.name, label: '人員' },
-  { key: 'space', value: userStore.currentSpace?.name, label: '場館' },
-  { key: 'cashDropAmount', value: cashDropAmount.value, label: '投庫金額' },
-  { key: 'remainCash', value: 0, label: '剩餘現金' },
-]);
-
-function dropCash() {
-  cashDropTime.value = dayjs().format('YYYY-MM-DD HH:mm');
-  isConfirmOpen.value = true;
-}
-
-async function onCashDrop() {
-  await new Promise((resolve) => {
-    console.log('onCashDrop');
-
-    setTimeout(() => resolve('cashDrop done'), 1000);
+async function onConfirm() {
+  const { onOk } = await useDialog({ title: '確定要投庫嗎', message: '此動作無法復原。', type: 'confirm' });
+  onOk(async () => {
+    await cashDropStore.cashDrop({ cashDropAmount: +cashDropAmount.value });
+    isCashDropDetailDialogOpen.value = true;
+    useNotify('投庫完成');
+    cashDropAmount.value = '';
   });
 }
 </script>
 
 <template>
   <div class="cash-drop">
-    <p class="cash-drop__display">上次投庫後的現金收入<span style="margin-left: 10px; font-weight: 700;">{{ nowCashRemaining.toLocaleString() }}</span></p>
     <div class="cash-drop__input">
-      <span :style="{ color: '#BE0000' }">投庫金額</span>
-      <QInput v-model="cashDropAmount" type="number" error hide-bottom-space no-error-icon placeholder="請輸入投庫金額" outlined dense style="flex-grow: 1" />
+      <QInput v-model="cashDropAmount" label="投庫金額" type="number" hide-bottom-space placeholder="請輸入投庫金額" outlined dense style="flex-grow: 1" />
     </div>
-    <p class="cash-drop__hint">投庫金額不可大於現金收入</p>
-    <QBtn class="cash-drop__submit" label="投庫" color="black" @click="dropCash" />
+    <QBtn class="cash-drop__submit" label="確定投庫" color="black" @click="onConfirm" />
     <CashDropDetailsDialog
-      v-model="isConfirmOpen"
-      mode="edit"
-      :details="cashDropDetails"
-      :cash-drop-func="onCashDrop"
+      v-model="isCashDropDetailDialogOpen"
+      :details="cashDropStore.cashDropDetails"
     />
   </div>
 </template>
@@ -57,18 +40,13 @@ async function onCashDrop() {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  &__display {
-    margin-bottom: 10px;
-  }
+
   &__input {
     display: flex;
     gap: 10px;
     align-items: center;
   }
-  &__hint {
-    font-size: 16px;
-    color: #be0000;
-  }
+
   &__submit {
     align-self: flex-start;
     width: 126px;

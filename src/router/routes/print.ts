@@ -6,4 +6,9 @@ export const printRoutes: RouteRecordRaw[] = [
     name: 'receiptPrint',
     component: () => import('@/views/print/ReceiptPrintView.vue'),
   },
+  {
+    path: '/cash-drop-print',
+    name: 'cashDropPrint',
+    component: () => import('@/views/print/CashDropPrintView.vue'),
+  },
 ];

@@ -32,7 +32,7 @@ function onOkClick() {
 
 <template>
   <QDialog ref="dialogRef" :model-value="true" @update:model-value="$emit('update:modelValue', $event)">
-    <QCard>
+    <QCard style="min-width: 400px;">
       <QCardSection class="row items-center q-pb-none">
         <h3 class="text-h6 q-mx-auto">
           {{ title }}
