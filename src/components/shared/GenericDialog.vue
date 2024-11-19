@@ -26,6 +26,9 @@ defineEmits<{
       <div class="generic-dialog__title">
         <slot name="title">{{ title }}</slot>
       </div>
+      <div v-if="$slots.header" class="generic-dialog__header">
+        <slot name="header" />
+      </div>
       <div class="generic-dialog__body">
         <slot name="body">{{ message }}</slot>
       </div>
@@ -50,7 +53,9 @@ defineEmits<{
     font-weight: 600;
     line-height: 36px;
   }
-
+  &__header {
+    padding: 24px;
+  }
   &__body {
     padding: 24px;
     line-height: 24px;

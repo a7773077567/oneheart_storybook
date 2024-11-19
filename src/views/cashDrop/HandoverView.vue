@@ -1,88 +1,99 @@
 <script setup lang="ts">
-import { HandoverDetailsDialog, HandoverMisc, HandoverTitle } from '@/components/cashDrop';
+import type { HandoverMisc } from '@/components/cashDrop';
+import { HandoverCashDrop, HandoverDetails, HandoverDetailsDialog } from '@/components/cashDrop';
 import type { SimpleTable } from '@/components/shared';
-import { computed, ref } from 'vue';
+import { useDialog } from '@/composables/dialog';
+import { useHandoverStore } from '@/stores';
+import { removeCookie } from '@/utils/helpers';
+import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 type SimpleTableRows = InstanceType<typeof SimpleTable>['$props']['rows'];
 
+const router = useRouter();
+const handoverStore = useHandoverStore();
+const cashDropAmount = ref('');
 const handoverMisc = ref<InstanceType<typeof HandoverMisc>['$props']['modelValue']>([]);
 const isHandoverDetailsOpen = ref(false);
-const overallData = {
-  totalRevenue: 6000,
-  initialCash: 5000,
-  cashFlow: 1950,
-  totalCashDrop: 2000,
-  remainingCash: 4950,
-};
 
-const transactionRows = computed<SimpleTableRows>(() => {
-  const miscRows: SimpleTableRows = handoverMisc.value.map((item) => {
-    return {
-      type: { val: item.name, span: 3 },
-      amount: { val: item.amount, color: 'rgba(212, 20, 20, 1)' },
-      remainingCash: { val: 3000 },
-    };
-  });
-  return [
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000, color: 'rgba(212, 20, 20, 1)' }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '19:40' }, type: { val: '投庫', icon: '/images/safe-box.svg' }, paymentMethod: { val: '現金' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000 }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000, color: 'rgba(212, 20, 20, 1)' }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '19:40' }, type: { val: '投庫', icon: '/images/safe-box.svg' }, paymentMethod: { val: '現金' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000 }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000, color: 'rgba(212, 20, 20, 1)' }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '19:40' }, type: { val: '投庫', icon: '/images/safe-box.svg' }, paymentMethod: { val: '現金' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000 }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000, color: 'rgba(212, 20, 20, 1)' }, remainingCash: { val: 2000 } },
-    { transactionTime: { val: '19:40' }, type: { val: '投庫', icon: '/images/safe-box.svg' }, paymentMethod: { val: '現金' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:40' }, type: { val: '治療費' }, paymentMethod: { val: 'Linepay' }, amount: { val: 2000 }, remainingCash: { val: 5000 } },
-    { transactionTime: { val: '18:50' }, type: { val: '堂數退款' }, paymentMethod: { val: '現金' }, amount: { val: 3000 }, remainingCash: { val: 2000 } },
-    ...miscRows,
-  ];
+watch(isHandoverDetailsOpen, (newVal) => {
+  if (newVal === false) {
+    removeCookie('firstToken');
+    removeCookie('secondToken');
+    removeCookie('lastSpaceId');
+    router.go(0);
+  }
 });
 
-async function onHandover() {
-  console.log('onHandover');
+const transactionRows = computed<SimpleTableRows>(() => {
+  const { handoverDetails } = handoverStore;
+  if (!handoverDetails) {
+    return [];
+  }
+  const { cashDrops, detailedExpenses } = handoverDetails;
+  return [...cashDrops, ...detailedExpenses];
+});
+
+async function readyToHandover() {
+  if (containEmptyValue()) {
+    useDialog({
+      title: '系統提示',
+      message: '尚有細項名稱或金額未填寫',
+      type: 'confirm',
+    });
+
+    return;
+  }
+
+  const { onOk } = await useDialog({
+    title: '確定要交班嗎',
+    message: '交班後帳號將自動登出。',
+    type: 'confirm',
+  });
+
+  onOk(async () => {
+    await handoverStore.changeShift({
+      cashDropAmount: +cashDropAmount.value,
+      detailedExpenses: handoverMisc.value,
+    });
+    isHandoverDetailsOpen.value = true;
+  });
+}
+
+function containEmptyValue() {
+  return handoverMisc.value.length && handoverMisc.value.some(({ name, amount }) => name.trim().length === 0 || +amount === 0);
 }
 </script>
 
 <template>
   <div class="handover">
-    <div class="handover__header">
-      <HandoverTitle />
-    </div>
-    <div class="handover__details">
-      <HandoverMisc v-model="handoverMisc" />
-    </div>
-    <div class="handover__action">
-      <QBtn label="確定" color="dark" style="width: 126px;" @click="isHandoverDetailsOpen = true" />
+    <div class="handover__cash-drop">
+      <HandoverCashDrop v-model="cashDropAmount" />
     </div>
 
-    <HandoverDetailsDialog
-      v-model="isHandoverDetailsOpen"
-      :overall-data="overallData"
-      :transaction-rows="transactionRows"
-      :handover-func="onHandover"
-      mode="edit"
-    />
+    <div class="handover__details">
+      <HandoverDetails v-model="handoverMisc" />
+      <HandoverDetailsDialog
+        v-if="isHandoverDetailsOpen"
+        v-model="isHandoverDetailsOpen"
+        :overall-data="handoverStore.handoverDetails!.overall"
+        :transaction-rows="transactionRows"
+        :duration="handoverStore.handoverDetails!.duration"
+      />
+    </div>
+
+    <div class="handover__action">
+      <QBtn label="確定交班" color="dark" style="width: 126px;" @click="readyToHandover" />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .handover {
-  padding-top: 22px;
-  &__header {
-    margin-bottom: 24px;
-  }
-  &__details {
-    margin-bottom: 32px;
-  }
+  max-width: 640px;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 </style>

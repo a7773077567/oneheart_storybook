@@ -6,40 +6,22 @@ defineProps<{
 }>();
 
 const fields: InstanceType<typeof SimpleTable>['$props']['fields'] = [
-  { name: 'transactionTime', label: '交易時間', width: '140px' },
+  { name: 'time', label: '交易時間' },
   { name: 'type', label: '項目' },
-  { name: 'paymentMethod', label: '支付方式', width: '82px' },
-  { name: 'amount', label: '金額', width: '82px', currency: true },
-  { name: 'remainingCash', label: '剩餘現金', width: '82px', currency: true },
+  { name: 'method', label: '支付方式' },
+  { name: 'amount', label: '項目' },
 ];
 </script>
 
 <template>
   <div class="handover-transactions">
-    <div class="handover-transactions__title">
-      <div class="title">班次內交易明細</div>
-    </div>
-    <div class="handover-transactions__body">
-      <SimpleTable
-        :fields="fields"
-        :rows="rows"
-      />
-    </div>
+    <SimpleTable
+      :fields="fields"
+      :rows="rows"
+    />
   </div>
 </template>
 
 <style lang="scss" scoped>
-.handover-transactions {
-  &__body {
-    // max-height: 336px;
-    // overflow-y: scroll;
-  }
-}
 
-.title {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  margin-bottom: 8px;
-}
 </style>

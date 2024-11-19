@@ -11,4 +11,9 @@ export const printRoutes: RouteRecordRaw[] = [
     name: 'cashDropPrint',
     component: () => import('@/views/print/CashDropPrintView.vue'),
   },
+  {
+    path: '/hand-over-print',
+    name: 'handoverPrint',
+    component: () => import('@/views/print/HandoverPrintView.vue'),
+  },
 ];

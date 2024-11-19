@@ -37,9 +37,10 @@ function goPrint() {
       @confirm="goPrint"
       @cancel="model = false"
     >
+      <template #header>
+        <p>請記得將<b>簽名後的明細、應投入現金、發票及收據、作廢發票及收據、信用卡結帳單據</b>、其他單據一併放入夾鏈袋並投入金庫</p>
+      </template>
       <template #body>
-        <p class="print-message">請記得將<b>簽名後的明細、應投入現金、發票及收據、作廢發票及收據、信用卡結帳單據</b>、其他單據一併放入夾鏈袋並投入金庫</p>
-        <QSeparator spaced="24px" />
         <div class="cash-drop-details">
           <div class="cash-drop-details__title">投庫明細</div>
           <TwoColumnTable :data="details">

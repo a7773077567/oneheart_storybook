@@ -3,21 +3,19 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   data: {
-    totalRevenue: number;
-    initialCash: number;
-    cashFlow: number;
-    totalCashDrop: number;
-    remainingCash: number;
+    totalIncome: number;
+    totalCashIncome: number;
+    totalCashDropAmount: number;
+    balanceDifference: number;
   };
 }>();
 
 const overAllData = computed(() => {
   const fields = [
-    { label: '總收入', name: 'totalRevenue' },
-    { label: '初始現金', name: 'initialCash' },
-    { label: '現金收支', name: 'cashFlow' },
-    { label: '投庫總額', name: 'totalCashDrop' },
-    { label: '剩餘現金', name: 'remainingCash' },
+    { label: '總收入', name: 'totalIncome' },
+    { label: '現金總收入', name: 'totalCashIncome' },
+    { label: '投庫總額', name: 'totalCashDropAmount' },
+    { label: '交班現金差額', name: 'balanceDifference' },
   ];
   return Object.entries(props.data).sort(([aKey], [bKey]) => {
     const aIdx = fields.findIndex(field => field.name === aKey);
@@ -35,9 +33,9 @@ const overAllData = computed(() => {
     <template v-for="(item, idx) in overAllData" :key="idx">
       <div class="overall__item">
         <div class="overall__item-label">{{ item.label }}</div>
-        <div :class="[item.name === 'remainingCash' ? 'overall__item-val--remaining' : 'overall__item-val']">{{ item.val }}</div>
+        <div class="overall__item-val">{{ item.val }}</div>
       </div>
-      <QSeparator v-if="idx === 0" vertical color="grey-5" />
+      <!-- <QSeparator v-if="idx === 0" vertical color="grey-5" /> -->
     </template>
   </div>
 </template>
@@ -58,10 +56,6 @@ const overAllData = computed(() => {
     font-size: 20px;
     font-weight: 500;
     line-height: 30px;
-    &--remaining {
-      @extend .overall__item-val;
-      font-size: 24px;
-    }
   }
 }
 </style>

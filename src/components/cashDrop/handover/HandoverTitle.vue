@@ -4,8 +4,8 @@
 
 <template>
   <div class="handover-title">
-    <div class="title">此班別是否有細項支出？</div>
-    <div class="subtitle">水電費、瓦斯費、郵費、貨運費、雜支...</div>
+    <div class="title">請填寫細項支出</div>
+    <div class="subtitle">細項包含水電費、瓦斯費、郵費、貨運費、雜支...</div>
   </div>
 </template>
 
