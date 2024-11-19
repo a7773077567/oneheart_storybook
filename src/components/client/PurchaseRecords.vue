@@ -146,7 +146,7 @@ async function checkPaymentDetail(val: any) {
   showDetail.value = true;
   targetPaymentDetails.value = val;
   const data = await getClientPaymentDetail({ clientId: +props.clientId, paymentId: val.id });
-  targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
+  targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data, clientName: data.client?.name };
 }
 </script>
 
