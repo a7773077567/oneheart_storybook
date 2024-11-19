@@ -11,7 +11,7 @@ defineEmits<{
 }>();
 
 const count = computed(() => props.data.length);
-const isComplete = computed(() => props.data.every(item => item.state >= 3));
+const isComplete = computed(() => props.data.every(item => item.state >= 4));
 const label = computed(() => isComplete.value ? '完成' : '未完成');
 </script>
 
