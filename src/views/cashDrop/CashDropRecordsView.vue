@@ -1,48 +1,76 @@
 <script setup lang="ts">
 import CashDropDetailsDialog from '@/components/cashDrop/CashDropDetailsDialog.vue';
+import { useCashDropStore } from '@/stores/cashDrop';
 import type { QTableProps } from 'quasar';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
+
+const cashDropStore = useCashDropStore();
+const { meta } = await cashDropStore.getCashDropRecords({
+  order: 'DESC',
+  page: 1,
+  take: 10,
+});
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: meta?.itemCount,
+});
+
+const tableRef = ref(null);
 
 const columns: QTableProps['columns'] = [
-  { name: 'date', field: 'date', label: '日期', align: 'left', style: 'width: 123px' },
-  { name: 'time', field: 'time', label: '時間', align: 'left', style: 'width: 80px' },
-  { name: 'userName', field: 'userName', label: '人員', align: 'left', style: 'width: 123px' },
+  { name: 'date', field: 'date', label: '日期', align: 'left' },
+  { name: 'time', field: 'time', label: '時間', align: 'left' },
+  { name: 'userName', field: 'userName', label: '人員', align: 'left' },
   { name: 'dropAmount', field: 'dropAmount', label: '金額', align: 'left' },
-  { name: 'remainingCash', field: 'remainingCash', label: '剩餘現金', align: 'left' },
-  { name: 'details', field: 'details', label: '明細', align: 'left', style: 'width: 52px' },
-];
-
-const rows = [
-  { date: '123', time: '123', name: '123', userName: '123', dropAmount: 200, remainingCash: 200, details: '123' },
+  { name: 'details', field: 'details', label: '明細', align: 'left', style: 'width: 40px' },
 ];
 
 const isDetailsDialogOpen = ref(false);
 
-// TODO temporarily
-const cashDropDetails = computed(() => [
-  { key: 'date', value: '123', span: true, custom: true },
-  { key: 'account', value: '123', label: '人員' },
-  { key: 'space', value: '123', label: '場館' },
-  { key: 'cashDropAmount', value: 123, label: '投庫金額' },
-  { key: 'remainCash', value: 0, label: '剩餘現金' },
-]);
+const onRequest: QTableProps['onRequest'] = async (props) => {
+  const { page, rowsPerPage } = props.pagination;
+  const { meta } = await cashDropStore.getCashDropRecords({
+    order: 'DESC',
+    page,
+    take: rowsPerPage,
+  });
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  pagination.value.rowsNumber = meta?.itemCount;
+};
+
+async function openDetailsDialog(cashDropId: number) {
+  await cashDropStore.getCashDrop(cashDropId);
+  isDetailsDialogOpen.value = true;
+}
 </script>
 
 <template>
   <div class="cash-drop-records">
-    <QTable :columns="columns" :rows bordered separator="cell" :rows-per-page-options="[0]">
+    <QTable
+      ref="tableRef"
+      v-model:pagination="pagination"
+      :columns="columns"
+      :rows="cashDropStore.cashDropRecordRows"
+      row-key="id"
+      bordered separator="cell"
+      :rows-per-page-options="[10, 20, 50]"
+      @request="onRequest"
+    >
       <template #body-cell-details="props">
         <QTd :props="props">
-          <QBtn icon="o_article" flat round @click="isDetailsDialogOpen = true" />
+          <QBtn icon="o_article" flat round @click="() => openDetailsDialog(props.row.id)" />
         </QTd>
       </template>
     </QTable>
 
-    <CashDropDetailsDialog v-model="isDetailsDialogOpen" mode="read" :details="cashDropDetails" />
+    <CashDropDetailsDialog v-model="isDetailsDialogOpen" :details="cashDropStore.cashDropDetails" />
   </div>
 </template>
 
 <style lang="scss" scoped>
   .cash-drop-records {
+  margin-top: 15px;
 }
 </style>

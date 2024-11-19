@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue';
+import { ref } from 'vue';
 import { CashDropDetailsDialog } from '@/components/cashDrop';
 import { useCashDropStore } from '@/stores/cashDrop';
 import { useDialog } from '@/composables/dialog';
