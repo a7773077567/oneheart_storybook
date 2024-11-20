@@ -11,7 +11,7 @@ defineEmits<{
   (e: 'confirm', state: boolean): void;
 }>();
 
-const state = ref(props.initVal);
+const state = ref(Number(props.initVal));
 </script>
 
 <template>
@@ -25,20 +25,20 @@ const state = ref(props.initVal);
         <QItem>
           <QItemSection>是</QItemSection>
           <QItemSection>
-            <QRadio v-model="state" left-label :val="true" />
+            <QRadio v-model="state" left-label :val="1" />
           </QItemSection>
         </QItem>
         <QItem>
           <QItemSection>否</QItemSection>
           <QItemSection>
-            <QRadio v-model="state" left-label :val="false" />
+            <QRadio v-model="state" left-label :val="0" />
           </QItemSection>
         </QItem>
       </QList>
     </QCardSection>
     <QCardActions class="q-pa-lg">
       <QBtn label="取消" @click="$emit('cancel')" />
-      <QBtn label="確定" color="black" @click="$emit('confirm', state)" />
+      <QBtn label="確定" color="black" @click="$emit('confirm', !!state)" />
     </QCardActions>
   </QCard>
 </template>
