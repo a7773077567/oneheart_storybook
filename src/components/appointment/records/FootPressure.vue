@@ -3,7 +3,7 @@ import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import { useForm } from 'vee-validate';
 import { computed, ref } from 'vue';
-import { type ClientScheduleDetail, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
+import { type Attachment, type ClientScheduleDetail, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import dayjs from 'dayjs';
 import { pick } from 'radash';
 import { extractUuidFromS3Url } from '@/utils/helpers';
@@ -21,37 +21,45 @@ const $q = useQuasar();
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
 
-const staticAttachments = ref([]);
-const dynamicAttachments = ref([]);
+const staticAttachments = ref<File[]>([]);
+const dynamicAttachments = ref<File[]>([]);
 
-const initialValues = computed(() => pick(props.scheduleDetail.record, ['staticPressureAttachments', 'dynamicPressureAttachments', 'note']));
-const { handleSubmit, values, resetForm } = useForm({ initialValues: initialValues.value });
-const staticDisplayAttachments = computed(() => values.staticPressureAttachments?.map((attUrl, idx) => ({ name: `staticPressureAttachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
-const dynamicDisplayAttachments = computed(() => values.dynamicPressureAttachments?.map((attUrl, idx) => ({ name: `dynamicPressureAttachments[${idx}]`, url: attUrl }))?.filter(file => !!file.url));
+const initialValues = computed(() => {
+  return pick(props.scheduleDetail.record, ['staticPressureAttachments', 'dynamicPressureAttachments', 'note']);
+});
+const { handleSubmit, values } = useForm({ initialValues: initialValues.value });
+const staticDisplayAttachments = computed(() => values.staticPressureAttachments?.map((att, idx) => ({ name: `staticPressureAttachments[${idx}]`, url: att?.attachmentUrl, label: att?.originalFileName }))?.filter(file => !!file.url));
+const dynamicDisplayAttachments = computed(() => values.dynamicPressureAttachments?.map((att, idx) => ({ name: `dynamicPressureAttachments[${idx}]`, url: att?.attachmentUrl, label: att?.originalFileName }))?.filter(file => !!file.url));
 
 const onSubmit = handleSubmit(async (formValue) => {
-  let staticFileUUIDs: string[] = [];
-  let dynamicFileUUIDs: string[] = [];
+  let newStaticFiles: Attachment[] = [];
+  let newDynamicFiles: Attachment[] = [];
 
   if (staticAttachments.value.length > 0) {
-    staticFileUUIDs = await Promise.all(staticAttachments.value.map(file =>
-      appointmentStore.uploadAttachments(recordId.value, file),
+    newStaticFiles = await Promise.all(staticAttachments.value.map(async (file) => {
+      const url = await appointmentStore.uploadAttachments(recordId.value, file);
+      return ({ fileName: extractUuidFromS3Url(url) ?? '', originalFileName: file.name ?? '未命名附檔' });
+    },
     ));
   }
   if (dynamicAttachments.value.length > 0) {
-    dynamicFileUUIDs = await Promise.all(dynamicAttachments.value.map(file =>
-      appointmentStore.uploadAttachments(recordId.value, file),
+    newDynamicFiles = await Promise.all(dynamicAttachments.value.map(async (file) => {
+      const url = await appointmentStore.uploadAttachments(recordId.value, file);
+      return ({ fileName: extractUuidFromS3Url(url) ?? '', originalFileName: file.name ?? '未命名附檔' });
+    },
     ));
   }
   await updateClientSchedule(recordId.value, {
     ...formValue,
-    staticPressureAttachments: [...formValue.staticPressureAttachments ?? [], ...staticFileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[],
-    dynamicPressureAttachments: [...formValue.dynamicPressureAttachments ?? [], ...dynamicFileUUIDs].map(s3Url => extractUuidFromS3Url(s3Url)).filter(file => file) as string[],
+    staticPressureAttachments: [...(formValue.staticPressureAttachments ?? []).map(file => ({ fileName: file?.fileName, originalFileName: file?.originalFileName })), ...newStaticFiles],
+    dynamicPressureAttachments: [...(formValue.dynamicPressureAttachments ?? []).map(file => ({ fileName: file?.fileName, originalFileName: file?.originalFileName })), ...newDynamicFiles].map(file => ({ ...file, fileName: extractUuidFromS3Url(file.fileName) as string })),
   });
-  $q.notify({ message: '已存檔', timeout: 2000 });
+  $q.notify({ message: '已存檔', timeout: 2000, position: 'top' });
 
   await appointmentStore.getClientSchedule(props.scheduleId);
-  resetForm({ values: initialValues.value });
+
+  staticAttachments.value = [];
+  dynamicAttachments.value = [];
 });
 
 async function finishRecord() {
@@ -77,20 +85,23 @@ async function finishRecord() {
           <OFile v-model="staticAttachments" label="靜態足壓檔案" multiple />
           <div class="preview_files">
             <OPreview
-              v-for="(attachment, idx) in staticDisplayAttachments" :key="attachment.name"
+              v-for="(attachment) in staticDisplayAttachments" :key="attachment.name"
               :name="attachment.name"
-              :label="`附件資料 ${idx + 1}`"
+              :label="attachment.label"
+              :value="attachment.url"
             />
           </div>
         </div>
         <div class="column q-gutter-md">
           <OFile v-model="dynamicAttachments" label="動態足壓檔案" multiple />
           <div class="preview_files">
-            <OPreview
-              v-for="(attachment, idx) in dynamicDisplayAttachments" :key="attachment.name"
-              :name="attachment.name"
-              :label="`附件資料 ${idx + 1}`"
-            />
+            <template v-for="(attachment) in dynamicDisplayAttachments" :key="attachment.name">
+              <OPreview
+                :name="attachment.name"
+                :label="attachment.label"
+                :value="attachment.url"
+              />
+            </template>
           </div>
         </div>
       </div>

@@ -5,3 +5,5 @@ export { useClientStore } from './client';
 export { usePointsStore } from './points';
 export { useVoucherStore } from './voucher';
 export { useDashboardStore } from './dashboard';
+export { useCashDropStore } from './cashDrop';
+export { useHandoverStore } from './handover';

@@ -23,3 +23,6 @@ export { default as AllOptionSelect } from './AllOptionSelect.vue';
 export { default as CalendarMonth } from './CalendarMonth.vue';
 export { default as CalendarNavigation } from './CalendarNavigation.vue';
 export { default as CaseCompletionIndicator } from './CaseCompletionIndicator.vue';
+export { default as TwoColumnTable } from './TwoColumnTable.vue';
+export { default as GenericDialog } from './GenericDialog.vue';
+export { default as SimpleTable } from './SimpleTable.vue';

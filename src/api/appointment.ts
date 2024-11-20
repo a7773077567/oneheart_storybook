@@ -43,8 +43,8 @@ export interface Record {
   forFrontDesk: string;
   attachments: string[];
   note: string;
-  dynamicPressureAttachments: string[];
-  staticPressureAttachments: string[];
+  dynamicPressureAttachments: Attachment[];
+  staticPressureAttachments: Attachment[];
   personalHealthStatus: string;
   nutritionistAdvice: string;
   customerProblemDescription: string;
@@ -64,6 +64,12 @@ export interface Record {
     },
   ];
   advice: string;
+}
+
+export interface Attachment {
+  originalFileName: string; // 原始檔案名稱
+  fileName: string; // UUID
+  attachmentUrl?: string;
 }
 
 export interface Nutrition {
@@ -88,7 +94,6 @@ export interface MedicalRecord {
   forExerciseGroup: string; // 給運動組的建議
   forFrontDesk: string; // 給櫃檯的建議
   attachments: string[];
-
 }
 
 // TODO TBD
@@ -153,8 +158,8 @@ export interface PhysicalConsultation {
 }
 
 export interface FootPressure {
-  staticPressureAttachments: string[]; // 靜態足壓檔案
-  dynamicPressureAttachments: string[]; // 動態足壓檔案
+  staticPressureAttachments: Attachment[]; // 靜態足壓檔案
+  dynamicPressureAttachments: Attachment[]; // 動態足壓檔案
   notes: string; // 備註
 }
 
@@ -481,6 +486,14 @@ export async function fetchHistoryRecords(recordId: number) {
  */
 export async function adjustFirstScheduleState({ clientScheduleId, firstScheduleState }: { clientScheduleId: number; firstScheduleState: ScheduleVisitState }) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-firstScheduleState`, { firstScheduleState });
+  return data;
+}
+
+/**
+ * 更改病歷單初診狀態
+ */
+export async function adjustEmployeePriceState({ clientScheduleId, isEmployeePrice }: { clientScheduleId: number; isEmployeePrice: boolean }) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-isEmployeePrice`, { isEmployeePrice });
   return data;
 }
 

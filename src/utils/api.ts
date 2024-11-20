@@ -119,8 +119,11 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
 
   const needFirstToken = firstTokenList.some(item => url.includes(item)) && checkClientFirstToken(url, method!);
   const token = needFirstToken ? getCookie('firstToken') : getCookie('secondToken');
+  if (!token) {
+    console.log(url, 'no token');
+    return Promise.reject(new Error('No token available'));
+  }
   config.headers!.Authorization = `Bearer ${token}`;
-
   return config;
 }
 

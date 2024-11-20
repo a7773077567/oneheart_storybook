@@ -281,13 +281,13 @@ async function cancelTransaction() {
       </template>
       <template #body-cell-attachment="{ value }">
         <QTd class="text-center">
-          <QBtn v-if="!!value" flat round icon="o_description" @click="checkReceipt(value)" />
+          <QBtn v-if="!!value" flat round icon="o_receipt_long" @click="checkReceipt(value)" />
           <span v-else>-</span>
         </QTd>
       </template>
       <template #body-cell-detail="{ value }">
         <QTd>
-          <QBtn v-if="!!value" flat round icon="o_description" @click="checkPaymentDetail(value)" />
+          <QBtn v-if="!!value" flat round icon="o_article" @click="checkPaymentDetail(value)" />
           <span v-else>-</span>
         </QTd>
       </template>

@@ -1,6 +1,6 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useUserStore } from '@/stores';
-import { appointmentRoutes, clientRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
+import { useHandoverStore, useUserStore } from '@/stores';
+import { appointmentRoutes, cashDropHandoverRoutes, clientRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
 
 export const routes: RouteRecordRaw[] = [
   ...loginRoutes,
@@ -21,6 +21,7 @@ export const routes: RouteRecordRaw[] = [
       ...shiftRoutes,
       ...userRoutes,
       ...gymRoutes,
+      ...cashDropHandoverRoutes,
     ],
   },
   ...printRoutes,
@@ -33,6 +34,7 @@ export const routes: RouteRecordRaw[] = [
       hide: true,
     },
   },
+
 ];
 
 const router = createRouter({
@@ -51,7 +53,12 @@ router.beforeEach(async (to) => {
     return { name: 'userLogin' };
   }
 
-  return true;
+  const userStore = useUserStore();
+
+  if (to.name !== 'spaceLogin' && userStore.canI('READ_HANDOVER')) {
+    const handoverStore = useHandoverStore();
+    handoverStore.getShiftChangeReminder();
+  }
 });
 
 async function checkAuth() {

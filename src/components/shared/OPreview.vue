@@ -1,20 +1,27 @@
 <script setup lang='ts'>
+import { computed } from 'vue';
 import { useField } from 'vee-validate';
 
 const props = defineProps<{
   name: string;
   label: string;
+  value?: string;
 }>();
 
 const { value } = useField<string | null>(() => props.name || '', undefined, {
   syncVModel: true, // Skipping update:modelValue emission definition by setting this config
 });
 
+// to refactor
+const previewValue = computed(() => {
+  return props.value !== undefined ? props.value : value;
+});
+
 function previewFile() {
-  if (!value.value)
+  if (!previewValue.value || typeof previewValue.value !== 'string')
     return;
 
-  window.open(value.value);
+  window.open(previewValue.value);
 }
 </script>
 

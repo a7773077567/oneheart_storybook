@@ -3,14 +3,16 @@ import { computed, ref, watch } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
-import { useUserStore } from '@/stores';
+import { useHandoverStore, useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { spaceLogin } from '@/api/user';
 import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
 import Logo from '/images/one-heart.png';
 import TestingLogo from '/images/development-one-heart.png';
+import ShiftChangeReminder from '@/components/layout/ShiftChangeReminder.vue';
 
 const userStore = useUserStore();
+const handoverStore = useHandoverStore();
 const { userInfo, currentSpaceId } = storeToRefs(userStore);
 const router = useRouter();
 
@@ -47,6 +49,12 @@ const permissionControlTabs = computed(() => {
     }
     return group;
   }) ?? [];
+
+  if (!userStore.canI('READ_HANDOVER')) {
+    _filteredPages = _filteredPages.filter((route) => {
+      return route.name !== 'cashDropHandover';
+    });
+  }
 
   if (import.meta.env.MODE === 'production' && !isAdminAccount) {
     return _filteredPages.filter(route => route?.meta?.permission);
@@ -96,7 +104,9 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
       <QPage class="q-py-md q-px-lg">
+        <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" style="margin-bottom: 24px;" @click="$router.push({ name: 'handover' })" />
         <Breadcrumbs class="gutter--sm breadcrumb" />
+
         <RouterView />
       </QPage>
     </QPageContainer>

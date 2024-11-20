@@ -2,7 +2,7 @@
 defineProps<{
   data: {
     key: string;
-    value?: string | number;
+    value?: any;
     label?: string;
     span?: boolean;
     custom?: boolean;
@@ -17,12 +17,8 @@ defineProps<{
         <slot :name="item.key" :data="item" />
       </div>
       <div v-else class="cell">
-        <div class="cell__item text-no-wrap">
-          {{ item.label }}：
-        </div>
-        <div class="cell__item">
-          {{ item.value }}
-        </div>
+        <div class="cell__item">{{ item.label }}：</div>
+        <div class="cell__item">{{ item.value }}</div>
       </div>
     </div>
   </div>
@@ -41,7 +37,7 @@ defineProps<{
 
 .cell {
   display: grid;
-  grid-template-columns: 85px 1fr;
+  grid-template-columns: max-content 1fr;
   height: 100%;
   border: 1px solid black;
   &--custom {

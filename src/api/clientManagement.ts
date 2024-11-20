@@ -3,6 +3,7 @@ import type { User } from './user';
 import type { ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { ContractTypes } from './contract';
+import type { PaymentDetail } from './payment';
 
 export interface ClientsGetParams {
   nameOrPhone?: string;
@@ -189,5 +190,11 @@ export async function addClientAssociation(clientId: number, data: NewAssociatio
 // 取得客戶所有合約
 export async function getAllContract(clientId: number) {
   const { data } = await api.get<ClientContract[]>(`clients/${clientId}/contracts`);
+  return data;
+}
+
+// 取得客戶的單一筆付款紀錄明細
+export async function getClientPaymentDetail({ clientId, paymentId }: { clientId: number;paymentId: number }) {
+  const { data } = await api.get<PaymentDetail>(`clients/${clientId}/payments/${paymentId}`);
   return data;
 }

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
 import { PaymentMethods } from '@/const/appointment';
-import { AddOnTable, CheckTable, PaymentComposition } from '@/components/appointment';
+import { CheckTable, PaymentComposition } from '@/components/appointment';
 import type { PaymentDetail } from '@/api';
 import { PointTypes, ShiftType, TransactionTypes } from '@/const/general';
 
@@ -22,6 +22,7 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'type', value: data.userShift?.type ? ShiftType[data.userShift.type] : '', label: '項目' },
         { key: 'userName', value: data.userShift?.user.name ?? '', label: '治療師' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
+        { key: 'addOnServices', value: data.addOnServices?.filter(service => service.isAddOn)?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務', span: true },
       ];
     case TransactionTypes.團課券購買:
     case TransactionTypes.團課券退款:
@@ -61,18 +62,6 @@ const paymentDetail = computed(() => {
       return props.detail.clientSchedulePaymentMultiChannelPay;
   }
 });
-
-const hasAddOn = computed(() => props.detail.type === TransactionTypes.門診費用 && props.detail.addOnServices.some(addOn => addOn.isAddOn));
-
-const addOns = computed(() => {
-  if (props.detail.type !== TransactionTypes.門診費用)
-    return [];
-
-  return [
-    { key: 'title', value: '加購服務', span: true, custom: false },
-    ...props.detail.addOnServices.filter(addOn => addOn.isAddOn).map(addOn => ({ key: 'item1', value: addOn.serviceName, label: '項目' })),
-  ];
-});
 </script>
 
 <template>
@@ -90,15 +79,15 @@ const addOns = computed(() => {
         </template>
       </CheckTable>
 
-      <AddOnTable v-if="hasAddOn" :data="addOns" />
+      <div>
+        <h3 class="subtitle q-mb-md">{{ detail.type === TransactionTypes.堂數退款 || detail.type === TransactionTypes.團課券退款 ? '退款' : '交易' }}總金額：</h3>
+        <QInput label="總金額" filled readonly :model-value="detail.amount " />
+      </div>
 
-      <!-- @vue-ignore -->
-      <PaymentComposition readonly :model-value="paymentDetail as CompositionPayment" :method-options="methodOptions" />
-
-      <div class="payment_detail__sum">
-        <p>{{ detail.type === TransactionTypes.堂數退款 || detail.type === TransactionTypes.團課券退款 ? '退款' : '交易' }}總金額：</p>
-        <div class="amount">{{ detail.amount }}</div>
-        <span>元</span>
+      <div>
+        <h3 class="subtitle q-mb-md">付款方式</h3>
+        <!-- @vue-ignore -->
+        <PaymentComposition readonly :model-value="paymentDetail as CompositionPayment" :method-options="methodOptions" />
       </div>
     </QCardSection>
   </QCard>
@@ -109,6 +98,11 @@ const addOns = computed(() => {
   padding-bottom: 32px;
   > * + * {
     margin-top: 24px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    font-weight: 500;
   }
 
   &__sum {

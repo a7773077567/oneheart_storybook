@@ -6,13 +6,14 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
+import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
+import EmployeePriceForm from './EmployeePriceForm.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -42,6 +43,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 const data = computed(() => [
   { key: 'name', label: '姓名', value: client.value.name },
   { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
+  { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
   { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
   { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
   { key: 'phone', label: '電話', value: client.value.phone },
@@ -149,6 +151,15 @@ async function handleFirstScheduleChange(state: ScheduleVisitState) {
   useNotify('初診狀態編輯成功');
   await appointmentStore.getClientSchedule(+props.scheduleId);
 }
+
+// 員工價
+const isEditingEmployeePrice = ref(false);
+async function handleEmployeePriceChange(state: boolean) {
+  isEditingEmployeePrice.value = false;
+  await adjustEmployeePriceState({ clientScheduleId: +props.scheduleId, isEmployeePrice: state });
+  useNotify('員工價編輯成功');
+  await appointmentStore.getClientSchedule(+props.scheduleId);
+}
 </script>
 
 <template>
@@ -179,6 +190,17 @@ async function handleFirstScheduleChange(state: ScheduleVisitState) {
             <span>{{ row.value }}</span>
             <div v-if="hasFirstSchedulePermission">
               <QBtn round flat icon="edit" size="sm" @click="isEditingFirstSchedule = true" />
+            </div>
+          </div>
+        </template>
+        <template #isEmployeePrice="{ row }">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <QIcon v-if="row.value" name="check_circle" color="green" class="q-mr-sm" />
+              <span>{{ row.value ? '是 (享有員工價)' : '否' }}</span>
+            </div>
+            <div>
+              <QBtn round flat icon="edit" size="sm" @click="isEditingEmployeePrice = true" />
             </div>
           </div>
         </template>
@@ -247,6 +269,9 @@ async function handleFirstScheduleChange(state: ScheduleVisitState) {
   </div>
   <QDialog v-model="isEditingFirstSchedule">
     <FirstScheduleForm :client-name="client.name" :init-val="schedule.isFirstClientSchedule" @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange" />
+  </QDialog>
+  <QDialog v-model="isEditingEmployeePrice">
+    <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
   </QDialog>
 </template>
 
