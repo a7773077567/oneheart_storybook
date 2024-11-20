@@ -50,6 +50,12 @@ const permissionControlTabs = computed(() => {
     return group;
   }) ?? [];
 
+  if (!userStore.canI('READ_HANDOVER')) {
+    _filteredPages = _filteredPages.filter((route) => {
+      return route.name !== 'cashDropHandover';
+    });
+  }
+
   if (import.meta.env.MODE === 'production' && !isAdminAccount) {
     return _filteredPages.filter(route => route?.meta?.permission);
   }

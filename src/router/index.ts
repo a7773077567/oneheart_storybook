@@ -52,9 +52,13 @@ router.beforeEach(async (to) => {
   if (!isAuthenticated) {
     return { name: 'userLogin' };
   }
-  const handoverStore = useHandoverStore();
-  handoverStore.getShiftChangeReminder();
-  return true;
+
+  const userStore = useUserStore();
+
+  if (to.name !== 'spaceLogin' && userStore.canI('READ_HANDOVER')) {
+    const handoverStore = useHandoverStore();
+    handoverStore.getShiftChangeReminder();
+  }
 });
 
 async function checkAuth() {
