@@ -1,5 +1,5 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useUserStore } from '@/stores';
+import { useHandoverStore, useUserStore } from '@/stores';
 import { appointmentRoutes, cashDropHandoverRoutes, clientRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
 
 export const routes: RouteRecordRaw[] = [
@@ -52,7 +52,8 @@ router.beforeEach(async (to) => {
   if (!isAuthenticated) {
     return { name: 'userLogin' };
   }
-
+  const handoverStore = useHandoverStore();
+  handoverStore.getShiftChangeReminder();
   return true;
 });
 

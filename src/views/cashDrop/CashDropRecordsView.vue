@@ -16,8 +16,6 @@ const pagination = ref({
   rowsNumber: meta?.itemCount,
 });
 
-const tableRef = ref(null);
-
 const columns: QTableProps['columns'] = [
   { name: 'date', field: 'date', label: '日期', align: 'left' },
   { name: 'time', field: 'time', label: '時間', align: 'left' },
@@ -49,7 +47,6 @@ async function openDetailsDialog(cashDropId: number) {
 <template>
   <div class="cash-drop-records">
     <QTable
-      ref="tableRef"
       v-model:pagination="pagination"
       :columns="columns"
       :rows="cashDropStore.cashDropRecordRows"
