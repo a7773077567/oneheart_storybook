@@ -76,12 +76,17 @@ function openBookingsBox(bookings: any) {
   isBookingsBoxOpen.value = true;
   bookingsInBox.value = bookings;
 }
+
+function updateSelectedDate(date: string) {
+  selectedDate.value = date;
+  router.push({ query: { date } });
+}
 </script>
 
 <template>
   <div class="calendar-view">
     <ResourceCalendar
-      v-model="selectedDate"
+      :model-value="selectedDate"
       :model-resources="appointmentStore.activeUsers"
       :interval-start="16"
       :interval-count="30"
@@ -89,6 +94,7 @@ function openBookingsBox(bookings: any) {
       :resource-width="200"
       animated
       @model-resources="appointmentStore.users = $event"
+      @update:model-value="updateSelectedDate"
     >
       <template #nav-right>
         <div class="payment-indicator">
