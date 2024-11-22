@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 
 const printData = ref(JSON.parse(localStorage.getItem('printData')!));
-window.addEventListener('afterprint', () => {
-  setTimeout(() => window.close());
-});
+// window.addEventListener('afterprint', () => {
+//   setTimeout(() => window.close());
+// });
 
 onMounted(() => {
   window.print();
@@ -20,11 +20,7 @@ onMounted(() => {
 
 <style lang="scss">
 .cash-drop-print {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
+  padding: 10px;
   .cash-drop-details {
     display: flex;
     flex-direction: column;
@@ -42,6 +38,17 @@ onMounted(() => {
       font-size: 20px;
       border-bottom: 1px solid rgb(70, 5, 5);
     }
+  }
+}
+
+@media print {
+  .cash-drop-print {
+    zoom: 49%;
+  }
+  @page {
+    margin: 0;
+    size: 80mm 140mm;
+    scale: 0.5;
   }
 }
 </style>
