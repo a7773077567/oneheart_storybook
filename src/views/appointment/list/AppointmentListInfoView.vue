@@ -14,6 +14,7 @@ const tabs = computed(() => getTabs());
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
+const hasSignedFirstContract = computed(() => !!appointmentStore.targetClientSchedule?.hasSignedFirstContract);
 
 function getTabs() {
   const types = Object.values(Types);
@@ -44,6 +45,10 @@ function getRecordModules() {
     }
   }
 }
+
+function handleSign() {
+  console.log('sign contract');
+}
 </script>
 
 <template>
@@ -56,7 +61,14 @@ function getRecordModules() {
       <QTabPanel v-for="(tab, idx) in tabs" :key="idx" :name="tab.name">
         <KeepAlive>
           <Suspense>
-            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
+            <div>
+              <div v-if="!hasSignedFirstContract" class="first_contract_banner">
+                <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
+                <p>需簽署「就診須知合約」才能報到並進行後續治療服務</p>
+                <QBtn label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleSign" />
+              </div>
+              <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
+            </div>
           </Suspense>
         </KeepAlive>
       </QTabPanel>
@@ -70,6 +82,12 @@ function getRecordModules() {
   height: 0;
   .q-tab-panels {
     height: 100%;
+  }
+  .first_contract_banner {
+    background: #fddda9;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
   }
 }
 </style>

@@ -27,14 +27,13 @@ export const routes: RouteRecordRaw[] = [
   ...printRoutes,
   {
     path: '/sign-success',
-    name: 'TransactionSignSuccess',
-    component: () => import('@/views/order/TransactionSignSuccess.vue'),
+    name: 'ContractSignSuccess',
+    component: () => import('@/views/contract/ContractSignSuccess.vue'),
     meta: {
       requiredAuth: false,
       hide: true,
     },
   },
-
 ];
 
 const router = createRouter({

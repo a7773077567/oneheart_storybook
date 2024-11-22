@@ -207,6 +207,7 @@ export interface ClientSchedule {
   rearrangeClientSchedule: ClientSchedule | null;
   note: string;
   clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
+  hasSignedFirstContract: boolean; // todo, wait for api
 }
 
 export interface ClientSchedulesModifyHistory {
