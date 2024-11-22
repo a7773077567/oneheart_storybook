@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
-
+import { HighConversionOpportunity } from '@/components/appointment/index';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
@@ -41,6 +41,7 @@ const specialOffers = computed(() => [
       <template v-for="(offer, idx) in specialOffers" :key="idx">
         <QBadge v-if="!!offer.value" color="green-3" text-color="green-8" class="text-weight-bold">{{ offer.label }}</QBadge>
       </template>
+      <HighConversionOpportunity v-if="data.isHighSalesOpportunity" mini-mode />
     </div>
 
     <p class="booking-card__state">{{ stateLabel }}</p>

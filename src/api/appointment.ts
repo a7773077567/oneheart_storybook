@@ -96,7 +96,6 @@ export interface MedicalRecord {
   attachments: string[];
 }
 
-// TODO TBD
 // ========== HistoryRecords for all types  ==========
 export type HistoryRecord = MedicalHistoryRecord & OtherHistoryRecord;
 
@@ -104,7 +103,7 @@ export interface OtherHistoryRecord {
   userShiftType: 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
   record: {
     pastHistory: string | null;
-    occupationType: any; // TODO TBD
+    occupationType: any;
     exerciseHabits: string | null;
     others: string | null;
     clinicalObservation: string | null;
@@ -112,10 +111,10 @@ export interface OtherHistoryRecord {
     movementAssessment: string | null;
     problemSummary: string | null;
     canvasAttachment: null;
-    attachments: any[]; // TODO TBD
+    attachments: any[];
     note: string | null;
-    dynamicPressureAttachments: null; // TODO TBD
-    staticPressureAttachments: null; // TODO TBD
+    dynamicPressureAttachments: null;
+    staticPressureAttachments: null;
     personalHealthStatus: string | null;
     nutritionistAdvice: string | null;
     customerProblemDescription: string | null;
@@ -208,6 +207,7 @@ export interface ClientSchedule {
   note: string;
   clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
   isSignedFirstVisitContract: boolean | null;
+  isHighSalesOpportunity: boolean;
 }
 
 export interface ClientSchedulesModifyHistory {
