@@ -20,10 +20,7 @@ onMounted(() => {
 
 <style lang="scss">
 .handover-print {
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
+  padding: 10px;
   .handover-details {
     display: flex;
     flex-direction: column;
@@ -95,6 +92,17 @@ onMounted(() => {
       align-items: center;
       gap: 4px;
     }
+  }
+}
+
+@media print {
+  .handover-print {
+    zoom: 49%;
+  }
+  @page {
+    margin: 0;
+    size: 80mm 140mm;
+    scale: 0.5;
   }
 }
 </style>
