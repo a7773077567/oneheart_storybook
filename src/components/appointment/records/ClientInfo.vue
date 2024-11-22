@@ -14,6 +14,7 @@ import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
+import { PhysicalTypes } from '@/const/general';
 
 const props = defineProps<{
   scheduleId: number;
@@ -40,20 +41,24 @@ const isCheckedOut = computed(() => schedule.value.paymentState === 2);
 const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
 // const beforeCheckIn = computed(() => schedule.value.state === 1);
 
-const data = computed(() => [
-  { key: 'name', label: '姓名', value: client.value.name },
-  { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
-  { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
-  { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
-  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
-  { key: 'phone', label: '電話', value: client.value.phone },
-  { key: 'address', label: '地址', value: client.value.address ?? '無' },
-  { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
-  { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
-  { key: 'location', label: '地點', value: userShift.value.space?.name },
-  { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
-  { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
-]);
+const data = computed(() => {
+  const all = [
+    { key: 'name', label: '姓名', value: client.value.name },
+    { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
+    { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
+    { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
+    { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
+    { key: 'phone', label: '電話', value: client.value.phone },
+    { key: 'address', label: '地址', value: client.value.address ?? '無' },
+    { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
+    { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
+    { key: 'location', label: '地點', value: userShift.value.space?.name },
+    { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
+    { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
+  ];
+  // 只有物理治療相關項目顯示初診欄位
+  return PhysicalTypes.includes(+userShift.value.type) ? all : all.filter(field => field.key !== 'isFirstClientSchedule');
+});
 
 const states = computed(() => [
   { label: '狀態', value: scheduleState.value },
