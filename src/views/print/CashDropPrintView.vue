@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 
 const printData = ref(JSON.parse(localStorage.getItem('printData')!));
-// window.addEventListener('afterprint', () => {
-//   setTimeout(() => window.close());
-// });
+window.addEventListener('afterprint', () => {
+  setTimeout(() => window.close());
+});
 
 onMounted(() => {
   window.print();
