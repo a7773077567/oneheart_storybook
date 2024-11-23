@@ -110,6 +110,7 @@ function rearrangeClientSchedule(clientSchedule: ClientSchedule) {
 <style lang="scss" scoped>
 .query {
   &__body {
+    height: calc(100vh - 350px);
     padding: 20px 10px;
     display: flex;
     flex-direction: column;
