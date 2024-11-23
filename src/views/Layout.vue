@@ -103,10 +103,9 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
     </QHeader>
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
+      <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" @click="$router.push({ name: 'handover' })" />
       <QPage class="q-py-md q-px-lg">
-        <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" style="margin-bottom: 24px;" @click="$router.push({ name: 'handover' })" />
         <Breadcrumbs class="gutter--sm breadcrumb" />
-
         <RouterView />
       </QPage>
     </QPageContainer>
@@ -126,7 +125,7 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
   }
 }
 main.q-page {
-  height: calc(100vh - 106px);
+  height: calc(100vh - 175px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
