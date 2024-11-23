@@ -45,6 +45,20 @@ onMounted(() => {
   .cash-drop-print {
     zoom: 49%;
   }
+
+  .cell {
+    &__item {
+      padding: 4px;
+      font-size: 20px;
+    }
+    &--custom {
+      > div {
+        padding: 4px;
+        font-size: 20px;
+      }
+    }
+  }
+
   @page {
     margin: 0;
     size: 80mm 140mm;

@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 
 const printData = ref(JSON.parse(localStorage.getItem('printData')!));
-window.addEventListener('afterprint', () => {
-  setTimeout(() => window.close());
-});
+// window.addEventListener('afterprint', () => {
+//   setTimeout(() => window.close());
+// });
 
 onMounted(() => {
   window.print();
@@ -99,6 +99,31 @@ onMounted(() => {
   .handover-print {
     zoom: 49%;
   }
+
+  .handover-details {
+    &__title {
+      font-size: 32px !important;
+    }
+    &__duration {
+      font-size: 24px !important;
+    }
+  }
+
+  .overall {
+    &__item {
+      font-size: 20px;
+    }
+  }
+
+  .simple-table {
+    &__cell {
+      font-size: 18px !important;
+    }
+    &__cell-box {
+      font-size: 18px;
+    }
+  }
+
   @page {
     margin: 0;
     size: 80mm 140mm;
