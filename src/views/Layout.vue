@@ -104,8 +104,8 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
       <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" @click="$router.push({ name: 'handover' })" />
-      <QPage class="q-py-md q-px-lg">
-        <Breadcrumbs class="gutter--sm breadcrumb" />
+      <Breadcrumbs class="q-px-lg q-py-md breadcrumb" />
+      <QPage class="q-px-lg">
         <RouterView />
       </QPage>
     </QPageContainer>
@@ -125,9 +125,8 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
   }
 }
 main.q-page {
-  height: calc(100vh - 175px);
-  display: flex;
-  flex-direction: column;
+  height: calc(100vh - 211px);
+  min-height: initial !important;
   overflow: hidden;
   > *:not(.breadcrumb) {
     overflow: auto;

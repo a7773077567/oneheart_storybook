@@ -145,7 +145,7 @@ function getCalendarStyle() {
     margin-bottom: 10px;
   }
   &__body {
-    height: calc(100vh - 264px);
+    height: calc(100vh - 309px);
   }
 }
 
