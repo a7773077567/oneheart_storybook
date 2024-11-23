@@ -93,6 +93,6 @@ function getUserShifts() {
 }
 
 :deep(.calendar__body) {
-  height: calc(100vh - 329px);
+  height: calc(100vh - 309px);
 }
 </style>
