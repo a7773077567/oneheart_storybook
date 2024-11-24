@@ -28,3 +28,5 @@ export { default as GenericDialog } from './GenericDialog.vue';
 export { default as SimpleTable } from './SimpleTable.vue';
 export { default as PieChart } from './PieChart.vue';
 export { default as ChartInfo } from './ChartInfo.vue';
+export { default as SignalLight } from './SignalLight.vue';
+export { default as InfoCard } from './InfoCard.vue';
