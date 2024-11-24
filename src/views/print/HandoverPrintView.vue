@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 
 const printData = ref(JSON.parse(localStorage.getItem('printData')!));
-// window.addEventListener('afterprint', () => {
-//   setTimeout(() => window.close());
-// });
+window.addEventListener('afterprint', () => {
+  setTimeout(() => window.close());
+});
 
 onMounted(() => {
   window.print();
@@ -20,7 +20,9 @@ onMounted(() => {
 
 <style lang="scss">
 .handover-print {
-  padding: 10px;
+  padding: 16px 32px;
+  display: flex;
+  justify-content: center;
   .handover-details {
     display: flex;
     flex-direction: column;
