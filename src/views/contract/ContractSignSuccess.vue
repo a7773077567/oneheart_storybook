@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { ContractTypes, updateClientFirstVisitContract } from '@/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -13,36 +14,51 @@ const contractDetail = computed(() => {
   return {};
 });
 
-function handleRedirect() {
-  console.log(contractDetail.value);
+watch(contractDetail, (contract) => {
+  if (!contract)
+    return;
 
+  updateClientFirstVisitContract({
+    clientId: +contract.clientId,
+    clientScheduleId: +contract.scheduleId,
+    firstVisitContractDottedsignTaskId: contract.taskId,
+  });
+}, {
+  immediate: true,
+});
+
+async function handleRedirect() {
   if (!contractDetail.value)
     return;
 
   // 依照合約類型導向不同頁面
   switch ((contractDetail.value?.contractType)) {
-    case 'point':
+    case ContractTypes['儲值治療類合約']:
       return router.push({ name: 'pointsTopup', query: {
         isSigned: 'true',
         content: JSON.stringify(contractDetail.value),
       } });
-    case 'voucher':
+    case ContractTypes['儲值運動類合約']:
       return router.push({ name: 'GroupClassVoucher', query: {
         isSigned: 'true',
         content: JSON.stringify(contractDetail.value),
       } });
-    case 'newClient':
-    default:
+    case ContractTypes['物理治療初診就診須知']:
+    default:{
+      if (!contractDetail.value.scheduleId) {
+        return router.push({ name: 'appointmentListCalendar' });
+      }
       return router.push({ name: 'appointmentListInfo', params: { scheduleId: contractDetail.value.scheduleId } });
+    }
   }
 }
 
 const btnLabel = computed(() => {
   switch ((contractDetail.value?.contractType)) {
-    case 'point':
-    case 'voucher':
+    case ContractTypes['儲值治療類合約']:
+    case ContractTypes['儲值運動類合約']:
       return '請返回交易流程繼續完成結帳';
-    case 'newClient':
+    case ContractTypes['物理治療初診就診須知']:
     default:
       return '返回預約資料';
   }
@@ -53,8 +69,7 @@ const btnLabel = computed(() => {
   <div class="sign_success">
     <h2 class="q-mb-md">合約簽署已完成</h2>
     <QIcon name="check_circle" color="green" size="54px" class="q-mb-xl" />
-    <p class="q-mb-xl">{{ btnLabel }}</p>
-    <QBtn class="q-px-lg" color="black" label="返回" @click="handleRedirect" />
+    <QBtn class="q-px-lg" color="black" :label="btnLabel" @click="handleRedirect" />
   </div>
 </template>
 

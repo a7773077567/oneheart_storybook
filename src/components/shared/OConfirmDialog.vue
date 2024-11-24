@@ -7,6 +7,7 @@ interface DialogProps {
   okLabel?: string;
   cancelLabel?: string;
   type?: 'confirm' | 'success';
+  hideCancel?: boolean;
 }
 
 withDefaults(defineProps<DialogProps>(), {
@@ -50,7 +51,7 @@ function onOkClick() {
       <hr>
 
       <QCardActions vertical class="q-pa-lg add_association_dialog__actions">
-        <QBtn :label="cancelLabel" @click="onDialogHide" />
+        <QBtn v-if="!hideCancel" :label="cancelLabel" @click="onDialogHide" />
         <QBtn :label="okLabel" color="black" @click="onOkClick" />
       </QCardActions>
     </QCard>

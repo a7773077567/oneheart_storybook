@@ -2,6 +2,9 @@
 import { computed, ref } from 'vue';
 import { TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
+import { ContractTypes, getContractShareLink } from '@/api';
+import { Dialog, Loading } from 'quasar';
+import { GenericDialog } from '@/components/shared';
 
 const props = defineProps<{
   scheduleId: string;
@@ -14,7 +17,7 @@ const tabs = computed(() => getTabs());
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
-const hasSignedFirstContract = computed(() => !!appointmentStore.targetClientSchedule?.hasSignedFirstContract);
+const needToSignFirstVisit = computed(() => appointmentStore.targetClientSchedule?.isSignedFirstVisitContract === false);
 
 function getTabs() {
   const types = Object.values(Types);
@@ -46,8 +49,31 @@ function getRecordModules() {
   }
 }
 
-function handleSign() {
-  console.log('sign contract');
+const showError = ref(false);
+const successRedirectUrl = `${window.location.origin}/sign-success`;
+async function handleSign() {
+  Loading.show({ message: '等待合約完成...' });
+  const payload = JSON.stringify(({
+    contractType: ContractTypes['物理治療初診就診須知'],
+    clientId: appointmentStore.targetClientSchedule?.clientId,
+    scheduleId: props.scheduleId,
+  }));
+
+  try {
+    const { shareLink } = await getContractShareLink({
+      redirectUrl: successRedirectUrl,
+      payloadJSONString: payload,
+      type: ContractTypes['物理治療初診就診須知'],
+    });
+
+    Loading.hide();
+    // show sign view in same page
+    window.location.replace(shareLink);
+  }
+  catch (error) {
+    Loading.hide();
+    showError.value = true;
+  }
 }
 </script>
 
@@ -62,7 +88,7 @@ function handleSign() {
         <KeepAlive>
           <Suspense>
             <div>
-              <div v-if="!hasSignedFirstContract" class="first_contract_banner">
+              <div v-if="needToSignFirstVisit" class="first_contract_banner">
                 <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
                 <p>需簽署「就診須知合約」才能報到並進行後續治療服務</p>
                 <QBtn label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleSign" />
@@ -74,6 +100,13 @@ function handleSign() {
       </QTabPanel>
     </QTabPanels>
   </QCard>
+  <GenericDialog
+    v-model="showError"
+    title="合約簽署失敗"
+    confirm-label="我知道了"
+    message="抱歉，執行過程中發生錯誤。請檢查您的網路連線或稍後再試一次。如果問題持續發生，請聯繫開發團隊。"
+    @confirm="showError = false"
+  />
 </template>
 
 <style lang="scss" scoped>
