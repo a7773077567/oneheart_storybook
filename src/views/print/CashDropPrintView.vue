@@ -20,7 +20,9 @@ onMounted(() => {
 
 <style lang="scss">
 .cash-drop-print {
-  padding: 10px;
+  padding: 16px 32px;
+  display: flex;
+  justify-content: center;
   .cash-drop-details {
     display: flex;
     flex-direction: column;

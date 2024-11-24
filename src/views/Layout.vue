@@ -128,6 +128,8 @@ main.q-page {
   height: calc(100vh - 211px);
   min-height: initial !important;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   > *:not(.breadcrumb) {
     overflow: auto;
   }
