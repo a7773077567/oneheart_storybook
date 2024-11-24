@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { useVoucherStore } from '@/stores';
-import { ContractTypes, contractShareLink } from '@/api';
+import { ContractTypes, getContractShareLink } from '@/api';
 
 defineEmits<{
   (e: 'cancel'): void;
@@ -15,10 +15,9 @@ const successRedirectUrl = `${window.location.origin}/sign-success`;
 
 async function handleSign() {
   isLoading.value = true;
-  // todo, contractType 改成自動推斷
-  const payload = JSON.stringify(({ ...voucherStore.voucherDetail, birthDate: voucherStore.targetClient?.birthDate, identityNumber: voucherStore.targetClient?.identityNumber, contractType: 'voucher' }));
+  const payload = JSON.stringify(({ ...voucherStore.voucherDetail, birthDate: voucherStore.targetClient?.birthDate, identityNumber: voucherStore.targetClient?.identityNumber, contractType: ContractTypes['儲值運動類合約'] }));
 
-  const { shareLink } = await contractShareLink({
+  const { shareLink } = await getContractShareLink({
     redirectUrl: successRedirectUrl,
     payloadJSONString: payload,
     type: ContractTypes['儲值運動類合約'],
