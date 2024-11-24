@@ -4,6 +4,6 @@ export { useAppointmentStore } from './appointment';
 export { useClientStore } from './client';
 export { usePointsStore } from './points';
 export { useVoucherStore } from './voucher';
-export { useDashboardStore } from './dashboard';
+export { usePersonalAppointmentStore } from './personalAppointment';
 export { useCashDropStore } from './cashDrop';
 export { useHandoverStore } from './handover';

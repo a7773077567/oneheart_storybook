@@ -26,3 +26,5 @@ export { default as CaseCompletionIndicator } from './CaseCompletionIndicator.vu
 export { default as TwoColumnTable } from './TwoColumnTable.vue';
 export { default as GenericDialog } from './GenericDialog.vue';
 export { default as SimpleTable } from './SimpleTable.vue';
+export { default as PieChart } from './PieChart.vue';
+export { default as ChartInfo } from './ChartInfo.vue';

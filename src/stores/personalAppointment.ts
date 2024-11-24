@@ -1,5 +1,5 @@
 import type { ClientSchedule, UserInProgressClientSchedule } from '@/api';
-import { type UserInProgressClientSchedulesParams, fetchUserInProgressClientSchedules } from '@/api/dashboard';
+import { type UserInProgressClientSchedulesParams, fetchUserInProgressClientSchedules } from '@/api/home/personalAppointment';
 import { ShiftType } from '@/const/general';
 import { defineStore } from 'pinia';
 
@@ -7,7 +7,7 @@ interface State {
   userInProgressClientSchedules: UserInProgressClientSchedule[];
 }
 
-export const useDashboardStore = defineStore('dashboard', {
+export const usePersonalAppointmentStore = defineStore('personalAppointment', {
   state: (): State => ({
     userInProgressClientSchedules: [],
   }),
