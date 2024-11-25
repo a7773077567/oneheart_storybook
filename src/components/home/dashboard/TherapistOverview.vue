@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { InfoCard, PieChart, SignalLight } from '@/components/shared';
+import { EducationPointEdit } from '@/components/home/dashboard';
+import { ref } from 'vue';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
@@ -35,8 +37,18 @@ const info = [
   },
   {
     name: 'educationPointsEntry',
+    label: '教育積分填寫',
+    value: {
+      predicted: 30,
+      current: 48,
+    },
   },
 ];
+
+const educationPoints = ref({
+  predicted: info[4].value.predicted,
+  current: info[4].value.current,
+});
 </script>
 
 <template>
@@ -45,9 +57,9 @@ const info = [
       <div class="title">治療師運營總覽</div>
     </div>
     <div class="overview__body">
-      <div class="overview__chart">
-        <div class="overview__duration-filter">本日</div>
-        <div class="overview__chart-box">
+      <div class="chart">
+        <div class="chart__header">本日</div>
+        <div class="chart__body">
           <PieChart
             :chart-data="caseStatus.chartData"
             :info-data="caseStatus.infoData"
@@ -64,13 +76,21 @@ const info = [
           />
         </div>
       </div>
-      <div class="overview__signal">
-        <SignalLight :predicted="2" :current="0" />
-        <InfoCard :data="info">
-          <template #educationPointsEntry>
-            123
-          </template>
-        </InfoCard>
+
+      <div class="overview__body-separator" />
+
+      <div class="info">
+        <div class="info__header">
+          header
+        </div>
+        <div class="info__body">
+          <SignalLight :predicted="2" :current="0" />
+          <InfoCard :data="info">
+            <template #educationPointsEntry>
+              <EducationPointEdit v-model="educationPoints" />
+            </template>
+          </InfoCard>
+        </div>
       </div>
     </div>
   </div>
@@ -78,7 +98,7 @@ const info = [
 
 <style lang="scss" scoped>
 .overview {
-  width: 1084px;
+  width: fit-content;
   &__header {
     margin-bottom: 20px;
   }
@@ -90,19 +110,31 @@ const info = [
     border: 1px solid #dbdae7;
   }
 
-  &__chart {
-    border-right: 1px solid rgba(219, 218, 231, 1);
+  &__body-separator {
+    width: 1px;
+    background-color: rgba(219, 218, 231, 1);
   }
+}
 
-  &__duration-filter {
+.chart {
+  &__header {
     padding: 16px 16px 0 16px;
   }
 
-  &__chart-box {
+  &__body {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 40px;
+  }
+}
+
+.info {
+  &__header {
+    padding: 16px 16px 0 16px;
+  }
+  &__body {
+    padding: 24px;
   }
 }
 
