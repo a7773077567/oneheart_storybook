@@ -1,14 +1,37 @@
 <script setup lang="ts">
-import { InfoCard, PieChart, SignalLight } from '@/components/shared';
+import { AllOptionSelect, InfoCard, OptionSelect, PieChart, SignalLight } from '@/components/shared';
 import { EducationPointEdit } from '@/components/home/dashboard';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { DateFilterOptions } from '@/const/dashboard';
+import { useAppointmentStore, useUserStore } from '@/stores';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
-defineProps<{
+const props = defineProps<{
   caseStatus: ChartData;
   checkoutPlan: ChartData;
+  therapistFilter: number;
+  dateFilter: number;
 }>();
+
+const emit = defineEmits<{
+  (e: 'update:therapistFilter', val: number): void;
+  (e: 'update:dateFilter', val: number): void;
+}>();
+
+const userStore = useUserStore();
+const appointmentStore = useAppointmentStore();
+await appointmentStore.getUsers([userStore.currentSpaceId!]);
+
+const therapistFilterModel = computed({
+  get: () => props.therapistFilter,
+  set: val => emit('update:therapistFilter', val),
+});
+
+const dateFilterModel = computed({
+  get: () => props.dateFilter,
+  set: val => emit('update:dateFilter', val),
+});
 
 const info = [
   {
@@ -49,16 +72,26 @@ const educationPoints = ref({
   predicted: info[4].value.predicted,
   current: info[4].value.current,
 });
+const therapistFilterOptions = [
+  {
+    label: '所有治療師',
+    value: 0,
+  },
+  ...appointmentStore.activeUsers,
+];
 </script>
 
 <template>
   <div class="overview">
     <div class="overview__header">
       <div class="title">治療師運營總覽</div>
+      <OptionSelect v-model="therapistFilterModel" :options="therapistFilterOptions" />
     </div>
     <div class="overview__body">
       <div class="chart">
-        <div class="chart__header">本日</div>
+        <div class="chart__header">
+          <OptionSelect v-model="dateFilterModel" :options="DateFilterOptions" />
+        </div>
         <div class="chart__body">
           <PieChart
             :chart-data="caseStatus.chartData"
@@ -81,7 +114,7 @@ const educationPoints = ref({
 
       <div class="info">
         <div class="info__header">
-          header
+          <!-- <AllOptionSelect  /> -->
         </div>
         <div class="info__body">
           <SignalLight :predicted="2" :current="0" />
@@ -101,6 +134,9 @@ const educationPoints = ref({
   width: fit-content;
   &__header {
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
   &__body {

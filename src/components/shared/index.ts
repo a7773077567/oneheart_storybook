@@ -30,3 +30,4 @@ export { default as PieChart } from './PieChart.vue';
 export { default as ChartInfo } from './ChartInfo.vue';
 export { default as SignalLight } from './SignalLight.vue';
 export { default as InfoCard } from './InfoCard.vue';
+export { default as OptionSelect } from './OptionSelect.vue';

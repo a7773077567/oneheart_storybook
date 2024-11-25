@@ -19,8 +19,8 @@ export const CaseStatusMap = {
     label: '改期',
     color: 'rgba(103, 159, 195, 1)',
   },
-  canceledCount: {
-    name: 'canceledCount',
+  cancellationCount: {
+    name: 'cancellationCount',
     label: '取消',
     color: 'rgba(173, 198, 214, 1)',
   },
@@ -43,3 +43,8 @@ export const CheckoutPlanMap = {
     color: 'rgba(5, 48, 72, 1)',
   },
 } as const;
+
+export const DateFilterOptions = ['本日', '本月', '上月', '本季', '本年'].map((item, idx) => ({
+  label: item,
+  value: idx,
+}));
