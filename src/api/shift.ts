@@ -107,6 +107,7 @@ export interface UserShiftsGet {
   userIds: number[];
   startDate: string;
   endDate: string;
+  userShiftTypes?: ShiftType[];
 }
 
 export interface ShiftReq {

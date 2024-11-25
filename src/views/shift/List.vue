@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { omit } from 'radash';
+import { isEqual, omit } from 'radash';
 import { ShiftChip, ShiftEditor, ShiftSelector } from '@/components/shift';
 import { createUserShift, deleteUserShift, updateUserShift } from '@/api/shift';
 import type { CreateUserShift, UpdateUserShift, UserShiftTemplate } from '@/api/shift';
@@ -9,6 +9,7 @@ import { useShiftStore, useUserStore } from '@/stores';
 import type { ChangeParams } from '@/components/shared/Calendar.vue';
 import { ErrorMessages } from '@/api/errorMessages';
 import { useQuasar } from 'quasar';
+import type { ShiftType } from '@/const/general';
 
 const shiftStore = useShiftStore();
 const userStore = useUserStore();
@@ -24,8 +25,14 @@ const targetUserId = ref<number | null>(null);
 const targetUserShiftId = ref<number | null>(null);
 const targetShiftTemplates = computed(() => userStore.isGym ? shiftStore.shiftTemplatesForGym : shiftStore.shiftTemplates);
 const shiftSelectorHint = ref('');
+const selectedShifts = ref<ShiftType[]>(shiftStore.spaceShiftOptions.map(s => s.value));
 
-watch(duration, getUserShifts);
+watch([duration, selectedShifts], ([newD, newS], [oriD, oriS]) => {
+  if (isEqual(newD, oriD) && isEqual(newS, oriS)) {
+    return;
+  }
+  getUserShifts();
+});
 
 await shiftStore.getUsers([userStore.currentSpaceId!]);
 
@@ -119,6 +126,7 @@ async function getUserShifts() {
     await shiftStore.getUserShifts({
       ...duration.value,
       userIds: userIds.value,
+      userShiftTypes: selectedShifts.value,
     });
   }
   catch (err) {
@@ -145,6 +153,13 @@ function closeShiftSelector() {
       @model-resources="shiftStore.users = $event"
       @change="onCalendarChange"
     >
+      <template #filters>
+        <AllOptionSelect
+          v-model="selectedShifts"
+          label="科別"
+          :options="shiftStore.spaceShiftOptions"
+        />
+      </template>
       <template #day="{ scope: { resource, timestamp, isEditing } }">
         <div class="day">
           <ShiftChip
