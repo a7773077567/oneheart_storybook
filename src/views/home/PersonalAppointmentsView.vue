@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CalendarMonth, CaseCompletionIndicator } from '@/components/shared';
-import { PersonalAppointmentCard, PersonalAppointmentDialog } from '@/components/home/dashboard';
+import { PersonalAppointmentCard, PersonalAppointmentDialog } from '@/components/home/personalAppointment';
 import { today } from '@quasar/quasar-ui-qcalendar';
 import { computed, ref } from 'vue';
 import { usePersonalAppointmentStore } from '@/stores';
