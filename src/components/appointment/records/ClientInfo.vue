@@ -266,7 +266,7 @@ async function handleEmployeePriceChange(state: boolean) {
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
           <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="appointmentStore.needToSignFirstVisit" @click="finishService" />
           <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
         </div>
       </div>

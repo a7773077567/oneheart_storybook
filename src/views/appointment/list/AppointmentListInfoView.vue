@@ -17,7 +17,6 @@ const tabs = computed(() => getTabs());
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
-const needToSignFirstVisit = computed(() => appointmentStore.targetClientSchedule?.isSignedFirstVisitContract === false);
 
 function getTabs() {
   const types = Object.values(Types);
@@ -86,16 +85,14 @@ async function handleSign() {
     <QTabPanels v-model="currentTab" animated>
       <QTabPanel v-for="(tab, idx) in tabs" :key="idx" :name="tab.name">
         <KeepAlive>
-          <Suspense>
-            <div>
-              <div v-if="needToSignFirstVisit" class="first_contract_banner">
-                <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
-                <p>需簽署「就診須知合約」才能報到並進行後續治療服務</p>
-                <QBtn label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleSign" />
-              </div>
-              <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
+          <div>
+            <div v-if="appointmentStore.needToSignFirstVisit" class="first_contract_banner">
+              <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
+              <p>需簽署「就診須知合約」才能進行後續治療服務</p>
+              <QBtn label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleSign" />
             </div>
-          </Suspense>
+            <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
+          </div>
         </KeepAlive>
       </QTabPanel>
     </QTabPanels>
