@@ -71,6 +71,16 @@ const ShiftTypeConst = {
   新人實習門診: 13,
 } as const;
 
+// 物理治療項目：只有以下 5 個科別屬於物理治療項目
+// https://www.notion.so/enginelin/fe29a884eab74700a7c01e75875f72ff?pvs=4
+export const PhysicalTypes = [
+  ShiftType['物理諮詢門診'],
+  ShiftType['物理治療門診'],
+  ShiftType['院長物理治療'],
+  ShiftType['院長評估門診'],
+  ShiftType['物理治療體驗門診'],
+] as const;
+
 type TabName = typeof TabNames[number];
 export interface Type {
   identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { usePointsStore } from '@/stores';
-import { ContractTypes, contractShareLink } from '@/api';
+import { ContractTypes, getContractShareLink } from '@/api';
 import { PointTypes } from '@/const/general';
 
 defineEmits<{
@@ -29,10 +29,9 @@ const successRedirectUrl = `${window.location.origin}/sign-success`;
 
 async function handleSign() {
   isLoading.value = true;
-  // todo, contractType 改成自動推斷
-  const payload = JSON.stringify(({ ...pointStore.topupDetail, birthDate: pointStore.targetClient?.birthDate, identityNumber: pointStore.targetClient?.identityNumber, contractType: 'point' }));
+  const payload = JSON.stringify(({ ...pointStore.topupDetail, birthDate: pointStore.targetClient?.birthDate, identityNumber: pointStore.targetClient?.identityNumber, contractType: ContractTypes['儲值治療類合約'] }));
 
-  const { shareLink } = await contractShareLink({
+  const { shareLink } = await getContractShareLink({
     redirectUrl: successRedirectUrl,
     payloadJSONString: payload,
     type: contractType.value,

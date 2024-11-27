@@ -148,6 +148,7 @@ export const useAppointmentStore = defineStore('appointment', {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
+    needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
   },
   actions: {
     async getUsers(spaceIds: number[]) {

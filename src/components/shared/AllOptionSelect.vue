@@ -48,6 +48,7 @@ watch(() => props.modelValue.length, (newVal) => {
 const popupStyle = {
   width: '280px',
   background: '#F8FBFF',
+  height: '296px',
 };
 
 const selectStyle = computed(() => {

@@ -22,6 +22,10 @@ const stateColor = computed(() => stateInfo.value.cardStyle?.color);
 const isGroupClass = computed(() => props.data.userShift.type === 11);
 const type = computed(() => Object.values(Types).find(type => props.data.userShift.type === type.identifier));
 const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name : type.value?.label);
+const specialOffers = computed(() => [
+  { label: '員工價', value: props.data.isEmployeePrice },
+  { label: '自動推薦', value: props.data.isUsingAutoRecommend },
+]);
 </script>
 
 <template>
@@ -30,13 +34,17 @@ const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name 
       <div class="booking-card__client--val q-pr-sm">客戶：{{ data.client.name }}</div>
       <p class="booking-card__client--val">科別：{{ typeLabel }}</p>
     </div>
+
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
-    <p class="booking-card__state">{{ stateLabel }}</p>
-    <div class="flex">
-      <QBadge v-if="!!data.isEmployeePrice" color="green-3" text-color="green-8" class="text-weight-bold">
-        員工價
-      </QBadge>
+
+    <div class="flex q-gutter-xs">
+      <template v-for="(offer, idx) in specialOffers" :key="idx">
+        <QBadge v-if="!!offer.value" color="green-3" text-color="green-8" class="text-weight-bold">{{ offer.label }}</QBadge>
+      </template>
     </div>
+
+    <p class="booking-card__state">{{ stateLabel }}</p>
+
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
     <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">

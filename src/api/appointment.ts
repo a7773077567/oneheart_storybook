@@ -207,6 +207,7 @@ export interface ClientSchedule {
   rearrangeClientSchedule: ClientSchedule | null;
   note: string;
   clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
+  isSignedFirstVisitContract: boolean | null;
 }
 
 export interface ClientSchedulesModifyHistory {

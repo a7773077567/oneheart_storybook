@@ -33,6 +33,7 @@ export interface Client {
   note: string;
   phone: string;
   relationTypeName: string | null;
+  firstVisitContractUrl?: string | null;
 }
 
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;
@@ -197,4 +198,9 @@ export async function getAllContract(clientId: number) {
 export async function getClientPaymentDetail({ clientId, paymentId }: { clientId: number;paymentId: number }) {
   const { data } = await api.get<PaymentDetail>(`clients/${clientId}/payments/${paymentId}`);
   return data;
+}
+
+// 修改客戶就診須知
+export async function updateClientFirstVisitContract({ clientId, clientScheduleId, firstVisitContractDottedsignTaskId }: { clientId: number; clientScheduleId: number; firstVisitContractDottedsignTaskId: number }) {
+  await api.patch(`clients/${clientId}/update-firstVisitContract`, { clientScheduleId, firstVisitContractDottedsignTaskId });
 }

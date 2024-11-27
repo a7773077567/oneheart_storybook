@@ -6,7 +6,7 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
+import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
@@ -14,6 +14,7 @@ import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
+import { PhysicalTypes } from '@/const/general';
 
 const props = defineProps<{
   scheduleId: number;
@@ -40,20 +41,26 @@ const isCheckedOut = computed(() => schedule.value.paymentState === 2);
 const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
 // const beforeCheckIn = computed(() => schedule.value.state === 1);
 
-const data = computed(() => [
-  { key: 'name', label: '姓名', value: client.value.name },
-  { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
-  { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
-  { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
-  { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
-  { key: 'phone', label: '電話', value: client.value.phone },
-  { key: 'address', label: '地址', value: client.value.address ?? '無' },
-  { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
-  { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
-  { key: 'location', label: '地點', value: userShift.value.space?.name },
-  { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
-  { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
-]);
+const data = computed(() => {
+  const all = [
+    { key: 'name', label: '姓名', value: client.value.name },
+    { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
+    { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
+    { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
+    { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
+    { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
+    { key: 'phone', label: '電話', value: client.value.phone },
+    { key: 'address', label: '地址', value: client.value.address ?? '無' },
+    { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
+    { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
+    { key: 'location', label: '地點', value: userShift.value.space?.name },
+    { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
+    { key: 'firstVisitContract', label: '預約就診須知', value: client.value?.firstVisitContractUrl ?? null },
+    { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
+  ];
+  // 只有物理治療相關項目顯示初診欄位
+  return PhysicalTypes.includes(+userShift.value.type) ? all : all.filter(field => field.key !== 'firstVisitContract');
+});
 
 const states = computed(() => [
   { label: '狀態', value: scheduleState.value },
@@ -160,6 +167,14 @@ async function handleEmployeePriceChange(state: boolean) {
   useNotify('員工價編輯成功');
   await appointmentStore.getClientSchedule(+props.scheduleId);
 }
+
+// 就診須知合約下載
+async function handleDownload(contractUrl: string) {
+  if (!contractUrl)
+    return;
+
+  window.open(contractUrl);
+}
 </script>
 
 <template>
@@ -204,6 +219,11 @@ async function handleEmployeePriceChange(state: boolean) {
             </div>
           </div>
         </template>
+        <template #autoRecommendation="{ row }">
+          <QIcon v-if="row.value" name="check_circle" color="green" class="q-mr-sm" />
+          <span>{{ row.value ? '是（選擇自動推薦治療師）' : '否' }}</span>
+        </template>
+
         <template #lineId="{ row }">
           <div v-if="row.value">{{ row.value }}</div>
           <QBadge v-else color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">LINE 未綁定</QBadge>
@@ -214,9 +234,7 @@ async function handleEmployeePriceChange(state: boolean) {
             <div class="liffIntroducerName__value">
               後台綁定
               <template v-if="!client.introducer">
-                <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">
-                  介紹人未綁定
-                </QBadge>
+                <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">介紹人未綁定</QBadge>
                 <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
               </template>
               <template v-else>
@@ -236,6 +254,10 @@ async function handleEmployeePriceChange(state: boolean) {
               <QBtn v-if="!isEditingTime" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
+        </template>
+        <template #firstVisitContract="{ row }">
+          <a v-if="!!row.value" class="link" @click="handleDownload(row.value as string)">預約就診須知合約.pdf</a>
+          <span v-else> - </span>
         </template>
         <template #note>
           <div class="note">
@@ -261,7 +283,7 @@ async function handleEmployeePriceChange(state: boolean) {
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
           <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" @click="finishService" />
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="appointmentStore.needToSignFirstVisit" @click="finishService" />
           <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
         </div>
       </div>

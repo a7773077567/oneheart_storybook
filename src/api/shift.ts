@@ -1,5 +1,6 @@
 import { api } from '@/utils/api';
 import type { Role, Space, User } from './user';
+import type { ShiftType } from '@/const/general';
 
 // ========== Types ==========
 
@@ -57,7 +58,7 @@ export interface UserShift {
   id: number;
   spaceId: number;
   userId: number;
-  type: number;
+  type: ShiftType;
   name: string;
   date: string;
   startTime: string;
@@ -106,6 +107,7 @@ export interface UserShiftsGet {
   userIds: number[];
   startDate: string;
   endDate: string;
+  userShiftTypes?: ShiftType[];
 }
 
 export interface ShiftReq {

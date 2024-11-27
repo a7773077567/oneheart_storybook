@@ -64,11 +64,14 @@ function getCalendarStyle() {
 <template>
   <div class="calendar">
     <div class="calendar__nav">
-      <AllOptionSelect
-        v-model="selected"
-        label="治療師"
-        :options="options"
-      />
+      <div class="filters">
+        <AllOptionSelect
+          v-model="selected"
+          label="治療師"
+          :options="options"
+        />
+        <slot name="filters" />
+      </div>
       <div v-if="!simpleMode" class="column items-center q-gutter-md">
         <DatePicker v-model="model" />
         <CalendarNav
@@ -143,6 +146,11 @@ function getCalendarStyle() {
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 10px;
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
   }
   &__body {
     height: calc(100vh - 309px);
