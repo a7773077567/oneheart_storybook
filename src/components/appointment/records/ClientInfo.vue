@@ -6,7 +6,7 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishRecord, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
+import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
@@ -55,6 +55,7 @@ const data = computed(() => {
     { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
     { key: 'location', label: '地點', value: userShift.value.space?.name },
     { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
+    { key: 'firstVisitContract', label: '預約就診須知', value: client.value?.firstVisitContractUrl ?? null },
     { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
   ];
   // 只有物理治療相關項目顯示初診欄位
@@ -166,6 +167,14 @@ async function handleEmployeePriceChange(state: boolean) {
   useNotify('員工價編輯成功');
   await appointmentStore.getClientSchedule(+props.scheduleId);
 }
+
+// 就診須知合約下載
+async function handleDownload(contractUrl: string) {
+  if (!contractUrl)
+    return;
+
+  window.open(contractUrl);
+}
 </script>
 
 <template>
@@ -245,6 +254,10 @@ async function handleEmployeePriceChange(state: boolean) {
               <QBtn v-if="!isEditingTime" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
+        </template>
+        <template #firstVisitContract="{ row }">
+          <a v-if="!!row.value" class="link" @click="handleDownload(row.value as string)">預約就診須知合約.pdf</a>
+          <span v-else> - </span>
         </template>
         <template #note>
           <div class="note">

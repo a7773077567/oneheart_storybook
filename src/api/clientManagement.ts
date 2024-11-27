@@ -33,6 +33,7 @@ export interface Client {
   note: string;
   phone: string;
   relationTypeName: string | null;
+  firstVisitContractUrl?: string | null;
 }
 
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;
