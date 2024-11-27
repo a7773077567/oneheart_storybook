@@ -59,7 +59,7 @@ const data = computed(() => {
     { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
   ];
   // 只有物理治療相關項目顯示初診欄位
-  return PhysicalTypes.includes(+userShift.value.type) ? all : all.filter(field => field.key !== 'isFirstClientSchedule');
+  return PhysicalTypes.includes(+userShift.value.type) ? all : all.filter(field => field.key !== 'firstVisitContract');
 });
 
 const states = computed(() => [
