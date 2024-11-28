@@ -15,8 +15,13 @@ defineEmits<{
 <template>
   <QCard>
     <QCardSection class="q-px-sm q-py-xs">
-      <div class="text-h6">
-        {{ data.name }}
+      <div class="text-h6 flex items-center">
+        <span class="q-mr-sm">
+          {{ data.name }}
+        </span>
+        <QChip size="sm" :color="data.scheduleClasses >= data.numberOfClasses ? 'black' : 'red'" text-color="white" class="q-ml-sm text-weight-medium">
+          {{ data.scheduleClasses }}/{{ data.numberOfClasses }}
+        </QChip>
       </div>
     </QCardSection>
     <QCardSection horizontal class="justify-between items-center q-px-sm">
@@ -33,5 +38,8 @@ defineEmits<{
 </template>
 
 <style lang="scss" scoped>
-
+  :deep(.q-chip__content) {
+  font-weight: 500;
+  font-size: 11px;
+}
 </style>

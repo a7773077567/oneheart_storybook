@@ -56,7 +56,7 @@ async function addUserShift(shiftTemplate: UserShiftTemplate) {
   const isGroupClass = shiftTemplate.type === 11;
   if (isGroupClass) {
     payload = {
-      ...omit(shiftTemplate, ['id', 'spaceId', 'remainingClasses', 'maxClientsForGroupClass', 'numberOfClasses']),
+      ...omit(shiftTemplate, ['id', 'spaceId', 'remainingClasses', 'maxClientsForGroupClass', 'numberOfClasses', 'scheduleClasses']),
       userId: targetUserId.value!,
       date: targetDate.value!,
       name: null,

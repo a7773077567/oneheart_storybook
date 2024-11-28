@@ -3,8 +3,7 @@ import { computed } from 'vue';
 import type { UserShift } from '@/api/shift';
 import { getWeekDay } from '@/utils/date';
 import dayjs from 'dayjs';
-import { TherapyTypes } from '@/const/general';
-import { getTypeLabel } from '@/utils/mappers';
+import { ShiftType } from '@/const/general';
 
 interface Props {
   data: UserShift;
@@ -25,7 +24,7 @@ const date = computed(() => {
 });
 
 const duration = computed(() => toDurationLabel(props.data.startTime, props.data.endTime));
-const type = computed(() => getTypeLabel(props.data.type));
+const type = computed(() => ShiftType[props.data.type] as keyof typeof ShiftType);
 const unavailable = computed(() => props.data.notAvailableTimes.map(item => toDurationLabel(item.startTime, item.endTime, true)));
 const bgc = computed(() => props.data.color);
 
@@ -35,6 +34,8 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
     ? `${label}不可預約`
     : label;
 }
+
+const reachMaxGroupClassCounts = computed(() => (props.data.groupClass?.scheduleClasses ?? 0) >= (props.data.groupClass?.numberOfClasses ?? 0));
 </script>
 
 <template>
@@ -44,6 +45,11 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
     </div>
     <div class="shift-chip__item">
       {{ data.name }}
+    </div>
+    <div v-if="type === '團課'" class="shift-chip__item">
+      <QChip size="xs" :color="reachMaxGroupClassCounts ? 'black' : 'red'" text-color="white">
+        {{ data.groupClass?.scheduleClasses }}/{{ data.groupClass?.numberOfClasses }}
+      </QChip>
     </div>
     <QPopupProxy anchor="top right">
       <QCard style="padding: 10px 0 20px 0">
@@ -61,6 +67,7 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
           >
             {{ item }}
           </div>
+          <div v-if="type === '團課'">已排 {{ data.groupClass?.scheduleClasses }} 堂 / 共需 {{ data.groupClass?.numberOfClasses }} 堂</div>
         </QCardSection>
         <QCardActions v-if="editMode" style="padding: 0 30px;">
           <QBtn icon="o_delete" flat round dense @click="$emit('delete', data.id)" />
@@ -88,6 +95,10 @@ function toDurationLabel(startTime: string, endTime: string, isUnavailable?: boo
     color: black;
     font-size: 12px;
     font-weight: 500;
+  }
+  :deep(.q-chip__content) {
+    font-weight: 500;
+    font-size: 11px;
   }
 }
 </style>
