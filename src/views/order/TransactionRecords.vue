@@ -9,7 +9,7 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Receipt } from '@/components/appointment';
-import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import CancelOrder from '@/components/order/CancelOrder.vue';
 
@@ -92,9 +92,9 @@ const cols: QTableProps['columns'] = [
         case TransactionTypes.團課券退款:
           return `${ticketGained} 張 / $ -${amount}`;
         case TransactionTypes.堂數交易:
-          return `${+paidPointGained + +giftPointGained} 堂/ $${amount}`;
+          return `${showDecimal(+paidPointGained + +giftPointGained)} 堂/ $${amount}`;
         case TransactionTypes.堂數退款:
-          return `${+paidPointGained + +giftPointGained} 堂/ $ -${amount}`;
+          return `${showDecimal(+paidPointGained + +giftPointGained)} 堂/ $ -${amount}`;
         default:
           amount = 0;
       }
@@ -190,9 +190,12 @@ async function checkReceipt(paymentId: number) {
       extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }];
       break;
     case TransactionTypes.團課券購買:
-    case TransactionTypes.團課券退款:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
       extraFields = [{ name: 'groupClassName', label: '課程名稱', value: groupClassName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'pointGained', label: '張數', value: `${ticketGained ?? 0}張` }];
+      break;
+    case TransactionTypes.團課券退款:
+      amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
+      extraFields = [{ name: 'groupClassName', label: '課程名稱', value: groupClassName }, { name: 'amount', label: '金額', value: `-$${amount}` }, { name: 'pointGained', label: '張數', value: `${ticketGained ?? 0}張` }];
       break;
     case TransactionTypes.堂數交易:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
@@ -200,7 +203,7 @@ async function checkReceipt(paymentId: number) {
       break;
     case TransactionTypes.堂數退款:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '堂數', value: `${paidPointGained + giftPointGained}堂` }];
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `-$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '堂數', value: `${showDecimal(+paidPointGained + +giftPointGained)}堂` }];
       break;
     default:
       amount = 0;
