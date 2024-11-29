@@ -23,11 +23,21 @@ await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 
+onBeforeUnmount(() => {
+  appointmentStore.rearrangeMode = false;
+});
+
 watch(selectedDate, async (newDate) => {
   try {
-    appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
     $q.loading.show();
-    await appointmentStore.getAvailable(appointmentStore.availableQuery);
+    if (appointmentStore.rearrangeMode && appointmentStore.rearrangeQuery) {
+      appointmentStore.rearrangeQuery.date = newDate;
+      await appointmentStore.getAvailableRearranged(appointmentStore.rearrangeQuery);
+    }
+    else {
+      appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
+      await appointmentStore.getAvailable(appointmentStore.availableQuery);
+    }
     appointmentStore.querySent = true;
   }
   catch (err) {
