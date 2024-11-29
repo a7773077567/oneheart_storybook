@@ -67,7 +67,7 @@ const reachMaxGroupClassCounts = computed(() => (props.data.groupClass?.schedule
           >
             {{ item }}
           </div>
-          <div v-if="type === '團課'">已排 {{ data.groupClass?.scheduleClasses }} 堂 / 共需 {{ data.groupClass?.numberOfClasses }} 堂</div>
+          <div v-if="type === '團課'" class="text-no-wrap">為團體課程，已排定 {{ data.groupClass?.scheduleClasses }} 堂 / 共需 {{ data.groupClass?.numberOfClasses }} 堂</div>
         </QCardSection>
         <QCardActions v-if="editMode" style="padding: 0 30px;">
           <QBtn icon="o_delete" flat round dense @click="$emit('delete', data.id)" />
