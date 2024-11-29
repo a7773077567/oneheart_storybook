@@ -15,7 +15,9 @@ const props = defineProps<{
 const clientStore = useClientStore();
 await Promise.allSettled([clientStore.getClientInfo(+props.clientId), clientStore.getDepInChargeTherapist(+props.clientId)]);
 
-const initialValues = computed<Partial<Client>>(() => clientStore.targetClient ? pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer', 'liffIntroducerName']) : {});
+const initialValues = computed<Partial<Client>>(() => clientStore.targetClient
+  ? { ...pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer', 'liffIntroducerName']), introducer: clientStore.targetClient.introducer?.id ?? null }
+  : {});
 const { handleSubmit } = useForm({ initialValues: initialValues.value });
 
 const isEdit = ref(false);

@@ -24,7 +24,7 @@ export interface Client {
   identityType: number;
   identityNumber: string | null;
   isVerifiedBySMS: boolean;
-  introducer: Pick<Client, 'associations' | 'email' | 'id' | 'inBodyFiles' | 'introducer' | 'lineUserId' | 'name' | 'phone' | 'relationTypeName' >;
+  introducer: Pick<Client, 'associations' | 'email' | 'id' | 'inBodyFiles' | 'introducer' | 'lineUserId' | 'name' | 'phone' | 'relationTypeName'> | null;
   inBodyFileUrls: string[];
   inBodyFiles: InbodyFile[];
   lineUserId: string;
