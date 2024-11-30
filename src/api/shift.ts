@@ -1,5 +1,6 @@
 import { api } from '@/utils/api';
-import type { ShiftType } from '@/const/general';
+import type { ShiftType, SpaceType } from '@/const/general';
+import type { User } from './user';
 
 // import type { Role, Space, User } from './user';
 
@@ -70,6 +71,12 @@ export interface UserShift {
   startTime: string;
   type: ShiftType;
   userId: number;
+  user: Pick<User, 'id' | 'name' | 'role'>;
+  space: {
+    id: number;
+    name: string;
+    type: SpaceType;
+  };
 }
 
 export interface CreateUserShift {
