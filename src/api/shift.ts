@@ -1,6 +1,7 @@
 import { api } from '@/utils/api';
-import type { Role, Space, User } from './user';
 import type { ShiftType } from '@/const/general';
+
+// import type { Role, Space, User } from './user';
 
 // ========== Types ==========
 
@@ -24,16 +25,17 @@ export interface ShiftTemplate {
 }
 
 export interface GroupShiftTemplate {
-  id: number;
-  spaceId: number;
-  type: 11;
-  name: string;
-  startTime: string;
-  endTime: string;
   color: string;
-  numberOfClasses: number;
+  endTime: string;
+  id: number;
   maxClientsForGroupClass: number;
-  remainingClasses: number;
+  name: string;
+  numberOfClasses: number; // 團課總數
+  remainingClasses: number; // 剩餘可排數量
+  scheduleClasses: number; // 已排課數量
+  spaceId: number;
+  startTime: string;
+  type: ShiftType.團課;
 }
 
 export type UserShiftTemplate = ShiftTemplate | GroupShiftTemplate;
@@ -55,21 +57,19 @@ export interface GroupShiftTemplatePayload {
 }
 
 export interface UserShift {
-  id: number;
-  spaceId: number;
-  userId: number;
-  type: ShiftType;
-  name: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  notAvailableTimes: Duration[] ;
   color: string;
+  date: string;
+  endTime: string;
+  groupClass: null | GroupShiftTemplate;
+  id: number;
   maxClients: number | null;
   maxClientsForCoachClass: number | null;
-  groupClassId: number | null;
-  space: Space;
-  user: User;
+  name: string;
+  notAvailableTimes: Duration[];
+  spaceId: number;
+  startTime: string;
+  type: ShiftType;
+  userId: number;
 }
 
 export interface CreateUserShift {
