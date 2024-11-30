@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { Client, UserShift } from '@/api';
+import type { Client, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 
@@ -190,7 +190,7 @@ export interface ClientSchedule {
   client: Client;
   date: string;
   userShiftId: number;
-  userShift: UserShift;
+  userShift: UserShiftDetail;
   userShiftSlotId: number;
   userShiftAppointmentId: number;
   scheduleStartTime: string;

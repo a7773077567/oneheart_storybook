@@ -1,5 +1,5 @@
 import { api } from '@/utils/api';
-import type { UserShift } from '@/api/shift';
+import type { UserShiftDetail } from '@/api/shift';
 import type { Client } from '@/api/clientManagement';
 
 export interface UserInProgressClientSchedulesParams {
@@ -9,7 +9,7 @@ export interface UserInProgressClientSchedulesParams {
 
 export interface UserInProgressClientSchedule {
   id: number;
-  userShift: UserShift;
+  userShift: UserShiftDetail;
   date: string;
   scheduleStartTime: string;
   scheduleEndTime: string;

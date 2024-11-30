@@ -2,7 +2,7 @@ import { api } from '@/utils/api';
 import type { PaymentTypes, PointTypes, TransactionTypes } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
-import type { UserShift } from './shift';
+import type { UserShiftDetail } from './shift';
 import type { AddOnService } from './appointment';
 
 interface BasicPaymentRecord {
@@ -109,7 +109,7 @@ export async function getPayments(params?: PaymentQuery) {
 }
 
 // 單一交易記錄
-export type PaymentDetail = (MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord) & { client: Client; userShift: UserShift | null };
+export type PaymentDetail = (MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord) & { client: Client; userShift: UserShiftDetail | null };
 export async function getSinglePayment(paymentId: number) {
   const { data } = await api.get<PaymentDetail>(`payments/${paymentId}`);
   return data;

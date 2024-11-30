@@ -71,6 +71,10 @@ export interface UserShift {
   startTime: string;
   type: ShiftType;
   userId: number;
+
+}
+
+export interface UserShiftDetail extends UserShift {
   user: Pick<User, 'id' | 'name' | 'role'>;
   space: {
     id: number;

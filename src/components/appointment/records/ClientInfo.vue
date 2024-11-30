@@ -53,8 +53,8 @@ const data = computed(() => {
     { key: 'address', label: '地址', value: client.value.address ?? '無' },
     { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
     { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
-    { key: 'location', label: '地點', value: userShift.value.space?.name },
-    { key: 'doctor', label: '治療師/教練', value: userShift.value.user.name },
+    { key: 'location', label: '地點', value: userShift.value.space?.name ?? '' },
+    { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'firstVisitContract', label: '預約就診須知', value: client.value?.firstVisitContractUrl ?? null },
     { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
   ];
