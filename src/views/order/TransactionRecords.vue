@@ -12,6 +12,7 @@ import { Receipt } from '@/components/appointment';
 import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import CancelOrder from '@/components/order/CancelOrder.vue';
+import { Space } from '@/const/space';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -178,10 +179,11 @@ getRecordList({
 // receipt
 const receiptData = ref<ReceiptData>([]);
 const isReceiptDialogOpen = ref(false);
-const space = ref<string | undefined>();
+const space = ref<string>('');
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained } = await getSinglePayment(paymentId);
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName } = await getSinglePayment(paymentId);
+  space.value = spaceName!;
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
@@ -296,7 +298,7 @@ async function cancelTransaction() {
       </template>
     </QTable>
     <QDialog v-model="isReceiptDialogOpen">
-      <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" />
+      <Receipt :rows="receiptData" :space-name="space" :space-id="Space[space as keyof typeof Space]" hide-checkout payment-method="現金" />
     </QDialog>
     <QDialog v-model="showDetail">
       <PaymentDetail :detail="targetPaymentDetails" />

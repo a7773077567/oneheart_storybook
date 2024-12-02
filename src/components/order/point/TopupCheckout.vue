@@ -129,7 +129,7 @@ watch(payments, (chosenPayments) => {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :loading="isProceeding" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :space-id="userStore?.currentSpace?.id" :loading="isProceeding" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref, watch } from 'vue';
 import { CheckTable, CheckoutAction, PaymentComposition, Receipt } from '@/components/appointment';
-import { useVoucherStore } from '@/stores';
+import { useUserStore, useVoucherStore } from '@/stores';
 import dayjs from 'dayjs';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
@@ -19,6 +19,7 @@ type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
   type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const voucherStore = useVoucherStore();
+const userStore = useUserStore();
 const totalAmount = computed({
   get: () => voucherStore.voucherDetail?.amount ?? 0,
   set(amount) {
@@ -55,6 +56,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
 
 const $q = useQuasar();
 const isProceeding = ref(false);
+
 async function onCheckout() {
   const { clientId, groupClassId, ticketGained, amount,
     //  contractDottedsignTaskId #394 暫時移除簽約步驟
@@ -117,7 +119,7 @@ watch(payments, (chosenPayments) => {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" :is-loading="isProceeding" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :is-loading="isProceeding" :space-id="userStore?.currentSpace?.id" checkout="onCheckout" />
     </QDialog>
   </div>
 </template>

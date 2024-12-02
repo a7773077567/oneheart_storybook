@@ -1,11 +1,12 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { QTableProps } from 'quasar';
 import { type PurchaseRecord, getClientPaymentDetail, getClientPayments, getSinglePayment } from '@/api';
 import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { Receipt } from '@/components/appointment';
 import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
+import { Space } from '@/const/space';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -100,10 +101,11 @@ const cols: QTableProps['columns'] = [
 // receipt
 const receiptData = ref<ReceiptData>([]);
 const isReceiptDialogOpen = ref(false);
-const space = ref<string | undefined>();
+const space = ref('');
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained } = await getClientPaymentDetail({ clientId: +props.clientId, paymentId });
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName } = await getClientPaymentDetail({ clientId: +props.clientId, paymentId });
+  space.value = spaceName!;
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
@@ -171,7 +173,7 @@ async function checkPaymentDetail(val: any) {
     </QTable>
   </div>
   <QDialog v-model="isReceiptDialogOpen">
-    <Receipt :rows="receiptData" :space-name="space" hide-checkout payment-method="現金" />
+    <Receipt :rows="receiptData" :space-name="space" :space-id="Space[space as keyof typeof Space]" hide-checkout payment-method="現金" />
   </QDialog>
   <QDialog v-model="showDetail">
     <PaymentDetail :detail="targetPaymentDetails" />

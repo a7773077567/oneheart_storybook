@@ -119,7 +119,7 @@ watch(payments, (chosenPayments) => {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :space="userShift?.space" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :space-name="userShift?.space.name" :space-id="userShift.spaceId" @checkout="onCheckout" />
     </QDialog>
 
     <CheckTable :data="info">

@@ -128,7 +128,7 @@ async function onCheckout() {
     </div>
 
     <QDialog v-model="isCheckoutOpen">
-      <Receipt hide-print :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :loading="isRefunding" @checkout="onCheckout" @close="isCheckoutOpen = false" />
+      <Receipt hide-print :rows="receiptData" payment-method="現金" :space-name="userStore?.currentSpace?.name" :space-id="userStore?.currentSpace?.id" :loading="isRefunding" @checkout="onCheckout" @close="isCheckoutOpen = false" />
     </QDialog>
   </div>
 </template>

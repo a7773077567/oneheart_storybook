@@ -9,7 +9,8 @@ const props = withDefaults(defineProps<{
     label: string;
     value: any;
   }[];
-  space?: Space;
+  spaceName?: string;
+  spaceId?: number;
   hideCheckout?: boolean;
   title?: string;
   confirmLabel?: string;
@@ -29,7 +30,7 @@ defineEmits<{
 const router = useRouter();
 const receiptStampImg = computed(() =>
   import.meta.env.PROD
-    ? `/images/stamps/stamp-${props.space?.id}.png`
+    ? `/images/stamps/stamp-${props.spaceId}.png`
     : '/images/stamps/stamp-1.png',
 );
 
@@ -51,7 +52,7 @@ function goPrint() {
     </QCardSection>
     <QCardSection>
       <div class="receipt">
-        <p class="receipt__title">{{ space?.name }}</p>
+        <p class="receipt__title">{{ spaceName }}</p>
         <p class="receipt__subtitle">醫療費用收據（客戶聯）</p>
         <div class="receipt__body">
           <table class="table">
