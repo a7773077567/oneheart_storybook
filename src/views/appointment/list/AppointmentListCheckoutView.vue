@@ -60,7 +60,7 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
   points: item.points,
 }));
 
-const spaceName = computed(() => userShift.space?.name);
+// const spaceName = computed(() => userShift.space?.name);
 
 const receiptData = computed(() => {
   return [
@@ -119,7 +119,7 @@ watch(payments, (chosenPayments) => {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :space-name="spaceName" @checkout="onCheckout" />
+      <Receipt :rows="receiptData" :space="userShift?.space" @checkout="onCheckout" />
     </QDialog>
 
     <CheckTable :data="info">

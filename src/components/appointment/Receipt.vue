@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import type { Space } from '@/api';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   rows: {
     name: string | undefined;
     label: string;
     value: any;
   }[];
-  spaceName?: string;
+  space?: Space;
   hideCheckout?: boolean;
   title?: string;
   confirmLabel?: string;
@@ -25,6 +27,11 @@ defineEmits<{
 }>();
 
 const router = useRouter();
+const receiptStampImg = computed(() =>
+  import.meta.env.PROD
+    ? `/images/stamps/stamp-${props.space?.id}.png`
+    : '/images/stamps/stamp-1.png',
+);
 
 function goPrint() {
   const printContents = document.querySelector('.receipt')!.innerHTML;
@@ -44,7 +51,7 @@ function goPrint() {
     </QCardSection>
     <QCardSection>
       <div class="receipt">
-        <p class="receipt__title">{{ spaceName }}</p>
+        <p class="receipt__title">{{ space?.name }}</p>
         <p class="receipt__subtitle">醫療費用收據（客戶聯）</p>
         <div class="receipt__body">
           <table class="table">
@@ -55,7 +62,7 @@ function goPrint() {
           </table>
         </div>
         <div class="receipt__stamp">
-          <img src="@/assets/images/appointment/duty-stamp.png" alt="">
+          <img :src="receiptStampImg" alt="receiptStampImg">
         </div>
       </div>
     </QCardSection>
