@@ -44,9 +44,9 @@ const selectStyle = computed(() => {
     :style="selectStyle"
     :popup-content-style="popupStyle"
   >
-    <template #option="{ opt, selected, itemProps, toggleOption }">
+    <template #option="{ opt, itemProps, toggleOption }">
       <QItem v-bind="itemProps" @click="() => toggleOption(opt.value)">
-        <QCheckbox :model-value="selected" :label="opt.label" class="checkbox" @click="() => toggleOption(opt.value)" />
+        <QRadio :model-value="model" :val="opt.value" :label="opt.label" class="checkbox" @click="() => toggleOption(opt.value)" />
       </QItem>
     </template>
 
@@ -60,7 +60,12 @@ const selectStyle = computed(() => {
 .checkbox {
   gap: 16px;
 }
-:deep(.q-checkbox__label) {
+
+:deep(.q-radio) {
+  gap: 8px;
+}
+
+:deep(.q-radio__label) {
   color: #1a1b21;
   font-size: 16px;
   font-weight: 500;

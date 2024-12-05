@@ -5,7 +5,7 @@ import { computed, ref, watch } from 'vue';
 const props = defineProps<{
   modelValue: QSelectProps['modelValue'];
   options: QSelectProps['options'];
-  label: QSelectProps['label'];
+  label?: QSelectProps['label'];
 }>();
 
 const emit = defineEmits<{
@@ -122,6 +122,9 @@ const displayValue = computed(() =>
 }
 
 :deep(.q-field__native > span) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: #45464f;
   font-size: 14px;
   font-weight: 500;

@@ -44,7 +44,7 @@ export const CheckoutPlanMap = {
   },
 } as const;
 
-export const DateFilterOptions = ['本日', '本月', '上月', '本季', '本年'].map((item, idx) => ({
+export const RangeSelectOptions = ['本日', '本月', '上月', '本季', '本年'].map((item, idx) => ({
   label: item,
   value: idx,
 }));

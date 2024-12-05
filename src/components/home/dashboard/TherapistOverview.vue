@@ -2,35 +2,41 @@
 import { AllOptionSelect, InfoCard, OptionSelect, PieChart, SignalLight } from '@/components/shared';
 import { EducationPointEdit } from '@/components/home/dashboard';
 import { computed, ref } from 'vue';
-import { DateFilterOptions } from '@/const/dashboard';
-import { useAppointmentStore, useUserStore } from '@/stores';
+import type { QSelectProps } from 'quasar';
+import dayjs from 'dayjs';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
 const props = defineProps<{
+  therapistSelect: number;
+  rangeSelect: number;
+  typeSelect: number[];
+  therapistSelectOptions: QSelectProps['options'];
+  rangeSelectOptions: QSelectProps['options'];
+  typeSelectOptions: QSelectProps['options'];
   caseStatus: ChartData;
   checkoutPlan: ChartData;
-  therapistFilter: number;
-  dateFilter: number;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:therapistFilter', val: number): void;
-  (e: 'update:dateFilter', val: number): void;
+  (e: 'update:therapistSelect', val: number): void;
+  (e: 'update:rangeSelect', val: number): void;
+  (e: 'update:typeSelect', val: number[]): void;
 }>();
 
-const userStore = useUserStore();
-const appointmentStore = useAppointmentStore();
-await appointmentStore.getUsers([userStore.currentSpaceId!]);
-
-const therapistFilterModel = computed({
-  get: () => props.therapistFilter,
-  set: val => emit('update:therapistFilter', val),
+const therapistSelectModel = computed({
+  get: () => props.therapistSelect,
+  set: val => emit('update:therapistSelect', val),
 });
 
-const dateFilterModel = computed({
-  get: () => props.dateFilter,
-  set: val => emit('update:dateFilter', val),
+const rangeSelectModel = computed({
+  get: () => props.rangeSelect,
+  set: val => emit('update:rangeSelect', val),
+});
+
+const typeSelectModel = computed({
+  get: () => props.typeSelect,
+  set: val => emit('update:typeSelect', val),
 });
 
 const info = [
@@ -68,29 +74,28 @@ const info = [
   },
 ];
 
+const dateRange = computed(() => {
+  const today = dayjs();
+  const startDate = today.startOf('month');
+  return `${startDate.format('MM/DD')}-${today.format('MM/DD')}(今日)`;
+});
+
 const educationPoints = ref({
   predicted: info[4].value.predicted,
   current: info[4].value.current,
 });
-const therapistFilterOptions = [
-  {
-    label: '所有治療師',
-    value: 0,
-  },
-  ...appointmentStore.activeUsers,
-];
 </script>
 
 <template>
   <div class="overview">
     <div class="overview__header">
       <div class="title">治療師運營總覽</div>
-      <OptionSelect v-model="therapistFilterModel" :options="therapistFilterOptions" />
+      <OptionSelect v-model="therapistSelectModel" :options="therapistSelectOptions" />
     </div>
     <div class="overview__body">
       <div class="chart">
         <div class="chart__header">
-          <OptionSelect v-model="dateFilterModel" :options="DateFilterOptions" />
+          <OptionSelect v-model="rangeSelectModel" :options="rangeSelectOptions" />
         </div>
         <div class="chart__body">
           <PieChart
@@ -114,10 +119,11 @@ const therapistFilterOptions = [
 
       <div class="info">
         <div class="info__header">
-          <!-- <AllOptionSelect  /> -->
+          <AllOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
+          <div class="date-range">{{ dateRange }}</div>
         </div>
         <div class="info__body">
-          <SignalLight :predicted="2" :current="0" />
+          <!-- <SignalLight :predicted="2" :current="0" /> -->
           <InfoCard :data="info">
             <template #educationPointsEntry>
               <EducationPointEdit v-model="educationPoints" />
@@ -166,8 +172,12 @@ const therapistFilterOptions = [
 }
 
 .info {
+  width: 409px;
   &__header {
     padding: 16px 16px 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   &__body {
     padding: 24px;
@@ -179,5 +189,12 @@ const therapistFilterOptions = [
   font-size: 24px;
   font-weight: 500;
   line-height: 32px;
+}
+
+.date-range {
+  font-size: 14px;
+  // font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.25px;
 }
 </style>
