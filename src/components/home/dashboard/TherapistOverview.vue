@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AllOptionSelect, InfoCard, OptionSelect, PieChart, SignalLight } from '@/components/shared';
+import { InfoCard, MultiOptionSelect, OptionSelect, PieChart, SignalLight } from '@/components/shared';
 import { EducationPointEdit } from '@/components/home/dashboard';
 import { computed, ref } from 'vue';
 import type { QSelectProps } from 'quasar';
@@ -119,7 +119,7 @@ const educationPoints = ref({
 
       <div class="info">
         <div class="info__header">
-          <AllOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
+          <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
           <div class="date-range">{{ dateRange }}</div>
         </div>
         <div class="info__body">

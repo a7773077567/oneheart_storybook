@@ -154,7 +154,7 @@ function closeShiftSelector() {
       @change="onCalendarChange"
     >
       <template #filters>
-        <AllOptionSelect
+        <MultiOptionSelect
           v-model="selectedShifts"
           label="科別"
           :options="shiftStore.spaceShiftOptions"
