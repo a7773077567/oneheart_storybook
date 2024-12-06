@@ -35,9 +35,10 @@ const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
   const apiValues = omit(value as Client, ['howToKnowUs', 'introducer', 'liffIntroducerName']);
   const fetch = [updateClient(props.clientId, apiValues)];
-  const isIntroducerNull = initialValues.value.introducer === null;
-  if (isIntroducerNull && !!value.introducer) {
-    fetch.push(updateIntroducer(+props.clientId, { introducerClientId: +value.introducer }));
+
+  const isIntroducerChanged = initialValues.value.introducer !== value.introducer;
+  if (isIntroducerChanged) {
+    fetch.push(updateIntroducer(+props.clientId, { introducerClientId: value.introducer ? +value.introducer : null }));
   }
   await Promise.all(fetch);
   isEdit.value = false;

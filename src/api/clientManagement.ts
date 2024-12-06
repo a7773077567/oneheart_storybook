@@ -160,7 +160,7 @@ export async function getClientPayments(clientId: number) {
 }
 
 // 更新客戶的介紹者
-export async function updateIntroducer(clientId: number, body: { introducerClientId: number }) {
+export async function updateIntroducer(clientId: number, body: { introducerClientId: number | null }) {
   await api.patch(`clients/${clientId}/update-introducer`, body);
 }
 
