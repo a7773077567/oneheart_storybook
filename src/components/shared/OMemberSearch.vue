@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useField } from 'vee-validate';
+import { QSelect } from 'quasar';
 import type { QSelectProps, QSelectSlots } from 'quasar';
 import type { Optional } from '@/types/utilities';
 import { type Client, fetchClients } from '@/api';
@@ -72,6 +73,10 @@ function addNewValue() {
 
   const isPhoneNumber = isValidTaiwanMobileNumber(customValue.value);
   emit('addValue', isPhoneNumber ? { name: null, phone: customValue.value } : { name: customValue.value, phone: null });
+
+  if (select.value) {
+    (select.value as QSelect).hidePopup();
+  }
 }
 
 function removeValue() {
@@ -100,7 +105,6 @@ function removeValue() {
     style="background:white"
     @input-value="filterFn"
     @update:model-value="handleUpdate"
-    @new-value="addNewValue"
     @clear="removeValue"
   >
     <template v-if="addValue" #after-options>
