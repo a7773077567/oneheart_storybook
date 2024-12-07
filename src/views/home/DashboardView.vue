@@ -3,6 +3,7 @@ import { CaseStatusMap, RangeSelectOptions } from '@/const/dashboard';
 import { TherapistOverview } from '@/components/home/dashboard';
 import { computed, ref } from 'vue';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
+import { LineChart } from '@/components/shared';
 
 const userStore = useUserStore();
 const shiftStore = useShiftStore();
@@ -50,6 +51,9 @@ const therapistSelectOptions = [
   },
   ...appointmentStore.activeUsers,
 ];
+
+const lineLabels = ['1', '2', '3'];
+const lineData = [100, 200, 300];
 </script>
 
 <template>
@@ -64,6 +68,8 @@ const therapistSelectOptions = [
       :case-status="caseStatus"
       :checkout-plan="caseStatus"
     />
+
+    <LineChart :labels="lineLabels" :data="lineData" />
   </div>
 </template>
 

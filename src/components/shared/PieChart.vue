@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Pie } from 'vue-chartjs';
-import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip, plugins } from 'chart.js';
+import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
 import { computed } from 'vue';
 import { assign, pick } from 'radash';
 import { ChartInfo } from '@/components/shared';

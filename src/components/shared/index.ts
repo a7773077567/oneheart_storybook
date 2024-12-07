@@ -31,3 +31,4 @@ export { default as ChartInfo } from './ChartInfo.vue';
 export { default as SignalLight } from './SignalLight.vue';
 export { default as InfoCard } from './InfoCard.vue';
 export { default as OptionSelect } from './OptionSelect.vue';
+export { default as LineChart } from './LineChart.vue';
