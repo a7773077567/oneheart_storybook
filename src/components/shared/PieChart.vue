@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Pie } from 'vue-chartjs';
-import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
+import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip, type TooltipCallbacks } from 'chart.js';
 import { computed } from 'vue';
 import { assign, pick } from 'radash';
 import { ChartInfo } from '@/components/shared';
@@ -12,13 +12,14 @@ const props = defineProps<{
   subtitle?: string;
   chartData: {
     labels: string[];
-    data: number[];
+    data: any[];
     backgroundColor: string[];
   };
   infoData: InstanceType<typeof ChartInfo>['$props']['data'];
   infoCaption?: string;
   showInfoScroll?: boolean;
   options?: PieOptions;
+  tooltip?: string[];
 }>();
 
 ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, ArcElement);
@@ -35,11 +36,21 @@ const defaultOptions: PieOptions = {
     },
     tooltip: {
       displayColors: false,
+      caretSize: 0,
       padding: {
         top: 8,
         right: 14,
         bottom: 8,
         left: 14,
+      },
+      bodyFont: {
+        weight: 500,
+        size: 12,
+        lineHeight: '20px',
+      },
+      callbacks: {
+        title: () => '',
+        label: ctx => (ctx.raw as { tooltip: string[] }).tooltip,
       },
       backgroundColor: '#313137',
     },
@@ -76,13 +87,9 @@ const pieOptions = computed(() => props.options ? assign(defaultOptions, props.o
 .chart {
   display: flex;
   gap: 24px;
-  width: 626px;
+  justify-content: space-between;
 
-  &__info {
-    flex: 1 0 301px;
-  }
   &__diagram {
-    flex: 1 0 301px;
     display: flex;
     justify-content: center;
     align-items: flex-start;

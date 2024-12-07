@@ -5,7 +5,7 @@ const props = defineProps<{
   data: {
     color: string;
     label: string;
-    values: string[];
+    values: (string | number)[];
   }[];
   caption?: string;
   showScroll?: boolean;
@@ -15,9 +15,9 @@ const count = computed(() => `共 ${props.data.length} 項`);
 
 const gridTemplateColumns = computed(() => {
   if (!props.data || !props.data.length) {
-    return `repeat(2, auto)`;
+    return `auto minmax(48px, auto)`;
   }
-  return `repeat(${2 + props.data[0].values.length}, auto)`;
+  return `auto repeat(${1 + props.data[0].values.length}, minmax(48px, auto))`;
 });
 </script>
 
