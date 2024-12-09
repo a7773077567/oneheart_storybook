@@ -17,3 +17,4 @@ export { default as PriceTags } from './PriceTags.vue';
 export { default as ScheduleModifyHistories } from './ScheduleModifyHistories.vue';
 export { default as ResourceLabel } from './list/ResourceLabel.vue';
 export { default as MedicalHistoryClipboard } from './MedicalHistoryClipboard.vue';
+export { default as HighConversionOpportunity } from './HighConversionOpportunity.vue';

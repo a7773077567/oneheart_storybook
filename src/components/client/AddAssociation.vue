@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useQuasar } from 'quasar';
 import { OMemberSearch } from '@/components/shared';
+import { IdentityType } from '@/const/client';
 
 const props = defineProps<{
   clientId: number;
@@ -19,7 +20,7 @@ const emit = defineEmits<{
 const newAssociationSchema = z.object({
   name: z.string().min(1),
   relationTypeName: z.string().optional(),
-  identityType: z.number().optional(),
+  identityType: z.union([z.nativeEnum(IdentityType), z.null()]).optional(),
   identityNumber: z.string().optional(),
   birthDate: z.string().optional(),
   phone: z.string().length(10, { message: '請輸入完整手機號碼' }).startsWith('09', { message: '請輸入台灣手機號碼' }),
@@ -61,17 +62,10 @@ function clearClient() {
 }
 
 const $q = useQuasar();
-const isProceeding = ref(false);
 const onSubmit = handleSubmit(async (formData) => {
-  isProceeding.value = true;
-  try {
-    await addClientAssociation(props.clientId, formData);
-    $q.notify({ message: '常用人員新增成功', timeout: 200, position: 'top' });
-    emit('submit');
-  }
-  finally {
-    isProceeding.value = false;
-  }
+  await addClientAssociation(props.clientId, formData);
+  $q.notify({ message: '常用人員新增成功', timeout: 600, position: 'top' });
+  emit('submit');
 });
 </script>
 
@@ -108,6 +102,12 @@ const onSubmit = handleSubmit(async (formData) => {
           </fieldset>
           <fieldset class="col-12">
             <OInput :disable="isExistedClient" inside-label="生日(非必填)" date-mode name="birthDate" hide-bottom-space :error="!!errors.birthDate" class="col-grow" />
+          </fieldset>
+          <fieldset class="col-12">
+            <div class="q-gutter-lg q-pb-md">
+              <QRadio :model-value="values.identityType" :disable="isExistedClient" :val="IdentityType.nationalID" label="身份字號" @update:model-value="setFieldValue('identityType', IdentityType.nationalID)" />
+              <QRadio :model-value="values.identityType" :disable="isExistedClient" :val="IdentityType.residentCertificate" label="居留證號" @update:model-value="setFieldValue('identityType', IdentityType.residentCertificate)" />
+            </div>
           </fieldset>
           <fieldset class="col-12">
             <OInput :disable="isExistedClient" inside-label="身分證/居留證(非必填)" name="identityNumber" hide-bottom-space class="col-grow" />

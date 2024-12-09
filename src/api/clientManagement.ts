@@ -4,6 +4,7 @@ import type { ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { ContractTypes } from './contract';
 import type { PaymentDetail } from './payment';
+import type { IdentityType } from '@/const/client';
 
 export interface ClientsGetParams {
   nameOrPhone?: string;
@@ -12,7 +13,9 @@ export interface ClientsGetParams {
   take?: number;
 }
 
-export type ClientAssociation = Pick<Client, 'id' | 'name' | 'phone' | 'gender' | 'identityType' | 'identityNumber' | 'birthDate'>;
+export interface ClientAssociation extends Pick<Client, 'id' | 'name' | 'phone' | 'gender' | 'identityType' | 'identityNumber' | 'birthDate'> {
+  relationTypeName: string | null;
+}
 export interface Client {
   address: string | null;
   associations: ClientAssociation[];
@@ -21,7 +24,7 @@ export interface Client {
   gender: string | null;
   howToKnowUs: string;
   id: number;
-  identityType: number;
+  identityType: IdentityType | null;
   identityNumber: string | null;
   isVerifiedBySMS: boolean;
   introducer: Pick<Client, 'associations' | 'email' | 'id' | 'inBodyFiles' | 'introducer' | 'lineUserId' | 'name' | 'phone' | 'relationTypeName'> | null;
@@ -160,7 +163,7 @@ export async function getClientPayments(clientId: number) {
 }
 
 // 更新客戶的介紹者
-export async function updateIntroducer(clientId: number, body: { introducerClientId: number }) {
+export async function updateIntroducer(clientId: number, body: { introducerClientId: number | null }) {
   await api.patch(`clients/${clientId}/update-introducer`, body);
 }
 
@@ -175,17 +178,25 @@ export async function getMedicalHistory(clientId: number, params: MedicalHistory
 }
 
 // 新增客戶關係人
-// export type IdentityNumberType = 1 | 2;
-export interface NewAssociation {
+export interface AssociationBasic {
   name: string;
-  relationTypeName?: string;
-  identityType?: number; // 身分證：1, 居留證:2
-  identityNumber?: string;
-  birthDate?: string;
+  relationTypeName?: string | null;
+  identityType?: IdentityType | null; // 身分證：1, 居留證:2
+  identityNumber?: string | null;
+  birthDate?: string | null;
   phone: string;
 }
-export async function addClientAssociation(clientId: number, data: NewAssociation) {
+export async function addClientAssociation(clientId: number, data: AssociationBasic) {
   await api.post(`clients/${clientId}/associations`, data);
+}
+
+// 刪除客戶關係人
+export async function deleteAssociation({ clientId, clientIdToBeDeleteAssociation }: { clientId: number; clientIdToBeDeleteAssociation: number }) {
+  await api.delete(`clients/${clientId}/associations`, { data: { clientIdToBeDeleteAssociation } });
+}
+// 編輯關係人
+export async function editAssociation({ clientId, associationClientId, data }: { clientId: number; associationClientId: number; data: AssociationBasic }) {
+  await api.patch(`clients/${clientId}/associations/${associationClientId}`, data);
 }
 
 // 取得客戶所有合約

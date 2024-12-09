@@ -9,7 +9,7 @@ import { useQuasar } from 'quasar';
 import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
 import { computed, ref } from 'vue';
 import { OInput, TimeDurationPicker } from '@/components/shared';
-import { ClientInfoTable, ScheduleModifyHistories } from '@/components/appointment';
+import { ClientInfoTable, HighConversionOpportunity, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
@@ -186,6 +186,7 @@ async function handleDownload(contractUrl: string) {
         </p>
         <div class="payment-state">
           <QChip v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false" style="background-color: #F8C9CB;">未結帳</QChip>
+          <HighConversionOpportunity v-if="schedule.isHighSalesOpportunity" />
         </div>
         <ScheduleModifyHistories :data="appointmentStore.scheduleModifyHistories" />
       </div>
