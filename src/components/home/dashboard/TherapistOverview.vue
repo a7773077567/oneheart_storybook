@@ -80,10 +80,10 @@ const dateRange = computed(() => {
   return `${startDate.format('MM/DD')}-${today.format('MM/DD')}(今日)`;
 });
 
-const educationPoints = ref({
-  predicted: info[4].value.predicted,
-  current: info[4].value.current,
-});
+// const educationPoints = ref({
+//   predicted: info[4].value.predicted,
+//   current: info[4].value.current,
+// });
 </script>
 
 <template>
@@ -125,9 +125,9 @@ const educationPoints = ref({
         <div class="info__body">
           <!-- <SignalLight :predicted="2" :current="0" /> -->
           <InfoCard :data="info">
-            <template #educationPointsEntry>
+            <!-- <template #educationPointsEntry>
               <EducationPointEdit v-model="educationPoints" />
-            </template>
+            </template> -->
           </InfoCard>
         </div>
       </div>
