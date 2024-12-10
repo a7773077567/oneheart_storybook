@@ -60,8 +60,7 @@ export const useReceptionStore = defineStore('reception', {
           backgroundColor: LoopColors,
         },
         infoData: data.map(item => item.infoData),
-        infoCaption: '已執行/預約(hr), 佔比(%)',
-        showInfoScroll: true,
+        infoCaption: '已執行/排班(hr), 佔比(%)',
       };
     },
     newAndReturnStatistic: (state): PieChartProps => {

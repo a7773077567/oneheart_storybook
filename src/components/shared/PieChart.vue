@@ -17,7 +17,6 @@ const props = defineProps<{
   };
   infoData: InstanceType<typeof ChartInfo>['$props']['data'];
   infoCaption?: string;
-  showInfoScroll?: boolean;
   options?: PieOptions;
   tooltip?: string[];
 }>();
@@ -72,7 +71,7 @@ const pieOptions = computed(() => props.options ? assign(defaultOptions, props.o
         <div v-if="subtitle" class="chart__subtitle">{{ subtitle }}</div>
       </div>
       <div class="chart__info-items">
-        <ChartInfo :data="infoData" :caption="infoCaption" :show-scroll="showInfoScroll" />
+        <ChartInfo :data="infoData" :caption="infoCaption" />
       </div>
     </div>
     <div class="chart__diagram">

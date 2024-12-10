@@ -8,10 +8,11 @@ const props = defineProps<{
     values: (string | number)[];
   }[];
   caption?: string;
-  showScroll?: boolean;
+  // showScroll?: boolean;
 }>();
 
 const count = computed(() => `共 ${props.data.length} 項`);
+const showScroll = computed(() => props.data.length > 4);
 
 const gridTemplateColumns = computed(() => {
   if (!props.data || !props.data.length) {
