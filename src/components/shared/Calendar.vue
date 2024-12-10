@@ -6,7 +6,7 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarScheduler.sass';
 import { computed, ref } from 'vue';
 import { getWeekDay } from '@/utils/date';
 import type { User } from '@/api/user';
-import AllOptionSelect from './AllOptionSelect.vue';
+import MultiOptionSelect from './MultiOptionSelect.vue';
 
 export interface ChangeParams {
   start: string;
@@ -65,7 +65,7 @@ function getCalendarStyle() {
   <div class="calendar">
     <div class="calendar__nav">
       <div class="filters">
-        <AllOptionSelect
+        <MultiOptionSelect
           v-model="selected"
           label="治療師"
           :options="options"

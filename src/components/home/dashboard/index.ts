@@ -1,2 +1,3 @@
-export { default as PersonalAppointmentCard } from './PersonalAppointmentCard.vue';
-export { default as PersonalAppointmentDialog } from './PersonalAppointmentDialog.vue';
+export { default as TherapistOverview } from './TherapistOverview.vue';
+export { default as EducationPointEdit } from './EducationPointEdit.vue';
+export { default as DashboardBox } from './DashboardBox.vue';
