@@ -9,3 +9,4 @@ export * from './payment';
 export * from './voucher';
 export * from './contract';
 export * from './home/personalAppointment';
+export * from './dashboard';
