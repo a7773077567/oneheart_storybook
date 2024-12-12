@@ -39,12 +39,12 @@ defineEmits<{
     font-weight: 500;
     cursor: pointer;
     &:first-child {
-      border: 2px solid #1a1833;
-      border-left: 2px solid #1a1833;
+      border: 2px solid #767680;
+      border-left: 2px solid #767680;
       border-radius: 8px 0 0 8px;
     }
     &:last-child {
-      border: 2px solid #1a1833;
+      border: 2px solid #767680;
       border-radius: 0 8px 8px 0;
       border-left: 0;
     }
