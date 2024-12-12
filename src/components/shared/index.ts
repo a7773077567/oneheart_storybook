@@ -32,3 +32,4 @@ export { default as SignalLight } from './SignalLight.vue';
 export { default as InfoCard } from './InfoCard.vue';
 export { default as OptionSelect } from './OptionSelect.vue';
 export { default as LineChart } from './LineChart.vue';
+export { default as SwitchBtn } from './SwitchBtn.vue';
