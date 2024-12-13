@@ -111,8 +111,8 @@ export async function resetPassword(payload: NewPasswordReq) {
   return data;
 }
 
-export async function fetchUsers(spaceIds: number[]) {
-  const { data } = await api.get<User[]>('users', { params: { spaceIds } });
+export async function fetchUsers(query: { spaceIds?: number[]; roleTypes?: RoleType[] }) {
+  const { data } = await api.get<User[]>('users', { params: query });
   return data;
 }
 
