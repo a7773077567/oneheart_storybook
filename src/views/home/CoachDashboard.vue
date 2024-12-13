@@ -33,7 +33,7 @@ interface CoachGoal {
 const operationGoalList = ref<CoachGoal[]>([]);
 
 // filters
-const filterTime = ref<CoachStatisticsDateRange>('month');
+const filterTime = ref<CoachStatisticsDateRange>('today');
 const timeOptions = [{ label: '本日', value: 'today' }, { label: '本月', value: 'month' }];
 const userId = ref<number>(0);
 const trainerOptions = ref<{ label: string; value: number }[]>([]);
