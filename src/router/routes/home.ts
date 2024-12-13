@@ -63,6 +63,6 @@ function getRoleDashboard(role: RoleType) {
     case RoleType['店長']:
     case RoleType['副店長']:
     default:
-      return import('@/views/home/TrainerDashboard.vue');
+      return import('@/views/home/CoachDashboard.vue');
   }
 }
