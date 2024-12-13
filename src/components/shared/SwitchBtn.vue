@@ -12,7 +12,7 @@ defineEmits<{
 <template>
   <div class="switch_bar">
     <div
-      v-for="option in options" :key="option.value"
+      v-for="option in options" :key="`${option.value}`"
       class="option"
       :class="{ 'option--active': option.value === modelValue }"
       @click="$emit('update:modelValue', option.value)"
