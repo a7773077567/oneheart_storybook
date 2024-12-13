@@ -205,19 +205,21 @@ watch(() => [userId, filterTime], async () => {
               </div>
               <QSeparator vertical class="q-mx-lg" />
               <div class="col">
-                <ul class="list column full-height" :class="ifShowAll ? 'overflow-auto' : 'overflow-hidden'">
-                  <li v-for="counts in displayPaymentStaticList" :key="counts.label" class="list_item">
-                    <div class="list_item--label">{{ counts.label }}</div>
-                    <div class="list_item--val">{{ counts.value }} 件</div>
-                  </li>
+                <div class="column full-height">
+                  <ul class="list" :class="ifShowAll ? 'overflow-auto' : 'overflow-hidden'">
+                    <li v-for="counts in displayPaymentStaticList" :key="counts.label" class="list_item">
+                      <div class="list_item--label">{{ counts.label }}</div>
+                      <div class="list_item--val">{{ counts.value }} 件</div>
+                    </li>
+                  </ul>
                   <div v-if="statics.allPaymentStatistic.length > 4 && !ifShowAll" class="q-mt-auto">
                     <QSeparator />
-                    <div class="q-py-sm show_all_btn flex items-center" @click="(ifShowAll = true), (statics.allPaymentStatistic = [...statics.allPaymentStatistic, ...statics.allPaymentStatistic, ...statics.allPaymentStatistic])">
+                    <div class="q-py-sm show_all_btn flex items-center" @click="(ifShowAll = true), (statics.allPaymentStatistic = statics.allPaymentStatistic)">
                       <span>展開全部</span>
                       <QIcon name="arrow_drop_down" size="24px" />
                     </div>
                   </div>
-                </ul>
+                </div>
               </div>
             </div>
           </template>
@@ -326,10 +328,14 @@ watch(() => [userId, filterTime], async () => {
 
   .statics {
     flex: 1 1 auto;
-    max-height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    display: block;
+    min-height: fit-content;
+    @media (min-width: 1200px) {
+      overflow: hidden;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
     &_number {
       padding: 16px 24px 24px;
       flex: 0 1 240px;
@@ -344,6 +350,7 @@ watch(() => [userId, filterTime], async () => {
         flex: 1;
       }
       .list {
+        max-height: 200px;
         overflow: auto;
       }
       .list_item + .list_item {
