@@ -52,7 +52,7 @@ export interface CoachOperationGoal {
   targetOrder: number;
 
 }
-export async function getCoachOperationGoal(userId?: number) {
+export async function getCoachOperationGoal(userId?: number | undefined) {
   const { data } = await api.get<CoachOperationGoal[]>(`dashboard/coachOperatingObjective`, { params: { ...(userId && { userId }) } });
   return data;
 }
@@ -62,7 +62,6 @@ export interface NewGoal {
   userId: number;
   quarter: number;
   targetCount: number;
-
 }
 export async function updateCoachOperationGoal(params: NewGoal) {
   await api.post(`dashboard/coachOperatingObjective`, params);

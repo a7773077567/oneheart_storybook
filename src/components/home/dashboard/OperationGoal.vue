@@ -10,10 +10,11 @@ export interface Goal {
 
 const props = defineProps<{
   list: Goal[];
+  readOnly?: boolean;
 }>();
 
 defineEmits<{
-  (e: 'update'): void;
+  (e: 'edit', val: Goal): void;
 }>();
 
 const renderList = computed(() => {
@@ -35,8 +36,8 @@ const renderList = computed(() => {
         <QItemLabel class="item--label">目標件數</QItemLabel>
         <QItemLabel class="item--val">{{ item.goal }}</QItemLabel>
       </QItemSection>
-      <QItemSection side>
-        <QBtn :disable="item.ifExpired" flat round icon="edit" size="12px" />
+      <QItemSection v-if="!readOnly" side>
+        <QBtn :disable="item.ifExpired" flat round icon="edit" size="12px" @click="$emit('edit', item)" />
       </QItemSection>
     </QItem>
   </QList>
