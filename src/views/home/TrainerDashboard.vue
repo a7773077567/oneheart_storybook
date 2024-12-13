@@ -127,7 +127,7 @@ const columns: QTableProps['columns'] = [
   { name: 'date', field: 'date', label: '日期', align: 'left' },
   { name: 'scheduleStartTime', field: 'scheduleStartTime', label: '時間', align: 'left', format: (val, row) => `${val} - ${row.scheduleEndTime}` },
   { name: 'client', field: 'client', label: '客戶', align: 'left', format: val => val?.name },
-  { name: 'record', field: 'record', label: '運動建議', align: 'left', format: val => val?.coachAdvice },
+  { name: 'record', field: 'record', label: '運動建議', align: 'left', format: val => val?.forClient, style: 'max-width:120px; text-overflow:ellipsis; word-break:break-all; overflow:hidden' },
   { name: 'remainingTotalCoachClassPoints', field: 'remainingTotalCoachClassPoints', label: '剩餘運動堂數', align: 'center' },
   { name: 'details', field: 'details', label: '病歷單', align: 'left', style: 'width: 40px' },
 ];
@@ -195,7 +195,10 @@ watch(() => [userId, filterTime], async () => {
                     <div class="list_item--val">{{ statics.paidOrders }} 件</div>
                   </li>
                   <li class="list_item">
-                    <div class="list_item--label">交易金額</div>
+                    <div>
+                      <span class="list_item--label">交易金額</span>
+                      <p class="note">不含堂數及功能性團課</p>
+                    </div>
                     <div class="list_item--val">$ {{ statics.totalAmount }}</div>
                   </li>
                 </ul>
@@ -235,10 +238,20 @@ watch(() => [userId, filterTime], async () => {
               :columns="columns"
               :rows="appointmentList"
               row-key="id"
-              bordered separator="cell"
+              separator="horizontal"
+              rows-per-page-label="每頁顯示筆數"
+              :pagination-label="(start:number, end:number, total:number) => `${start}-${end}筆（共${total}筆）`"
               :rows-per-page-options="[10, 20, 50]"
               @request="onRequest"
             >
+              <template #body-cell-record="props">
+                <QTd :props="props">
+                  <p :style="props.col.style">{{ props.value }}</p>
+                  <QTooltip v-if="props.value" class="bg-black text-white q-px-sm q-py-xs text-caption" anchor="center right" self="bottom middle" max-width="240px" max-height="160px">
+                    {{ props.value }}
+                  </QTooltip>
+                </QTd>
+              </template>
               <template #body-cell-details="props">
                 <QTd :props="props">
                   <QBtn
@@ -344,6 +357,11 @@ watch(() => [userId, filterTime], async () => {
           font-weight: 500;
           line-height: 1.5;
           letter-spacing: 0.1px;
+        }
+        .note {
+          font-size: 12px;
+          font-weight: 500;
+          margin-top: 8px;
         }
         &--val {
           font-size: 18px;

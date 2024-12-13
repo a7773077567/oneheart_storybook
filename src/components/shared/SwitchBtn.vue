@@ -33,7 +33,7 @@ defineEmits<{
     justify-content: center;
     gap: 8px;
     width: 104px;
-    padding: 10px 12px;
+    padding: 6px 12px;
     text-align: center;
     font-size: 14px;
     font-weight: 500;

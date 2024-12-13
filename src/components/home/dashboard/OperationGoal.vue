@@ -24,7 +24,7 @@ const renderList = computed(() => {
 
 <template>
   <QList separator class="goal_list">
-    <QItem v-for="item in renderList" :key="item.quarter" class="q-pa-none">
+    <QItem v-for="item in renderList" :key="item.quarter" class="q-py-sm q-px-none">
       <QItemSection class="item--title">
         Q{{ item.quarter }}
       </QItemSection>
