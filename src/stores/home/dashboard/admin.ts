@@ -1,6 +1,6 @@
 import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
-import type { TherapistClientScheduleStatics, TherapistEducationPoint, TodayBusinessStatus } from '@/types/home/dashboard/admin';
+import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
@@ -12,6 +12,7 @@ interface State {
   therapistClientScheduleStatics: TherapistClientScheduleStatics;
   therapistEducationPoint: TherapistEducationPoint;
   todayBusinessStatus: TodayBusinessStatus;
+  therapistOverviewStatistics: TherapistOverviewStatistic;
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -30,6 +31,12 @@ export const useAdminStore = defineStore('admin', {
         newAndReturnStatistic: [],
         onetimeAndSessionsPurchaseStatistic: [],
         allPaymentStatistic: [],
+      },
+      therapistOverviewStatistics: {
+        averageExecutionCount: 0,
+        returnVisitRate: 0,
+        clientRate: 0,
+        referralCount: 0,
       },
     };
   },
@@ -251,6 +258,14 @@ export const useAdminStore = defineStore('admin', {
     async getTodayBusinessStatus() {
       const { data } = await api.get<TodayBusinessStatus>('dashboard/today-businessStatus');
       this.todayBusinessStatus = data;
+    },
+
+    async getTherapistOverviewStatistics(params: {
+      userId?: number;
+      userShiftTypes: number[];
+    }) {
+      const { data } = await api.get<TherapistOverviewStatistic>('dashboard/therapistOverviewStatics', { params });
+      this.therapistOverviewStatistics = data;
     },
   },
 });

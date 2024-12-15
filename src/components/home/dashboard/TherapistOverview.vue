@@ -4,7 +4,7 @@ import { EducationPointEdit } from '@/components/home/dashboard';
 import { computed } from 'vue';
 import type { QSelectProps } from 'quasar';
 import dayjs from 'dayjs';
-import type { TherapistEducationPoint } from '@/types/home/dashboard/admin';
+import type { TherapistEducationPoint, TherapistOverviewStatistic } from '@/types/home/dashboard/admin';
 import { RangeSelectOptions } from '@/const/dashboard';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
@@ -19,6 +19,7 @@ const props = defineProps<{
   checkoutPlan: ChartData;
   educationPoint: TherapistEducationPoint;
   hideEducationPoint: boolean;
+  overview: TherapistOverviewStatistic;
 }>();
 
 const emit = defineEmits<{
@@ -52,25 +53,25 @@ const info = computed(() => [
   {
     name: 'avgExecutionCount',
     label: '平均執行數',
-    value: 'TBD',
+    value: props.overview.averageExecutionCount,
     caption: '治療師每日平均工作量',
   },
   {
     name: 'returnVisitRate',
     label: '回診率',
-    value: 'TBD',
+    value: props.overview.returnVisitRate,
     caption: '初診客戶回診率',
   },
   {
     name: 'clientRate',
     label: '客戶率',
-    value: 'TBD',
+    value: props.overview.clientRate,
     caption: '初診客戶是否購買堂數',
   },
   {
     name: 'referralCount',
     label: '轉介數',
-    value: 'TBD',
+    value: props.overview.referralCount,
     caption: '治療師受客戶轉介次數',
   },
   {
@@ -109,7 +110,7 @@ const dateRange = computed(() => {
 
       <div class="info">
         <div class="info__header">
-          <MultiOptionSelect v-model="typeSelectModel" disable :options="typeSelectOptions" label="科別" style="width: 216px;" />
+          <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
           <div class="date-range">{{ dateRange }}</div>
         </div>
         <div class="info__body">

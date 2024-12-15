@@ -11,8 +11,12 @@ const userStore = useUserStore();
 const shiftStore = useShiftStore();
 const appointmentStore = useAppointmentStore();
 const adminStore = useAdminStore();
-await appointmentStore.getUsers([userStore.currentSpaceId!]);
-adminStore.getTodayBusinessStatus();
+$q.loading.show();
+await Promise.all([
+  appointmentStore.getUsers([userStore.currentSpaceId!]),
+  adminStore.getTodayBusinessStatus(),
+]);
+$q.loading.hide();
 
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 const therapistSelect = ref(0);
@@ -37,6 +41,7 @@ const educationPointModel = computed({
     $q.loading.show();
   },
 });
+
 watch(therapistSelect, async (newVal) => {
   if (newVal === 0) {
     $q.loading.show();
@@ -47,8 +52,11 @@ watch(therapistSelect, async (newVal) => {
   }
   hideEducationPoint.value = false;
   $q.loading.show();
-  await adminStore.getTherapistClientScheduleStatics({ userId: newVal, dateRange: therapistRangeSelect.value });
-  await adminStore.getTherapistEducationPoint({ userId: newVal });
+  await Promise.all([
+    adminStore.getTherapistClientScheduleStatics({ userId: newVal, dateRange: therapistRangeSelect.value }),
+    adminStore.getTherapistEducationPoint({ userId: newVal }),
+    adminStore.getTherapistOverviewStatistics({ userId: newVal, userShiftTypes: therapistTypeSelect.value }),
+  ]);
   $q.loading.hide();
 }, { immediate: true });
 
@@ -61,8 +69,17 @@ watchEffect(async () => {
   $q.loading.hide();
 });
 
-const lineLabels = ['1', '2', '3'];
-const lineData = [100, 200, 300];
+watchEffect(async () => {
+  $q.loading.show();
+  const payload = therapistSelect.value === 0
+    ? { userShiftTypes: therapistTypeSelect.value }
+    : { userId: therapistSelect.value, userShiftTypes: therapistTypeSelect.value };
+  await adminStore.getTherapistOverviewStatistics(payload);
+  $q.loading.hide();
+});
+
+// const lineLabels = ['1', '2', '3'];
+// const lineData = [100, 200, 300];
 </script>
 
 <template>
@@ -77,6 +94,7 @@ const lineData = [100, 200, 300];
       :case-status="adminStore.caseStatistics"
       :checkout-plan="adminStore.checkoutPlanStatistics"
       :hide-education-point="hideEducationPoint"
+      :overview="adminStore.therapistOverviewStatistics"
     />
 
     <AdminTodayBusinessStatus
@@ -85,7 +103,7 @@ const lineData = [100, 200, 300];
       :onetime-and-sessions-purchase="adminStore.onetimeAndSessionsPurchaseStatistic"
       :all-payments="adminStore.allPaymentStatistic"
     />
-    <LineChart :labels="lineLabels" :data="lineData" />
+    <!-- <LineChart :labels="lineLabels" :data="lineData" /> -->
   </div>
 </template>
 

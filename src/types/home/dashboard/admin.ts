@@ -39,3 +39,10 @@ export interface TodayBusinessStatus {
     value: number;
   }[];
 }
+
+export interface TherapistOverviewStatistic {
+  averageExecutionCount: number;
+  returnVisitRate: number;
+  clientRate: number;
+  referralCount: number;
+}
