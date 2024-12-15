@@ -24,18 +24,18 @@ export const useReceptionStore = defineStore('reception', {
   getters: {
     therapistExecutionHoursStatistic: (state): PieChartProps => {
       const source = state.todayBusinessStatus.therapistExecutionHoursStatistic;
-      const totalAppointmentHrs = reduceMinsToHrs(source, 'appointmentHoursInMinute');
+      const totalUserShiftHrs = reduceMinsToHrs(source, 'userShiftHoursInMinute');
       const labels = source.map(item => item.label);
 
       const data = source.map((item, idx) => {
         const completionHrs = minsToHrs(item.completionHoursInMinute);
-        const appointmentHrs = minsToHrs(item.appointmentHoursInMinute);
-        const percentage = calcPercentage(appointmentHrs, totalAppointmentHrs);
+        const userShiftHrs = minsToHrs(item.userShiftHoursInMinute);
+        const percentage = calcPercentage(userShiftHrs, totalUserShiftHrs);
         return {
           chartData: {
-            value: item.appointmentHoursInMinute,
+            value: item.userShiftHoursInMinute,
             tooltip: [
-              `${item.label} ${percentage} (${appointmentHrs} hr)`,
+              `${item.label} ${percentage} (${userShiftHrs} hr)`,
               `已執行: ${completionHrs} hr`,
               `已取消： ${item.cancelledClientScheduleCount} 件`,
               `初診: ${item.firstClientScheduleCount} 件`,
@@ -44,7 +44,7 @@ export const useReceptionStore = defineStore('reception', {
           },
           infoData: {
             label: item.label,
-            values: [`${completionHrs}/${appointmentHrs}hr`, percentage],
+            values: [`${completionHrs}/${userShiftHrs}hr`, percentage],
             color: LoopColors[idx],
 
           },
@@ -53,7 +53,7 @@ export const useReceptionStore = defineStore('reception', {
 
       return {
         title: '治療師預約執行時數',
-        subtitle: `總時數 ${totalAppointmentHrs} 小時`,
+        subtitle: `總時數 ${totalUserShiftHrs} 小時`,
         chartData: {
           labels,
           data: data.map(item => item.chartData),

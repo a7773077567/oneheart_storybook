@@ -6,6 +6,7 @@ export interface TodayBusinessStatus {
     completionHoursInMinute: number;
     appointmentHoursInMinute: number;
     emptyShiftPercentage: number;
+    userShiftHoursInMinute: number;
   }[];
   newAndReturnStatistic: {
     label: string;
