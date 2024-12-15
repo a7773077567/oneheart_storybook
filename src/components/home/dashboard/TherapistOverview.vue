@@ -127,7 +127,6 @@ const dateRange = computed(() => {
 
 <style lang="scss" scoped>
 .overview {
-  width: fit-content;
   &__header {
     margin-bottom: 20px;
     display: flex;
@@ -149,6 +148,7 @@ const dateRange = computed(() => {
 }
 
 .chart {
+  flex-grow: 1;
   &__header {
     padding: 16px 16px 0 16px;
   }

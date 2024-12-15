@@ -19,6 +19,7 @@ const props = defineProps<{
   infoCaption?: string;
   options?: PieOptions;
   tooltip?: string[];
+  infoWidth?: string;
 }>();
 
 ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, ArcElement);
@@ -61,6 +62,7 @@ const pieData = computed(() => ({
   datasets: [{ ...pick(props.chartData, ['data', 'backgroundColor']) }],
 }));
 const pieOptions = computed(() => props.options ? assign(defaultOptions, props.options) : defaultOptions);
+const minInfoWidth = computed(() => props.infoWidth ?? '228px');
 </script>
 
 <template>
@@ -88,7 +90,12 @@ const pieOptions = computed(() => props.options ? assign(defaultOptions, props.o
   gap: 24px;
   justify-content: space-between;
 
+  &__info {
+    min-width: v-bind('minInfoWidth');
+  }
   &__diagram {
+    flex-grow: 1;
+
     display: flex;
     justify-content: center;
     align-items: flex-start;

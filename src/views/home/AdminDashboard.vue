@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { TherapistOverview } from '@/components/home/dashboard';
+import { AdminTodayBusinessStatus, TherapistOverview } from '@/components/home/dashboard';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
 import { LineChart } from '@/components/shared';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const userStore = useUserStore();
 const shiftStore = useShiftStore();
 const appointmentStore = useAppointmentStore();
 const adminStore = useAdminStore();
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
+adminStore.getTodayBusinessStatus();
 
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 const therapistSelect = ref(0);
@@ -24,30 +27,38 @@ const therapistSelectOptions = [
 const educationPointModel = computed({
   get: () => adminStore.therapistEducationPoint,
   set: async ({ currentEducationPoint, predictedEducationPoint }) => {
+    $q.loading.show();
     await adminStore.updateEducationPoint({
       userId: therapistSelect.value,
       currentEducationPoint,
       predictedEducationPoint,
     });
     await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
+    $q.loading.show();
   },
 });
 watch(therapistSelect, async (newVal) => {
   if (newVal === 0) {
+    $q.loading.show();
     hideEducationPoint.value = true;
     await adminStore.getTherapistClientScheduleStatics({ dateRange: therapistRangeSelect.value });
+    $q.loading.hide();
     return;
   }
   hideEducationPoint.value = false;
+  $q.loading.show();
   await adminStore.getTherapistClientScheduleStatics({ userId: newVal, dateRange: therapistRangeSelect.value });
   await adminStore.getTherapistEducationPoint({ userId: newVal });
+  $q.loading.hide();
 }, { immediate: true });
 
 watchEffect(async () => {
+  $q.loading.show();
   const payload = therapistSelect.value === 0
     ? { dateRange: therapistRangeSelect.value }
     : { userId: therapistSelect.value, dateRange: therapistRangeSelect.value };
-  adminStore.getTherapistClientScheduleStatics(payload);
+  await adminStore.getTherapistClientScheduleStatics(payload);
+  $q.loading.hide();
 });
 
 const lineLabels = ['1', '2', '3'];
@@ -68,14 +79,23 @@ const lineData = [100, 200, 300];
       :hide-education-point="hideEducationPoint"
     />
 
+    <AdminTodayBusinessStatus
+      :therapist-execution-hours="adminStore.therapistExecutionHoursStatistic"
+      :new-and-return-statistic="adminStore.newAndReturnStatistic"
+      :onetime-and-sessions-purchase="adminStore.onetimeAndSessionsPurchaseStatistic"
+      :all-payments="adminStore.allPaymentStatistic"
+    />
     <LineChart :labels="lineLabels" :data="lineData" />
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .dashboard {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  > * {
+    width: 1084px;
+  }
 }
 </style>
