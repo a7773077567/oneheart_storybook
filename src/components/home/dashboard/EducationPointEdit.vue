@@ -1,24 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-interface Model {
-  predicted: number;
-  current: number;
-}
+import type { TherapistEducationPoint } from '@/types/home/dashboard/admin';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
-  modelValue: Model;
+  modelValue: TherapistEducationPoint;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', val: Model): void;
+  (e: 'update:modelValue', val: TherapistEducationPoint): void;
 }>();
 
 const model = ref({ ...props.modelValue });
+watch(() => props.modelValue, (newVal) => {
+  model.value = { ...newVal };
+});
 const isDialogOpen = ref(false);
 
 function onSave() {
-  emit('update:modelValue', model.value);
+  emit('update:modelValue', {
+    predictedEducationPoint: +model.value.predictedEducationPoint,
+    currentEducationPoint: +model.value.currentEducationPoint,
+  });
   isDialogOpen.value = false;
 }
 
@@ -34,11 +36,11 @@ function onCancel() {
     <div class="education__items">
       <div class="education__item">
         <div class="education__item-label">預測教育積分</div>
-        <div class="education__item-value">{{ model.predicted }}</div>
+        <div class="education__item-value">{{ modelValue.predictedEducationPoint }}</div>
       </div>
       <div class="education__item">
         <div class="education__item-label">目前教育積分</div>
-        <div class="education__item-value">{{ model.current }}</div>
+        <div class="education__item-value">{{ modelValue.currentEducationPoint }}</div>
       </div>
       <QBtn icon="o_edit" flat round class="education__edit" @click="isDialogOpen = true" />
     </div>
@@ -47,8 +49,8 @@ function onCancel() {
       <div class="edit">
         <div class="edit__title">教育積分填寫</div>
         <div class="edit__body">
-          <QInput v-model="model.predicted" label="預測教育積分" outlined />
-          <QInput v-model="model.current" label="目前教育積分" outlined />
+          <QInput v-model="model.predictedEducationPoint" label="預測教育積分" outlined />
+          <QInput v-model="model.currentEducationPoint" label="目前教育積分" outlined />
         </div>
         <div class="edit__actions">
           <QBtn label="取消" color="primary" flat class="cancel" @click="onCancel" />

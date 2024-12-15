@@ -1,18 +1,23 @@
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue';
+
+const props = defineProps<{
   data: {
     name: string;
     label?: string;
     value?: any;
     caption?: string;
+    hide?: boolean;
   }[];
 }>();
+
+const showData = computed(() => props.data.filter(item => !item.hide));
 </script>
 
 <template>
   <div class="card">
     <slot
-      v-for="(item, idx) in data"
+      v-for="(item, idx) in showData"
       :key="idx"
       :name="item.name"
       :data="item"

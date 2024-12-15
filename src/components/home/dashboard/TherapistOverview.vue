@@ -1,27 +1,31 @@
 <script setup lang="ts">
 import { InfoCard, MultiOptionSelect, OptionSelect, PieChart, SignalLight } from '@/components/shared';
 import { EducationPointEdit } from '@/components/home/dashboard';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { QSelectProps } from 'quasar';
 import dayjs from 'dayjs';
+import type { TherapistEducationPoint } from '@/types/home/dashboard/admin';
+import { RangeSelectOptions } from '@/const/dashboard';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
 const props = defineProps<{
   therapistSelect: number;
-  rangeSelect: number;
+  rangeSelect: string;
   typeSelect: number[];
   therapistSelectOptions: QSelectProps['options'];
-  rangeSelectOptions: QSelectProps['options'];
   typeSelectOptions: QSelectProps['options'];
   caseStatus: ChartData;
   checkoutPlan: ChartData;
+  educationPoint: TherapistEducationPoint;
+  hideEducationPoint: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:therapistSelect', val: number): void;
-  (e: 'update:rangeSelect', val: number): void;
+  (e: 'update:rangeSelect', val: string): void;
   (e: 'update:typeSelect', val: number[]): void;
+  (e: 'update:educationPoint', val: TherapistEducationPoint): void;
 }>();
 
 const therapistSelectModel = computed({
@@ -39,51 +43,49 @@ const typeSelectModel = computed({
   set: val => emit('update:typeSelect', val),
 });
 
-const info = [
+const educationPointModel = computed({
+  get: () => props.educationPoint,
+  set: val => emit('update:educationPoint', val),
+});
+
+const info = computed(() => [
   {
     name: 'avgExecutionCount',
     label: '平均執行數',
-    value: '1.25',
+    value: 'TBD',
     caption: '治療師每日平均工作量',
   },
   {
     name: 'returnVisitRate',
     label: '回診率',
-    value: '80%',
+    value: 'TBD',
     caption: '初診客戶回診率',
   },
   {
     name: 'clientRate',
     label: '客戶率',
-    value: '80%',
+    value: 'TBD',
     caption: '初診客戶是否購買堂數',
   },
   {
     name: 'referralCount',
     label: '轉介數',
-    value: '15',
+    value: 'TBD',
     caption: '治療師受客戶轉介次數',
   },
   {
-    name: 'educationPointsEntry',
+    name: 'educationPoint',
     label: '教育積分填寫',
-    value: {
-      predicted: 30,
-      current: 48,
-    },
+    value: props.educationPoint,
+    hide: props.hideEducationPoint,
   },
-];
+]);
 
 const dateRange = computed(() => {
   const today = dayjs();
   const startDate = today.startOf('month');
   return `${startDate.format('MM/DD')}-${today.format('MM/DD')}(今日)`;
 });
-
-// const educationPoints = ref({
-//   predicted: info[4].value.predicted,
-//   current: info[4].value.current,
-// });
 </script>
 
 <template>
@@ -95,23 +97,11 @@ const dateRange = computed(() => {
     <div class="overview__body">
       <div class="chart">
         <div class="chart__header">
-          <OptionSelect v-model="rangeSelectModel" :options="rangeSelectOptions" />
+          <OptionSelect v-model="rangeSelectModel" :options="RangeSelectOptions" />
         </div>
         <div class="chart__body">
-          <PieChart
-            :chart-data="caseStatus.chartData"
-            :info-data="caseStatus.infoData"
-            :info-caption="caseStatus.infoCaption"
-            :title="caseStatus.title"
-            :subtitle="caseStatus.subtitle"
-          />
-          <PieChart
-            :chart-data="checkoutPlan.chartData"
-            :info-data="checkoutPlan.infoData"
-            :info-caption="checkoutPlan.infoCaption"
-            :title="checkoutPlan.title"
-            :subtitle="checkoutPlan.subtitle"
-          />
+          <PieChart v-bind="caseStatus" />
+          <PieChart v-bind="checkoutPlan" />
         </div>
       </div>
 
@@ -119,15 +109,15 @@ const dateRange = computed(() => {
 
       <div class="info">
         <div class="info__header">
-          <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
+          <MultiOptionSelect v-model="typeSelectModel" disable :options="typeSelectOptions" label="科別" style="width: 216px;" />
           <div class="date-range">{{ dateRange }}</div>
         </div>
         <div class="info__body">
           <!-- <SignalLight :predicted="2" :current="0" /> -->
           <InfoCard :data="info">
-            <!-- <template #educationPointsEntry>
-              <EducationPointEdit v-model="educationPoints" />
-            </template> -->
+            <template #educationPoint>
+              <EducationPointEdit v-model="educationPointModel" />
+            </template>
           </InfoCard>
         </div>
       </div>

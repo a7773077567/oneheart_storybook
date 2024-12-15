@@ -47,7 +47,10 @@ export const CheckoutPlanMap = {
 export const LoopColors = ['rgba(5, 48, 72, 1)', 'rgba(12, 90, 136, 1)', 'rgba(26, 122, 179, 1)', 'rgba(103, 159, 195, 1)', 'rgba(173, 198, 214, 1)', 'rgba(230, 184, 180, 1)', 'rgba(227, 142, 134, 1)', 'rgba(223, 84, 88, 1)', 'rgba(194, 34, 39, 1)', 'rgba(152, 16, 21, 1)'];
 export const LimitColors = ['rgba(223, 84, 88, 1)', 'rgba(26, 122, 179, 1)', 'rgba(5, 48, 72, 1)', 'rgba(103, 159, 195, 1)', 'rgba(173, 198, 214, 1)'];
 
-export const RangeSelectOptions = ['本日', '本月', '上月', '本季', '本年'].map((item, idx) => ({
-  label: item,
-  value: idx,
-}));
+export const RangeSelectOptions = [
+  { label: '本日', value: 'today' },
+  { label: '本月', value: 'month' },
+  { label: '上月', value: 'lastMonth' },
+  { label: '本季', value: 'quarter' },
+  { label: '本年', value: 'year' },
+];
