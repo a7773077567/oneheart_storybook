@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { TherapistOverview } from '@/components/home/dashboard';
 import { computed, ref, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
@@ -8,43 +8,53 @@ import { useQuasar } from 'quasar';
 const $q = useQuasar();
 const shiftStore = useShiftStore();
 const adminStore = useAdminStore();
-const therapistSelect = ref(0);
 
-await adminStore.getTherapistEducationPoint({ userId: adminStore.userId });
+$q.loading.show();
+await adminStore.getTherapists();
+$q.loading.hide();
 
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
-const therapistTypeSelect = ref(typeOptions.value.map(option => option.value));
+const therapistSelect = ref(0);
 const therapistRangeSelect = ref('today');
-
+const therapistTypeSelect = ref(typeOptions.value.map(option => option.value));
+const hideEducationPoint = computed(() => therapistSelect.value === 0);
 const educationPointModel = computed({
   get: () => adminStore.therapistEducationPoint,
   set: async ({ currentEducationPoint, predictedEducationPoint }) => {
     $q.loading.show();
     await adminStore.updateEducationPoint({
-      userId: adminStore.userId,
+      userId: therapistSelect.value,
       currentEducationPoint,
       predictedEducationPoint,
     });
-    await adminStore.getTherapistEducationPoint({ userId: adminStore.userId });
+    await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
     $q.loading.hide();
   },
 });
 
 watchEffect(async () => {
   $q.loading.show();
-  await adminStore.getTherapistClientScheduleStatics({
-    userId: adminStore.userId,
-    dateRange: therapistRangeSelect.value,
-  });
+  const payload = therapistSelect.value === 0
+    ? { dateRange: therapistRangeSelect.value }
+    : { userId: therapistSelect.value, dateRange: therapistRangeSelect.value };
+  await adminStore.getTherapistClientScheduleStatics(payload);
   $q.loading.hide();
 });
 
 watchEffect(async () => {
   $q.loading.show();
-  await adminStore.getTherapistOverviewStatistics({
-    userId: adminStore.userId,
-    userShiftTypes: therapistTypeSelect.value,
-  });
+  const payload = therapistSelect.value === 0
+    ? { userShiftTypes: therapistTypeSelect.value }
+    : { userId: therapistSelect.value, userShiftTypes: therapistTypeSelect.value };
+  await adminStore.getTherapistOverviewStatistics(payload);
+  $q.loading.hide();
+});
+
+watchEffect(async () => {
+  if (therapistSelect.value === 0)
+    return;
+  $q.loading.show();
+  await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
   $q.loading.hide();
 });
 </script>
@@ -60,6 +70,7 @@ watchEffect(async () => {
       :type-select-options="typeOptions"
       :case-status="adminStore.caseStatistics"
       :checkout-plan="adminStore.checkoutPlanStatistics"
+      :hide-education-point="hideEducationPoint"
       :overview="adminStore.therapistOverviewStatistics"
       :is-management="adminStore.roleQuery.isManagement"
     />
@@ -68,7 +79,6 @@ watchEffect(async () => {
 
 <style lang="scss" scoped>
 .dashboard {
-  padding-top: 4px;
   display: flex;
   flex-direction: column;
   gap: 24px;

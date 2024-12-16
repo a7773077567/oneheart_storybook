@@ -18,8 +18,9 @@ const props = defineProps<{
   caseStatus: ChartData;
   checkoutPlan: ChartData;
   educationPoint: TherapistEducationPoint;
-  hideEducationPoint: boolean;
+  hideEducationPoint?: boolean;
   overview: TherapistOverviewStatistic;
+  isManagement: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -59,13 +60,13 @@ const info = computed(() => [
   {
     name: 'returnVisitRate',
     label: '回診率',
-    value: props.overview.returnVisitRate,
+    value: props.overview.returnVisitRate && `${props.overview.returnVisitRate}%`,
     caption: '初診客戶回診率',
   },
   {
     name: 'clientRate',
-    label: '客戶率',
-    value: props.overview.clientRate,
+    label: '會員率',
+    value: props.overview.clientRate && `${props.overview.clientRate}%`,
     caption: '初診客戶是否購買堂數',
   },
   {
@@ -91,7 +92,7 @@ const dateRange = computed(() => {
 
 <template>
   <div class="overview">
-    <div class="overview__header">
+    <div v-if="isManagement" class="overview__header">
       <div class="title">治療師運營總覽</div>
       <OptionSelect v-model="therapistSelectModel" :options="therapistSelectOptions" />
     </div>

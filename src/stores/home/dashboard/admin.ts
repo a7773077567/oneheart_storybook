@@ -1,5 +1,7 @@
+import type { Space, User } from '@/api';
 import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
+import { useUserStore } from '@/stores/user';
 import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
@@ -13,6 +15,7 @@ interface State {
   therapistEducationPoint: TherapistEducationPoint;
   todayBusinessStatus: TodayBusinessStatus;
   therapistOverviewStatistics: TherapistOverviewStatistic;
+  therapists: User[];
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -38,6 +41,7 @@ export const useAdminStore = defineStore('admin', {
         clientRate: 0,
         referralCount: 0,
       },
+      therapists: [],
     };
   },
   getters: {
@@ -215,7 +219,7 @@ export const useAdminStore = defineStore('admin', {
           },
           infoData: {
             label: item.label,
-            values: [`${item.value}元`, percentage],
+            values: [`$${item.value.toLocaleString('en-us')}`, percentage],
             color: LoopColors[idx],
           },
         };
@@ -230,6 +234,29 @@ export const useAdminStore = defineStore('admin', {
         },
         infoData: data.map(item => item.infoData),
       };
+    },
+    therapistOptions(state) {
+      const userStore = useUserStore();
+      const therapistForLead = state.therapists.filter(item => item.role.type === 5);
+      const targetTherapist = [2, 3].includes(userStore.userInfo!.role.type)
+        ? state.therapists
+        : therapistForLead;
+      const options = targetTherapist.map(item => ({ label: item.name, value: item.id }));
+
+      return [{ label: '所有治療師', value: 0 }, ...options];
+    },
+    roleQuery() {
+      const userStore = useUserStore();
+      return {
+        isManagement: [2, 3, 4].includes(userStore.userInfo!.role.type),
+        isDirector: [2, 3].includes(userStore.userInfo!.role.type),
+        isLeadTherapist: [4].includes(userStore.userInfo!.role.type),
+        isTherapist: [5].includes(userStore.userInfo!.role.type),
+      };
+    },
+    userId() {
+      const userStore = useUserStore();
+      return userStore.userInfo!.id;
     },
   },
   actions: {
@@ -266,6 +293,15 @@ export const useAdminStore = defineStore('admin', {
     }) {
       const { data } = await api.get<TherapistOverviewStatistic>('dashboard/therapistOverviewStatics', { params });
       this.therapistOverviewStatistics = data;
+    },
+
+    async getTherapists() {
+      const { data: spaces } = await api.get<Space[]>('spaces');
+      const spaceIds = spaces.map(item => item.id);
+      const roleTypes = [2, 3, 4, 5];
+
+      const { data } = await api.get<User[]>('users', { params: { spaceIds, roleTypes } });
+      this.therapists = data;
     },
   },
 });

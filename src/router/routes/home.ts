@@ -54,8 +54,9 @@ function getRoleDashboard(role: RoleType) {
     case RoleType['系統管理者']:
       return import('@/views/home/AdminDashboard.vue');
     case RoleType['物理治療師']:
-    case RoleType['物理治療師組長']:
       return import('@/views/home/TherapistDashboard.vue');
+    case RoleType['物理治療師組長']:
+      return import('@/views/home/LeadTherapistDashboard.vue');
     case RoleType['櫃檯']:
       return import('@/views/home/ReceptionDashboard.vue');
     case RoleType['教練']:

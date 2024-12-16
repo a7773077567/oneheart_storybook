@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { AdminTodayBusinessStatus, TherapistOverview } from '@/components/home/dashboard';
-import { computed, ref, watch, watchEffect } from 'vue';
-import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
+import { computed, ref, watchEffect } from 'vue';
+import { useShiftStore } from '@/stores';
 import { LineChart } from '@/components/shared';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
-const userStore = useUserStore();
 const shiftStore = useShiftStore();
-const appointmentStore = useAppointmentStore();
 const adminStore = useAdminStore();
+
 $q.loading.show();
 await Promise.all([
-  appointmentStore.getUsers([userStore.currentSpaceId!]),
+  adminStore.getTherapists(),
   adminStore.getTodayBusinessStatus(),
 ]);
 $q.loading.hide();
@@ -21,13 +20,8 @@ $q.loading.hide();
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 const therapistSelect = ref(0);
 const therapistRangeSelect = ref('today');
-const hideEducationPoint = ref(false);
 const therapistTypeSelect = ref(typeOptions.value.map(option => option.value));
-const therapistSelectOptions = [
-  { label: '所有治療師', value: 0 },
-  ...appointmentStore.activeUsers,
-];
-
+const hideEducationPoint = computed(() => therapistSelect.value === 0);
 const educationPointModel = computed({
   get: () => adminStore.therapistEducationPoint,
   set: async ({ currentEducationPoint, predictedEducationPoint }) => {
@@ -38,27 +32,9 @@ const educationPointModel = computed({
       predictedEducationPoint,
     });
     await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
-    $q.loading.show();
+    $q.loading.hide();
   },
 });
-
-watch(therapistSelect, async (newVal) => {
-  if (newVal === 0) {
-    $q.loading.show();
-    hideEducationPoint.value = true;
-    await adminStore.getTherapistClientScheduleStatics({ dateRange: therapistRangeSelect.value });
-    $q.loading.hide();
-    return;
-  }
-  hideEducationPoint.value = false;
-  $q.loading.show();
-  await Promise.all([
-    adminStore.getTherapistClientScheduleStatics({ userId: newVal, dateRange: therapistRangeSelect.value }),
-    adminStore.getTherapistEducationPoint({ userId: newVal }),
-    adminStore.getTherapistOverviewStatistics({ userId: newVal, userShiftTypes: therapistTypeSelect.value }),
-  ]);
-  $q.loading.hide();
-}, { immediate: true });
 
 watchEffect(async () => {
   $q.loading.show();
@@ -78,6 +54,14 @@ watchEffect(async () => {
   $q.loading.hide();
 });
 
+watchEffect(async () => {
+  if (therapistSelect.value === 0)
+    return;
+  $q.loading.show();
+  await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
+  $q.loading.hide();
+});
+
 // const lineLabels = ['1', '2', '3'];
 // const lineData = [100, 200, 300];
 </script>
@@ -89,12 +73,13 @@ watchEffect(async () => {
       v-model:rangeSelect="therapistRangeSelect"
       v-model:typeSelect="therapistTypeSelect"
       v-model:education-point="educationPointModel"
-      :therapist-select-options="therapistSelectOptions"
+      :therapist-select-options="adminStore.therapistOptions"
       :type-select-options="typeOptions"
       :case-status="adminStore.caseStatistics"
       :checkout-plan="adminStore.checkoutPlanStatistics"
       :hide-education-point="hideEducationPoint"
       :overview="adminStore.therapistOverviewStatistics"
+      :is-management="adminStore.roleQuery.isManagement"
     />
 
     <AdminTodayBusinessStatus
