@@ -60,14 +60,16 @@ const info = computed(() => [
   {
     name: 'returnVisitRate',
     label: '回診率',
-    value: props.overview.returnVisitRate && `${props.overview.returnVisitRate}%`,
+    value: props.overview.returnVisitRate ? `${props.overview.returnVisitRate}%` : '沒有初診客戶',
     caption: '初診客戶回診率',
+    shrinkFontSize: !props.overview.returnVisitRate,
   },
   {
     name: 'clientRate',
     label: '會員率',
-    value: props.overview.clientRate && `${props.overview.clientRate}%`,
+    value: props.overview.clientRate ? `${props.overview.clientRate}%` : '沒有初診客戶',
     caption: '初診客戶是否購買堂數',
+    shrinkFontSize: !props.overview.clientRate,
   },
   {
     name: 'referralCount',

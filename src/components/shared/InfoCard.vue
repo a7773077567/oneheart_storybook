@@ -8,6 +8,7 @@ const props = defineProps<{
     value?: any;
     caption?: string;
     hide?: boolean;
+    shrinkFontSize?: boolean;
   }[];
 }>();
 
@@ -24,7 +25,7 @@ const showData = computed(() => props.data.filter(item => !item.hide));
     >
       <div :class="[idx === data.length - 1 ? 'card__item--last' : 'card__item']">
         <div class="card__label">{{ item.label }}</div>
-        <div class="card__value">{{ item.value }}</div>
+        <div :class="[item.shrinkFontSize ? 'card__value--shrink' : 'card__value']">{{ item.value }}</div>
         <div class="card__caption">{{ item.caption }}</div>
       </div>
     </slot>
@@ -62,6 +63,10 @@ const showData = computed(() => props.data.filter(item => !item.hide));
     font-size: 28px;
     font-weight: 500;
     line-height: 36px;
+    &--shrink {
+      @extend .card__value;
+      font-size: 20px;
+    }
   }
 
   &__caption {

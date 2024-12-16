@@ -55,11 +55,10 @@ watchEffect(async () => {
 });
 
 watchEffect(async () => {
-  if (therapistSelect.value === 0)
+  if (therapistSelect.value === 0) {
     return;
-  $q.loading.show();
-  await adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
-  $q.loading.hide();
+  }
+  adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
 });
 
 // const lineLabels = ['1', '2', '3'];
