@@ -50,7 +50,7 @@ export const LimitColors = ['rgba(223, 84, 88, 1)', 'rgba(26, 122, 179, 1)', 'rg
 export const RangeSelectOptions = [
   { label: '本日', value: 'today' },
   { label: '本月', value: 'month' },
-  { label: '上月', value: 'lastMonth' },
   { label: '本季', value: 'quarter' },
-  { label: '本年', value: 'year' },
+  { label: '今年', value: 'year' },
+  { label: '過去12個月', value: 'past12month' },
 ];
