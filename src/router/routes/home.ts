@@ -1,4 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '@/stores';
+import { RoleType } from '@/api/user';
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -14,7 +16,10 @@ export const homeRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: () => import('@/views/home/DashboardView.vue'),
+        component: () => {
+          const userStore = useUserStore();
+          return getRoleDashboard(userStore.role);
+        },
         meta: {
           label: '儀表板',
           requiredAuth: true,
@@ -41,3 +46,24 @@ export const homeRoutes: RouteRecordRaw[] = [
     ],
   },
 ];
+
+function getRoleDashboard(role: RoleType) {
+  switch (role) {
+    case RoleType['院長']:
+    case RoleType['副院長']:
+    case RoleType['系統管理者']:
+      return import('@/views/home/AdminDashboard.vue');
+    case RoleType['物理治療師']:
+      return import('@/views/home/TherapistDashboard.vue');
+    case RoleType['物理治療師組長']:
+      return import('@/views/home/LeadTherapistDashboard.vue');
+    case RoleType['櫃檯']:
+      return import('@/views/home/ReceptionDashboard.vue');
+    case RoleType['教練']:
+    case RoleType['教練組長']:
+    case RoleType['店長']:
+    case RoleType['副店長']:
+    default:
+      return import('@/views/home/CoachDashboard.vue');
+  }
+}

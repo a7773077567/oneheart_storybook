@@ -1,4 +1,4 @@
-import { type CashDropPayload, type CashDropRecord, type CashDropRecordsMeta, type CashDropRecordsParams, type CashDropRes, cashDropApi } from '@/api/cashDrop';
+import { type CashDropPayload, type CashDropRecord, type CashDropRecordsMeta, type CashDropRecordsParams, type CashDropRes, cashDropApi } from '@/api/home/cashDrop';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 

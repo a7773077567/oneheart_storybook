@@ -18,6 +18,7 @@
     "@quasar/quasar-ui-qcalendar": "^4.0.0-beta.19",
     "@vee-validate/zod": "^4.12.5",
     "axios": "^1.6.5",
+    "chart.js": "^4.4.6",
     "dayjs": "^1.11.10",
     "konva": "^9.3.6",
     "pinia": "^2.1.7",
@@ -25,6 +26,7 @@
     "radash": "^12.1.0",
     "vee-validate": "^4.12.5",
     "vue": "^3.3.11",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.2.5",
     "vue3-google-login": "^2.0.25",
     "zod": "^3.22.4"

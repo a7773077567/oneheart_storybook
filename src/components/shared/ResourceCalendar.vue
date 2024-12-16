@@ -5,7 +5,7 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
 import { computed, ref } from 'vue';
 import type { User } from '@/api/user';
-import AllOptionSelect from './AllOptionSelect.vue';
+import MultiOptionSelect from './MultiOptionSelect.vue';
 
 interface Props {
   modelValue: string;
@@ -59,7 +59,7 @@ function getCalendarStyle() {
 <template>
   <div class="calendar">
     <div class="calendar__nav">
-      <AllOptionSelect
+      <MultiOptionSelect
         v-model="selected"
         label="治療師"
         :options="options"

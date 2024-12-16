@@ -65,7 +65,7 @@ export const useShiftStore = defineStore('shift', {
       this.shiftTemplates = data;
     },
     async getUsers(spaceIds: number[]) {
-      const data = await fetchUsers(spaceIds);
+      const data = await fetchUsers({ spaceIds });
       this.users = data;
     },
     async getUserShifts(params: UserShiftsGet) {
