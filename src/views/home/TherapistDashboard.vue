@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { TherapistOverview } from '@/components/home/dashboard';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
@@ -30,21 +30,12 @@ const educationPointModel = computed({
   },
 });
 
-watchEffect(async () => {
+watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => {
   $q.loading.show();
-  await adminStore.getTherapistClientScheduleStatics({
-    userId: adminStore.userId,
-    dateRange: therapistRangeSelect.value,
-  });
-  $q.loading.hide();
-});
-
-watchEffect(async () => {
-  $q.loading.show();
-  await adminStore.getTherapistOverviewStatistics({
-    userId: adminStore.userId,
-    userShiftTypes: therapistTypeSelect.value,
-  });
+  await Promise.all([
+    adminStore.getTherapistClientScheduleStatics({ userId: therapistSelect.value || undefined, dateRange: therapistRangeSelect.value }),
+    adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
+  ]);
   $q.loading.hide();
 });
 </script>

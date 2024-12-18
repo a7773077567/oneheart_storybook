@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TherapistOverview } from '@/components/home/dashboard';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
@@ -32,29 +32,14 @@ const educationPointModel = computed({
   },
 });
 
-watchEffect(async () => {
+watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => {
   $q.loading.show();
-  const payload = therapistSelect.value === 0
-    ? { dateRange: therapistRangeSelect.value }
-    : { userId: therapistSelect.value, dateRange: therapistRangeSelect.value };
-  await adminStore.getTherapistClientScheduleStatics(payload);
+  await Promise.all([
+    adminStore.getTherapistClientScheduleStatics({ userId: therapistSelect.value || undefined, dateRange: therapistRangeSelect.value }),
+    adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
+    therapistSelect.value !== 0 && adminStore.getTherapistEducationPoint({ userId: therapistSelect.value }),
+  ]);
   $q.loading.hide();
-});
-
-watchEffect(async () => {
-  $q.loading.show();
-  const payload = therapistSelect.value === 0
-    ? { userShiftTypes: therapistTypeSelect.value }
-    : { userId: therapistSelect.value, userShiftTypes: therapistTypeSelect.value };
-  await adminStore.getTherapistOverviewStatistics(payload);
-  $q.loading.hide();
-});
-
-watchEffect(async () => {
-  if (therapistSelect.value === 0) {
-    return;
-  }
-  adminStore.getTherapistEducationPoint({ userId: therapistSelect.value });
 });
 </script>
 
