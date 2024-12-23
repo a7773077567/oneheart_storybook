@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { AdminTodayBusinessStatus, TherapistOverview } from '@/components/home/dashboard';
+import { AdminTodayBusinessStatus, TherapistOverview, TherapistTurnover } from '@/components/home/dashboard';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
-import { LineChart } from '@/components/shared';
+
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
 
@@ -20,6 +20,7 @@ $q.loading.hide();
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 const therapistSelect = ref(0);
 const therapistRangeSelect = ref('today');
+const turnoverRangeSelect = ref('today');
 const therapistTypeSelect = ref(typeOptions.value.map(option => option.value));
 const hideEducationPoint = computed(() => therapistSelect.value === 0);
 const educationPointModel = computed({
@@ -43,6 +44,12 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
     adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
     therapistSelect.value !== 0 && adminStore.getTherapistEducationPoint({ userId: therapistSelect.value }),
   ]);
+  $q.loading.hide();
+});
+
+watchEffect(async () => {
+  $q.loading.show();
+  await adminStore.getTherapistTurnoverStatistics({ dateRange: turnoverRangeSelect.value });
   $q.loading.hide();
 });
 </script>
@@ -70,6 +77,11 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
       :all-payments="adminStore.allPaymentStatistic"
     />
     <!-- <LineChart :labels="lineLabels" :data="lineData" /> -->
+    <TherapistTurnover
+      v-model="turnoverRangeSelect"
+      :line-chart-data="adminStore.turnoverLineChartData"
+      :pie-chart-data="adminStore.turnoverPieChartData"
+    />
   </div>
 </template>
 
