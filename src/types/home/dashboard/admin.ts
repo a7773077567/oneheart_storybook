@@ -46,3 +46,17 @@ export interface TherapistOverviewStatistic {
   clientRate: number;
   referralCount: number;
 }
+
+export interface TherapistTurnoverStatistic {
+  lineChartData: {
+    type: 'today' | 'month' | 'quarter' | 'year' | 'past12month';
+    value: number;
+    time: string | null;
+    day: number | null;
+    isoweek: number | null;
+    month: number | null;
+  }[];
+  onetimePurchase: number;
+  firstSessionPurchase: number;
+  secondSessionPurchase: number;
+}
