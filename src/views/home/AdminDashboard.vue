@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminTodayBusinessStatus, TherapistOverview, TherapistTurnover } from '@/components/home/dashboard';
+import { AdminTodayBusinessStatus, TherapistClientGroup, TherapistOverview, TherapistTurnover } from '@/components/home/dashboard';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
@@ -63,11 +63,19 @@ async function onClickPie(queryType: string) {
   });
 }
 
-async function onRequest(props: Record<string, any>) {
+async function onDetailsRequest(props: Record<string, any>) {
   const { page, rowsPerPage } = props.pagination;
   await adminStore.getTherapistTurnoverStatisticsDetails({
     dateRange: turnoverRangeSelect.value,
     queryType: turnoverQueryTYpe.value,
+    page,
+    take: rowsPerPage,
+  });
+}
+
+async function onGroupRequest(props: Record<string, any>) {
+  const { page, rowsPerPage } = props.pagination;
+  await adminStore.getTherapistClientGroupStatistics({
     page,
     take: rowsPerPage,
   });
@@ -103,7 +111,12 @@ async function onRequest(props: Record<string, any>) {
       :pie-chart-data="adminStore.turnoverPieChartData"
       :details-data="adminStore.turnoverDetailRows"
       @click-pie="onClickPie"
-      @request="onRequest"
+      @request="onDetailsRequest"
+    />
+    <TherapistClientGroup
+      v-model:pagination="adminStore.clientGroup.pagination"
+      :rows="adminStore.clientGroupRows"
+      @request="onGroupRequest"
     />
   </div>
 </template>
@@ -113,6 +126,7 @@ async function onRequest(props: Record<string, any>) {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-bottom: 100px;
   > * {
     width: 1084px;
   }

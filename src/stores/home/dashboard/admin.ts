@@ -3,13 +3,12 @@ import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
 import { ShiftType } from '@/const/general';
 import { useUserStore } from '@/stores/user';
-import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TherapistTurnoverStatisticsDetailsMeta, TodayBusinessStatus } from '@/types/home/dashboard/admin';
+import type { PageMeta, TherapistClientGroupStatistic, TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
-import type { QTableProps } from 'quasar';
 
 ;
 
@@ -24,7 +23,16 @@ interface State {
   therapists: User[];
   turnover: {
     data: TherapistTurnoverStatisticsDetailsData[];
-    meta: TherapistTurnoverStatisticsDetailsMeta | null;
+    meta: PageMeta | null;
+    pagination: {
+      page: number;
+      rowsPerPage: number;
+      rowsNumber: number;
+    };
+  };
+  clientGroup: {
+    data: TherapistClientGroupStatistic[];
+    meta: PageMeta | null;
     pagination: {
       page: number;
       rowsPerPage: number;
@@ -69,6 +77,15 @@ export const useAdminStore = defineStore('admin', {
         pagination: {
           page: 1,
           rowsPerPage: 6,
+          rowsNumber: 0,
+        },
+      },
+      clientGroup: {
+        data: [],
+        meta: null,
+        pagination: {
+          page: 1,
+          rowsPerPage: 4,
           rowsNumber: 0,
         },
       },
@@ -332,6 +349,18 @@ export const useAdminStore = defineStore('admin', {
         };
       });
     },
+    clientGroupRows(state) {
+      return state.clientGroup.data.map((item) => {
+        const details = item.clientGroupDetails.map((detail) => {
+          return [detail.label, detail.points];
+        });
+        return {
+          ...Object.fromEntries(details),
+          clientName: item.clientName,
+          clientId: item.clientId,
+        };
+      });
+    },
     therapistOptions(state) {
       const userStore = useUserStore();
       const therapistForLead = state.therapists.filter(item => item.role.type === 5);
@@ -415,13 +444,26 @@ export const useAdminStore = defineStore('admin', {
       take: number;
       order?: 'ASC' | 'DESC';
     }) {
-      const { data, meta } = await api.get<TherapistTurnoverStatisticsDetailsData[], TherapistTurnoverStatisticsDetailsMeta>('dashboard/therapistTurnoverStatisticsDetailList', { params });
+      const { data, meta } = await api.get<TherapistTurnoverStatisticsDetailsData[], PageMeta>('dashboard/therapistTurnoverStatisticsDetailList', { params });
       this.turnover.data = data;
       this.turnover.meta = meta!;
       const { page, itemCount, take } = meta!;
       this.turnover.pagination.page = page;
       this.turnover.pagination.rowsNumber = itemCount;
       this.turnover.pagination.rowsPerPage = take;
+    },
+    async  getTherapistClientGroupStatistics(params: {
+      page?: number;
+      take?: number;
+      order?: 'ASC' | 'DESC';
+    }) {
+      const { data, meta } = await api.get<TherapistClientGroupStatistic[], PageMeta>('dashboard/therapistClientGroupStatistics', { params });
+      this.clientGroup.data = data;
+      this.clientGroup.meta = meta!;
+      const { page, itemCount, take } = meta!;
+      this.clientGroup.pagination.page = page;
+      this.clientGroup.pagination.rowsNumber = itemCount;
+      this.clientGroup.pagination.rowsPerPage = take;
     },
   },
 });
