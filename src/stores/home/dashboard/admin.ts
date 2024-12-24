@@ -1,13 +1,17 @@
 import type { Space, User } from '@/api';
 import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
+import { ShiftType } from '@/const/general';
 import { useUserStore } from '@/stores/user';
-import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TodayBusinessStatus } from '@/types/home/dashboard/admin';
+import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TherapistTurnoverStatisticsDetailsMeta, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
+import type { QTableProps } from 'quasar';
+
+;
 
 type PieChartProps = InstanceType<typeof PieChart>['$props'];
 
@@ -18,6 +22,15 @@ interface State {
   therapistOverviewStatistics: TherapistOverviewStatistic;
   therapistTurnoverStatistics: TherapistTurnoverStatistic;
   therapists: User[];
+  turnover: {
+    data: TherapistTurnoverStatisticsDetailsData[];
+    meta: TherapistTurnoverStatisticsDetailsMeta | null;
+    pagination: {
+      page: number;
+      rowsPerPage: number;
+      rowsNumber: number;
+    };
+  };
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -50,6 +63,15 @@ export const useAdminStore = defineStore('admin', {
         secondSessionPurchase: 0,
       },
       therapists: [],
+      turnover: {
+        data: [],
+        meta: null,
+        pagination: {
+          page: 1,
+          rowsPerPage: 6,
+          rowsNumber: 0,
+        },
+      },
     };
   },
   getters: {
@@ -299,7 +321,16 @@ export const useAdminStore = defineStore('admin', {
           data: data.map(item => item.chartData),
         },
         infoData: data.map(item => item.infoData),
+
       };
+    },
+    turnoverDetailRows(state) {
+      return state.turnover.data.map((item) => {
+        return {
+          ...item,
+          userShiftType: ShiftType[item.userShiftType],
+        };
+      });
     },
     therapistOptions(state) {
       const userStore = useUserStore();
@@ -375,6 +406,22 @@ export const useAdminStore = defineStore('admin', {
     }) {
       const { data } = await api.get<TherapistTurnoverStatistic>('dashboard/therapistTurnoverStatistics', { params });
       this.therapistTurnoverStatistics = data;
+    },
+
+    async getTherapistTurnoverStatisticsDetails(params: {
+      dateRange: string;
+      queryType: string;
+      page: number;
+      take: number;
+      order?: 'ASC' | 'DESC';
+    }) {
+      const { data, meta } = await api.get<TherapistTurnoverStatisticsDetailsData[], TherapistTurnoverStatisticsDetailsMeta>('dashboard/therapistTurnoverStatisticsDetailList', { params });
+      this.turnover.data = data;
+      this.turnover.meta = meta!;
+      const { page, itemCount, take } = meta!;
+      this.turnover.pagination.page = page;
+      this.turnover.pagination.rowsNumber = itemCount;
+      this.turnover.pagination.rowsPerPage = take;
     },
   },
 });

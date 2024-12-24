@@ -2,7 +2,6 @@
 import { AdminTodayBusinessStatus, TherapistOverview, TherapistTurnover } from '@/components/home/dashboard';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
-
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
 
@@ -20,7 +19,8 @@ $q.loading.hide();
 const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 const therapistSelect = ref(0);
 const therapistRangeSelect = ref('today');
-const turnoverRangeSelect = ref('today');
+const turnoverRangeSelect = ref('year');
+const turnoverQueryTYpe = ref('');
 const therapistTypeSelect = ref(typeOptions.value.map(option => option.value));
 const hideEducationPoint = computed(() => therapistSelect.value === 0);
 const educationPointModel = computed({
@@ -52,6 +52,26 @@ watchEffect(async () => {
   await adminStore.getTherapistTurnoverStatistics({ dateRange: turnoverRangeSelect.value });
   $q.loading.hide();
 });
+
+async function onClickPie(queryType: string) {
+  turnoverQueryTYpe.value = queryType;
+  await adminStore.getTherapistTurnoverStatisticsDetails({
+    dateRange: turnoverRangeSelect.value,
+    queryType,
+    page: 1,
+    take: 6,
+  });
+}
+
+async function onRequest(props: Record<string, any>) {
+  const { page, rowsPerPage } = props.pagination;
+  await adminStore.getTherapistTurnoverStatisticsDetails({
+    dateRange: turnoverRangeSelect.value,
+    queryType: turnoverQueryTYpe.value,
+    page,
+    take: rowsPerPage,
+  });
+}
 </script>
 
 <template>
@@ -76,11 +96,14 @@ watchEffect(async () => {
       :onetime-and-sessions-purchase="adminStore.onetimeAndSessionsPurchaseStatistic"
       :all-payments="adminStore.allPaymentStatistic"
     />
-    <!-- <LineChart :labels="lineLabels" :data="lineData" /> -->
     <TherapistTurnover
       v-model="turnoverRangeSelect"
+      v-model:details-pagination="adminStore.turnover.pagination"
       :line-chart-data="adminStore.turnoverLineChartData"
       :pie-chart-data="adminStore.turnoverPieChartData"
+      :details-data="adminStore.turnoverDetailRows"
+      @click-pie="onClickPie"
+      @request="onRequest"
     />
   </div>
 </template>

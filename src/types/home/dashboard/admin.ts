@@ -60,3 +60,19 @@ export interface TherapistTurnoverStatistic {
   firstSessionPurchase: number;
   secondSessionPurchase: number;
 }
+
+export interface TherapistTurnoverStatisticsDetailsData {
+  clientId: number;
+  clientName: number;
+  userShiftType: number;
+  amount: number;
+}
+
+export interface TherapistTurnoverStatisticsDetailsMeta {
+  page: number;
+  take: number;
+  itemCount: number;
+  pageCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
