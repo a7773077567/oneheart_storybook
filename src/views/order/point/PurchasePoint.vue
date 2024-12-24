@@ -41,6 +41,9 @@ function checkContractStatus() {
     pointsStore.targetClient = { birthDate: signedContent.birthDate, identityNumber: signedContent.identityNumber };
   }
 }
+
+// fetch data
+pointsStore.getSellerOption();
 </script>
 
 <template>

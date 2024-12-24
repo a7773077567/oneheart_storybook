@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
-import { type Client, type PointsGroup, getClientPointGroup } from '@/api';
+import { type Client, type PointsGroup, RoleType, fetchUsers, getClientPointGroup } from '@/api';
 import { PointTypes } from '@/const/general';
 
 interface State {
   topupDetail: PointsPurchase;
   targetClientPointGroup: PointsGroup[];
   targetClient: Partial<Client> | null;
+  sellerOptions: any[];
 }
 
 export interface PointsPurchase {
@@ -21,6 +22,8 @@ export interface PointsPurchase {
   giftPointGained: number;
   amount: number;
   contractDottedsignTaskId: string | null;
+  sellerId: number | null;
+  sellerName: string | null;
 }
 
 const initialTopup = {
@@ -36,6 +39,8 @@ const initialTopup = {
   giftPointGained: 0,
   amount: 0,
   contractDottedsignTaskId: null,
+  sellerId: null,
+  sellerName: null,
 };
 export const usePointsStore = defineStore('points', {
   state: (): State => {
@@ -43,6 +48,7 @@ export const usePointsStore = defineStore('points', {
       topupDetail: initialTopup,
       targetClientPointGroup: [],
       targetClient: null,
+      sellerOptions: [],
     };
   },
   getters: {
@@ -58,6 +64,15 @@ export const usePointsStore = defineStore('points', {
     },
     resetTopup() {
       this.topupDetail = initialTopup;
+    },
+    async getSellerOption() {
+      const data = await fetchUsers({ roleTypes: [
+        RoleType['物理治療師'],
+        RoleType['物理治療師組長'],
+        RoleType['院長'],
+        RoleType['副院長'],
+      ] });
+      this.sellerOptions = data.map(p => ({ label: p.name, value: p.id }));
     },
   },
 });

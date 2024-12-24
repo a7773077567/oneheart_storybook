@@ -29,6 +29,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
   { key: 'name', value: pointsStore.topupDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
+  { key: 'sellerName', value: pointsStore.topupDetail.sellerName ?? '-', span: true, label: '銷售者' },
   { key: 'pointType', value: pointsStore.topupDetail.pointType && PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
   { key: 'plan', value: pointsStore.topupDetail?.plan ? POINTS_PLAN[pointsStore.topupDetail.plan].name : '', label: '方案' },
@@ -57,7 +58,7 @@ const receiptData = computed(() => {
 
 const isProceeding = ref(false);
 async function onCheckout() {
-  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount,
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount, sellerId,
     //  contractDottedsignTaskId #394 暫時移除簽約步驟
   } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
@@ -87,6 +88,7 @@ async function onCheckout() {
       giftPointGained,
       amount,
       multiChannelPay,
+      sellerId,
       // contractDottedsignTaskId: `${contractDottedsignTaskId}`,
     });
 

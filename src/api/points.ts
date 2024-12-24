@@ -68,6 +68,7 @@ export interface GainPoint {
     details: string;
   }[];
   contractDottedsignTaskId?: string; // #394 暫時移除簽約步驟
+  sellerId: number | null;
 }
 // 儲值堂數
 export async function gainPoint(param: GainPoint) {

@@ -34,6 +34,16 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
     case TransactionTypes.堂數交易:
+      return [
+        { key: 'date', value: data.date, span: true, custom: true },
+        { key: 'name', value: data.clientName, label: '姓名' },
+        { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
+        { key: 'seller', value: data.seller?.name ?? '-', label: '銷售者', span: true },
+        { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
+        { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
+        { key: 'paidPointGained', value: `${data.paidPointGained} 堂`, label: '堂數' },
+        { key: 'giftPointGained', value: `${data.giftPointGained} 堂`, label: '贈堂' },
+      ];
     case TransactionTypes.堂數退款:
     default:
       return [

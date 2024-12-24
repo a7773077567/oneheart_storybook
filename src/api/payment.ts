@@ -4,6 +4,7 @@ import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
 import type { UserShiftDetail } from './shift';
 import type { AddOnService } from './appointment';
+import type { User } from './user';
 
 interface BasicPaymentRecord {
   amount: number;
@@ -63,6 +64,7 @@ export interface PointsPaymentRecord extends BasicPaymentRecord {
   pointUsed: null;
   type: TransactionTypes.堂數交易 | TransactionTypes.堂數退款;
   ticketGained: null;
+  seller: User;
 }
 
 // 團課券購買

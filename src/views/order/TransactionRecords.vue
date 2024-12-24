@@ -102,9 +102,16 @@ const cols: QTableProps['columns'] = [
     },
   },
   {
+    name: 'seller',
+    required: true,
+    label: '銷售者',
+    align: 'left',
+    field: row => row.seller?.name ?? '-',
+  },
+  {
     name: 'cancel',
     required: true,
-    label: '',
+    label: '刪除交易(門診)',
     align: 'left',
     field: row => row.isDeleted,
   },
