@@ -84,6 +84,10 @@ const columns: QTableColumn[] = [
   &__line {
     width: 556px;
   }
+
+  &__pie {
+    flex-shrink: 0;
+  }
 }
 
 .table {
