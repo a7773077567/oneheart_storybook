@@ -54,3 +54,14 @@ export const RangeSelectOptions = [
   { label: '今年', value: 'year' },
   { label: '過去12個月', value: 'past12month' },
 ];
+
+export enum ClientGroupStatisticType {
+  物理治療 = 1,
+  院長物理治療 = 2,
+  營養 = 3,
+  教練課 = 4,
+  震波 = 5,
+  射頻 = 6,
+  磁波 = 7,
+  G動椅 = 8,
+}

@@ -68,7 +68,17 @@ export interface TherapistTurnoverStatisticsDetailsData {
   amount: number;
 }
 
-export interface TherapistTurnoverStatisticsDetailsMeta {
+export interface TherapistClientGroupStatistic {
+  clientId: number;
+  clientName: string;
+  clientGroupDetails: {
+    label: string;
+    type: number;
+    points: number;
+  }[];
+}
+
+export interface PageMeta {
   page: number;
   take: number;
   itemCount: number;

@@ -22,7 +22,8 @@ defineProps<{
     display: flex;
     gap: 16px;
     align-items: center;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
+    padding: 16px 0;
   }
 
   &__body {
