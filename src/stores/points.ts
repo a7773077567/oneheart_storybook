@@ -17,14 +17,14 @@ export interface PointsPurchase {
   pointType: PointTypes;
   groupName: string;
   clientGroupId: number;
-  plan: number | null;
+  plan: number;
   planName: string;
   paidPointGained: number;
   giftPointGained: number;
   amount: number;
   contractDottedsignTaskId: string | null;
   sellerId: number | null;
-  sellerName: string | null;
+  sellerName?: string | null;
 }
 
 const initialTopup = {

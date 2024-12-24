@@ -11,6 +11,7 @@ import { refundPoint } from '@/api';
 import { useUserStore } from '@/stores';
 import { calcReceiptAmount } from '@/utils/helpers';
 import { useDialog } from '@/composables/dialog';
+import { pointUnit } from '@/const/points';
 
 const props = defineProps<{
   modelValue: RefundDetail;
@@ -39,7 +40,7 @@ const refundDetail = computed<CheckTableData>(() => {
     { key: 'phone', value: client?.phone ?? '', label: '電話' },
     { key: 'pointType', value: pointGroup?.type ? PointTypes[pointGroup.type] : '', label: '類別' },
     { key: 'groupName', value: pointGroup?.name ?? '', label: '群組' },
-    { key: 'classCounts', value: `${pointGroup?.points ?? 0} 堂`, label: '堂數' },
+    { key: 'classCounts', value: `${pointGroup?.points ?? 0} ${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}`, label: '堂數' },
   ];
 });
 
@@ -53,7 +54,7 @@ const receiptData = computed(() => {
     { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
     { name: 'group', label: '群組', value: pointGroup?.name ?? '' },
     { name: 'amount', label: '金額', value: `$${calcReceiptAmount(payments.value)}` },
-    { name: 'pointGained', label: '退款堂數', value: `${pointGroup?.points ?? 0}堂` },
+    { name: 'pointGained', label: `退款${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}數`, value: `${pointGroup?.points ?? 0}${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}` },
   ];
 });
 
