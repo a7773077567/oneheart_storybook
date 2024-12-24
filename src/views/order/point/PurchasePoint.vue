@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import TopupForm from '@/components/order/point/TopupForm.vue';
 import TopupCheckout from '@/components/order/point/TopupCheckout.vue';
 
 // import TopupSign from '@/components/order/point/TopupSign.vue';
-import { usePointsStore } from '@/stores';
+import { usePointsStore, useUserStore } from '@/stores';
 import { OSteps } from '@/components/shared';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -42,8 +42,9 @@ function checkContractStatus() {
   }
 }
 
-// fetch data
-pointsStore.getSellerOption();
+// get seller data
+const userStore = useUserStore();
+userStore.getUsers();
 </script>
 
 <template>

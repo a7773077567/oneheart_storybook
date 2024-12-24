@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { type Client, type PointsGroup, RoleType, fetchUsers, getClientPointGroup } from '@/api';
 import { PointTypes } from '@/const/general';
+import { useUserStore } from './user';
 
 interface State {
   topupDetail: PointsPurchase;

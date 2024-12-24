@@ -6,7 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { createPointGroup } from '@/api';
 import type { Client, CreateGroupField } from '@/api';
-import { usePointsStore } from '@/stores';
+import { usePointsStore, useUserStore } from '@/stores';
 import { POINTS_PLAN, plansByType } from '@/const/points';
 import { PointTypes } from '@/const/general';
 import PointsGroupForm from '@/components/client/pointsGroup/PointsGroupForm.vue';
@@ -19,6 +19,8 @@ const emit = defineEmits<{
 }>();
 
 const pointsStore = usePointsStore();
+const userStore = useUserStore();
+
 const pointsTopupSchema = z.object({
   clientName: z.string(),
   clientId: z.number(),
@@ -60,6 +62,7 @@ const planOptions = computed(() => {
 
   return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
+const sellerOptions = computed(() => userStore.users.map(p => ({ label: p.name, value: p.id })));
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
@@ -141,7 +144,7 @@ async function createGroup(value: CreateGroupField) {
           label="銷售者"
           class="field--val"
           name="sellerName"
-          :options="pointsStore.sellerOptions"
+          :options="sellerOptions"
           hide-bottom-space
           :virtual-scroll-item-size="50"
           :emit-value="false"

@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
-import { useVoucherStore } from '@/stores';
+import { useUserStore, useVoucherStore } from '@/stores';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const voucherStore = useVoucherStore();
+const userStore = useUserStore();
 
 voucherStore.getGroupClass();
 
@@ -23,6 +24,8 @@ const pointsTopupSchema = z.object({
   ticketGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
   groupClassId: z.preprocess(a => Number(a), z.number().nonnegative()),
+  sellerId: z.number().nullable(),
+  sellerName: z.string().nullable(),
 });
 
 const initialValues = computed(() => voucherStore.voucherDetail);
@@ -55,6 +58,12 @@ function selectClient(selectList: Client[]) {
 
   showClientSearch.value = false;
 }
+
+const sellerOptions = computed(() => userStore.users.map(p => ({ label: p.name, value: p.id })));
+function choseSeller(selectedSeller: { label: string; value: number }) {
+  setFieldValue('sellerId', selectedSeller.value);
+  setFieldValue('sellerName', selectedSeller.label);
+}
 </script>
 
 <template>
@@ -77,6 +86,19 @@ function selectClient(selectList: Client[]) {
             </template>
           </QBadge>
         </div>
+      </fieldset>
+      <fieldset class="col-8">
+        <OSelect
+          label="銷售者"
+          class="field--val"
+          name="sellerName"
+          :options="sellerOptions"
+          hide-bottom-space
+          :virtual-scroll-item-size="50"
+          :emit-value="false"
+          error-message=""
+          @update:model-value="choseSeller"
+        />
       </fieldset>
       <fieldset class="col-8">
         <OSelect
