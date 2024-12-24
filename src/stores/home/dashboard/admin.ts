@@ -289,11 +289,11 @@ export const useAdminStore = defineStore('admin', {
           case 'today':
             return dayjs(item.time).format('HH:mm');
           case 'month':
-            return item.day?.toString();
+            return `${item.day}日`;
           case 'quarter':
-            return item.isoweek?.toString();
+            return `${item.isoweek}週`;
           default:
-            return item.month?.toString();
+            return `${item.month! + 1}月`;
         }
       });
       const data = source.map(item => item.value);
@@ -320,7 +320,7 @@ export const useAdminStore = defineStore('admin', {
         return {
           chartData: {
             value: item,
-            tooltip: [`${currency} ${percentage}($${currency})`],
+            tooltip: [`${labels[idx]} ${percentage}($${currency})`],
           },
           infoData: {
             label: labels[idx],
