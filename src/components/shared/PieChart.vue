@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Pie } from 'vue-chartjs';
-import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip, type TooltipCallbacks } from 'chart.js';
+import { ArcElement, type ArcOptions, type ArcProps, CategoryScale, Chart as ChartJS, type ChartOptions, Legend, LinearScale, Title, Tooltip, type TooltipCallbacks } from 'chart.js';
 import { computed } from 'vue';
 import { assign, pick } from 'radash';
 import { ChartInfo } from '@/components/shared';
@@ -20,6 +20,7 @@ const props = defineProps<{
   options?: PieOptions;
   tooltip?: string[];
   infoWidth?: string;
+  onClick?: ChartOptions['onClick'];
 }>();
 
 ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, ArcElement);
@@ -55,6 +56,7 @@ const defaultOptions: PieOptions = {
       backgroundColor: '#313137',
     },
   },
+  onClick: props.onClick,
 };
 
 const pieData = computed(() => ({

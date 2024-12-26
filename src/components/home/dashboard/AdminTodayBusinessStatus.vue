@@ -16,7 +16,7 @@ defineProps<{
 
 dayjs.locale('zh-tw');
 
-const title = computed(() => dayjs().format('YYYY年M月D日（週dd）'));
+const title = computed(() => `本日營運狀況 ${dayjs().format('YYYY年M月D日（週dd）')}`);
 </script>
 
 <template>

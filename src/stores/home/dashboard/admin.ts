@@ -1,12 +1,16 @@
 import type { Space, User } from '@/api';
 import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
+import { ShiftType } from '@/const/general';
 import { useUserStore } from '@/stores/user';
-import type { TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TodayBusinessStatus } from '@/types/home/dashboard/admin';
+import type { PageMeta, TherapistClientGroupStatistic, TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
+import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
+
+;
 
 type PieChartProps = InstanceType<typeof PieChart>['$props'];
 
@@ -15,7 +19,26 @@ interface State {
   therapistEducationPoint: TherapistEducationPoint;
   todayBusinessStatus: TodayBusinessStatus;
   therapistOverviewStatistics: TherapistOverviewStatistic;
+  therapistTurnoverStatistics: TherapistTurnoverStatistic;
   therapists: User[];
+  turnover: {
+    data: TherapistTurnoverStatisticsDetailsData[];
+    meta: PageMeta | null;
+    pagination: {
+      page: number;
+      rowsPerPage: number;
+      rowsNumber: number;
+    };
+  };
+  clientGroup: {
+    data: TherapistClientGroupStatistic[];
+    meta: PageMeta | null;
+    pagination: {
+      page: number;
+      rowsPerPage: number;
+      rowsNumber: number;
+    };
+  };
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -41,7 +64,31 @@ export const useAdminStore = defineStore('admin', {
         clientRate: 0,
         referralCount: 0,
       },
+      therapistTurnoverStatistics: {
+        lineChartData: [],
+        firstSessionPurchase: 0,
+        onetimePurchase: 0,
+        secondSessionPurchase: 0,
+      },
       therapists: [],
+      turnover: {
+        data: [],
+        meta: null,
+        pagination: {
+          page: 1,
+          rowsPerPage: 6,
+          rowsNumber: 0,
+        },
+      },
+      clientGroup: {
+        data: [],
+        meta: null,
+        pagination: {
+          page: 1,
+          rowsPerPage: 4,
+          rowsNumber: 0,
+        },
+      },
     };
   },
   getters: {
@@ -235,6 +282,85 @@ export const useAdminStore = defineStore('admin', {
         infoData: data.map(item => item.infoData),
       };
     },
+    turnoverLineChartData(state) {
+      const source = state.therapistTurnoverStatistics.lineChartData;
+      const labels = source.map((item) => {
+        switch (item.type) {
+          case 'today':
+            return dayjs(item.time).format('HH:mm');
+          case 'month':
+            return `${item.day}日`;
+          case 'quarter':
+            return `${item.isoweek}週`;
+          default:
+            return `${item.month! + 1}月`;
+        }
+      });
+      const data = source.map(item => item.value);
+      return {
+        labels,
+        data,
+        options: {
+          pointBackgroundColor: '#3A4E6B',
+          pointBorderColor: '#3A4E6B',
+          pointBorderWidth: 4,
+          borderColor: '#3A4E6B',
+          borderWidth: 2,
+        },
+      };
+    },
+    turnoverPieChartData(state): PieChartProps {
+      const { onetimePurchase, firstSessionPurchase, secondSessionPurchase } = state.therapistTurnoverStatistics;
+      const source = [onetimePurchase, firstSessionPurchase, secondSessionPurchase];
+      const totalAmount = source.reduce((acc, item) => acc + item, 0);
+      const labels = ['單次消費', '初次堂數購買', '二次購買堂數'];
+      const data = source.map((item, idx) => {
+        const percentage = calcPercentage(item, totalAmount);
+        const currency = item.toLocaleString('en-us');
+        return {
+          chartData: {
+            value: item,
+            tooltip: [`${labels[idx]} ${percentage}($${currency})`],
+          },
+          infoData: {
+            label: labels[idx],
+            values: [`$${currency}`, percentage],
+            color: LimitColors[idx],
+          },
+        };
+      });
+
+      return {
+        title: `總營業額 $${totalAmount.toLocaleString('en-us')}`,
+        chartData: {
+          labels,
+          backgroundColor: LimitColors,
+          data: data.map(item => item.chartData),
+        },
+        infoData: data.map(item => item.infoData),
+
+      };
+    },
+    turnoverDetailRows(state) {
+      return state.turnover.data.map((item) => {
+        return {
+          ...item,
+          userShiftType: ShiftType[item.userShiftType],
+        };
+      });
+    },
+    clientGroupRows(state) {
+      return state.clientGroup.data.map((item) => {
+        const details = item.clientGroupDetails.map((detail) => {
+          return [detail.label, detail.points];
+        });
+        return {
+          ...Object.fromEntries(details),
+          clientName: item.clientName,
+          clientId: item.clientId,
+        };
+      });
+    },
     therapistOptions(state) {
       const userStore = useUserStore();
       const therapistForLead = state.therapists.filter(item => item.role.type === 5);
@@ -302,6 +428,42 @@ export const useAdminStore = defineStore('admin', {
 
       const { data } = await api.get<User[]>('users', { params: { spaceIds, roleTypes } });
       this.therapists = data;
+    },
+
+    async getTherapistTurnoverStatistics(params: {
+      dateRange: string;
+    }) {
+      const { data } = await api.get<TherapistTurnoverStatistic>('dashboard/therapistTurnoverStatistics', { params });
+      this.therapistTurnoverStatistics = data;
+    },
+
+    async getTherapistTurnoverStatisticsDetails(params: {
+      dateRange: string;
+      queryType: string;
+      page: number;
+      take: number;
+      order?: 'ASC' | 'DESC';
+    }) {
+      const { data, meta } = await api.get<TherapistTurnoverStatisticsDetailsData[], PageMeta>('dashboard/therapistTurnoverStatisticsDetailList', { params });
+      this.turnover.data = data;
+      this.turnover.meta = meta!;
+      const { page, itemCount, take } = meta!;
+      this.turnover.pagination.page = page;
+      this.turnover.pagination.rowsNumber = itemCount;
+      this.turnover.pagination.rowsPerPage = take;
+    },
+    async  getTherapistClientGroupStatistics(params: {
+      page?: number;
+      take?: number;
+      order?: 'ASC' | 'DESC';
+    }) {
+      const { data, meta } = await api.get<TherapistClientGroupStatistic[], PageMeta>('dashboard/therapistClientGroupStatistics', { params });
+      this.clientGroup.data = data;
+      this.clientGroup.meta = meta!;
+      const { page, itemCount, take } = meta!;
+      this.clientGroup.pagination.page = page;
+      this.clientGroup.pagination.rowsNumber = itemCount;
+      this.clientGroup.pagination.rowsPerPage = take;
     },
   },
 });
