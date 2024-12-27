@@ -90,14 +90,14 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     paidPointGained: 5,
     giftPointGained: 0,
     price: 9500,
-    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+    for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.射頻],
   },
   13: {
     name: 'winback能量治療十堂送一 $20,000',
     paidPointGained: 10,
     giftPointGained: 1,
     price: 20000,
-    for: [PointTypes.物理治療, PointTypes.院長物理治療],
+    for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.射頻],
   },
   14: {
     name: '教練課5堂 $8,000',
@@ -148,6 +148,90 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     price: 34000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
+  21: {
+    name: '震波徒手加價',
+    paidPointGained: 1,
+    giftPointGained: 0,
+    price: 1,
+    for: [PointTypes.震波],
+  },
+  22: {
+    name: '儲值 6000 發',
+    paidPointGained: 6000,
+    giftPointGained: 1000,
+    price: 7000,
+    for: [PointTypes.震波],
+  },
+  23: {
+    name: '儲值 10000 發',
+    paidPointGained: 10000,
+    giftPointGained: 2000,
+    price: 12000,
+    for: [PointTypes.震波],
+  },
+  24: {
+    name: '儲值 20000 發',
+    paidPointGained: 20000,
+    giftPointGained: 6000,
+    price: 26000,
+    for: [PointTypes.震波],
+  },
+  25: {
+    name: '儲值 60000 發',
+    paidPointGained: 60000,
+    giftPointGained: 24000,
+    price: 84000,
+    for: [PointTypes.震波],
+  },
+  26: {
+    name: '儲值 100000 發',
+    paidPointGained: 100000,
+    giftPointGained: 50000,
+    price: 150000,
+    for: [PointTypes.震波],
+  },
+  27: {
+    name: 'winback徒手加價',
+    paidPointGained: 1,
+    giftPointGained: 0,
+    price: 1,
+    for: [PointTypes.射頻],
+  },
+  28: {
+    name: '磁波徒手加價',
+    paidPointGained: 1,
+    giftPointGained: 0,
+    price: 1,
+    for: [PointTypes.磁波],
+  },
+  29: {
+    name: '磁波治療五堂',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 9500,
+    for: [PointTypes.磁波],
+  },
+  30: {
+    name: '磁波治療十堂',
+    paidPointGained: 10,
+    giftPointGained: 1,
+    price: 20000,
+    for: [PointTypes.磁波],
+  },
+  31: {
+    name: 'Ｇ動椅治療六堂',
+    paidPointGained: 6,
+    giftPointGained: 0,
+    price: 15000,
+    for: [PointTypes.G動椅],
+  },
+  32: {
+    name: 'Ｇ動椅治療十二堂',
+    paidPointGained: 12,
+    giftPointGained: 0,
+    price: 26400,
+    for: [PointTypes.G動椅],
+  },
 } as const;
 
 interface TypePlan {
@@ -159,12 +243,26 @@ interface TypePlan {
 
 const getPlanByType = (plan: PointTypes) => Object.keys(POINTS_PLAN).map(plan => +plan).filter(planNumber => POINTS_PLAN[+planNumber as keyof typeof POINTS_PLAN].for?.includes(plan));
 
+// 方案總表: https://www.notion.so/enginelin/faf06bae4bbf4069baba2c5c9ee54146?pvs=4
 export const plansByType: TypePlan[] = [
   { id: 1, type: PointTypes.物理治療, plans: getPlanByType(PointTypes.物理治療) },
   { id: 2, type: PointTypes.院長物理治療, plans: getPlanByType(PointTypes.院長物理治療) },
   { id: 3, type: PointTypes.營養, plans: getPlanByType(PointTypes.營養) },
-  { id: 4, type: PointTypes.教練課, plans: getPlanByType(PointTypes.教練課),
-  },
+  { id: 4, type: PointTypes.教練課, plans: getPlanByType(PointTypes.教練課) },
+  { id: 5, type: PointTypes.震波, plans: getPlanByType(PointTypes.震波) },
+  { id: 6, type: PointTypes.射頻, plans: getPlanByType(PointTypes.射頻) },
+  { id: 7, type: PointTypes.磁波, plans: getPlanByType(PointTypes.磁波) },
+  { id: 7, type: PointTypes.G動椅, plans: getPlanByType(PointTypes.G動椅) },
 ];
 
-// 方案總表: https://www.notion.so/enginelin/faf06bae4bbf4069baba2c5c9ee54146?pvs=4
+// 點數單位
+export const pointUnit: { [key in PointTypes]: string } = {
+  [PointTypes.物理治療]: '堂',
+  [PointTypes.院長物理治療]: '堂',
+  [PointTypes.教練課]: '堂',
+  [PointTypes.營養]: '堂',
+  [PointTypes.震波]: '發',
+  [PointTypes.磁波]: '堂',
+  [PointTypes.G動椅]: '堂',
+  [PointTypes.射頻]: '堂',
+} as const;

@@ -58,7 +58,7 @@ const $q = useQuasar();
 const isProceeding = ref(false);
 
 async function onCheckout() {
-  const { clientId, groupClassId, ticketGained, amount,
+  const { clientId, groupClassId, ticketGained, amount, sellerId,
     //  contractDottedsignTaskId #394 暫時移除簽約步驟
   } = voucherStore.voucherDetail as PurchaseVoucher;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
@@ -79,6 +79,7 @@ async function onCheckout() {
       ticketGained,
       amount,
       multiChannelPay,
+      sellerId,
       // contractDottedsignTaskId: `${contractDottedsignTaskId}`,  #394 暫時移除簽約步驟
     });
 
@@ -119,7 +120,7 @@ watch(payments, (chosenPayments) => {
       <QBtn color="black" size="md" label="上一步" class="q-px-lg" @click="$emit('goBack')" />
     </div>
     <QDialog v-model="isCheckoutOpen">
-      <Receipt :rows="receiptData" :is-loading="isProceeding" :space-id="userStore?.currentSpace?.id" checkout="onCheckout" />
+      <Receipt :rows="receiptData" :is-loading="isProceeding" :space-id="userStore?.currentSpace?.id" @checkout="onCheckout" />
     </QDialog>
   </div>
 </template>

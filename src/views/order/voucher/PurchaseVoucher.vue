@@ -4,7 +4,7 @@ import VoucherForm from '@/components/order/voucher/VoucherForm.vue';
 import VoucherCheckout from '@/components/order/voucher/VoucherCheckout.vue';
 
 // import VoucherSign from '@/components/order/voucher/VoucherSign.vue';
-import { useVoucherStore } from '@/stores';
+import { useUserStore, useVoucherStore } from '@/stores';
 import { useRoute, useRouter } from 'vue-router';
 
 const voucherStore = useVoucherStore();
@@ -41,6 +41,10 @@ function finishPurchase() {
   router.push({ name: 'GroupClassVoucher' });
   currentStep.value = steps[0];
 }
+
+// get seller data
+const userStore = useUserStore();
+userStore.getUsers();
 </script>
 
 <template>
