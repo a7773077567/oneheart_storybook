@@ -49,6 +49,7 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
   { key: 'name', value: voucherStore.voucherDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: voucherStore.voucherDetail?.clientPhone ?? '', label: '電話' },
+  { key: 'phone', value: voucherStore.voucherDetail?.sellerName ?? '-', label: '銷售者', span: true },
   { key: 'classId', value: voucherStore.voucherDetail?.groupClassName ?? '', label: '團課名稱' },
   { key: 'ticketGained', value: `${voucherStore.voucherDetail?.ticketGained} 張`, label: '數量' },
   { key: 'amount', value: `$ ${(voucherStore.voucherDetail?.amount ?? 0)}`, label: '金額' },
