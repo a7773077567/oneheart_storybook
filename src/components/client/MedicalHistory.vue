@@ -3,6 +3,7 @@ import { ShiftType, Types } from '@/const/general';
 import { useClientStore } from '@/stores';
 import { computed, ref, watchEffect } from 'vue';
 import type { QTableProps } from 'quasar';
+import { sortDepTypes } from '@/utils/helpers';
 
 const props = defineProps<{
   clientId: string;
@@ -41,7 +42,7 @@ const rows = computed(() => {
 });
 
 function getFilterOptions() {
-  const options = Object.values(Types).map(type => ({ label: type.label, value: type.identifier }));
+  const options = sortDepTypes(Object.values(Types).map(type => ({ label: type.label, value: type.identifier })), 'value');
   return [{ label: '所有科別', value: 0 }, ...options];
 }
 </script>

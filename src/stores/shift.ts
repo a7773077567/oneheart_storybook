@@ -5,6 +5,7 @@ import type { AvailableClassesForGym, GroupShiftTemplate, ShiftTemplate, UserShi
 import { defineStore } from 'pinia';
 import { useUserStore } from './user';
 import { SpaceType, Types } from '@/const/general';
+import { sortDepTypes } from '@/utils/helpers';
 
 interface State {
   shiftTemplates: ShiftTemplate[];
@@ -36,7 +37,7 @@ export const useShiftStore = defineStore('shift', {
     },
     spaceShiftOptions() {
       const userStore = useUserStore();
-      const types = Object.values(Types).filter(item => !item.hideInOptions);
+      const types = sortDepTypes(Object.values(Types).filter(item => !item.hideInOptions), 'identifier');
       if (userStore.currentSpace?.type === SpaceType['綜合']) {
         return types.map(({ label, identifier }) => ({ label, value: identifier }));
       }

@@ -58,6 +58,10 @@ export enum ShiftType {
   團課 = 11,
   物理治療體驗門診 = 12,
   新人實習門診 = 13,
+  // '震波' = 14,
+  // '射頻' = 15,
+  // '磁波' = 16,
+  // 'G動椅' = 17,
 }
 const ShiftTypeConst = {
   物理諮詢門診: 1,
@@ -111,7 +115,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: false,
-    hideInOptions: true,
+    hideInOptions: true, // #311 [後台] 暫時移除物理諮詢門診 https://www.notion.so/enginelin/311-1106ce59243c8093a7a2c19f099eb8f6?pvs=4
   },
   physicalTherapy: {
     identifier: ShiftType['物理治療門診'],
@@ -124,7 +128,6 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['物理治療'],
     canEditTime: true,
-
   },
   footPressure: {
     identifier: ShiftType['足壓門診'],
