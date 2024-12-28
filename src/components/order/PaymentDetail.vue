@@ -26,6 +26,14 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'addOnServices', value: data.addOnServices?.filter(service => service.isAddOn)?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務', span: true },
       ];
     case TransactionTypes.團課券購買:
+      return [
+        { key: 'date', value: data.date, span: true, custom: true },
+        { key: 'name', value: data.clientName, label: '姓名' },
+        { key: 'classId', value: data.groupClassName, label: '團課名稱' },
+        { key: 'ticketGained', value: `${data.ticketGained} 張`, label: '數量' },
+        { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
+        { key: 'seller', value: data.seller?.name ?? '-', label: '銷售者', span: true },
+      ];
     case TransactionTypes.團課券退款:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
