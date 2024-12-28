@@ -37,7 +37,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
   [RoleType['教練組長']]: {
     READ_HANDOVER: false,
     EDIT_COACH_OPERATION_TARGET: true,
-    VIEW_USER_SETTING: true,
+    VIEW_USER_SETTING: false,
   },
   [RoleType['教練']]: {
     READ_HANDOVER: false,
