@@ -41,8 +41,6 @@ const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
 
 const permissionControlTabs = computed(() => {
-  // temporary control
-  const isAdminAccount = userInfo.value?.id === 16;
   let _filteredPages = navTabs.value?.map((group) => {
     if (group && group.children) {
       return ({ ...group, children: group?.children?.filter(subpage => !subpage.meta?.hide) });
@@ -56,7 +54,7 @@ const permissionControlTabs = computed(() => {
     });
   }
 
-  if (import.meta.env.MODE === 'production' && !isAdminAccount) {
+  if (!userStore.canI('VIEW_USER_SETTING')) {
     return _filteredPages.filter(route => route?.meta?.permission);
   }
 
