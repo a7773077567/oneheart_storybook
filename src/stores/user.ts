@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', {
       return spaceType === 2 || spaceType === 3;
     },
     role(state): RoleType { return state.userInfo?.role.type ?? RoleType['系統管理者']; },
-    isWillyAccount: state => state.userInfo?.id === 16,
+    isWillyAccount: state => import.meta.env.MODE === 'production' && state.userInfo?.id === 16,
     canI() {
       return (action: PermissionEvents): boolean => {
         // 權限特例，針對 willy 帳號開放
