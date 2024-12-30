@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
+import type { PointTypes } from '@/const/general';
 import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { deletePayment, getPayments, getSinglePayment } from '@/api';
 import type { MedicalPaymentRecord, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
@@ -13,6 +14,7 @@ import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import CancelOrder from '@/components/order/CancelOrder.vue';
 import { Space } from '@/const/space';
+import { pointUnit } from '@/const/points';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -84,7 +86,7 @@ const cols: QTableProps['columns'] = [
     label: '堂(張)數 / 金額',
     align: 'left',
     style: row => `${row.isDeleted ? 'opacity: 0.4' : ''}`,
-    field: ({ type, amount, ticketGained, paidPointGained, giftPointGained }) => {
+    field: ({ type, amount, ticketGained, paidPointGained, giftPointGained, pointPaymentClientGroupType }) => {
       switch (type) {
         case TransactionTypes.門診費用:
           return `$${amount}`;
@@ -93,18 +95,25 @@ const cols: QTableProps['columns'] = [
         case TransactionTypes.團課券退款:
           return `${ticketGained} 張 / $ -${amount}`;
         case TransactionTypes.堂數交易:
-          return `${showDecimal(+paidPointGained + +giftPointGained)} 堂/ $${amount}`;
+          return `${showDecimal(+paidPointGained + +giftPointGained)} ${pointUnit[pointPaymentClientGroupType as PointTypes]}/ $${amount}`;
         case TransactionTypes.堂數退款:
-          return `${showDecimal(+paidPointGained + +giftPointGained)} 堂/ $ -${amount}`;
+          return `${showDecimal(+paidPointGained + +giftPointGained)} ${pointUnit[pointPaymentClientGroupType as PointTypes]}/ $ -${amount}`;
         default:
           amount = 0;
       }
     },
   },
   {
+    name: 'seller',
+    required: true,
+    label: '銷售者',
+    align: 'left',
+    field: row => row.seller?.name ?? '-',
+  },
+  {
     name: 'cancel',
     required: true,
-    label: '',
+    label: '刪除交易(門診)',
     align: 'left',
     field: row => row.isDeleted,
   },
@@ -182,7 +191,7 @@ const isReceiptDialogOpen = ref(false);
 const space = ref<string>('');
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName } = await getSinglePayment(paymentId);
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName, pointPaymentClientGroupType } = await getSinglePayment(paymentId);
   space.value = spaceName!;
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
@@ -201,11 +210,11 @@ async function checkReceipt(paymentId: number) {
       break;
     case TransactionTypes.堂數交易:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '取得堂數', value: `${paidPointGained}堂` }, { name: 'giftPointGained', label: '贈送堂數', value: `${giftPointGained}堂` }];
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: `取得${pointUnit[pointPaymentClientGroupType as PointTypes]}數`, value: `${paidPointGained}${pointUnit[pointPaymentClientGroupType as PointTypes]}` }, { name: 'giftPointGained', label: `贈送${pointUnit[pointPaymentClientGroupType as PointTypes]}數`, value: `${giftPointGained}${pointUnit[pointPaymentClientGroupType as PointTypes]}` }];
       break;
     case TransactionTypes.堂數退款:
       amount = calcReceiptAmount(pointPaymentMultiChannelPay);
-      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `-$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: '堂數', value: `${showDecimal(+paidPointGained + +giftPointGained)}堂` }];
+      extraFields = [{ name: 'group', label: '群組', value: pointPaymentClientGroupName }, { name: 'amount', label: '金額', value: `-$${amount}` }, { name: 'planName', label: '方案', value: pointPaymentPlan }, { name: 'pointGained', label: `${pointUnit[pointPaymentClientGroupType as PointTypes]}數`, value: `${showDecimal(+paidPointGained + +giftPointGained)}${pointUnit[pointPaymentClientGroupType as PointTypes]}` }];
       break;
     default:
       amount = 0;

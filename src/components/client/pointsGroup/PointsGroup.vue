@@ -54,9 +54,7 @@ async function deleteGroup(delGroupId: number) {
 const $q = useQuasar();
 async function createGroup(value: CreateGroupField) {
   await createPointGroup(value);
-  $q.dialog({
-    message: '群組創建成功',
-  });
+  $q.notify({ message: '群組創建成功', timeout: 200, position: 'top' });
   showGroupForm.value = false;
   getGroupList();
 }

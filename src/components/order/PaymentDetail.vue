@@ -4,6 +4,7 @@ import { PaymentMethods } from '@/const/appointment';
 import { CheckTable, PaymentComposition } from '@/components/appointment';
 import type { PaymentDetail } from '@/api';
 import { PointTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { pointUnit } from '@/const/points';
 
 const props = defineProps<{
   detail: PaymentDetail ;
@@ -25,6 +26,14 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'addOnServices', value: data.addOnServices?.filter(service => service.isAddOn)?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務', span: true },
       ];
     case TransactionTypes.團課券購買:
+      return [
+        { key: 'date', value: data.date, span: true, custom: true },
+        { key: 'name', value: data.clientName, label: '姓名' },
+        { key: 'classId', value: data.groupClassName, label: '團課名稱' },
+        { key: 'ticketGained', value: `${data.ticketGained} 張`, label: '數量' },
+        { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
+        { key: 'seller', value: data.seller?.name ?? '-', label: '銷售者', span: true },
+      ];
     case TransactionTypes.團課券退款:
       return [
         { key: 'date', value: data.date, span: true, custom: true },
@@ -34,6 +43,16 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
       ];
     case TransactionTypes.堂數交易:
+      return [
+        { key: 'date', value: data.date, span: true, custom: true },
+        { key: 'name', value: data.clientName, label: '姓名' },
+        { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
+        { key: 'seller', value: data.seller?.name ?? '-', label: '銷售者', span: true },
+        { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
+        { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
+        { key: 'paidPointGained', value: `${data.paidPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `${pointUnit[data.pointPaymentClientGroupType]}數` },
+        { key: 'giftPointGained', value: `${data.giftPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `贈送${pointUnit[data.pointPaymentClientGroupType]}數` },
+      ];
     case TransactionTypes.堂數退款:
     default:
       return [
@@ -42,8 +61,8 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
         { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
         { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
-        { key: 'paidPointGained', value: `${data.paidPointGained} 堂`, label: '堂數' },
-        { key: 'giftPointGained', value: `${data.giftPointGained} 堂`, label: '贈堂' },
+        { key: 'paidPointGained', value: `${data.paidPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `${pointUnit[data.pointPaymentClientGroupType]}數` },
+        { key: 'giftPointGained', value: `${data.giftPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `贈${pointUnit[data.pointPaymentClientGroupType]}` },
       ];
   }
 });

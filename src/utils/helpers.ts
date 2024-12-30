@@ -1,6 +1,7 @@
 import { Cookies } from 'quasar';
 import type { Checkout } from '@/api';
 import { PaymentMethods } from '@/const/appointment';
+import { ShiftType } from '@/const/general';
 
 type Payment = Checkout['multiChannelPay'][number];
 
@@ -85,4 +86,28 @@ export function showDecimal(val: number, places: number = 2) {
 
 export function calcPercentage(divisor: number, dividend: number) {
   return dividend === 0 ? '0%' : `${Math.round((divisor / dividend) * 100)}%`;
+}
+
+// 科別順序
+export function sortDepTypes<T extends Record<string, any>>(typesArr: T[], key: keyof T): T[] {
+  const typesOrder = [
+    ShiftType['物理治療門診'],
+    ShiftType['院長物理治療'],
+    ShiftType['物理治療體驗門診'],
+    ShiftType['院長評估門診'],
+    ShiftType['物理諮詢門診'],
+    // ShiftType['震波'],
+    // ShiftType['射頻'],
+    // ShiftType['磁波'],
+    // ShiftType['G動椅'],
+    ShiftType['足壓門診'],
+    ShiftType['睡眠門診'],
+    ShiftType['營養門診'],
+    ShiftType['營養諮詢門診'],
+    ShiftType['新人實習門診'],
+    ShiftType['教練課'],
+    ShiftType['運動諮詢'],
+    ShiftType['團課'],
+  ] as const;
+  return typesArr.slice().sort((a, b) => typesOrder.indexOf(a[key]) - typesOrder.indexOf(b[key]));
 }

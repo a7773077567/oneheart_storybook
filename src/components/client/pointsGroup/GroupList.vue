@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { computed } from 'vue';
 import type { QTableProps } from 'quasar';
 import { PointTypes } from '@/const/general';
 import type { PointsGroup } from '@/api';
@@ -57,11 +58,11 @@ const cols: QTableProps['columns'] = [
               <div class="group_title_name">
                 {{ group.name }}
               </div>
-              <span class="q-ml-md">堂數</span>
+              <span class="q-ml-md"> {{ group.type === PointTypes['震波'] ? '發數' : '堂數' }}</span>
               <div class="group_title_points">
                 {{ showDecimal(group.points) ?? 0 }}
               </div>
-              <span>點</span>
+              <span>{{ group.type === PointTypes['震波'] ? '發' : '堂' }}</span>
             </div>
           </QItemSection>
           <QItemSection side>

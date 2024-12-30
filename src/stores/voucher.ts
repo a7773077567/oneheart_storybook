@@ -11,6 +11,7 @@ export interface VoucherDetail extends PurchaseVoucher {
   clientName: string;
   clientPhone: string;
   groupClassName: string;
+  sellerName?: null | string;
 }
 
 export const useVoucherStore = defineStore('voucher', {
