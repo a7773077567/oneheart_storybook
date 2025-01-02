@@ -45,7 +45,7 @@ export const useUserStore = defineStore('user', {
       return state.userInfo?.spaces.find(space => space.id === state.currentSpaceId);
     },
     isGym(state) {
-      const spaceType = state.userInfo?.spaces.find(space => space.id === state.currentSpaceId)!.type;
+      const spaceType = state.userInfo?.spaces.find(space => space.id === state.currentSpaceId)?.type;
       return spaceType === 2 || spaceType === 3;
     },
     role(state): RoleType { return state.userInfo?.role.type ?? RoleType['系統管理者']; },

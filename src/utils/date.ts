@@ -63,5 +63,5 @@ export function reduceMinsToHrs<T extends Record<string, any>, K extends keyof T
 }
 
 export function minsToHrs(val: number) {
-  return dayjs.duration(val, 'm').hours();
+  return dayjs.duration(val, 'm').asHours();
 }
