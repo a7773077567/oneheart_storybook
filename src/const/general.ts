@@ -102,6 +102,8 @@ export interface Type {
   pointType?: number;
   canEditTime: boolean;
   hideInOptions?: boolean;
+  roles: number[];
+  selectLabel: '治療師' | '教練';
 }
 
 export const Types: Record<TypeName, Type> = {
@@ -116,6 +118,8 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     canEditTime: false,
     hideInOptions: true, // #311 [後台] 暫時移除物理諮詢門診 https://www.notion.so/enginelin/311-1106ce59243c8093a7a2c19f099eb8f6?pvs=4
+    roles: [2, 3, 4, 5],
+    selectLabel: '治療師',
   },
   physicalTherapy: {
     identifier: ShiftType['物理治療門診'],
@@ -128,6 +132,8 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['物理治療'],
     canEditTime: true,
+    roles: [2, 3, 4, 5],
+    selectLabel: '治療師',
   },
   footPressure: {
     identifier: ShiftType['足壓門診'],
@@ -139,6 +145,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    selectLabel: '治療師',
   },
   nutrition: {
     identifier: ShiftType['營養門診'],
@@ -150,6 +158,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    selectLabel: '治療師',
   },
   sleep: {
     identifier: ShiftType['睡眠門診'],
@@ -161,6 +171,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    selectLabel: '治療師',
   },
   deanConsultation: {
     identifier: ShiftType['院長評估門診'],
@@ -172,6 +184,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2],
+    selectLabel: '治療師',
   },
   deanTherapy: {
     identifier: ShiftType['院長物理治療'],
@@ -184,6 +198,8 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['院長物理治療'],
     canEditTime: true,
+    roles: [2],
+    selectLabel: '治療師',
   },
   nutritionConsultation: {
     identifier: ShiftType['營養諮詢門診'],
@@ -196,6 +212,8 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['營養'],
     canEditTime: true,
+    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    selectLabel: '治療師',
   },
   oneOnOne: {
     identifier: ShiftType['教練課'],
@@ -208,6 +226,8 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['教練課'],
     canEditTime: true,
+    roles: [8, 9],
+    selectLabel: '教練',
   },
   sports: {
     identifier: ShiftType['運動諮詢'],
@@ -219,6 +239,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
     showInOptions: true,
     canEditTime: true,
+    roles: [8, 9],
+    selectLabel: '教練',
   },
   group: {
     identifier: ShiftType['團課'],
@@ -230,6 +252,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
     showInOptions: false,
     canEditTime: false,
+    roles: [8, 9],
+    selectLabel: '教練',
   },
   physicalTrial: {
     identifier: ShiftType['物理治療體驗門診'],
@@ -241,6 +265,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2, 3, 4, 5],
+    selectLabel: '治療師',
   },
   InternshipClinic: {
     identifier: ShiftType['新人實習門診'],
@@ -252,6 +278,8 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
+    roles: [2, 3, 4, 5],
+    selectLabel: '治療師',
   },
 };
 

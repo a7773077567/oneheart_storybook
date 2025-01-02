@@ -39,13 +39,15 @@ export const useShiftStore = defineStore('shift', {
       const userStore = useUserStore();
       const types = sortDepTypes(Object.values(Types).filter(item => !item.hideInOptions), 'identifier');
       if (userStore.currentSpace?.type === SpaceType['綜合']) {
-        return types.map(({ label, identifier }) => ({ label, value: identifier }));
+        return types.map(item => ({ ...item, label: item.label, value: item.identifier }));
       }
 
-      return types.filter(({ spaceType, showInOptions }) => spaceType === userStore.currentSpace?.type && showInOptions).map(({ label, identifier }) => ({
-        label,
-        value: identifier,
-      }));
+      return types.filter(({ spaceType, showInOptions }) => spaceType === userStore.currentSpace?.type && showInOptions)
+        .map(item => ({
+          ...item,
+          label: item.label,
+          value: item.identifier,
+        }));
     },
     activeUsers: (state) => {
       const { users } = state;
