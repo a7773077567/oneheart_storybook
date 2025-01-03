@@ -1,3 +1,5 @@
+import { RoleType } from '@/const/user';
+
 // 堂數群組
 export enum PointTypes {
   '物理治療' = 1,
@@ -89,6 +91,21 @@ export const PhysicalTypes = [
   ShiftType['物理治療體驗門診'],
 ] as const;
 
+export const TherapyRoles = [
+  RoleType['系統管理者'],
+  RoleType['院長'],
+  RoleType['副院長'],
+  RoleType['物理治療師組長'],
+  RoleType['物理治療師'],
+];
+
+export const CoachRoles = [
+  RoleType['店長'],
+  RoleType['副店長'],
+  RoleType['教練組長'],
+  RoleType['教練'],
+];
+
 type TabName = typeof TabNames[number];
 export interface Type {
   identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
@@ -118,7 +135,7 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     canEditTime: false,
     hideInOptions: true, // #311 [後台] 暫時移除物理諮詢門診 https://www.notion.so/enginelin/311-1106ce59243c8093a7a2c19f099eb8f6?pvs=4
-    roles: [2, 3, 4, 5],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   physicalTherapy: {
@@ -132,7 +149,7 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['物理治療'],
     canEditTime: true,
-    roles: [2, 3, 4, 5],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   footPressure: {
@@ -145,7 +162,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   nutrition: {
@@ -158,7 +175,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   sleep: {
@@ -171,7 +188,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   deanConsultation: {
@@ -184,7 +201,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   deanTherapy: {
@@ -198,7 +215,7 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['院長物理治療'],
     canEditTime: true,
-    roles: [2],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   nutritionConsultation: {
@@ -212,7 +229,7 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['營養'],
     canEditTime: true,
-    roles: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   oneOnOne: {
@@ -226,7 +243,7 @@ export const Types: Record<TypeName, Type> = {
     showInOptions: true,
     pointType: PointTypes['教練課'],
     canEditTime: true,
-    roles: [8, 9],
+    roles: CoachRoles,
     selectLabel: '教練',
   },
   sports: {
@@ -239,7 +256,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
     showInOptions: true,
     canEditTime: true,
-    roles: [8, 9],
+    roles: CoachRoles,
     selectLabel: '教練',
   },
   group: {
@@ -252,7 +269,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['運動場館'],
     showInOptions: false,
     canEditTime: false,
-    roles: [8, 9],
+    roles: CoachRoles,
     selectLabel: '教練',
   },
   physicalTrial: {
@@ -265,7 +282,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2, 3, 4, 5],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
   InternshipClinic: {
@@ -278,7 +295,7 @@ export const Types: Record<TypeName, Type> = {
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
-    roles: [2, 3, 4, 5],
+    roles: TherapyRoles,
     selectLabel: '治療師',
   },
 };

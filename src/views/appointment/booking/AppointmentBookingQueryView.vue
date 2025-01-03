@@ -32,9 +32,9 @@ const { handleSubmit, values, setFieldValue } = useForm({
 watch(() => values.userShiftType, (newShiftType) => {
   const shiftDetails = getType(newShiftType!)!;
   const newTherapistOptions = appointmentStore.activeUsers.filter(item => shiftDetails.roles.includes(item.role.type));
-  const newTherapistIds = newTherapistOptions.map(item => item.id);
+  // const newTherapistIds = newTherapistOptions.map(item => item.id);
   therapistOptions.value = newTherapistOptions;
-  setFieldValue('userIds', newTherapistIds);
+  setFieldValue('userIds', []);
   selectLabel.value = shiftDetails.selectLabel;
 }, { immediate: true });
 
@@ -67,7 +67,7 @@ const onSubmit = handleSubmit(async (values) => {
       <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" />
     </InputBox>
     <InputBox :label="`選擇${selectLabel}`">
-      <OSelect :emit-value="false" name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple />
+      <OSelect name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" />
