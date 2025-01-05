@@ -6,6 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import type { Client } from '@/api';
 import { useUserStore, useVoucherStore } from '@/stores';
+import { getOpenAccount } from '@/utils/helpers';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -59,7 +60,7 @@ function selectClient(selectList: Client[]) {
   showClientSearch.value = false;
 }
 
-const sellerOptions = computed(() => userStore.users.map(p => ({ label: p.name, value: p.id })));
+const sellerOptions = computed(() => userStore.users.filter(getOpenAccount).map(p => ({ label: p.name, value: p.id })));
 function choseSeller(selectedSeller: { label: string; value: number }) {
   setFieldValue('sellerId', selectedSeller.value);
   setFieldValue('sellerName', selectedSeller.label);
