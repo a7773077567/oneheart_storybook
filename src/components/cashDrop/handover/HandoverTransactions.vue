@@ -9,7 +9,7 @@ const fields: InstanceType<typeof SimpleTable>['$props']['fields'] = [
   { name: 'time', label: '交易時間' },
   { name: 'type', label: '項目' },
   { name: 'method', label: '支付方式' },
-  { name: 'amount', label: '項目' },
+  { name: 'amount', label: '金額' },
 ];
 </script>
 
