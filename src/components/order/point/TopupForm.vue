@@ -11,7 +11,7 @@ import { POINTS_PLAN, plansByType, pointUnit } from '@/const/points';
 import { PointTypes } from '@/const/general';
 import PointsGroupForm from '@/components/client/pointsGroup/PointsGroupForm.vue';
 import { useQuasar } from 'quasar';
-import { errorMessages } from 'vue/compiler-sfc';
+import { getOpenAccount } from '@/utils/helpers';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -61,7 +61,7 @@ const planOptions = computed(() => {
 
   return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
-const sellerOptions = computed(() => userStore.users.map(p => ({ label: p.name, value: p.id })));
+const sellerOptions = computed(() => userStore.users.filter(getOpenAccount).map(p => ({ label: p.name, value: p.id })));
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];

@@ -1,5 +1,5 @@
 import { Cookies } from 'quasar';
-import type { Checkout } from '@/api';
+import { AccountState, type Checkout, type User, WorkState } from '@/api';
 import { PaymentMethods } from '@/const/appointment';
 import { ShiftType } from '@/const/general';
 
@@ -110,4 +110,9 @@ export function sortDepTypes<T extends Record<string, any>>(typesArr: T[], key: 
     ShiftType['團課'],
   ] as const;
   return typesArr.slice().sort((a, b) => typesOrder.indexOf(a[key]) - typesOrder.indexOf(b[key]));
+}
+
+// 帳號為：開通、無停權、無離職
+export function getOpenAccount(user: User) {
+  return user.state === AccountState['開通'] && user.stateOfWork === WorkState['在職'];
 }
