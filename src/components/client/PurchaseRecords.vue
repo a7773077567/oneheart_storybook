@@ -5,7 +5,7 @@ import { type PurchaseRecord, getClientPaymentDetail, getClientPayments, getSing
 import type { PointTypes } from '@/const/general';
 import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { Receipt } from '@/components/appointment';
-import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
+import { calcReceiptAmount, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import { Space } from '@/const/space';
 import { pointUnit } from '@/const/points';
@@ -137,7 +137,7 @@ async function checkReceipt(paymentId: number) {
 
   receiptData.value = [
     { name: 'name', label: '姓名', value: client?.name },
-    { name: 'gender', label: '性別', value: checkGender(client?.identityNumber, client.identityType!)?.label },
+    { name: 'gender', label: '性別', value: client?.gender },
     { name: 'id', label: '身分證字號', value: client?.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client?.birthDate },
     ...extraFields,

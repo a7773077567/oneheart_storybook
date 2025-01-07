@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { PointTypes } from '@/const/general';
 import { gainPoint } from '@/api';
 import { useQuasar } from 'quasar';
-import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import { calcReceiptAmount } from '@/utils/helpers';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { POINTS_PLAN, pointUnit } from '@/const/points';
 
@@ -41,11 +41,11 @@ const purchaseDetail = computed<CheckTableData>(() => [
 const $q = useQuasar();
 const receiptData = computed(() => {
   const { planName, paidPointGained, clientName, groupName, giftPointGained } = pointsStore.topupDetail;
-  const { identityNumber, birthDate, identityType } = pointsStore.targetClient ?? { identityNumber: '', birthDate: '', identityType: 1 };
+  const { identityNumber, birthDate, gender } = pointsStore.targetClient ?? { identityNumber: '', birthDate: '', gender: '' };
 
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null, identityType!)?.label ?? '' },
+    { name: 'gender', label: '性別', value: gender },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'group', label: '群組', value: groupName },

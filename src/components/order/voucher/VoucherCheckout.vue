@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { type PurchaseVoucher, buyGroupClassTickets } from '@/api';
 import { useQuasar } from 'quasar';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
-import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import { calcReceiptAmount } from '@/utils/helpers';
 import type { VoucherDetail } from '@/stores/voucher';
 
 const emit = defineEmits<{
@@ -34,10 +34,10 @@ const methodOptions = Object.values(PaymentMethods).filter(({ forGroupTicketPurc
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;
-  const { identityNumber, birthDate, identityType } = voucherStore.targetClient ?? { identityNumber: '', birthDate: '', identityType: 1 };
+  const { identityNumber, birthDate, gender } = voucherStore.targetClient ?? { identityNumber: '', birthDate: '', gender: '' };
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null, identityType!)?.label ?? '' },
+    { name: 'gender', label: '性別', value: gender },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'groupClassName', label: '課程名稱', value: groupClassName },
