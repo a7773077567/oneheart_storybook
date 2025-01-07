@@ -95,6 +95,14 @@ export const PhysicalTypes = [
   ShiftType['物理治療體驗門診'],
 ] as const;
 
+// 儀器治療項目
+export const DeviceTypes = [
+  ShiftType['G動椅'],
+  ShiftType['射頻'],
+  ShiftType['磁波'],
+  ShiftType['震波'],
+];
+
 export const TherapyRoles = [
   RoleType['系統管理者'],
   RoleType['院長'],
