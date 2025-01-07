@@ -4,7 +4,7 @@ import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, PriceTags, 
 import { ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref, watch } from 'vue';
-import { calcReceiptAmount, checkGender } from '@/utils/helpers';
+import { calcReceiptAmount } from '@/utils/helpers';
 import { checkout } from '@/api/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
@@ -65,7 +65,7 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
 const receiptData = computed(() => {
   return [
     { name: 'name', label: '病患姓名', value: client.name },
-    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'gender', label: '性別', value: client.gender },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
     { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },

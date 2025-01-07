@@ -2,6 +2,7 @@ import { Cookies } from 'quasar';
 import { AccountState, type Checkout, type User, WorkState } from '@/api';
 import { PaymentMethods } from '@/const/appointment';
 import { ShiftType } from '@/const/general';
+import type { IdentityType } from '@/const/client';
 
 type Payment = Checkout['multiChannelPay'][number];
 
@@ -62,11 +63,15 @@ export function extractUuidFromS3Url(url: string) {
   return null;
 }
 
-export function checkGender(id: string | null) {
+export function checkGender(id: string | null, type: IdentityType) {
   if (!id) {
     return null;
   }
-  return id.slice(1, 2) === '1' ? { name: 'male', label: '男' } : { name: 'female', label: '女' };
+  const genderIdentify = id.slice(1, 2);
+  if (type === 1) {
+    return genderIdentify === '1' ? { name: 'male', label: '男' } : { name: 'female', label: '女' };
+  }
+  return genderIdentify === '8' ? { name: 'male', label: '先生' } : { name: 'female', label: '女士' };
 }
 
 export function calcReceiptAmount(payments: Pick<Payment, 'payMethod' | 'amount'>[]) {

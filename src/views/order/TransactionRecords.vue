@@ -10,7 +10,7 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Receipt } from '@/components/appointment';
-import { calcReceiptAmount, checkGender, showDecimal } from '@/utils/helpers';
+import { calcReceiptAmount, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import CancelOrder from '@/components/order/CancelOrder.vue';
 import { Space } from '@/const/space';
@@ -222,7 +222,7 @@ async function checkReceipt(paymentId: number) {
 
   receiptData.value = [
     { name: 'name', label: '姓名', value: client.name },
-    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'gender', label: '性別', value: client.gender },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
     ...extraFields,
