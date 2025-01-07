@@ -222,7 +222,7 @@ async function checkReceipt(paymentId: number) {
 
   receiptData.value = [
     { name: 'name', label: '姓名', value: client.name },
-    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'gender', label: '性別', value: checkGender(client.identityNumber, client.identityType!)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
     ...extraFields,

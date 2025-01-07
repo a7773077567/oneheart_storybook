@@ -65,7 +65,7 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
 const receiptData = computed(() => {
   return [
     { name: 'name', label: '病患姓名', value: client.name },
-    { name: 'gender', label: '性別', value: checkGender(client.identityNumber)?.label },
+    { name: 'gender', label: '性別', value: checkGender(client.identityNumber, client.identityType!)?.label },
     { name: 'id', label: '身分證字號', value: client.identityNumber },
     { name: 'birthDate', label: '出生年月日', value: client.birthDate },
     { name: 'amount', label: '金額', value: calcReceiptAmount(payments.value) },

@@ -34,10 +34,10 @@ const methodOptions = Object.values(PaymentMethods).filter(({ forGroupTicketPurc
 const isCheckoutOpen = ref(false);
 const receiptData = computed(() => {
   const { clientName, groupClassName } = voucherStore.voucherDetail!;
-  const { identityNumber, birthDate } = voucherStore.targetClient ?? { identityNumber: '', birthDate: '' };
+  const { identityNumber, birthDate, identityType } = voucherStore.targetClient ?? { identityNumber: '', birthDate: '', identityType: 1 };
   return [
     { name: 'name', label: '姓名', value: clientName },
-    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null)?.label ?? '' },
+    { name: 'gender', label: '性別', value: checkGender(identityNumber ?? null, identityType!)?.label ?? '' },
     { name: 'id', label: '身分證字號', value: identityNumber },
     { name: 'birthDate', label: '出生年月日', value: birthDate },
     { name: 'groupClassName', label: '課程名稱', value: groupClassName },
