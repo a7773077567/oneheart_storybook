@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { ClientSchedule } from '@/api';
 import { useQuasar } from 'quasar';
 import { getDuration } from '@/utils/date';
+import DeviceCalendar from '@/components/appointment/DeviceCalendar.vue';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -85,47 +86,52 @@ function updateSelectedDate(date: string) {
 
 <template>
   <div class="calendar-view">
-    <ResourceCalendar
-      :model-value="selectedDate"
-      :model-resources="appointmentStore.activeUsers"
-      :interval-start="16"
-      :interval-count="30"
-      :interval-minutes="30"
-      :resource-width="200"
-      animated
-      @model-resources="appointmentStore.users = $event"
-      @update:model-value="updateSelectedDate"
-    >
-      <template #nav-right>
-        <div class="payment-indicator">
-          <div class="payment-indicator__item">結帳</div>
-          <div class="payment-indicator__item--unpaid">未結帳</div>
-        </div>
-      </template>
-      <template #intervals="{ scope }">
-        <template
-          v-for="(item, idx) in getBookings(scope)"
-          :key="idx"
-        >
-          <AppointmentCard
-            v-if="item.count === 1"
-            :data="item.bookings[0]"
-            :style="getStyle(item)"
-            @click="router.push({ name: 'appointmentListInfo', params: { scheduleId: item.bookings[0].id } })"
-          />
-          <AppointmentCountCard
-            v-else
-            :style="getStyle(item)"
-            :count="item.count"
-            :is-checkout="item.isAllCheckout"
-            @click="() => openBookingsBox(item.bookings)"
-          />
+    <section class="appointment_calendar">
+      <ResourceCalendar
+        :model-value="selectedDate"
+        :model-resources="appointmentStore.activeUsers"
+        :interval-start="16"
+        :interval-count="30"
+        :interval-minutes="30"
+        :resource-width="200"
+        animated
+        @model-resources="appointmentStore.users = $event"
+        @update:model-value="updateSelectedDate"
+      >
+        <template #nav-right>
+          <div class="payment-indicator">
+            <div class="payment-indicator__item">結帳</div>
+            <div class="payment-indicator__item--unpaid">未結帳</div>
+          </div>
         </template>
-      </template>
-      <template #resource-label="{ scope }">
-        <ResourceLabel :name="scope.resource.name" :shifts="appointmentStore.resourceLabels[scope.resource.id]" />
-      </template>
-    </ResourceCalendar>
+        <template #intervals="{ scope }">
+          <template
+            v-for="(item, idx) in getBookings(scope)"
+            :key="idx"
+          >
+            <AppointmentCard
+              v-if="item.count === 1"
+              :data="item.bookings[0]"
+              :style="getStyle(item)"
+              @click="router.push({ name: 'appointmentListInfo', params: { scheduleId: item.bookings[0].id } })"
+            />
+            <AppointmentCountCard
+              v-else
+              :style="getStyle(item)"
+              :count="item.count"
+              :is-checkout="item.isAllCheckout"
+              @click="() => openBookingsBox(item.bookings)"
+            />
+          </template>
+        </template>
+        <template #resource-label="{ scope }">
+          <ResourceLabel :name="scope.resource.name" :shifts="appointmentStore.resourceLabels[scope.resource.id]" />
+        </template>
+      </ResourceCalendar>
+    </section>
+    <section class="device_container">
+      <DeviceCalendar />
+    </section>
     <QDialog v-model="isBookingsBoxOpen">
       <div class="bookings-box">
         <div v-close-popup class="bookings-box__close">
@@ -143,6 +149,19 @@ function updateSelectedDate(date: string) {
 </template>
 
 <style lang="scss" scoped>
+.calendar-view {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  .appointment_calendar {
+    flex: 1 1 70%;
+    height: 0;
+  }
+  .device_container {
+    flex: 1 1 30%;
+    height: 0;
+  }
+}
 .payment-indicator {
   display: flex;
   gap: 21px;

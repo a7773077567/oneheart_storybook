@@ -119,6 +119,9 @@ function getCalendarStyle() {
 
 <style lang="scss" scoped>
 .calendar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   // max-width: 1225px;
   &__nav {
     display: flex;
@@ -127,7 +130,9 @@ function getCalendarStyle() {
     margin-bottom: 10px;
   }
   &__body {
-    height: calc(100vh - 309px);
+    flex: 1;
+    min-height: calc(100% - 309px);
+    // height: calc(100vh - 309px);
   }
 }
 
