@@ -26,6 +26,10 @@ export const TherapyTypes = {
   group: '團課',
   physicalTrial: '物理治療體驗門診',
   InternshipClinic: '新人實習門診',
+  shockWave: '震波',
+  radioFrequency: '射頻',
+  magneticWave: '磁波',
+  GChair: 'G動椅',
 };
 
 // 場館類別
@@ -60,26 +64,26 @@ export enum ShiftType {
   團課 = 11,
   物理治療體驗門診 = 12,
   新人實習門診 = 13,
-  // '震波' = 14,
-  // '射頻' = 15,
-  // '磁波' = 16,
-  // 'G動椅' = 17,
+  震波 = 14,
+  射頻 = 15,
+  磁波 = 16,
+  G動椅 = 17,
 }
-const ShiftTypeConst = {
-  物理諮詢門診: 1,
-  物理治療門診: 2,
-  足壓門診: 3,
-  營養門診: 4,
-  睡眠門診: 5,
-  院長評估門診: 6,
-  院長物理治療: 7,
-  營養諮詢門診: 8,
-  教練課: 9,
-  運動諮詢: 10,
-  團課: 11,
-  物理治療體驗門診: 12,
-  新人實習門診: 13,
-} as const;
+// const ShiftTypeConst = {
+//   物理諮詢門診: 1,
+//   物理治療門診: 2,
+//   足壓門診: 3,
+//   營養門診: 4,
+//   睡眠門診: 5,
+//   院長評估門診: 6,
+//   院長物理治療: 7,
+//   營養諮詢門診: 8,
+//   教練課: 9,
+//   運動諮詢: 10,
+//   團課: 11,
+//   物理治療體驗門診: 12,
+//   新人實習門診: 13,
+// } as const;
 
 // 物理治療項目：只有以下 5 個科別屬於物理治療項目
 // https://www.notion.so/enginelin/fe29a884eab74700a7c01e75875f72ff?pvs=4
@@ -108,7 +112,8 @@ export const CoachRoles = [
 
 type TabName = typeof TabNames[number];
 export interface Type {
-  identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
+  // identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
+  identifier: ShiftType;
   name: string;
   label: string;
   tabs: TabName[];
@@ -292,6 +297,58 @@ export const Types: Record<TypeName, Type> = {
     tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 200,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+  },
+  shockWave: {
+    identifier: ShiftType['震波'],
+    name: 'shockWave',
+    label: '震波儀器治療',
+    tabs: ['clientInfo', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+  },
+  radioFrequency: {
+    identifier: ShiftType['射頻'],
+    name: 'radioFrequency',
+    label: '射頻儀器治療',
+    tabs: ['clientInfo', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+  },
+  magneticWave: {
+    identifier: ShiftType['磁波'],
+    name: 'magneticWave',
+    label: '磁波儀器治療',
+    tabs: ['clientInfo', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+  },
+  GChair: {
+    identifier: ShiftType['G動椅'],
+    name: 'GChair',
+    label: 'G動椅儀器治療',
+    tabs: ['clientInfo', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,

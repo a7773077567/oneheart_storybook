@@ -8,6 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
+import { ShiftType } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -64,18 +65,19 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
   <div class="booking-query">
     <InputBox label="選擇項目">
-      <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" />
+      <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" hide-bottom-space />
     </InputBox>
     <InputBox :label="`選擇${selectLabel}`">
-      <OSelect name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple />
+      <OSelect :disable="values.userShiftType === ShiftType['G動椅']" name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple hide-bottom-space />
     </InputBox>
+    <p v-if="values.userShiftType === ShiftType['G動椅']" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     <InputBox label="選擇日期" class="gutter">
-      <DatePicker name="date" />
+      <DatePicker name="date" hide-bottom-space />
     </InputBox>
     <InputBox label="選擇預約時間" class="gutter">
-      <OTime name="startTime" now-btn />
+      <OTime name="startTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">至</span>
-      <OTime name="endTime" now-btn />
+      <OTime name="endTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">止</span>
     </InputBox>
     <QBtn label="搜尋" outline style="width: 126px;" @click="onSubmit" />
@@ -84,7 +86,21 @@ const onSubmit = handleSubmit(async (values) => {
 
 <style lang="scss" scoped>
 .booking-query {
-  width: 356px;
+  min-width: 356px;
+  width: fit-content;
   padding: 20px;
+
+  .note {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1b21;
+    white-space: nowrap;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    padding-left: 16px;
+  }
+  .input-box {
+    margin-bottom: 20px;
+  }
 }
 </style>
