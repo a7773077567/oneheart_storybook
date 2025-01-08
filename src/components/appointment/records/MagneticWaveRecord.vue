@@ -88,6 +88,8 @@ async function finishRecord() {
           <OInput :name="`magneticWavesRecords[${index}].intensity`" inside-label="強度*" class="col" error-message="" />
           <div class="record_row_action col">
             <QBtn
+              :disable="index === 0"
+              :color="index === 0 ? 'grey' : 'black'"
               flat
               round
               icon="o_delete"
