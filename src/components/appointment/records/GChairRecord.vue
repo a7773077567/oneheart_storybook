@@ -1,13 +1,15 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { appointmentFinishRecord } from '@/api/appointment';
-import type { ClientScheduleDetail, GChairRecord } from '@/api/appointment';
+import { appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
+import type { ClientScheduleDetail } from '@/api/appointment';
 import { array, object, string } from 'zod';
-import { useFieldArray, useForm } from 'vee-validate';
+import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import { ScheduleStateMap } from '@/const/appointment';
+import { useNotify } from '@/composables/notify';
+import { MedicalHistoryClipboard } from '@/components/appointment';
 
 const props = defineProps<{
   title?: string;
@@ -21,28 +23,33 @@ const appointmentStore = useAppointmentStore();
 const title = computed(() => props.title ?? props.scheduleDetail.date);
 const gChairSequenceOptions = ['程序一', '程序二'];
 const schema = object({
-  sequence: string().min(1, 'Sequence is required'),
-  intensity: string().min(1, 'Intensity is required'),
+  magneticGChairRecords: array(object({
+    sequence: string().min(1, 'Sequence is required'),
+    intensity: string().min(1, 'Intensity is required'),
+  })),
 });
 const scheduleState = computed(() => ScheduleStateMap.get(props.scheduleDetail.state)!.label);
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 
 const initVal = computed(() => {
-  const ori = props.scheduleDetail.record.gChairRecord;
-  return !ori || Object.values(ori).length < 1
-    ? { sequence: '', intensity: '' }
-    : ori;
+  const ori = props.scheduleDetail.record.magneticGChairRecords;
+  return {
+    magneticGChairRecords: !ori || ori.length < 1
+      ? [{ sequence: '', intensity: '' }]
+      : ori,
+  };
 });
 const { handleSubmit, values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initVal.value,
 });
 
-const onSubmit = handleSubmit((v) => {
-  console.log(v);
-});
+const onSubmit = handleSubmit(async (v) => {
+  await updateClientSchedule(recordId.value, v);
+  useNotify('已存檔');
 
-// 歷史紀錄
-const openHistoryDialog = ref(false);
+  await appointmentStore.getClientSchedule(props.scheduleId);
+});
 
 defineExpose({
   values,
@@ -57,6 +64,20 @@ async function finishRecord() {
   catch (err) {
     console.log(err);
   }
+}
+
+// 歷史紀錄 todo
+const stateOfHistoryDialog = ref(false);
+async function openHistoryDialog() {
+  await appointmentStore.getHistoryRecords(recordId.value);
+  stateOfHistoryDialog.value = true;
+}
+function selectRecord(record: Record<string, any>) {
+  console.log(record);
+  // 選擇紀錄寫入
+  // setValues(record);
+  stateOfHistoryDialog.value = false;
+  useNotify('病例套用成功');
 }
 </script>
 
@@ -79,6 +100,9 @@ async function finishRecord() {
       </div>
     </div>
   </div>
+  <QDialog v-model="stateOfHistoryDialog">
+    <MedicalHistoryClipboard :data="appointmentStore.medicalHistoryRecords" @select="selectRecord" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">

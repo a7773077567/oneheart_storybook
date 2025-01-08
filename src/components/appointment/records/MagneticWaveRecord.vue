@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { appointmentFinishRecord } from '@/api/appointment';
+import { appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import type { ClientScheduleDetail, MagneticWavesRecord } from '@/api/appointment';
 import { array, object, string } from 'zod';
 import { useFieldArray, useForm } from 'vee-validate';
@@ -8,6 +8,8 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import { ScheduleStateMap } from '@/const/appointment';
+import { MedicalHistoryClipboard } from '@/components/appointment';
+import { useNotify } from '@/composables/notify';
 
 const props = defineProps<{
   title?: string;
@@ -29,7 +31,7 @@ const schema = object({
   ,
 });
 const scheduleState = computed(() => ScheduleStateMap.get(props.scheduleDetail.state)!.label);
-
+const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
 const singleRecord = {
   sequence: '',
   bodyPart: '',
@@ -48,12 +50,12 @@ const { handleSubmit, values } = useForm({
 
 const { fields, push, remove } = useFieldArray<MagneticWavesRecord>('magneticWavesRecords');
 
-const onSubmit = handleSubmit((v) => {
-  console.log(v);
-});
+const onSubmit = handleSubmit(async (v) => {
+  await updateClientSchedule(recordId.value, v);
+  useNotify('已存檔');
 
-// 歷史紀錄
-const openHistoryDialog = ref(false);
+  await appointmentStore.getClientSchedule(props.scheduleId);
+});
 
 defineExpose({
   values,
@@ -68,6 +70,20 @@ async function finishRecord() {
   catch (err) {
     console.log(err);
   }
+}
+
+// 歷史紀錄 todo
+const stateOfHistoryDialog = ref(false);
+async function openHistoryDialog() {
+  await appointmentStore.getHistoryRecords(recordId.value);
+  stateOfHistoryDialog.value = true;
+}
+function selectRecord(record: Record<string, any>) {
+  console.log(record);
+  // 選擇紀錄寫入
+  // setValues(record);
+  stateOfHistoryDialog.value = false;
+  useNotify('病例套用成功');
 }
 </script>
 
@@ -111,6 +127,9 @@ async function finishRecord() {
       </div>
     </div>
   </div>
+  <QDialog v-model="stateOfHistoryDialog">
+    <MedicalHistoryClipboard :data="appointmentStore.medicalHistoryRecords" @select="selectRecord" />
+  </QDialog>
 </template>
 
 <style scoped lang="scss">

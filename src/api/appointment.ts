@@ -64,8 +64,19 @@ export interface Record {
     },
   ];
   advice: string;
+  magneticWavesRecords?: MagneticWavesRecord[];
+  magneticGChairRecords?: GChairRecord[];
 }
 
+export interface MagneticWavesRecord {
+  sequence: string; // 程序
+  bodyPart: string; // 部位
+  intensity: string; // 強度
+};
+export interface GChairRecord {
+  sequence: string; // 程序
+  intensity: string; // 強度
+};
 export interface Attachment {
   originalFileName: string; // 原始檔案名稱
   fileName: string; // UUID

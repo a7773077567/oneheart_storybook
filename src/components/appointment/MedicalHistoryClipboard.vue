@@ -43,6 +43,7 @@ function selectRecord(record: Record<string, any>) {
 
 <template>
   <div class="medical-history-clipboard">
+    <p v-if="data.length === 0"> 無歷史紀錄</p>
     <div v-for="(item, idx) in data" :key="idx" class="history">
       <div class="history__header">
         <div class="history__date">{{ item.date }}</div>
