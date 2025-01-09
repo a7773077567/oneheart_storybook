@@ -144,6 +144,26 @@ export const useAppointmentStore = defineStore('appointment', {
         };
       });
     },
+    magneticWaveHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { magneticWavesRecords, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: { magneticWavesRecords: { label: '震波治療紀錄', value: magneticWavesRecords } },
+        };
+      });
+    },
+    GChariHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { magneticWavesRecords, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: { magneticGChairRecords: { label: 'G動椅治療紀錄', value: magneticWavesRecords } },
+        };
+      });
+    },
     isSameSpaceClinicSchedule: (state) => {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;

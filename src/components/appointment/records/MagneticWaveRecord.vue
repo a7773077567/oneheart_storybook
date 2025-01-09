@@ -43,7 +43,7 @@ const initVal = computed(() => {
     ? [singleRecord]
     : ori });
 });
-const { handleSubmit, values } = useForm({
+const { handleSubmit, values, setValues } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initVal.value,
 });
@@ -79,9 +79,7 @@ async function openHistoryDialog() {
   stateOfHistoryDialog.value = true;
 }
 function selectRecord(record: Record<string, any>) {
-  console.log(record);
-  // 選擇紀錄寫入
-  // setValues(record);
+  setValues(record);
   stateOfHistoryDialog.value = false;
   useNotify('病例套用成功');
 }
@@ -128,7 +126,18 @@ function selectRecord(record: Record<string, any>) {
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">
-    <MedicalHistoryClipboard :data="appointmentStore.medicalHistoryRecords" @select="selectRecord" />
+    <MedicalHistoryClipboard :data="appointmentStore.magneticWaveHistoryRecords" @select="selectRecord">
+      <template #record-content="{ value }">
+        <ul>
+          <li v-for="(recordItem, idx) in value" :key="idx">
+            <span>{{ idx + 1 }}</span>
+            {{ recordItem.sequence }}
+            {{ recordItem.bodyPart }}
+            {{ recordItem.intensity }}
+          </li>
+        </ul>
+      </template>
+    </MedicalHistoryClipboard>
   </QDialog>
 </template>
 

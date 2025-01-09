@@ -53,10 +53,14 @@ function selectRecord(record: Record<string, any>) {
         </div>
       </div>
       <div :class="[expandIdx === idx ? 'history__body--expanded' : 'history__body']" :style="{ height: `${ccOrders[idx]}px` }">
-        <div v-for="(record, key, recordIdx) in item.record" :key="record" :class="[recordIdx === 0 ? 'order--cc' : 'order']">
-          <div class="order__type">{{ record.label }}</div>
-          <div :class="[expandIdx === idx ? 'order__detail--expanded' : 'order__detail']">{{ record.value }}</div>
-        </div>
+        <slot name="record">
+          <div v-for="(record, key, recordIdx) in item.record" :key="record" :class="[recordIdx === 0 ? 'order--cc' : 'order']">
+            <div class="order__type">{{ record.label }}</div>
+            <slot v-bind="record" name="record-content">
+              <div :class="[expandIdx === idx ? 'order__detail--expanded' : 'order__detail']">{{ record.value }}</div>
+            </slot>
+          </div>
+        </slot>
       </div>
     </div>
   </div>

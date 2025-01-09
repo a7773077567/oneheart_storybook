@@ -39,7 +39,7 @@ const initVal = computed(() => {
       : ori,
   };
 });
-const { handleSubmit, values } = useForm({
+const { handleSubmit, values, setValues } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initVal.value,
 });
@@ -73,9 +73,8 @@ async function openHistoryDialog() {
   stateOfHistoryDialog.value = true;
 }
 function selectRecord(record: Record<string, any>) {
-  console.log(record);
   // 選擇紀錄寫入
-  // setValues(record);
+  setValues(record);
   stateOfHistoryDialog.value = false;
   useNotify('病例套用成功');
 }
