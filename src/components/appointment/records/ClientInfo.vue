@@ -14,7 +14,8 @@ import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
-import { PhysicalTypes } from '@/const/general';
+import { PhysicalTypes, ShiftType } from '@/const/general';
+import EditDeviceTime from './EditDeviceTime.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -43,6 +44,7 @@ const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.c
 
 const data = computed(() => {
   const all = [
+    { key: 'device', label: '儀器', value: props.scheduleDetail },
     { key: 'name', label: '姓名', value: client.value.name },
     { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
@@ -175,12 +177,20 @@ async function handleDownload(contractUrl: string) {
 
   window.open(contractUrl);
 }
+
+// 儀器
+const isEditingDevice = ref(false);
+async function updateDeviceInfo(val: any) {
+  console.log(val);
+  await appointmentStore.getClientSchedule(schedule.value.id);
+}
 </script>
 
 <template>
   <div class="client-info">
     <div class="client-info__header">
       <div class="misc">
+        <h3>{{ ShiftType[scheduleDetail.userShift.type] }}</h3>
         <p class="member-id">
           <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
         </p>
@@ -193,6 +203,14 @@ async function handleDownload(contractUrl: string) {
     </div>
     <div class="client-info__body">
       <ClientInfoTable :data="data">
+        <template #device="{ row }">
+          <div class="device_info">
+            <div>機台</div>
+            <div>時間 {{ (row.value as ClientScheduleDetail)?.scheduleStartTime }} - {{ (row.value as ClientScheduleDetail)?.scheduleEndTime }}</div>
+            <div v-if="+userShift.type === ShiftType['射頻']">發數</div>
+            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingDevice = true" />
+          </div>
+        </template>
         <template #name="{ row }">
           <div class="name">
             <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
@@ -295,6 +313,9 @@ async function handleDownload(contractUrl: string) {
   </QDialog>
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
+  </QDialog>
+  <QDialog v-model="isEditingDevice">
+    <EditDeviceTime title="編輯儀器治療" :value="{ machine: '', startTime: schedule.scheduleStartTime, endTime: schedule.scheduleEndTime }" :shift-type="userShift.type" @cancel="isEditingDevice = false" @save="updateDeviceInfo" />
   </QDialog>
 </template>
 
@@ -404,6 +425,7 @@ async function handleDownload(contractUrl: string) {
 .misc {
   display: grid;
   grid-template-columns: auto 1fr auto;
+  align-items: center;
 }
 
 .liffIntroducerName {
@@ -416,5 +438,10 @@ async function handleDownload(contractUrl: string) {
     display: flex;
     align-items: center;
   }
+}
+
+.device_info {
+  display: flex;
+  gap: 32px;
 }
 </style>

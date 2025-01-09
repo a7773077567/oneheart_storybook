@@ -91,7 +91,7 @@ const isDeviceOnlyTreatment = computed(() => userShiftType.value && DeviceTypes.
     <QTabPanels v-model="currentTab" animated>
       <QTabPanel v-for="(tab, idx) in tabs" :key="idx" :name="tab.name">
         <KeepAlive>
-          <div>
+          <div class="full-height">
             <div v-if="appointmentStore.needToSignFirstVisit" class="first_contract_banner">
               <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
               <p>需簽署「就診須知合約」才能進行後續治療服務</p>
