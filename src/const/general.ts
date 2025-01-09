@@ -323,6 +323,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: PointTypes['震波'],
   },
   radioFrequency: {
     identifier: ShiftType['射頻'],
@@ -336,6 +337,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: PointTypes['射頻'],
   },
   magneticWave: {
     identifier: ShiftType['磁波'],
@@ -349,6 +351,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: PointTypes['磁波'],
   },
   GChair: {
     identifier: ShiftType['G動椅'],
@@ -362,6 +365,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: PointTypes['G動椅'],
   },
 };
 

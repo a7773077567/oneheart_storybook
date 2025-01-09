@@ -119,7 +119,10 @@ watch(payments, (chosenPayments) => {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :space-name="userShift?.space.name" :space-id="userShift.spaceId" @checkout="onCheckout" />
+      <Receipt
+        :rows="receiptData" :space-name="userShift?.space.name" :space-id="userShift.spaceId"
+        @checkout="onCheckout"
+      />
     </QDialog>
 
     <CheckTable :data="info">
@@ -147,6 +150,7 @@ watch(payments, (chosenPayments) => {
 
 .slot-padding {
   padding: 10px;
+
   &--payment {
     @extend .slot-padding;
     padding: 18px 10px;
@@ -169,6 +173,7 @@ watch(payments, (chosenPayments) => {
   display: flex;
   align-items: center;
   gap: 5px;
+
   &__input {
     width: 134px;
     padding: 10px;
@@ -188,11 +193,13 @@ watch(payments, (chosenPayments) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
   &__item {
     display: flex;
     justify-content: space-between;
   }
 }
+
 .checkout-btn {
   display: flex;
   justify-content: flex-end;
