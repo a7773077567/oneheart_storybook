@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { DeviceTypes, TabMap, Types } from '@/const/general';
+import { MachineShifts, TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 import { ContractTypes, getContractShareLink } from '@/api';
 import { Dialog, Loading } from 'quasar';
@@ -75,7 +75,7 @@ async function handleSign() {
   }
 }
 
-const isDeviceOnlyTreatment = computed(() => userShiftType.value && DeviceTypes.includes(userShiftType.value));
+const isDeviceOnlyTreatment = computed(() => userShiftType.value && MachineShifts.includes(userShiftType.value));
 </script>
 
 <template>

@@ -1,19 +1,53 @@
 <script setup lang='ts'>
+import { computed, ref } from 'vue';
 import { QCalendarResource, today } from '@quasar/quasar-ui-qcalendar';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
-import { ref } from 'vue';
+
+interface Props {
+  modelValue: string;
+  modelResources: { id: number; name: string }[];
+  initOptions?: number[];
+  intervalStart?: number;
+  intervalCount?: number;
+  intervalMinutes?: number;
+  resourceWidth?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  intervalStart: 9,
+  intervalCount: 9,
+});
+
+const emit = defineEmits<{
+  (e: 'update:modelResources', val: typeof props.modelResources): void;
+  (e: 'update:modelValue', val: typeof props.modelValue): void;
+}>();
 
 const calendar = ref<QCalendarResource | null>(null);
-const selectedDate = ref(today());
-const resources = ref([
-  { id: '1', name: 'John' },
-  { id: '2', name: 'Board Room' },
-  { id: '3', name: 'Mary' },
-  { id: '4', name: 'Susan' },
-  { id: '5', name: 'Olivia' },
-]);
+const selectedDate = computed({
+  get: () => props.modelValue ?? today(),
+  set(updatedVal) {
+    emit('update:modelValue', updatedVal);
+  },
+});
+
+const resources = computed({
+  get: () => props.modelResources,
+  set(updatedR) {
+    emit('update:modelResources', updatedR);
+  },
+});
+
+function getCalendarStyle() {
+  return {
+    'height': '100%',
+    'max-height': 'fix-content',
+    '--calendar-border': '1px solid #B2B2B2',
+    ...(props.resourceWidth && { '--calendar-resources-width': `${props.resourceWidth}px` }),
+  };
+}
 </script>
 
 <template>
@@ -27,26 +61,22 @@ const resources = ref([
       :interval-start="16"
       :interval-count="30"
       :interval-minutes="30"
+      :resource-width="200"
       :cell-width="125"
       animated
       bordered
-      style="height: 100%; max-height: fit-content"
+      :style="getCalendarStyle()"
     >
-      <!-- :style="getCalendarStyle()" -->
       <template #head-resources>
         <div class="row flex-center full-width">
-          <span class="text-weight-bold">人員</span>
+          <span class="text-weight-bold">儀器</span>
         </div>
       </template>
       <template #resource-label="{ scope }">
         <slot name="resource-label" :scope="scope">
-          <div class="col-12">
-            <QChip>
-              <QAvatar v-if="scope.resource.avatar">
-                <img :src="scope.resource.avatar">
-              </QAvatar>
-              {{ scope.resource.name }}
-            </QChip>
+          <div class="col-12 resource">
+            <div class="resource_name">{{ scope.resource.name }}</div>
+            <span>儀器治療</span>
           </div>
         </slot>
       </template>
@@ -60,5 +90,22 @@ const resources = ref([
 <style scoped lang="scss">
 .device_calendar {
   height: 100%;
+  .resource {
+    padding: 4px 10px;
+    align-self: start;
+    color: #1a1b21;
+    &_name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+  }
+  :deep(.q-calendar-resource__head--interval) {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  :deep(.q-calendar-resource__resource--interval) {
+    min-height: 135px !important;
+  }
 }
 </style>

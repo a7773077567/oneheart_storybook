@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MedicalHistoryRecord } from '@/api';
+import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getMachineScheduleInprogress, getUploadS3Url, upload2awsS3 } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MachineSchedule, MedicalHistoryRecord } from '@/api';
 import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift, fetchUserShifts } from '@/api/shift';
@@ -33,6 +33,7 @@ interface State {
   appointmentCalendarInitOption: number[];
   userShifts: UserShift[];
   historyRecords: HistoryRecord[];
+  machineSchedules: MachineSchedule[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -60,6 +61,7 @@ export const useAppointmentStore = defineStore('appointment', {
     appointmentCalendarInitOption: [],
     userShifts: [],
     historyRecords: [],
+    machineSchedules: [],
   }),
   getters: {
     userOptions(state) {
@@ -250,6 +252,10 @@ export const useAppointmentStore = defineStore('appointment', {
     async getHistoryRecords(recordId: number) {
       const data = await fetchHistoryRecords(recordId);
       this.historyRecords = data;
+    },
+    async getMachineScheduleInprogress(query: Parameters<typeof getMachineScheduleInprogress>[0]) {
+      const data = await getMachineScheduleInprogress(query);
+      this.machineSchedules = data;
     },
   },
 

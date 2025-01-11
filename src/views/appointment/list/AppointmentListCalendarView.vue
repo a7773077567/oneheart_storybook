@@ -1,29 +1,38 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
-import { useAppointmentStore, useUserStore } from '@/stores';
+import { computed, ref, watchEffect } from 'vue';
+import { useAppointmentStore, useOptionStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { AppointmentCard, AppointmentCountCard, ResourceLabel } from '@/components/appointment';
 import { useRoute, useRouter } from 'vue-router';
-import type { ClientSchedule } from '@/api';
-import { useQuasar } from 'quasar';
+import type { ClientSchedule, MachineSchedule } from '@/api';
+import { BottomSheet, useQuasar } from 'quasar';
 import { getDuration } from '@/utils/date';
 import DeviceCalendar from '@/components/appointment/DeviceCalendar.vue';
+import DeviceCard from '@/components/appointment/DeviceCard.vue';
+import { MachineShifts } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
+const optionStore = useOptionStore();
+
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
+
 const isBookingsBoxOpen = ref(false);
 const bookingsInBox = ref<any[]>();
-
 const selectedDate = ref(route.query.date as string ?? dayjs().format('YYYY-MM-DD'));
+const selectedMachines = ref<number[]>(optionStore.machineList.map(m => m.id));
+const machineOptions = computed(() => optionStore.machineList.map(machine => ({ value: machine.id, label: machine.name })));
+
+// to refactor, filter machine or filter person no need to fetch both
 watchEffect(async () => {
   try {
     $q.loading.show();
     await Promise.all([
       appointmentStore.getClientSchedulesInProgress(selectedDate.value),
+      appointmentStore.getMachineScheduleInprogress({ date: selectedDate.value, machineIds: selectedMachines.value }),
       appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.activeUsers.map(item => item.id) }),
     ]);
   }
@@ -41,6 +50,7 @@ function getStyle(item: any) {
     left: `${item.left}px`,
     width: `${item.width - 1}px`,
     top: `${item.top}px`,
+    bottom: `${item.bottom ?? 10}px`,
   };
 }
 
@@ -81,6 +91,40 @@ function openBookingsBox(bookings: any) {
 function updateSelectedDate(date: string) {
   selectedDate.value = date;
   router.push({ query: { date } });
+}
+
+// machine
+function getMachineAppointment(scope: any) {
+  const machineId = scope.resource.id;
+
+  // machine 陣列如果是加購的話需要另外處理
+  const bookings = appointmentStore.machineSchedules.filter(item => item.machines[0].id === machineId);
+  const bookingGroup = bookings.reduce((acc, item) => {
+    const startTime = item.scheduleStartTime;
+    const group = acc[startTime] ?? [];
+    group.push(item);
+    return { ...acc, [startTime]: group };
+  }, {} as Record<string, MachineSchedule[]>);
+
+  return Object.values(bookingGroup).map((item) => {
+    const { scheduleStartTime, scheduleEndTime } = item[0];
+    const isAllCheckout = item.every(el => el.paymentState === 2);
+    const duration = getDuration(scheduleStartTime, scheduleEndTime, 'm');
+    const durationWidth = scope.timeDurationWidth(duration) - 20;
+    const cardMinWidth = 105;
+
+    return {
+      bookings: item,
+      left: scope.timeStartPosX(scheduleStartTime) + 10,
+      width: durationWidth - 20 > cardMinWidth ? durationWidth : cardMinWidth,
+      top: 10,
+      bottom: 10,
+      count: item.length,
+      isAllCheckout,
+      isMachineTreatment: MachineShifts.includes(item[0].userShift.type),
+    };
+  },
+  );
 }
 </script>
 
@@ -130,7 +174,39 @@ function updateSelectedDate(date: string) {
       </ResourceCalendar>
     </section>
     <section class="device_container">
-      <DeviceCalendar />
+      <MultiOptionSelect
+        v-model="selectedMachines"
+        class="device_select"
+        label="儀器"
+        :options="machineOptions"
+      />
+      <DeviceCalendar class="calendar" :model-value="selectedDate" :model-resources="optionStore.machineList" :resource-width="200">
+        <template #intervals="{ scope }">
+          <template
+            v-for="(item, idx) in getMachineAppointment(scope)"
+            :key="idx"
+          >
+            <DeviceCard
+              v-if="item.isMachineTreatment"
+              :data="item.bookings[0]"
+              :style="getStyle(item)"
+            />
+            <AppointmentCard
+              v-else-if="item.count === 1"
+              :data="item.bookings[0]"
+              :style="getStyle(item)"
+            />
+            <div v-else>
+              <AppointmentCountCard
+                :style="getStyle(item)"
+                :count="item.count"
+                :is-checkout="item.isAllCheckout"
+                @click="() => openBookingsBox(item.bookings)"
+              />
+            </div>
+          </template>
+        </template>
+      </DeviceCalendar>
     </section>
     <QDialog v-model="isBookingsBoxOpen">
       <div class="bookings-box">
@@ -154,12 +230,18 @@ function updateSelectedDate(date: string) {
   flex-direction: column;
   gap: 32px;
   .appointment_calendar {
-    flex: 1 1 70%;
+    flex: 1 1 60%;
     height: 0;
   }
   .device_container {
-    flex: 1 1 30%;
+    flex: 1 1 40%;
     height: 0;
+    .device_select {
+      margin-bottom: 20px;
+    }
+    .calendar {
+      height: calc(100% - 60px);
+    }
   }
 }
 .payment-indicator {
