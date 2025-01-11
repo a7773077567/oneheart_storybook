@@ -7,8 +7,8 @@ import { useRoute, useRouter } from 'vue-router';
 import type { ClientSchedule, MachineSchedule } from '@/api';
 import { BottomSheet, useQuasar } from 'quasar';
 import { getDuration } from '@/utils/date';
-import DeviceCalendar from '@/components/appointment/DeviceCalendar.vue';
-import DeviceCard from '@/components/appointment/DeviceCard.vue';
+import MachineCalendar from '@/components/appointment/MachineCalendar.vue';
+import MachineCard from '@/components/appointment/MachineCard.vue';
 import { MachineShifts } from '@/const/general';
 
 const $q = useQuasar();
@@ -180,13 +180,13 @@ function getMachineAppointment(scope: any) {
         label="儀器"
         :options="machineOptions"
       />
-      <DeviceCalendar class="calendar" :model-value="selectedDate" :model-resources="optionStore.machineList" :resource-width="200">
+      <MachineCalendar class="calendar" :model-value="selectedDate" :model-resources="optionStore.machineList" :resource-width="200">
         <template #intervals="{ scope }">
           <template
             v-for="(item, idx) in getMachineAppointment(scope)"
             :key="idx"
           >
-            <DeviceCard
+            <MachineCard
               v-if="item.isMachineTreatment"
               :data="item.bookings[0]"
               :style="getStyle(item)"
@@ -206,7 +206,7 @@ function getMachineAppointment(scope: any) {
             </div>
           </template>
         </template>
-      </DeviceCalendar>
+      </MachineCalendar>
     </section>
     <QDialog v-model="isBookingsBoxOpen">
       <div class="bookings-box">

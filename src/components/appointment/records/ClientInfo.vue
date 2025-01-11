@@ -15,7 +15,7 @@ import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
 import { PhysicalTypes, ShiftType } from '@/const/general';
-import EditDeviceTime from './EditDeviceTime.vue';
+import EditMachineForm from './EditMachineForm.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -179,8 +179,8 @@ async function handleDownload(contractUrl: string) {
 }
 
 // 儀器
-const isEditingDevice = ref(false);
-async function updateDeviceInfo(val: any) {
+const isEditingMachine = ref(false);
+async function updateMachineInfo(val: any) {
   console.log(val);
   await appointmentStore.getClientSchedule(schedule.value.id);
 }
@@ -208,7 +208,7 @@ async function updateDeviceInfo(val: any) {
             <div>機台</div>
             <div>時間 {{ (row.value as ClientScheduleDetail)?.scheduleStartTime }} - {{ (row.value as ClientScheduleDetail)?.scheduleEndTime }}</div>
             <div v-if="+userShift.type === ShiftType['射頻']">發數</div>
-            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingDevice = true" />
+            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingMachine = true" />
           </div>
         </template>
         <template #name="{ row }">
@@ -314,8 +314,8 @@ async function updateDeviceInfo(val: any) {
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
   </QDialog>
-  <QDialog v-model="isEditingDevice">
-    <EditDeviceTime title="編輯儀器治療" :value="{ machine: '', startTime: schedule.scheduleStartTime, endTime: schedule.scheduleEndTime }" :shift-type="userShift.type" @cancel="isEditingDevice = false" @save="updateDeviceInfo" />
+  <QDialog v-model="isEditingMachine">
+    <EditMachineForm title="編輯儀器治療" :value="{ machine: '', startTime: schedule.scheduleStartTime, endTime: schedule.scheduleEndTime }" :shift-type="userShift.type" @cancel="isEditingMachine = false" @save="updateMachineInfo" />
   </QDialog>
 </template>
 

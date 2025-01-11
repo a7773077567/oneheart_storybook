@@ -8,7 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 import { ShiftType } from '@/const/general';
 import { object, string } from 'zod';
 
-interface DeviceDetail {
+interface MachineDetail {
   machine: string;
   startTime: string;
   endTime: string;
@@ -17,7 +17,7 @@ interface DeviceDetail {
 
 const props = withDefaults(defineProps<{
   title: string;
-  value: DeviceDetail;
+  value: MachineDetail;
   shiftType: ShiftType;
 }>(), {
   title: '編輯儀器',

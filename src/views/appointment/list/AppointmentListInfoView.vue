@@ -75,14 +75,14 @@ async function handleSign() {
   }
 }
 
-const isDeviceOnlyTreatment = computed(() => userShiftType.value && MachineShifts.includes(userShiftType.value));
+const isMachineOnlyTreatment = computed(() => userShiftType.value && MachineShifts.includes(userShiftType.value));
 </script>
 
 <template>
   <QBtn label="返回" icon="chevron_left" color="primary" flat style="width: fit-content; margin: 4px 0; padding: 4px 8px; " @click="$router.back" />
   <QTabs v-model="currentTab" align="left" dense>
-    <QTab v-for="(tab, idx) in tabs" :key="idx" :name="tab.name" :label="tab.label" :disable="tab.name === 'addOnPrice' && isDeviceOnlyTreatment">
-      <QTooltip v-if="tab.name === 'addOnPrice' && isDeviceOnlyTreatment" anchor="top middle" self="center middle" class="bg-black">
+    <QTab v-for="(tab, idx) in tabs" :key="idx" :name="tab.name" :label="tab.label" :disable="tab.name === 'addOnPrice' && isMachineOnlyTreatment">
+      <QTooltip v-if="tab.name === 'addOnPrice' && isMachineOnlyTreatment" anchor="top middle" self="center middle" class="bg-black">
         儀器治療的預約單，不可再加購儀器服務
       </QTooltip>
     </QTab>
