@@ -96,7 +96,7 @@ export const PhysicalTypes = [
 ] as const;
 
 // 儀器治療項目
-export const DeviceTypes = [
+export const MachineShifts = [
   ShiftType['G動椅'],
   ShiftType['射頻'],
   ShiftType['磁波'],
@@ -397,3 +397,11 @@ export enum PaymentTypes {
 }
 
 export const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));
+
+// 儀器
+export enum MachineTypes {
+  震波儀器治療 = 1,
+  射頻儀器治療 = 2,
+  磁波儀器治療 = 3,
+  G動椅儀器治療 = 4,
+}

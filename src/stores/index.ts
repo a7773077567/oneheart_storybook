@@ -7,3 +7,4 @@ export { useVoucherStore } from './voucher';
 export { usePersonalAppointmentStore } from './personalAppointment';
 export { useCashDropStore } from './cashDrop';
 export { useHandoverStore } from './handover';
+export { useOptionStore } from './options';
