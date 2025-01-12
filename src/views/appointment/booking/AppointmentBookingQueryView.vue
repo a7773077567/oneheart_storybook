@@ -8,7 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
-import { ShiftType } from '@/const/general';
+import { MachineTypes, ShiftType } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -47,7 +47,18 @@ const onSubmit = handleSubmit(async (values) => {
     $q.loading.show();
     await appointmentStore.getAvailable(appointmentStore.availableQuery);
     appointmentStore.querySent = true;
-    await router.push({ name: 'appointmentBookingCalendar' });
+
+    // G動椅是另外的 Machine Calendar 顯示
+    await router.push(values.userShiftType === ShiftType['G動椅']
+      ? {
+          name: 'machineBookingCalendar',
+          params: {
+            machineType: MachineTypes['G動椅儀器治療'],
+          },
+        }
+      : {
+          name: 'appointmentBookingCalendar',
+        });
   }
   catch (err) {
     console.log(err);
@@ -68,7 +79,10 @@ const onSubmit = handleSubmit(async (values) => {
       <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" hide-bottom-space />
     </InputBox>
     <InputBox :label="`選擇${selectLabel}`">
-      <OSelect :disable="values.userShiftType === ShiftType['G動椅']" name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple hide-bottom-space />
+      <OSelect
+        :disable="values.userShiftType === ShiftType['G動椅']" name="userIds" :label="`選擇${selectLabel}`"
+        :options="therapistOptions" multiple hide-bottom-space
+      />
     </InputBox>
     <p v-if="values.userShiftType === ShiftType['G動椅']" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     <InputBox label="選擇日期" class="gutter">
@@ -99,6 +113,7 @@ const onSubmit = handleSubmit(async (values) => {
     margin-bottom: 16px;
     padding-left: 16px;
   }
+
   .input-box {
     margin-bottom: 20px;
   }

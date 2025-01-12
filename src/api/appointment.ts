@@ -1,9 +1,10 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { Client, UserShiftDetail } from '@/api';
+import type { Client, MachineInfo, Space, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
+import { ShiftType } from '@/const/general';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -259,7 +260,7 @@ export interface AppointmentStatus {
 export interface Available {
   slotId: number;
   userShiftId: number;
-  type: number;
+  type: ShiftType;
   name: string;
   date: string;
   startTime: string;
@@ -269,15 +270,21 @@ export interface Available {
     name: string;
   };
   appointmentStatus: AppointmentStatus | null;
+  machine: null | MachineInfo;
+  space: Space;
 }
 
 export interface CreateAppointmentPayload {
-  isEmployeePrice: boolean;
-  userShiftId: number;
   bookingClientIds: number[];
-  note?: string | null;
-  startTime: string;
+  date: string | null;
   endTime: string;
+  isEmployeePrice: boolean;
+  machineId: number | null; // G動椅才需要，其他科別帶 null
+  note?: string | null;
+  spaceId: number;
+  startTime: string;
+  userShiftType: ShiftType;
+  userShiftId: number;
 }
 
 export interface CreateAppointmentRearrangePayload {
@@ -514,7 +521,7 @@ export async function adjustEmployeePriceState({ clientScheduleId, isEmployeePri
 
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
-  userShiftType: z.number({ required_error: '必填' }),
+  userShiftType: z.nativeEnum(ShiftType, { required_error: '必填' }),
   userIds: z.number().array().optional(),
   // .min(1, { message: '至少選擇1名治療師' }),
   date: z.string(),

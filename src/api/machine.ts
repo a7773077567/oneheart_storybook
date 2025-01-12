@@ -10,8 +10,8 @@ export interface MachineSchedule extends ClientSchedule {
 export interface MachineInfo {
   id: number;
   name: string;
-  type: MachineTypes;
   space: Space;
+  type: MachineTypes;
 }
 
 export interface ReservedMachine extends MachineInfo {

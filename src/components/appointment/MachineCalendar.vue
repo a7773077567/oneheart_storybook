@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue';
-import { QCalendarResource, today } from '@quasar/quasar-ui-qcalendar';
+import { computed, ref, watch } from 'vue';
+import { QCalendarResource, nextDay, today } from '@quasar/quasar-ui-qcalendar';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
@@ -13,11 +13,15 @@ interface Props {
   intervalCount?: number;
   intervalMinutes?: number;
   resourceWidth?: number;
+  cellWidth?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   intervalStart: 9,
   intervalCount: 9,
+  intervalMinutes: 30,
+  resourceWidth: 200,
+  cellWidth: 125,
 });
 
 const emit = defineEmits<{
@@ -43,7 +47,7 @@ const resources = computed({
 function getCalendarStyle() {
   return {
     'height': '100%',
-    'max-height': 'fix-content',
+    'max-height': 'fit-content',
     '--calendar-border': '1px solid #B2B2B2',
     ...(props.resourceWidth && { '--calendar-resources-width': `${props.resourceWidth}px` }),
   };
@@ -52,17 +56,20 @@ function getCalendarStyle() {
 
 <template>
   <div class="device_calendar">
+    <div v-if="'nav' in $slots">
+      <slot name="nav" v-bind="{ calendar }" />
+    </div>
     <QCalendarResource
       ref="calendar"
       v-model="selectedDate"
       v-model:model-resources="resources"
       resource-key="id"
       resource-label="name"
-      :interval-start="16"
-      :interval-count="30"
-      :interval-minutes="30"
-      :resource-width="200"
-      :cell-width="125"
+      :interval-start="intervalStart"
+      :interval-count="intervalCount"
+      :interval-minutes="intervalMinutes"
+      :resource-width="resourceWidth"
+      :cell-width="cellWidth"
       animated
       bordered
       :style="getCalendarStyle()"
