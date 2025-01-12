@@ -94,6 +94,7 @@ function updateSelectedDate(date: string) {
 }
 
 // machine
+const displayMachineList = computed(() => optionStore.machineList.filter(m => selectedMachines.value.includes(m.id)));
 function getMachineAppointment(scope: any) {
   const machineId = scope.resource.id;
 
@@ -180,7 +181,12 @@ function getMachineAppointment(scope: any) {
         label="儀器"
         :options="machineOptions"
       />
-      <MachineCalendar class="calendar" :model-value="selectedDate" :model-resources="optionStore.machineList" :resource-width="200">
+      <MachineCalendar
+        class="calendar" :model-value="selectedDate" :model-resources="displayMachineList" :resource-width="200"
+        :interval-start="16"
+        :interval-count="30"
+        :interval-minutes="30"
+      >
         <template #intervals="{ scope }">
           <template
             v-for="(item, idx) in getMachineAppointment(scope)"
