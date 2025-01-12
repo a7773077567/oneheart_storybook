@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
@@ -6,16 +7,16 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
-import { computed, ref } from 'vue';
+import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, HighConversionOpportunity, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
-import { PhysicalTypes, ShiftType } from '@/const/general';
+import { MachineShifts, PhysicalTypes, ShiftType } from '@/const/general';
 import EditMachineForm from './EditMachineForm.vue';
+import type { FormContext } from 'vee-validate';
 
 const props = defineProps<{
   scheduleId: number;
@@ -180,9 +181,25 @@ async function handleDownload(contractUrl: string) {
 
 // 儀器
 const isEditingMachine = ref(false);
-async function updateMachineInfo(val: any) {
-  console.log(val);
-  await appointmentStore.getClientSchedule(schedule.value.id);
+const machineInitVal = computed(() => {
+  if (!schedule.value?.machines?.[0])
+    return null;
+  return ({
+    ...schedule.value.machines[0],
+    ...userShift.value.type === ShiftType['震波'] ? { independentShockWaveShots: schedule.value.record.independentShockWaveShots } : {},
+  });
+});
+async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }) {
+  try {
+    await adjustIndependentMachineInfo(props.scheduleId, value);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    isEditingMachine.value = false;
+  }
+  catch (error) {
+    setFieldError('period', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+    setFieldError('startTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+    setFieldError('endTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+  }
 }
 </script>
 
@@ -205,9 +222,13 @@ async function updateMachineInfo(val: any) {
       <ClientInfoTable :data="data">
         <template #device="{ row }">
           <div class="device_info">
-            <div>機台</div>
+            <div>機台 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.name }}</div>
             <div>時間 {{ (row.value as ClientScheduleDetail)?.scheduleStartTime }} - {{ (row.value as ClientScheduleDetail)?.scheduleEndTime }}</div>
-            <div v-if="+userShift.type === ShiftType['射頻']">發數</div>
+            <div v-if="+userShift.type === ShiftType['震波']">
+              發數
+              <QBadge v-if="!(row.value as ClientScheduleDetail)?.record?.independentShockWaveShots" style="background-color: #F8C9CB; color:#C2351A" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">發數未填寫</QBadge>
+              <span>{{ (row.value as ClientScheduleDetail)?.record?.independentShockWaveShots }}</span>
+            </div>
             <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingMachine = true" />
           </div>
         </template>
@@ -314,8 +335,14 @@ async function updateMachineInfo(val: any) {
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
   </QDialog>
-  <QDialog v-model="isEditingMachine">
-    <EditMachineForm title="編輯儀器治療" :value="{ machine: '', startTime: schedule.scheduleStartTime, endTime: schedule.scheduleEndTime }" :shift-type="userShift.type" @cancel="isEditingMachine = false" @save="updateMachineInfo" />
+  <QDialog v-if="MachineShifts.includes(userShift.type)" v-model="isEditingMachine">
+    <EditMachineForm
+      title="編輯儀器治療"
+      :init-val="machineInitVal"
+      :shift-type="userShift.type"
+      @cancel="isEditingMachine = false"
+      @submit="updateMachineInfo"
+    />
   </QDialog>
 </template>
 

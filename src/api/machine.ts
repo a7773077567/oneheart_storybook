@@ -4,10 +4,7 @@ import type { MachineTypes } from '@/const/general';
 import type { Space } from './user';
 
 export interface MachineSchedule extends ClientSchedule {
-  machines: (MachineInfo & {
-    machineStartTime: string;
-    machineEndTime: string;
-  })[];
+  machines: ReservedMachine[];
 }
 
 export interface MachineInfo {
@@ -15,6 +12,12 @@ export interface MachineInfo {
   name: string;
   type: MachineTypes;
   space: Space;
+}
+
+export interface ReservedMachine extends MachineInfo {
+  machineStartTime: string;
+  machineEndTime: string;
+  independentShockWaveShots?: number;
 }
 
 // 取得所有儀器
@@ -36,7 +39,13 @@ export async function getMachineScheduleInprogress(params: { date: string; machi
 }
 
 // 更新排程獨立預約資訊
-export async function adjustIndependentMachineInfo(clientScheduleId: number) {
-  const { data } = await api.get(`clientSchedules/${clientScheduleId}/adjust-independentMachineInfo`);
+export interface UpdateMachinePayload {
+  machineId:	number;
+  startTime: string;
+  endTime: string;
+  shockWaveShots?:	number;
+}
+export async function adjustIndependentMachineInfo(clientScheduleId: number, payload: UpdateMachinePayload) {
+  const { data } = await api.patch(`clientSchedules/${clientScheduleId}/adjust-independentMachineInfo`, payload);
   return data;
 }

@@ -3,10 +3,14 @@ import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 import duration, { type DurationUnitType } from 'dayjs/plugin/duration';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 dayjs.extend(objectSupport);
 dayjs.extend(duration);
 dayjs.extend(quarterOfYear);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 export function getWeekDay(weekDay: number) {
   const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];

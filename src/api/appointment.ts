@@ -3,6 +3,7 @@ import { z } from 'zod';
 import type { Client, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
+import type { MachineSchedule } from './machine';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -64,8 +65,9 @@ export interface Record {
     },
   ];
   advice: string;
-  magneticWavesRecords?: MagneticWavesRecord[];
-  magneticGChairRecords?: GChairRecord[];
+  magneticWavesRecords: MagneticWavesRecord[];
+  magneticGChairRecords: GChairRecord[];
+  independentShockWaveShots: number; // 震波發數
 }
 
 export interface MagneticWavesRecord {
@@ -288,6 +290,7 @@ export interface CreateAppointmentRearrangePayload {
 export interface ClientScheduleDetail extends ClientSchedule {
   medicalAndTrainingRecordId: number;
   record: Record & { userShiftType: number };
+  machines?: MachineSchedule['machines'];
 };
 
 interface UploadInfo {

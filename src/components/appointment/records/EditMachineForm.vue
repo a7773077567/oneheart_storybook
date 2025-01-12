@@ -1,23 +1,16 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { useForm } from 'vee-validate';
+import { type FormContext, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
-import dayjs from 'dayjs';
-import { availableReqSchema } from '@/api/appointment';
+import { useOptionStore } from '@/stores';
 import { ShiftType } from '@/const/general';
-import { object, string } from 'zod';
-
-interface MachineDetail {
-  machine: string;
-  startTime: string;
-  endTime: string;
-  independentShockWaveShots?: number;
-}
+import { number, object, string } from 'zod';
+import type { ReservedMachine, UpdateMachinePayload } from '@/api';
+import dayjs from 'dayjs';
 
 const props = withDefaults(defineProps<{
   title: string;
-  value: MachineDetail;
+  initVal: ReservedMachine | null;
   shiftType: ShiftType;
 }>(), {
   title: '編輯儀器',
@@ -25,33 +18,60 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'save', value: any): void;
+  (e: 'submit', value: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }): void;
 }>();
 
-const schema = computed(() => {
-  const basic = object({
-    machine: string().min(1, 'machine is required'),
-    startTime: string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
-    endTime: string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
-  });
-  return props.shiftType === ShiftType['射頻']
-    ? basic.extend({
-      independentShockWaveShots: string().min(1, 'independentShockWaveShots is required'),
-    })
-    : basic;
+const optionStore = useOptionStore();
+const initialValues = computed(() => {
+  if (!props.initVal)
+    return {};
+  const { id, machineStartTime, machineEndTime, independentShockWaveShots } = props.initVal;
+  return {
+    startTime: machineStartTime,
+    endTime: machineEndTime,
+    machineId: id,
+    shockWaveShots: independentShockWaveShots,
+  };
 });
-const initVal = computed(() => props.value);
-const periodNote = ref(`請選擇預約單內的時段 ${props.value.startTime} ${props.value.endTime}`);
 
-const { handleSubmit } = useForm({
+const today = dayjs().format('YYYY-MM-DD');
+const schema = computed(() => {
+  return object({
+    machineId: number().min(1, 'machine is required'),
+    startTime: string()
+      .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
+      .refine(val => dayjs(`${today} ${val}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${val}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`), { message: '請選擇預約單內的時段' }),
+    endTime: string()
+      .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
+      .refine(val => dayjs(`${today} ${val}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${val}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`), { message: '請選擇預約單內的時段' }),
+    shockWaveShots: number().optional()
+      .refine((val) => {
+        if (props.shiftType !== ShiftType['震波'])
+          return true;
+        return (!!val);
+      }, { message: 'independentShockWaveShots is required' }),
+  }).refine((vals) => {
+    const startTimeWithinPeriod = dayjs(`${today} ${vals.startTime}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${vals.startTime}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`);
+
+    const endTimeWithinPeriod = dayjs(`${today} ${vals.endTime}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${vals.endTime}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`);
+
+    return startTimeWithinPeriod && endTimeWithinPeriod;
+  }, { message: `請選擇預約單內的時段 ${initialValues.value?.startTime} - ${initialValues.value?.endTime}`, path: ['period'] });
+});
+
+const { handleSubmit, setFieldError, errors } = useForm({
   validationSchema: toTypedSchema(schema.value),
-  initialValues: initVal.value,
+  initialValues: initialValues.value,
+});
+const periodNote = computed(() => {
+  return 'period' in errors.value ? errors.value.period : `請選擇預約單內的時段 ${props.initVal?.machineStartTime} - ${props.initVal?.machineEndTime}`;
 });
 
 const onSubmit = handleSubmit((v) => {
-  console.log(v);
-  emit('save', v);
+  emit('submit', { value: v, setFieldError });
 });
+
+const machineList = computed(() => optionStore.machineList.filter(machine => machine.type === props.initVal?.type));
 </script>
 
 <template>
@@ -62,15 +82,22 @@ const onSubmit = handleSubmit((v) => {
     <QCardSection class="q-py-lg">
       <h3 class="device_form--subtitle">{{ ShiftType[shiftType] }}儀器治療</h3>
       <form @submit.prevent>
-        <OSelect name="machine" label="機台*" :options="[]" error-message="" />
+        <OSelect
+          name="machineId" label="機台*" option-value="id" option-label="name" :options="machineList"
+          error-message=""
+        />
         <div class="input-box">
           <OTime name="startTime" now-btn label="開始時間" error-message="" />
           <span style="translate:0 -10px;">至</span>
           <OTime name="endTime" now-btn label="結束時間" error-message="" />
           <span style="translate:0 -10px;">止</span>
         </div>
-        <p class="note">{{ periodNote }}</p>
-        <OInput v-if="shiftType === ShiftType['射頻']" name="independentShockWaveShots" inside-label="發數*" error-message="" />
+        <p class="note" :class="{ error: 'period' in errors }">{{ periodNote }}</p>
+        <OInput
+          v-if="shiftType === ShiftType['震波']" name="shockWaveShots" inside-label="發數*"
+          type="number"
+          error-message=""
+        />
       </form>
     </QCardSection>
     <QCardActions class="q-pa-lg justify-end">
@@ -85,25 +112,32 @@ const onSubmit = handleSubmit((v) => {
   &--title {
     font-size: 24px;
   }
+
   &--subtitle {
     margin-bottom: 16px;
     font-size: 18px;
     font-weight: 500;
   }
+
   .input-box {
     display: flex;
     align-items: center;
     gap: 10px;
   }
+
   :slotted(.q-field) {
     flex: 1 1 auto;
   }
+
   .note {
     padding: 0 16px;
     margin-bottom: 16px;
     font-size: 12px;
     font-weight: 500;
     color: #45464f;
+    &.error {
+      color: #c2351a;
+    }
   }
 }
 </style>
