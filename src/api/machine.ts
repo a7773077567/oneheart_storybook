@@ -38,7 +38,7 @@ export async function getMachineScheduleInprogress(params: { date: string; machi
   return data;
 }
 
-// 更新排程獨立預約資訊
+// 更新儀器預約資訊
 export interface UpdateMachinePayload {
   machineId:	number;
   startTime: string;

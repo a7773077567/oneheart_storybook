@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { Client, MachineInfo, Space, UserShiftDetail } from '@/api';
+import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
@@ -516,6 +516,24 @@ export async function adjustFirstScheduleState({ clientScheduleId, firstSchedule
  */
 export async function adjustEmployeePriceState({ clientScheduleId, isEmployeePrice }: { clientScheduleId: number; isEmployeePrice: boolean }) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-isEmployeePrice`, { isEmployeePrice });
+  return data;
+}
+
+/**
+ * 取得排程無綁定人員儀器作人員
+ * 當天有排班的User，且人員的角色為 type=2~5(院長、副院長、物理治療師組長、物理治療師）。加上角色為 type=10(櫃檯)
+ */
+export async function getMachineOperatingUsers(clientScheduleId: number) {
+  const { data } = await api.get<User[]>(`/clientSchedules/${clientScheduleId}/get-machineOperatingUsers`);
+  return data;
+}
+
+/**
+ * 綁定排程治療師
+ * 當天有排班的User，且人員的角色為 type=2~5(院長、副院長、物理治療師組長、物理治療師）。加上角色為 type=10(櫃檯)
+ */
+export async function updateMachineOperatingUsers(clientScheduleId: number, userId: number) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/update-machine-operator`, { userId });
   return data;
 }
 

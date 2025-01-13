@@ -4,7 +4,7 @@ import { HighConversionOpportunity } from '@/components/appointment/index';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
-import { Types } from '@/const/general';
+import { ShiftType, Types } from '@/const/general';
 
 interface Props {
   data: ClientSchedule;
@@ -26,6 +26,22 @@ const specialOffers = computed(() => [
   { label: '員工價', value: props.data.isEmployeePrice },
   { label: '自動推薦', value: props.data.isUsingAutoRecommend },
 ]);
+const tooltipInfo = [
+  { label: null, value: `${props.data.scheduleStartTime} - ${props.data.scheduleEndTime}` },
+  ...(props.data.isFirstClientSchedule ? [{ label: null, value: '初診' }] : []),
+  {
+    label: '姓名',
+    value: props.data.client.name,
+  },
+  {
+    label: '科別',
+    value: typeLabel.value,
+  },
+  {
+    label: '預約備註',
+    value: props.data.note,
+  },
+];
 </script>
 
 <template>
@@ -33,6 +49,7 @@ const specialOffers = computed(() => [
     <div class="booking-card__client">
       <div class="booking-card__client--val q-pr-sm">客戶：{{ data.client.name }}</div>
       <p class="booking-card__client--val">科別：{{ typeLabel }}</p>
+      <p v-if="data.userShift.type === ShiftType['G動椅']" class="booking-card__client--val">治療師：{{ data.userShift.user.name || '未指派' }}</p>
     </div>
 
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
@@ -49,13 +66,10 @@ const specialOffers = computed(() => [
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
     <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
-      <p class="q-mb-xs text-bold">{{ `${data.scheduleStartTime}-${data.scheduleEndTime}` }}</p>
-      <div>
-        <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
-        <span v-if="data.isFirstClientSchedule">初診</span>
+      <div v-for="(item, idx) in tooltipInfo" :key="idx" class="tooltip_info">
+        <div v-if="!!item.label" class="label">{{ item.label }}：</div>
+        <div class="value">{{ item.value }}</div>
       </div>
-      <p class="q-mb-xs">科別：{{ typeLabel }}</p>
-      <p class="note">{{ data.note ?? '-' }}</p>
     </QTooltip>
   </div>
 </template>
@@ -118,7 +132,7 @@ const specialOffers = computed(() => [
 
 <style lang="scss">
 .q-tooltip {
-  font-size: 16px !important;
+  font-size: 14px !important;
   overflow: hidden;
   .note {
     text-overflow: ellipsis;
@@ -126,6 +140,15 @@ const specialOffers = computed(() => [
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+  .tooltip_info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
   }
 }
 </style>

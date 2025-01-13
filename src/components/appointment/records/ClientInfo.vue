@@ -17,6 +17,7 @@ import EmployeePriceForm from './EmployeePriceForm.vue';
 import { MachineShifts, PhysicalTypes, ShiftType } from '@/const/general';
 import EditMachineForm from './EditMachineForm.vue';
 import type { FormContext } from 'vee-validate';
+import AssignMachineOperator from './AssignMachineOperator.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -47,6 +48,7 @@ const data = computed(() => {
   const all = [
     { key: 'device', label: '儀器', value: props.scheduleDetail },
     { key: 'name', label: '姓名', value: client.value.name },
+    { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
@@ -57,7 +59,6 @@ const data = computed(() => {
     { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
     { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
     { key: 'location', label: '地點', value: userShift.value.space?.name ?? '' },
-    { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'firstVisitContract', label: '預約就診須知', value: client.value?.firstVisitContractUrl ?? null },
     { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
   ];
@@ -201,6 +202,8 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
     setFieldError('endTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
   }
 }
+
+const isEditingOperator = ref(false);
 </script>
 
 <template>
@@ -238,6 +241,13 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
+          </div>
+        </template>
+        <template #doctor="{ row }">
+          <div class="flex items-center justify-between">
+            <span v-if="row.value">{{ row.value }}</span>
+            <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-px-sm q-py-xs text-weight-medium">未指派</QBadge>
+            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingOperator = true" />
           </div>
         </template>
         <template #isFirstClientSchedule="{ row }">
@@ -342,6 +352,16 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
       :shift-type="userShift.type"
       @cancel="isEditingMachine = false"
       @submit="updateMachineInfo"
+    />
+  </QDialog>
+  <QDialog v-if="userShift.type === ShiftType['G動椅']" v-model="isEditingOperator">
+    <AssignMachineOperator
+      title="指派治療師"
+      :init-val="{ userId: userShift.userId }"
+      :shift-type="userShift.type"
+      :client-schedule-id="scheduleId"
+      @save="isEditingOperator = false"
+      @cancel="isEditingOperator = false"
     />
   </QDialog>
 </template>

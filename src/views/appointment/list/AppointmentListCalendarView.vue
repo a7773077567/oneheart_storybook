@@ -5,11 +5,11 @@ import dayjs from 'dayjs';
 import { AppointmentCard, AppointmentCountCard, ResourceLabel } from '@/components/appointment';
 import { useRoute, useRouter } from 'vue-router';
 import type { ClientSchedule, MachineSchedule } from '@/api';
-import { BottomSheet, useQuasar } from 'quasar';
+import { useQuasar } from 'quasar';
 import { getDuration } from '@/utils/date';
 import MachineCalendar from '@/components/appointment/MachineCalendar.vue';
 import MachineCard from '@/components/appointment/MachineCard.vue';
-import { MachineShifts } from '@/const/general';
+import { ShiftType } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -122,7 +122,9 @@ function getMachineAppointment(scope: any) {
       bottom: 10,
       count: item.length,
       isAllCheckout,
-      isMachineTreatment: MachineShifts.includes(item[0].userShift.type),
+      showMachineCard: item[0].userShift.type === ShiftType['射頻']
+      || item[0].userShift.type === ShiftType['磁波']
+      || item[0].userShift.type === ShiftType['震波'],
     };
   },
   );
@@ -193,7 +195,7 @@ function getMachineAppointment(scope: any) {
             :key="idx"
           >
             <MachineCard
-              v-if="item.isMachineTreatment"
+              v-if="item.showMachineCard"
               :data="item.bookings[0]"
               :style="getStyle(item)"
             />
@@ -201,6 +203,7 @@ function getMachineAppointment(scope: any) {
               v-else-if="item.count === 1"
               :data="item.bookings[0]"
               :style="getStyle(item)"
+              @click="router.push({ name: 'appointmentListInfo', params: { scheduleId: item.bookings[0].id } })"
             />
             <div v-else>
               <AppointmentCountCard
