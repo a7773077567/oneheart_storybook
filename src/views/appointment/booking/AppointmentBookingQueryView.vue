@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
@@ -7,25 +7,36 @@ import dayjs from 'dayjs';
 import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { getType } from '@/utils/mappers';
 
 const $q = useQuasar();
 const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 const shiftStore = useShiftStore();
+const selectLabel = ref('治療師');
+const therapistOptions = ref<any[]>([]);
 await appointmentStore.getUsers([userStore.currentSpaceId!]);
-const typeOptions = computed(() => shiftStore.spaceShiftOptions);
 
-const { handleSubmit } = useForm({
+const { handleSubmit, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
   initialValues: {
-    userShiftType: typeOptions.value[0].value,
+    userShiftType: shiftStore.spaceShiftOptions[0].value,
     userIds: [],
     date: dayjs().format('YYYY-MM-DD'),
     startTime: '09:00',
     endTime: '21:00',
   },
 });
+
+watch(() => values.userShiftType, (newShiftType) => {
+  const shiftDetails = getType(newShiftType!)!;
+  const newTherapistOptions = appointmentStore.activeUsers.filter(item => shiftDetails.roles.includes(item.role.type));
+  // const newTherapistIds = newTherapistOptions.map(item => item.id);
+  therapistOptions.value = newTherapistOptions;
+  setFieldValue('userIds', []);
+  selectLabel.value = shiftDetails.selectLabel;
+}, { immediate: true });
 
 const onSubmit = handleSubmit(async (values) => {
   appointmentStore.appointmentCalendarInitOption = values.userIds!;
@@ -53,10 +64,10 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
   <div class="booking-query">
     <InputBox label="選擇項目">
-      <OSelect name="userShiftType" label="選擇項目" :options="typeOptions" />
+      <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" />
     </InputBox>
-    <InputBox label="選擇治療師">
-      <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.activeUsers" multiple />
+    <InputBox :label="`選擇${selectLabel}`">
+      <OSelect name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" />
