@@ -41,6 +41,7 @@ const onSubmit = handleSubmit(async (value) => {
     fetch.push(updateIntroducer(+props.clientId, { introducerClientId: value.introducer ? +value.introducer : null }));
   }
   await Promise.all(fetch);
+  await clientStore.getClientInfo(+props.clientId);
   isEdit.value = false;
   $q.notify({ message: '已存檔！', timeout: 200, position: 'center' });
 });
@@ -109,7 +110,8 @@ const departmentTherapists = computed(() => [{
         </fieldset>
         <fieldset class="col-12">
           <span class="label">後台綁定的介紹人</span>
-          <OMemberSearch name="introducer" class="full-width" :readonly="!isEdit" />
+          <OMemberSearch v-if="isEdit" name="introducer" class="full-width" :readonly="!isEdit" />
+          <QInput v-else :model-value="clientStore.targetClient?.introducer?.name" outlined dense readonly style="background:white" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">備註</span>
