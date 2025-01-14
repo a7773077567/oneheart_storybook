@@ -90,8 +90,10 @@ function selectRecord(record: Record<string, any>) {
     </div>
     <div class="body">
       <form @submit.prevent>
-        <OSelect name="sequence" label="程序*" :options="gChairSequenceOptions" class="col" error-message="" />
-        <OInput name="intensity" inside-label="強度*" class="col" error-message="" />
+        <div class="row q-col-gutter-md">
+          <OSelect name="magneticGChairRecords[0].sequence" label="程序*" :options="gChairSequenceOptions" class="col" error-message="" />
+          <OInput name="magneticGChairRecords[0].intensity" inside-label="強度*" class="col" error-message="" />
+        </div>
       </form>
       <div class="action">
         <QBtn v-if="scheduleState === '完成服務'" label="病例完成" color="primary" style="width: 127px;" @click="finishRecord" />
