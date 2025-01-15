@@ -198,30 +198,31 @@ export interface SportConsultation {
 
 export interface ClientSchedule {
   addOnServices: AddOnService[];
-  id: number;
-  clientId: number;
-  client: Client;
-  date: string;
-  userShiftId: number;
-  userShift: UserShiftDetail;
-  userShiftSlotId: number;
-  userShiftAppointmentId: number;
-  scheduleStartTime: string;
-  scheduleEndTime: string;
   bookedNumber: number;
-  paymentState: number;
-  state: number;
+  client: Client;
+  clientId: number;
+  clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
+  date: string;
+  id: number;
   isBeenRearranged: boolean;
   isEmployeePrice: boolean;
   isFirstClientSchedule: boolean;
-  isRearrangedClientSchedule: boolean;
-  isValidForRestore: boolean;
-  isUsingAutoRecommend: boolean;
-  rearrangeClientSchedule: ClientSchedule | null;
-  note: string;
-  clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
-  isSignedFirstVisitContract: boolean | null;
   isHighSalesOpportunity: boolean;
+  isRearrangedClientSchedule: boolean;
+  isSignedFirstVisitContract: boolean | null;
+  isSignedIndependentMachineContract?: boolean; // 判斷獨立儀器是否已經簽約
+  isUsingAutoRecommend: boolean;
+  isValidForRestore: boolean;
+  note: string;
+  paymentState: number;
+  rearrangeClientSchedule: ClientSchedule | null;
+  scheduleEndTime: string;
+  scheduleStartTime: string;
+  state: number;
+  userShift: UserShiftDetail;
+  userShiftAppointmentId: number;
+  userShiftId: number;
+  userShiftSlotId: number;
 }
 
 export interface ClientSchedulesModifyHistory {
