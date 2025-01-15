@@ -21,12 +21,12 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,
-    EDIT_COACH_OPERATION_TARGET: false,
+    EDIT_COACH_OPERATION_TARGET: true,
     VIEW_USER_SETTING: false,
   },
   [RoleType['副店長']]: {
     READ_HANDOVER: true,
-    EDIT_COACH_OPERATION_TARGET: false,
+    EDIT_COACH_OPERATION_TARGET: true,
     VIEW_USER_SETTING: false,
   },
   [RoleType['櫃檯']]: {
