@@ -355,7 +355,7 @@ const checkinReminder = computed(() => {
         <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
-          <QBtn v-if="scheduleState === '預約'" :disable="checkinReminder" label="報到" color="black" style="width: 127px;" @click="checkIn">
+          <QBtn v-if="scheduleState === '預約'" :disable="!!checkinReminder" label="報到" color="black" style="width: 127px;" @click="checkIn">
             <QTooltip v-if="!!checkinReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ checkinReminder }}
             </QTooltip>
