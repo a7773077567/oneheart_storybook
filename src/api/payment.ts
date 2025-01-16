@@ -3,7 +3,7 @@ import type { PaymentTypes, PointTypes, TransactionTypes } from '@/const/general
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
 import type { UserShiftDetail } from './shift';
-import type { AddOnService } from './appointment';
+import type { AddOnService, Record } from './appointment';
 import type { User } from './user';
 
 interface BasicPaymentRecord {
@@ -39,6 +39,7 @@ export interface MedicalPaymentRecord extends BasicPaymentRecord {
   type: TransactionTypes.門診費用;
   ticketGained: null;
   giftPointGained: null;
+  record: Record;
 }
 
 // 堂數購買

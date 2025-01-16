@@ -106,14 +106,15 @@ const isReceiptDialogOpen = ref(false);
 const space = ref('');
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName, pointPaymentClientGroupType } = await getClientPaymentDetail({ clientId: +props.clientId, paymentId });
+  const data = await getClientPaymentDetail({ clientId: +props.clientId, paymentId });
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName, pointPaymentClientGroupType } = data;
   space.value = spaceName!;
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
     case TransactionTypes.門診費用:
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }, ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${0}發` }] : [])];
+      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }, ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : [])];
       break;
     case TransactionTypes.團課券購買:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
