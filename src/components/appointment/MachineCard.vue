@@ -21,7 +21,6 @@ const schedulePeriod = computed(() => `${props.data.scheduleStartTime} - ${props
       <p class="q-mb-xs text-bold">{{ `${data.scheduleStartTime}-${data.scheduleEndTime}` }}</p>
       <div>
         <p class="q-mb-xs">客戶：{{ data.client.name }}</p>
-        <span v-if="data.isFirstClientSchedule">初診</span>
       </div>
       <p class="q-mb-xs">科別：{{ MachineTypes[data.machines[0].type] }}</p>
       <p v-if="!!data.note" class="note">預約備註：{{ data.note || '-' }}</p>
@@ -48,6 +47,29 @@ const schedulePeriod = computed(() => `${props.data.scheduleStartTime} - ${props
   &__detail {
     font-size: 12px;
     font-weight: 500;
+  }
+}
+</style>
+
+<style lang="scss">
+.q-tooltip {
+  font-size: 14px !important;
+  overflow: hidden;
+  .note {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  .tooltip_info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
   }
 }
 </style>

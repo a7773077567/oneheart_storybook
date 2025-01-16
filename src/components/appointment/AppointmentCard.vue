@@ -37,10 +37,13 @@ const tooltipInfo = [
     label: '科別',
     value: typeLabel.value,
   },
-  {
-    label: '預約備註',
-    value: props.data.note,
-  },
+  ...(props.data.note
+    ? [{
+        label: '預約備註',
+        value: props.data.note,
+      }]
+    : []),
+  ...(props.data.userShift.type === ShiftType['G動椅'] ? [{ label: '治療師', value: props.data.userShift.user?.id ? props.data.userShift.user?.name : '未指派' }] : []),
 ];
 </script>
 
