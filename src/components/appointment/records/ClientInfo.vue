@@ -204,6 +204,18 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
 }
 
 const isEditingOperator = ref(false);
+const notFinishReminder = computed(() => {
+  switch (true) {
+    case appointmentStore.needToSignFirstVisit:
+      return '尚未簽署同意書，不可完成服務。';
+    case appointmentStore.needToSignMachineContract:
+      return '尚未簽署儀器使用同意書，不可完成服務。';
+    case userShift.value.type === ShiftType['震波'] && props.scheduleDetail.record.independentShockWaveShots === null:
+      return '尚未填寫震波發數，不可完成服務';
+    default:
+      return false;
+  }
+});
 </script>
 
 <template>
@@ -333,7 +345,11 @@ const isEditingOperator = ref(false);
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
           <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="appointmentStore.needToSignFirstVisit" @click="finishService" />
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="!!notFinishReminder" @click="finishService">
+            <QTooltip v-if="notFinishReminder" class="bg-black" anchor="top left" self="bottom middle">
+              {{ notFinishReminder }}
+            </QTooltip>
+          </QBtn>
           <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
         </div>
       </div>

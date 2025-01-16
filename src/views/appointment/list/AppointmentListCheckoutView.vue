@@ -30,7 +30,7 @@ if (!appointmentStore.isSameSpaceClinicSchedule) {
   onCancel(() => router.push({ name: 'appointmentListCalendar' }));
 }
 
-const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule } = (appointmentStore.targetClientSchedule!);
+const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule, record } = (appointmentStore.targetClientSchedule!);
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
@@ -41,8 +41,9 @@ const info: CheckTableData = [
   { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
-  { key: 'userName', value: userShift?.user.name, label: '治療師', span: true },
-  { key: 'type', value: shiftType.value?.label, label: '項目', span: true },
+  { key: 'userName', value: userShift?.user.name, label: '治療師' },
+  { key: 'type', value: shiftType.value?.label, label: '項目' },
+  ...(userShift.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
 ];
 
 const hasAddOn = computed(() => addOnServices.some(addOn => addOn.isAddOn));
@@ -72,6 +73,7 @@ const receiptData = computed(() => {
     { name: 'declaration', label: '健保申報', value: '無' },
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
+    ...(userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
   ];
 });
 
