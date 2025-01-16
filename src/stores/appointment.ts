@@ -158,11 +158,11 @@ export const useAppointmentStore = defineStore('appointment', {
     },
     GChariHistoryRecords: ({ historyRecords }) => {
       return historyRecords.map((record) => {
-        const { magneticWavesRecords, userShiftType, date } = record;
+        const { magneticGChairRecords, userShiftType, date } = record;
         return {
           userShiftType,
           date,
-          record: { magneticGChairRecords: { label: 'G動椅治療紀錄', value: magneticWavesRecords } },
+          record: { magneticGChairRecords: { label: 'G動椅治療紀錄', value: magneticGChairRecords } },
         };
       });
     },

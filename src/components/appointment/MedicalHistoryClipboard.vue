@@ -4,6 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 defineProps<{
   data: any[];
+  expandAll?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -49,7 +50,7 @@ function selectRecord(record: Record<string, any>) {
         <div class="history__date">{{ item.date }}</div>
         <div class="history__actions">
           <QBtn icon="content_copy" label="套用病例" flat style="color: #137AB3;" @click="() => selectRecord(item.record)" />
-          <QBtn icon="arrow_drop_down" :class="[expandIdx === idx ? 'expand-icon--expanded' : 'expand-icon']" round flat @click="() => expandHistory(idx)" />
+          <QBtn v-if="!expandAll" icon="arrow_drop_down" :class="[expandIdx === idx ? 'expand-icon--expanded' : 'expand-icon']" round flat @click="() => expandHistory(idx)" />
         </div>
       </div>
       <div :class="[expandIdx === idx ? 'history__body--expanded' : 'history__body']" :style="{ height: `${ccOrders[idx]}px` }">
@@ -57,7 +58,7 @@ function selectRecord(record: Record<string, any>) {
           <div v-for="(record, key, recordIdx) in item.record" :key="record" :class="[recordIdx === 0 ? 'order--cc' : 'order']">
             <div class="order__type">{{ record.label }}</div>
             <slot v-bind="record" name="record-content">
-              <div :class="[expandIdx === idx ? 'order__detail--expanded' : 'order__detail']">{{ record.value }}</div>
+              <div :class="[expandIdx === idx || expandAll ? 'order__detail--expanded' : 'order__detail']">{{ record.value }}</div>
             </slot>
           </div>
         </slot>

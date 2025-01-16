@@ -102,7 +102,20 @@ function selectRecord(record: Record<string, any>) {
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">
-    <MedicalHistoryClipboard :data="appointmentStore.medicalHistoryRecords" @select="selectRecord" />
+    <MedicalHistoryClipboard expand-all :data="appointmentStore.GChariHistoryRecords" @select="selectRecord">
+      <template #record-content="{ value }">
+        <div class="row history_record">
+          <div class="col">
+            <span class="history_record_label">程序</span>
+            <span class="history_record_val">{{ value?.[0]?.sequence ?? '-' }}</span>
+          </div>
+          <div class="col">
+            <span class="history_record_label">強度</span>
+            <span class="history_record_val">{{ value?.[0]?.intensity ?? '-' }}</span>
+          </div>
+        </div>
+      </template>
+    </MedicalHistoryClipboard>
   </QDialog>
 </template>
 
@@ -140,6 +153,21 @@ function selectRecord(record: Record<string, any>) {
       display: flex;
       justify-content: end;
     }
+  }
+}
+</style>
+
+<style lang="scss">
+.medical-history-clipboard .history_record {
+  &_label {
+    color: #45464f;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 16px;
+  }
+  &_val {
+    font-size: 16px;
+    font-weight: 500;
   }
 }
 </style>

@@ -128,14 +128,28 @@ function selectRecord(record: Record<string, any>) {
   <QDialog v-model="stateOfHistoryDialog">
     <MedicalHistoryClipboard :data="appointmentStore.magneticWaveHistoryRecords" @select="selectRecord">
       <template #record-content="{ value }">
-        <ul>
-          <li v-for="(recordItem, idx) in value" :key="idx">
-            <span>{{ idx + 1 }}</span>
-            {{ recordItem.sequence }}
-            {{ recordItem.bodyPart }}
-            {{ recordItem.intensity }}
-          </li>
-        </ul>
+        <QList separator>
+          <QItem v-for="(recordItem, idx) in value" :key="idx">
+            <QItemSection>
+              <QItemLabel class="history_record">
+                <span class="history_record_label">程序</span>
+                <span class="history_record_val">{{ recordItem.sequence }}</span>
+              </QItemLabel>
+            </QItemSection>
+            <QItemSection>
+              <QItemLabel class="history_record">
+                <span class="history_record_label">部位</span>
+                <span class="history_record_val">{{ recordItem.bodyPart }}</span>
+              </QItemLabel>
+            </QItemSection>
+            <QItemSection>
+              <QItemLabel class="history_record">
+                <span class="history_record_label">強度</span>
+                <span class="history_record_val">{{ recordItem.intensity }}</span>
+              </QItemLabel>
+            </QItemSection>
+          </QItem>
+        </QList>
       </template>
     </MedicalHistoryClipboard>
   </QDialog>
@@ -175,6 +189,21 @@ function selectRecord(record: Record<string, any>) {
       display: flex;
       justify-content: end;
     }
+  }
+}
+</style>
+
+<style lang="scss">
+.medical-history-clipboard .history_record {
+  &_label {
+    color: #45464f;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 16px;
+  }
+  &_val {
+    font-size: 16px;
+    font-weight: 500;
   }
 }
 </style>

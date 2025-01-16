@@ -204,6 +204,8 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
 }
 
 const isEditingOperator = ref(false);
+
+// 以下情況 disable 完成服務：尚未簽署初診同意書、尚未簽署儀器使用同意書、尚未填寫震波發數
 const notFinishReminder = computed(() => {
   switch (true) {
     case appointmentStore.needToSignFirstVisit:
@@ -216,6 +218,15 @@ const notFinishReminder = computed(() => {
       return false;
   }
 });
+
+// G動椅尚未指派治療師前，disable 報到
+const checkinReminder = computed(() => {
+  if (userShift.value.type === ShiftType['G動椅'] && !userShift.value.user.id) {
+    return '尚未指派治療師不可報到';
+  }
+  return null;
+},
+);
 </script>
 
 <template>
@@ -344,7 +355,11 @@ const notFinishReminder = computed(() => {
         <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
-          <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
+          <QBtn v-if="scheduleState === '預約'" :disable="checkinReminder" label="報到" color="black" style="width: 127px;" @click="checkIn">
+            <QTooltip v-if="!!checkinReminder" class="bg-black" anchor="top left" self="bottom middle">
+              {{ checkinReminder }}
+            </QTooltip>
+          </QBtn>
           <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="!!notFinishReminder" @click="finishService">
             <QTooltip v-if="notFinishReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ notFinishReminder }}
