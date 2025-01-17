@@ -7,6 +7,10 @@ export interface ChangeShiftPayload {
     name: string;
     amount: number;
   }[];
+  detailedIncomes: {
+    name: string;
+    amount: number;
+  }[];
 }
 
 export interface ChangeShiftRes {
@@ -23,6 +27,11 @@ export interface ChangeShiftRes {
     cashDropType: number;
   }[];
   detailedExpenses: {
+    name: string;
+    amount: number;
+    type: number;
+  }[];
+  detailedIncomes: {
     name: string;
     amount: number;
     type: number;

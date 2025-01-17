@@ -13,10 +13,11 @@ type SimpleTableRows = InstanceType<typeof SimpleTable>['$props']['rows'];
 const router = useRouter();
 const handoverStore = useHandoverStore();
 const cashDropAmount = ref('');
-const handoverMisc = ref<InstanceType<typeof HandoverMisc>['$props']['modelValue']>([]);
-const isHandoverDetailsOpen = ref(false);
+const expenses = ref<InstanceType<typeof HandoverMisc>['$props']['modelValue']>([]);
+const incomes = ref<InstanceType<typeof HandoverMisc>['$props']['modelValue']>([]);
+const isDetailsDialogOpen = ref(false);
 
-watch(isHandoverDetailsOpen, (newVal) => {
+watch(isDetailsDialogOpen, (newVal) => {
   if (newVal === false) {
     removeCookie('firstToken');
     removeCookie('secondToken');
@@ -30,12 +31,12 @@ const transactionRows = computed<SimpleTableRows>(() => {
   if (!handoverDetails) {
     return [];
   }
-  const { cashDrops, detailedExpenses } = handoverDetails;
-  return [...cashDrops, ...detailedExpenses];
+  const { cashDrops, detailedExpenses, detailedIncomes } = handoverDetails;
+  return [...cashDrops, ...detailedIncomes, ...detailedExpenses];
 });
 
 async function readyToHandover() {
-  if (containEmptyValue()) {
+  if (hasEmptyVal()) {
     useDialog({
       title: '系統提示',
       message: '尚有細項名稱或金額未填寫',
@@ -54,14 +55,15 @@ async function readyToHandover() {
   onOk(async () => {
     await handoverStore.changeShift({
       cashDropAmount: +cashDropAmount.value,
-      detailedExpenses: handoverMisc.value,
+      detailedExpenses: expenses.value,
+      detailedIncomes: incomes.value,
     });
-    isHandoverDetailsOpen.value = true;
+    isDetailsDialogOpen.value = true;
   });
 }
 
-function containEmptyValue() {
-  return handoverMisc.value.length && handoverMisc.value.some(({ name, amount }) => name.trim().length === 0 || +amount === 0);
+function hasEmptyVal() {
+  return expenses.value.length && expenses.value.some(({ name, amount }) => name.trim().length === 0 || +amount === 0);
 }
 </script>
 
@@ -72,15 +74,20 @@ function containEmptyValue() {
     </div>
 
     <div class="handover__details">
-      <HandoverDetails v-model="handoverMisc" />
-      <HandoverDetailsDialog
-        v-if="isHandoverDetailsOpen"
-        v-model="isHandoverDetailsOpen"
-        :overall-data="handoverStore.handoverDetails!.overall"
-        :transaction-rows="transactionRows"
-        :duration="handoverStore.handoverDetails!.duration"
-      />
+      <HandoverDetails v-model="expenses" mode="expenses" />
     </div>
+
+    <div class="handover__details">
+      <HandoverDetails v-model="incomes" mode="incomes" />
+    </div>
+
+    <HandoverDetailsDialog
+      v-if="isDetailsDialogOpen"
+      v-model="isDetailsDialogOpen"
+      :overall-data="handoverStore.handoverDetails!.overall"
+      :transaction-rows="transactionRows"
+      :duration="handoverStore.handoverDetails!.duration"
+    />
 
     <div class="handover__action">
       <QBtn label="確定交班" color="dark" style="width: 126px;" @click="readyToHandover" />

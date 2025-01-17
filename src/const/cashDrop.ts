@@ -3,6 +3,7 @@ export enum CashDropType {
   交班投庫 = 2,
 }
 
-export enum DetailedExpenseType {
-  細項支出 = 3,
+export enum OtherType {
+  其他支出 = 3,
+  其他收入 = 4,
 }
