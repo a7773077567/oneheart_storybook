@@ -391,7 +391,7 @@ const checkinReminder = computed(() => {
       :init-val="{ userId: userShift.userId }"
       :shift-type="userShift.type"
       :client-schedule-id="scheduleId"
-      @save="isEditingOperator = false"
+      @save="(isEditingOperator = false), (appointmentStore.getClientSchedule(+props.scheduleId))"
       @cancel="isEditingOperator = false"
     />
   </QDialog>
