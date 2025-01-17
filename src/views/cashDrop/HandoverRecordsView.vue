@@ -34,8 +34,8 @@ const transactionRows = computed<SimpleTableRows>(() => {
   if (!handoverDetails) {
     return [];
   }
-  const { cashDrops, detailedExpenses } = handoverDetails;
-  return [...cashDrops, ...detailedExpenses];
+  const { cashDrops, detailedExpenses, detailedIncomes } = handoverDetails;
+  return [...cashDrops, ...detailedIncomes, ...detailedExpenses];
 });
 
 const onRequest: QTableProps['onRequest'] = async (props) => {
