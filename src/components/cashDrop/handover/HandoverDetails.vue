@@ -6,6 +6,7 @@ type HandoverMiscModel = InstanceType<typeof HandoverMisc>['$props']['modelValue
 
 const props = defineProps<{
   modelValue: HandoverMiscModel;
+  mode: 'expenses' | 'incomes';
 }>();
 
 const emit = defineEmits<{
@@ -21,7 +22,7 @@ const model = computed({
 <template>
   <div class="details">
     <div class="details__header">
-      <HandoverTitle />
+      <HandoverTitle :mode="mode" />
     </div>
     <div class="details__misc">
       <HandoverMisc v-model="model" />

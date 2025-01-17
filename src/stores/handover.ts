@@ -1,5 +1,5 @@
 import { type ChangeShiftPayload, type ChangeShiftRes, type HandoverRecordListItem, type HandoverRecordListMeta, type HandoverRecordListParams, handoverApi } from '@/api/home/handover';
-import { CashDropType } from '@/const/cashDrop';
+import { CashDropType, OtherType } from '@/const/cashDrop';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 import { pick } from 'radash';
@@ -37,14 +37,25 @@ export const useHandoverStore = defineStore('handover', {
             time: { val: dayjs(cashDropDate).format('YYYY-MM-DD HH:mm') },
             type: { val: CashDropType[cashDropType] },
             method: { val: '現金' },
-            amount: { val: cashDropAmount },
+            amount: { val: cashDropAmount.toLocaleString() },
           };
         }),
         detailedExpenses: changeShiftRes.detailedExpenses.map((expense) => {
-          const { name, amount } = expense;
+          const { name, amount, type } = expense;
           return {
-            type: { val: name, span: 3 },
-            amount: { val: amount },
+            time: { val: name },
+            type: { val: OtherType[type] },
+            method: { val: '現金' },
+            amount: { val: amount.toLocaleString() },
+          };
+        }),
+        detailedIncomes: changeShiftRes.detailedIncomes.map((expense) => {
+          const { name, amount, type } = expense;
+          return {
+            time: { val: name },
+            type: { val: OtherType[type] },
+            method: { val: '現金' },
+            amount: { val: amount.toLocaleString() },
           };
         }),
       };
