@@ -49,15 +49,17 @@ export const useHandoverStore = defineStore('handover', {
             amount: { val: amount.toLocaleString() },
           };
         }),
-        detailedIncomes: changeShiftRes.detailedIncomes.map((expense) => {
-          const { name, amount, type } = expense;
-          return {
-            time: { val: name },
-            type: { val: OtherType[type] },
-            method: { val: '現金' },
-            amount: { val: amount.toLocaleString() },
-          };
-        }),
+        detailedIncomes: !changeShiftRes.detailedIncomes
+          ? []
+          : changeShiftRes.detailedIncomes.map((expense) => {
+            const { name, amount, type } = expense;
+            return {
+              time: { val: name },
+              type: { val: OtherType[type] },
+              method: { val: '現金' },
+              amount: { val: amount.toLocaleString() },
+            };
+          }),
       };
     },
 
@@ -69,7 +71,7 @@ export const useHandoverStore = defineStore('handover', {
           date: dayjs(cashDropDate).format('YYYY-MM-DD'),
           time: dayjs(cashDropDate).format('HH:mm'),
           userName: user.name,
-          dropAmount: cashDropAmount,
+          dropAmount: cashDropAmount.toLocaleString(),
         };
       });
     },
