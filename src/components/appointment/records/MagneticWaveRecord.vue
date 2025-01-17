@@ -21,7 +21,7 @@ const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 
 const title = computed(() => props.title ?? props.scheduleDetail.date);
-const magneticWaveSequenceOptions = ['程序一', '程序二'];
+
 const schema = object({
   magneticWavesRecords: array(object({
     sequence: string().min(1, 'Sequence is required'),
@@ -97,7 +97,7 @@ function selectRecord(record: Record<string, any>) {
       <form @submit.prevent>
         <div v-for="(item, index) in fields" :key="index" class="record_row row q-col-gutter-md">
           <div class="record_row_idx col">{{ index + 1 }}</div>
-          <OSelect :name="`magneticWavesRecords[${index}].sequence`" label="程序*" :options="magneticWaveSequenceOptions" class="col" error-message="" />
+          <OInput :name="`magneticWavesRecords[${index}].sequence`" inside-label="程序*" class="col" error-message="" />
           <OInput :name="`magneticWavesRecords[${index}].bodyPart`" inside-label="部位*" class="col" error-message="" />
           <OInput :name="`magneticWavesRecords[${index}].intensity`" inside-label="強度*" class="col" error-message="" />
           <div class="record_row_action col">
