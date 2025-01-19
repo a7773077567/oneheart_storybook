@@ -4,6 +4,7 @@ import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
+import type { AddOnServiceTypes } from '@/const/general';
 import { ShiftType } from '@/const/general';
 
 export interface TherapyTypesRes {
@@ -343,8 +344,15 @@ export interface Checkout {
 }
 
 export interface AddOnService {
-  serviceName: string;
+  contractStatus: string;
+  contractTaskId: number | null;
+  endTime: string;
   isAddOn: boolean;
+  machine: string;
+  machineId: number | null;
+  serviceName: string;
+  serviceType: AddOnServiceTypes;
+  startTime: string;
 }
 
 export interface AdjustScheduleTimePayload {
@@ -484,13 +492,49 @@ export async function updateNote(clientScheduleId: number, note: string) {
 }
 
 /**
- * 更新排程加購服務
- * @param clientScheduleId
+ * 新增排程加購
+ * @param {object} params - The parameters for adding the service.
+ * @param {number} params.clientScheduleId - The ID of the client's schedule.
+ * @param {AddOnServiceTypes} params.serviceType - The type of additional service to add.
  */
-export async function updateAddOnServices(clientScheduleId: number, addOnServices: AddOnService[]) {
-  await api.patch(`/clientSchedules/${clientScheduleId}/update-addOnServices`, { addOnServices });
+export async function addOnService({ clientScheduleId, serviceType }: { clientScheduleId: number; serviceType: AddOnServiceTypes }) {
+  await api.post(`/clientSchedules/${clientScheduleId}/addOnService`, { serviceType });
 }
 
+export interface UpdateAddOnMachinePayload {
+  serviceType: AddOnServiceTypes;
+  machineId:	number;
+  startTime: string;
+  endTime: string;
+  addOnServiceShockWaveShots?:	number;
+}
+/**
+ * 更新排程加購服務
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.clientScheduleId - 排程 id
+ * @param {AddOnService[]} params.addOnServices - The list of add-on services to update.
+ */
+export async function updateAddOnServices({ clientScheduleId, addOnService }: { clientScheduleId: number; addOnService: UpdateAddOnMachinePayload }) {
+  await api.patch(`/clientSchedules/${clientScheduleId}/addOnService`, { addOnService });
+}
+
+/**
+ * 移除排程加購
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.clientScheduleId - 排程 id
+ * @param {AddOnServiceTypes} params.serviceType - 加購服務
+ */
+export async function deleteAddOnService({ clientScheduleId, serviceType }: { clientScheduleId: number; serviceType: AddOnServiceTypes }) {
+  await api.delete(`clientSchedules/${clientScheduleId}/addOnService/${serviceType}`);
+}
+
+/**
+ * 調整排程時間
+ *
+ * @param clientScheduleId - The ID of the client schedule to adjust.
+ * @param payload - The payload containing the new schedule time details.
+ * @returns The updated schedule data.
+ */
 export async function adjustScheduleTime(clientScheduleId: number, payload: AdjustScheduleTimePayload) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-scheduleTime`, payload);
   return data;

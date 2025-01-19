@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import { type FormContext, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useOptionStore } from '@/stores';
-import { ShiftType } from '@/const/general';
+import type { ShiftType } from '@/const/general';
+import { MachineTypes } from '@/const/general';
 import { number, object, string } from 'zod';
 import type { ReservedMachine, UpdateMachinePayload } from '@/api';
 import dayjs from 'dayjs';
@@ -11,7 +12,7 @@ import dayjs from 'dayjs';
 const props = withDefaults(defineProps<{
   title: string;
   initVal: ReservedMachine | null;
-  shiftType: ShiftType;
+  machineType: MachineTypes;
 }>(), {
   title: '編輯儀器',
 });
@@ -46,7 +47,7 @@ const schema = computed(() => {
       .refine(val => dayjs(`${today} ${val}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${val}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`), { message: '請選擇預約單內的時段' }),
     shockWaveShots: number().optional()
       .refine((val) => {
-        if (props.shiftType !== ShiftType['震波'])
+        if (props.machineType !== MachineTypes['震波儀器治療'])
           return true;
         return (!!val);
       }, { message: 'independentShockWaveShots is required' }),
@@ -80,7 +81,7 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
       <h2 class="device_form--title">{{ title }}</h2>
     </QCardSection>
     <QCardSection class="q-py-lg">
-      <h3 class="device_form--subtitle">{{ ShiftType[shiftType] }}儀器治療</h3>
+      <h3 class="device_form--subtitle">{{ MachineTypes[machineType] }}儀器治療</h3>
       <form @submit.prevent>
         <OSelect
           name="machineId" label="機台*" option-value="id" option-label="name" :options="machineList"
@@ -94,7 +95,7 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
         </div>
         <p class="note" :class="{ error: 'period' in errors }">{{ periodNote }}</p>
         <OInput
-          v-if="shiftType === ShiftType['震波']" name="shockWaveShots" inside-label="發數*"
+          v-if="machineType === MachineTypes['震波儀器治療']" name="shockWaveShots" inside-label="發數*"
           type="number"
           error-message=""
         />

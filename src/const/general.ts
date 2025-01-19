@@ -405,3 +405,10 @@ export enum MachineTypes {
   磁波儀器治療 = 3,
   G動椅儀器治療 = 4,
 }
+
+// 可加購項目
+export enum AddOnServiceTypes {
+  震波 = 14,
+  射頻 = 15,
+  磁波 = 16,
+}

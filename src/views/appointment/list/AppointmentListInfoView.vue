@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { MachineShifts, ShiftType, TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 import { ContractTypes, ShiftContractMapping, getContractShareLink } from '@/api';
-import { Dialog, Loading } from 'quasar';
+import { Dialog, Loading, QBadge } from 'quasar';
 import { GenericDialog } from '@/components/shared';
 
 const props = defineProps<{
@@ -95,6 +95,8 @@ function handleMachineSign() {
   const contractType = ShiftContractMapping[userShiftType.value as keyof typeof ShiftContractMapping];
   handleSign(contractType);
 }
+
+const addOnCounts = computed(() => appointmentStore.targetClientSchedule?.addOnServices?.filter(service => service.isAddOn)?.length ?? 0);
 </script>
 
 <template>
@@ -104,6 +106,7 @@ function handleMachineSign() {
       <QTooltip v-if="tab.name === 'addOnPrice' && isMachineOnlyTreatment" anchor="top middle" self="center middle" class="bg-black">
         儀器治療的預約單，不可再加購儀器服務
       </QTooltip>
+      <QBadge v-else-if="tab.name === 'addOnPrice' && !!addOnCounts" rounded color="red" :label="addOnCounts" />
     </QTab>
   </QTabs>
   <QCard flat bordered class="info">
@@ -148,6 +151,12 @@ function handleMachineSign() {
     padding: 8px 16px;
     display: flex;
     align-items: center;
+  }
+}
+:deep(.q-tab) {
+  .q-tab__content {
+    flex-direction: row !important;
+    gap: 4px;
   }
 }
 </style>

@@ -42,7 +42,7 @@ const duration = computed(() => ({
 }));
 const isCheckedOut = computed(() => schedule.value.paymentState === 2);
 const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
-// const beforeCheckIn = computed(() => schedule.value.state === 1);
+const isMachineOnlyShifts = computed(() => MachineShifts.includes(userShift.value.type));
 
 const data = computed(() => {
   const all = [
@@ -249,7 +249,7 @@ const checkinReminder = computed(() => {
         <template #device="{ row }">
           <div class="device_info">
             <div>機台 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.name }}</div>
-            <div>時間 {{ (row.value as ClientScheduleDetail)?.scheduleStartTime }} - {{ (row.value as ClientScheduleDetail)?.scheduleEndTime }}</div>
+            <div>時間 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineStartTime }} - {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineEndTime }}</div>
             <div v-if="+userShift.type === ShiftType['震波']">
               發數
               <QBadge v-if="!(row.value as ClientScheduleDetail)?.record?.independentShockWaveShots" style="background-color: #F8C9CB; color:#C2351A" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">發數未填寫</QBadge>
@@ -324,7 +324,7 @@ const checkinReminder = computed(() => {
               <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
             </div>
             <div class="time__actions">
-              <QBtn v-if="!isEditingTime" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+              <QBtn v-if="!isEditingTime && !isMachineOnlyShifts" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
         </template>
@@ -351,7 +351,7 @@ const checkinReminder = computed(() => {
     <div class="client-info__actions">
       <div class="actions">
         <QBtn v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
-        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+        <QBtn v-if="!isMachineOnlyShifts" class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" outline style="width: 127px;" @click="rearrangeClientSchedule" />
         <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
@@ -376,11 +376,11 @@ const checkinReminder = computed(() => {
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
   </QDialog>
-  <QDialog v-if="MachineShifts.includes(userShift.type)" v-model="isEditingMachine">
+  <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine">
     <EditMachineForm
       title="編輯儀器治療"
       :init-val="machineInitVal"
-      :shift-type="userShift.type"
+      :machine-type="machineInitVal!.type"
       @cancel="isEditingMachine = false"
       @submit="updateMachineInfo"
     />
