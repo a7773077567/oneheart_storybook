@@ -515,7 +515,7 @@ export interface UpdateAddOnMachinePayload {
  * @param {AddOnService[]} params.addOnServices - The list of add-on services to update.
  */
 export async function updateAddOnServices({ clientScheduleId, addOnService }: { clientScheduleId: number; addOnService: UpdateAddOnMachinePayload }) {
-  await api.patch(`/clientSchedules/${clientScheduleId}/addOnService`, { addOnService });
+  await api.patch(`/clientSchedules/${clientScheduleId}/addOnService`, { ...addOnService });
 }
 
 /**

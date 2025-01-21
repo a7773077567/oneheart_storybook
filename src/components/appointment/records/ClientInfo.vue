@@ -46,7 +46,7 @@ const isMachineOnlyShifts = computed(() => MachineShifts.includes(userShift.valu
 
 const data = computed(() => {
   const all = [
-    { key: 'device', label: '儀器', value: props.scheduleDetail },
+    ...(isMachineOnlyShifts.value ? [{ key: 'device', label: '儀器', value: props.scheduleDetail }] : []),
     { key: 'name', label: '姓名', value: client.value.name },
     { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
@@ -185,9 +185,13 @@ const isEditingMachine = ref(false);
 const machineInitVal = computed(() => {
   if (!schedule.value?.machines?.[0])
     return null;
+  const { id, machineStartTime, machineEndTime, type } = schedule.value.machines[0];
   return ({
-    ...schedule.value.machines[0],
-    ...userShift.value.type === ShiftType['震波'] ? { independentShockWaveShots: schedule.value.record.independentShockWaveShots } : {},
+    machineId: id,
+    startTime: machineStartTime,
+    endTime: machineEndTime,
+    machineType: type,
+    ...userShift.value.type === ShiftType['震波'] ? { shockWaveShots: schedule.value.record.independentShockWaveShots } : {},
   });
 });
 async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }) {
@@ -380,7 +384,7 @@ const checkinReminder = computed(() => {
     <EditMachineForm
       title="編輯儀器治療"
       :init-val="machineInitVal"
-      :machine-type="machineInitVal!.type"
+      :machine-type="machineInitVal!.machineType"
       @cancel="isEditingMachine = false"
       @submit="updateMachineInfo"
     />

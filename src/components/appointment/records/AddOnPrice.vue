@@ -4,7 +4,7 @@ import { addOnService, deleteAddOnService, updateAddOnServices } from '@/api';
 import type { AddOnService, ClientScheduleDetail, UpdateMachinePayload } from '@/api';
 import { QItemLabel, useQuasar } from 'quasar';
 import { useAppointmentStore } from '@/stores';
-import { AddOnServiceTypes } from '@/const/general';
+import { AddOnServiceTypes, MachineTypes } from '@/const/general';
 import type { FormContext } from 'vee-validate';
 import EditMachineForm from './EditMachineForm.vue';
 
@@ -37,7 +37,9 @@ async function rmItem(item: typeof addOnList.value[number]) {
 }
 
 const isEditingMachine = ref(false);
-const serviceInitVal = ref<AddOnService>({} as AddOnService);
+
+type InitVal = InstanceType<typeof EditMachineForm>['$props']['initVal'] & { machineType: MachineTypes; serviceType: AddOnServiceTypes };
+const serviceInitVal = ref<InitVal>({} as InitVal);
 
 async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }) {
   if (serviceInitVal.value === null)
@@ -62,6 +64,18 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
     setFieldError('period', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
     setFieldError('startTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
     setFieldError('endTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+  }
+}
+
+// to refactor
+function getMachineType(serviceType: AddOnServiceTypes): MachineTypes {
+  switch (serviceType) {
+    case AddOnServiceTypes['射頻']:
+      return MachineTypes['射頻儀器治療'];
+    case AddOnServiceTypes['磁波']:
+      return MachineTypes['磁波儀器治療'];
+    case AddOnServiceTypes['震波']:
+      return MachineTypes['震波儀器治療'];
   }
 }
 </script>
@@ -99,7 +113,15 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
             <QBtn label="移除" icon="o_delete" flat color="primary" class="q-px-md" @click="rmItem(addOn)" />
             <QBtn
               label="編輯" icon="o_edit" outline rounded color="primary" class="q-px-md"
-              @click="(isEditingMachine = true), (serviceInitVal = addOn)"
+              @click="(isEditingMachine = true), (serviceInitVal = {
+                machineId: addOn.machineId!,
+                startTime: addOn.startTime,
+                endTime: addOn.endTime,
+                machineType: getMachineType(addOn.serviceType),
+                serviceType: addOn.serviceType,
+                shockWaveShots: addOn?.shockWaveShots,
+              }
+              )"
             />
           </div>
           <QBtn
@@ -109,12 +131,12 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
         </QItemSection>
       </QItem>
     </QList>
-    <!-- <QDialog v-model="isEditingMachine">
+    <QDialog v-model="isEditingMachine">
       <EditMachineForm
-        title="編輯儀器治療" :init-val="serviceInitVal" :machine-type="serviceInitVal.serviceType"
+        title="編輯儀器治療" :init-val="serviceInitVal" :machine-type="serviceInitVal.machineType"
         @cancel="isEditingMachine = false" @submit="updateMachineInfo"
       />
-    </QDialog> -->
+    </QDialog>
   </div>
 </template>
 

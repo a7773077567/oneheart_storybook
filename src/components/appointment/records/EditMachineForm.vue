@@ -3,15 +3,20 @@ import { computed, ref } from 'vue';
 import { type FormContext, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useOptionStore } from '@/stores';
-import type { ShiftType } from '@/const/general';
 import { MachineTypes } from '@/const/general';
 import { number, object, string } from 'zod';
-import type { ReservedMachine, UpdateMachinePayload } from '@/api';
 import dayjs from 'dayjs';
+
+interface MachineInfo {
+  machineId: number;
+  startTime: string;
+  endTime: string;
+  shockWaveShots?: number;
+}
 
 const props = withDefaults(defineProps<{
   title: string;
-  initVal: ReservedMachine | null;
+  initVal: MachineInfo | null;
   machineType: MachineTypes;
 }>(), {
   title: '編輯儀器',
@@ -19,20 +24,18 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'submit', value: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }): void;
+  (e: 'submit', value: { value: MachineInfo; setFieldError: FormContext['setFieldError'] }): void;
 }>();
 
 const optionStore = useOptionStore();
 const initialValues = computed(() => {
   if (!props.initVal)
-    return {};
-  const { id, machineStartTime, machineEndTime, independentShockWaveShots } = props.initVal;
-  return {
-    startTime: machineStartTime,
-    endTime: machineEndTime,
-    machineId: id,
-    shockWaveShots: independentShockWaveShots,
-  };
+    return {
+      startTime: '',
+      endTime: '',
+      shockWaveShots: 0,
+    };
+  return props.initVal;
 });
 
 const today = dayjs().format('YYYY-MM-DD');
@@ -65,14 +68,14 @@ const { handleSubmit, setFieldError, errors } = useForm({
   initialValues: initialValues.value,
 });
 const periodNote = computed(() => {
-  return 'period' in errors.value ? errors.value.period : `請選擇預約單內的時段 ${props.initVal?.machineStartTime} - ${props.initVal?.machineEndTime}`;
+  return 'period' in errors.value ? errors.value.period : `請選擇預約單內的時段 ${props.initVal?.startTime} - ${props.initVal?.endTime}`;
 });
 
 const onSubmit = handleSubmit((v) => {
   emit('submit', { value: v, setFieldError });
 });
 
-const machineList = computed(() => optionStore.machineList.filter(machine => machine.type === props.initVal?.type));
+const machineList = computed(() => optionStore.machineList.filter(machine => machine.type === props.machineType));
 </script>
 
 <template>
