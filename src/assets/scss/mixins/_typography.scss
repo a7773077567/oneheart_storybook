@@ -1,0 +1,149 @@
+$base-font: "Noto Sans TC", serif;
+
+@mixin display-large($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 57px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: -0.25px;
+}
+
+@mixin display-medium($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 52px; 
+}
+
+@mixin display-small($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; 
+}
+
+@mixin headline-large($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 40px;
+}
+
+@mixin headline-medium($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 36px; 
+}
+
+@mixin headline-small($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; 
+}
+
+@mixin title-large($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px; 
+}
+
+@mixin title-medium($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px; 
+  letter-spacing: 0.15px;
+}
+
+@mixin title-small($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; 
+  letter-spacing: 0.1px;
+}
+
+@mixin label-large($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; 
+  letter-spacing: 0.1px;
+}
+
+@mixin label-medium($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}
+
+@mixin label-small($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16px; 
+  letter-spacing: 0.5px;
+}
+
+@mixin body-large($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px; 
+  letter-spacing: 0.5px;
+}
+
+@mixin body-medium($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; 
+  letter-spacing: 0.25px;
+}
+
+@mixin body-small($color) {
+  color: $color;
+  font-family: $base-font;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; 
+  letter-spacing: 0.4px;
+}
+
+
+
+
