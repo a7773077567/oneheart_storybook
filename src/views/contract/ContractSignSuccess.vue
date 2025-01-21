@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, watch } from 'vue';
-import { ContractTypes, updateClientFirstVisitContract, updateIndependentMachineContract } from '@/api';
+import { ContractTypes, updateAddOnServiceContract, updateClientFirstVisitContract, updateIndependentMachineContract } from '@/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -29,10 +29,20 @@ watch(contractDetail, (contract) => {
     case ContractTypes['SIS超磁場治療儀療程前注意事項']:
     case ContractTypes['G動椅儀器治療同意書']:
     case ContractTypes['射頻儀器治療同意書']:
+    {
+      if (contract.isAddOn) {
+        updateAddOnServiceContract({
+          clientScheduleId: +contract.scheduleId,
+          contractTaskId: +contract.taskId,
+          serviceType: +contract.serviceType,
+        });
+        return;
+      }
       return updateIndependentMachineContract({
         clientScheduleId: +contract.scheduleId,
         dottedsignTaskId: contract.taskId,
       });
+    }
     default:
   }
 }, {

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { addOnService, deleteAddOnService, updateAddOnServices } from '@/api';
-import type { AddOnService, ClientScheduleDetail, UpdateMachinePayload } from '@/api';
-import { QItemLabel, useQuasar } from 'quasar';
+import { addOnService, deleteAddOnService, getContractShareLink, updateAddOnServices } from '@/api';
+import type { ClientScheduleDetail, UpdateMachinePayload } from '@/api';
+import { Loading, QBadge, QItemLabel, useQuasar } from 'quasar';
 import { useAppointmentStore } from '@/stores';
 import { AddOnServiceTypes, MachineTypes } from '@/const/general';
 import type { FormContext } from 'vee-validate';
 import EditMachineForm from './EditMachineForm.vue';
+import { MachineContractMapping } from '@/const/contracts';
+import { GenericDialog } from '@/components/shared';
 
 const props = defineProps<{
   scheduleId: number;
@@ -78,6 +80,38 @@ function getMachineType(serviceType: AddOnServiceTypes): MachineTypes {
       return MachineTypes['震波儀器治療'];
   }
 }
+
+// 儀器合約
+const showError = ref(false);
+async function handleSign(serviceType: AddOnServiceTypes) {
+  const machineType = getMachineType(serviceType);
+  const contract = MachineContractMapping[machineType];
+
+  Loading.show({ message: '等待合約完成...' });
+  const payload = JSON.stringify(({
+    contractType: contract.contractType,
+    clientId: appointmentStore.targetClientSchedule?.clientId,
+    scheduleId: props.scheduleId,
+    serviceType,
+    isAddOn: true,
+  }));
+
+  try {
+    const { shareLink } = await getContractShareLink({
+      redirectUrl: `${window.location.origin}/sign-success`,
+      payloadJSONString: payload,
+      type: contract.contractType,
+    });
+
+    Loading.hide();
+    // show sign view in same page
+    window.location.replace(shareLink);
+  }
+  catch (error) {
+    Loading.hide();
+    showError.value = true;
+  }
+}
 </script>
 
 <template>
@@ -92,7 +126,7 @@ function getMachineType(serviceType: AddOnServiceTypes): MachineTypes {
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
           <QItemLabel v-if="!!addOn.contractTaskId">已簽約</QItemLabel>
-          <QBtn v-else label="簽約" rounded color="primary" style="width: fit-content" />
+          <QBtn v-else label="簽約" rounded color="primary" style="width: fit-content" @click="handleSign(addOn.serviceType)" />
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
           <QItemLabel>機台 {{ addOn.machine }}</QItemLabel>
@@ -138,6 +172,13 @@ function getMachineType(serviceType: AddOnServiceTypes): MachineTypes {
       />
     </QDialog>
   </div>
+  <GenericDialog
+    v-model="showError"
+    title="合約簽署失敗"
+    confirm-label="我知道了"
+    message="抱歉，執行過程中發生錯誤。請檢查您的網路連線或稍後再試一次。如果問題持續發生，請聯繫開發團隊。"
+    @confirm="showError = false"
+  />
 </template>
 
 <style lang="scss" scoped>

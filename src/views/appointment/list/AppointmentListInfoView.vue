@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { MachineTypes } from '@/const/general';
 import { MachineShifts, ShiftType, TabMap, Types } from '@/const/general';
+import { MachineContractMapping } from '@/const/contracts';
 import { useAppointmentStore } from '@/stores';
-import { ContractTypes, ShiftContractMapping, getContractShareLink } from '@/api';
+import { ContractTypes, getContractShareLink } from '@/api';
 import { Dialog, Loading, QBadge } from 'quasar';
 import { GenericDialog } from '@/components/shared';
 
@@ -75,25 +77,20 @@ async function handleSign(contractType: ContractTypes) {
   }
 }
 
-const isMachineOnlyTreatment = computed(() => userShiftType.value && MachineShifts.includes(userShiftType.value));
-const machineContractName = computed(() => {
-  if (!userShiftType.value || !MachineShifts.includes(userShiftType.value))
-    return '';
+const isMachineOnlyTreatment = computed(() => !!userShiftType.value && MachineShifts.includes(userShiftType.value));
+const machineContract = computed(() => {
+  if (!isMachineOnlyTreatment.value && !!appointmentStore.targetClientSchedule?.machines?.[0]?.type)
+    return null;
 
-  const contracts: Partial<Record<ShiftType, string>> = {
-    [ShiftType['震波']]: '聚焦式震波療程同意書',
-    [ShiftType['磁波']]: 'SIS超磁場治療儀療程前注意事項',
-    [ShiftType['射頻']]: '射頻儀器治療同意書',
-    [ShiftType['G動椅']]: 'G動椅儀器治療同意書',
-  };
-  return userShiftType.value ? contracts[userShiftType.value] : '';
+  const machineType = appointmentStore.targetClientSchedule?.machines?.[0]?.type as MachineTypes;
+  return MachineContractMapping[machineType];
 });
 
 function handleMachineSign() {
-  if (!userShiftType.value || !MachineShifts.includes(userShiftType.value))
+  if (!userShiftType.value || !isMachineOnlyTreatment.value || !machineContract.value)
     return;
-  const contractType = ShiftContractMapping[userShiftType.value as keyof typeof ShiftContractMapping];
-  handleSign(contractType);
+
+  handleSign(machineContract.value.contractType);
 }
 
 const addOnCounts = computed(() => appointmentStore.targetClientSchedule?.addOnServices?.filter(service => service.isAddOn)?.length ?? 0);
@@ -121,8 +118,8 @@ const addOnCounts = computed(() => appointmentStore.targetClientSchedule?.addOnS
             </div>
             <div v-if="isMachineOnlyTreatment && appointmentStore.needToSignMachineContract" class="first_contract_banner">
               <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
-              <p>需簽署「{{ machineContractName }}」才能進行後續治療服務</p>
-              <QBtn v-if="!!machineContractName && !!userShiftType" label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleMachineSign" />
+              <p>需簽署「{{ machineContract?.name }}」才能進行後續治療服務</p>
+              <QBtn v-if="!!machineContract && !!userShiftType" label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleMachineSign" />
             </div>
             <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
           </div>
