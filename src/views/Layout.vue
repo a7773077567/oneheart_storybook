@@ -80,7 +80,7 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
 
 <template>
   <QLayout view="hHh LpR lFf">
-    <QHeader elevated class="bg-white text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
+    <QHeader class="bg-surface text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
       <QToolbar style="flex-wrap:wrap; gap: 4px">
         <div class="flex items-center no-wrap">
           <QBtn dense flat round icon="menu" @click="toggleDrawer" />
@@ -104,11 +104,13 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
     </QHeader>
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
-      <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" @click="$router.push({ name: 'handover' })" />
-      <Breadcrumbs class="q-px-lg q-py-md breadcrumb" />
-      <QPage class="q-px-lg">
-        <RouterView />
-      </QPage>
+      <div class="page-box">
+        <ShiftChangeReminder v-if="handoverStore.isNeedToShiftChange" @click="$router.push({ name: 'handover' })" />
+        <Breadcrumbs class="q-px-lg q-py-md breadcrumb" />
+        <QPage class="q-px-lg">
+          <RouterView />
+        </QPage>
+      </div>
     </QPageContainer>
   </QLayout>
 </template>
@@ -134,5 +136,24 @@ main.q-page {
   > *:not(.breadcrumb) {
     overflow: auto;
   }
+}
+
+.q-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.q-page-container) {
+  background-color: $surface;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 0 20px 20px 0;
+}
+
+.page-box {
+  background-color: white;
+  border-radius: 28px;
+  flex-grow: 1;
 }
 </style>
