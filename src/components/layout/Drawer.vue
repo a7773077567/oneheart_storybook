@@ -19,7 +19,7 @@ const drawerItems = computed(() => currentMatched.value[0].children);
 </script>
 
 <template>
-  <QDrawer v-if="drawerItems?.length" v-model="drawerOpen" show-if-above side="left" :width="220" class="bg-white text-black q-pl-md shadow-5">
+  <QDrawer v-if="drawerItems?.length" v-model="drawerOpen" show-if-above side="left" :width="220" class="bg-surface text-black q-pl-md ">
     <QScrollArea class="fit">
       <QList>
         <QItem
