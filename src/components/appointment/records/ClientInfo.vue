@@ -191,7 +191,9 @@ const machineInitVal = computed(() => {
     startTime: machineStartTime,
     endTime: machineEndTime,
     machineType: type,
-    ...userShift.value.type === ShiftType['震波'] ? { shockWaveShots: schedule.value.record.independentShockWaveShots } : {},
+    scheduleStartTime: schedule.value.scheduleStartTime,
+    scheduleEndTime: schedule.value.scheduleEndTime,
+    ...userShift.value.type === ShiftType['震波'] ? { shockWaveShots: schedule.value.record.independentShockWaveShots ?? 0 } : {},
   });
 });
 async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }) {

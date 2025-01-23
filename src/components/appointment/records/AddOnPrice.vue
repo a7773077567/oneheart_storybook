@@ -4,7 +4,8 @@ import { addOnService, deleteAddOnService, getContractShareLink, updateAddOnServ
 import type { ClientScheduleDetail, UpdateMachinePayload } from '@/api';
 import { Loading, QBadge, QItemLabel, useQuasar } from 'quasar';
 import { useAppointmentStore } from '@/stores';
-import { AddOnServiceTypes, MachineTypes } from '@/const/general';
+import type { MachineTypes } from '@/const/general';
+import { AddOnServiceTypes } from '@/const/general';
 import type { FormContext } from 'vee-validate';
 import EditMachineForm from './EditMachineForm.vue';
 import { MachineContractMapping } from '@/const/contracts';
@@ -24,12 +25,20 @@ const addOnList = computed(
     isAdded: service.isAddOn,
   })),
 );
+// 發數要從 record 拿，不存在加購項目中
+const shockWaveShots = computed(() => props.scheduleDetail.record?.addOnServiceShockWaveShots ?? 0);
 
 const $q = useQuasar();
 async function addItem(item: typeof addOnList.value[number]) {
-  await addOnService({ clientScheduleId: props.scheduleId, serviceType: item.serviceType });
-  $q.notify({ message: '加價服務添加成功', timeout: 200, position: 'top' });
-  appointmentStore.getClientSchedule(props.scheduleId);
+  try {
+    await addOnService({ clientScheduleId: props.scheduleId, serviceType: item.serviceType });
+    $q.notify({ message: '加價服務添加成功', timeout: 200, position: 'top' });
+
+    appointmentStore.getClientSchedule(props.scheduleId);
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 async function rmItem(item: typeof addOnList.value[number]) {
@@ -69,23 +78,10 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
   }
 }
 
-// to refactor
-function getMachineType(serviceType: AddOnServiceTypes): MachineTypes {
-  switch (serviceType) {
-    case AddOnServiceTypes['射頻']:
-      return MachineTypes['射頻儀器治療'];
-    case AddOnServiceTypes['磁波']:
-      return MachineTypes['磁波儀器治療'];
-    case AddOnServiceTypes['震波']:
-      return MachineTypes['震波儀器治療'];
-  }
-}
-
 // 儀器合約
 const showError = ref(false);
-async function handleSign(serviceType: AddOnServiceTypes) {
-  const machineType = getMachineType(serviceType);
-  const contract = MachineContractMapping[machineType];
+async function handleSign({ serviceType, type }: { serviceType: AddOnServiceTypes; type: MachineTypes }) {
+  const contract = MachineContractMapping[type];
 
   Loading.show({ message: '等待合約完成...' });
   const payload = JSON.stringify(({
@@ -126,7 +122,7 @@ async function handleSign(serviceType: AddOnServiceTypes) {
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
           <QItemLabel v-if="!!addOn.contractTaskId">已簽約</QItemLabel>
-          <QBtn v-else label="簽約" rounded color="primary" style="width: fit-content" @click="handleSign(addOn.serviceType)" />
+          <QBtn v-else label="簽約" rounded color="primary" style="width: fit-content" @click="handleSign(addOn)" />
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
           <QItemLabel>機台 {{ addOn.machine }}</QItemLabel>
@@ -137,7 +133,8 @@ async function handleSign(serviceType: AddOnServiceTypes) {
         <QItemSection v-if="addOn.isAdded">
           <div v-if="addOn.serviceType === AddOnServiceTypes['震波']" class="flex" style="width: max-content">
             <span>發數</span>
-            <QBadge style="background-color: #F8C9CB; color:#C2351A" class="q-ml-sm q-px-sm q-py-xs text-weight-medium">
+            <span v-if="!!shockWaveShots">{{ shockWaveShots }}</span>
+            <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-ml-sm q-px-sm q-py-xs text-weight-medium">
               發數未填寫
             </QBadge>
           </div>
@@ -151,15 +148,17 @@ async function handleSign(serviceType: AddOnServiceTypes) {
                 machineId: addOn.machineId!,
                 startTime: addOn.startTime,
                 endTime: addOn.endTime,
-                machineType: getMachineType(addOn.serviceType),
+                scheduleStartTime: scheduleDetail.scheduleStartTime,
+                scheduleEndTime: scheduleDetail.scheduleEndTime,
+                machineType: addOn.type,
                 serviceType: addOn.serviceType,
-                shockWaveShots: addOn?.shockWaveShots,
+                ...(addOn.serviceType === AddOnServiceTypes['震波'] ? { shockWaveShots } : {}),
               }
               )"
             />
           </div>
           <QBtn
-            v-else label="添加" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="black" class="q-px-lg"
+            v-else rounded icon="add" label="添加" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="primary" class="q-px-lg"
             @click="addItem(addOn)"
           />
         </QItemSection>

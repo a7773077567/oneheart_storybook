@@ -4,7 +4,7 @@ import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
-import type { AddOnServiceTypes } from '@/const/general';
+import type { AddOnServiceTypes, MachineTypes } from '@/const/general';
 import { ShiftType } from '@/const/general';
 
 export interface TherapyTypesRes {
@@ -69,7 +69,8 @@ export interface Record {
   advice: string;
   magneticWavesRecords: MagneticWavesRecord[];
   magneticGChairRecords: GChairRecord[];
-  independentShockWaveShots: number; // 震波發數
+  independentShockWaveShots: number | null; // 獨立預約震波發數
+  addOnServiceShockWaveShots: number | null; // 加購震波發數
 }
 
 export interface MagneticWavesRecord {
@@ -353,6 +354,7 @@ export interface AddOnService {
   serviceName: string;
   serviceType: AddOnServiceTypes;
   startTime: string;
+  type: MachineTypes;
 }
 
 export interface AdjustScheduleTimePayload {
