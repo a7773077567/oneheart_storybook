@@ -10,6 +10,7 @@ import { useQuasar } from 'quasar';
 import { ScheduleStateMap } from '@/const/appointment';
 import { MedicalHistoryClipboard } from '@/components/appointment';
 import { useNotify } from '@/composables/notify';
+import { AddOnServiceTypes } from '@/const/general';
 
 const props = defineProps<{
   title?: string;
@@ -21,6 +22,7 @@ const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 
 const title = computed(() => props.title ?? props.scheduleDetail.date);
+const isAddOnRecord = computed(() => !!props.scheduleDetail.addOnServices.find(service => service.serviceType === AddOnServiceTypes['磁波'])?.isAddOn);
 
 const schema = object({
   magneticWavesRecords: array(object({
@@ -75,7 +77,12 @@ async function finishRecord() {
 // 歷史紀錄 todo
 const stateOfHistoryDialog = ref(false);
 async function openHistoryDialog() {
-  await appointmentStore.getHistoryRecords(recordId.value);
+  if (isAddOnRecord.value) {
+    await appointmentStore.getAddOnHistoryRecords({ recordId: recordId.value, serviceType: AddOnServiceTypes['磁波'] });
+  }
+  else {
+    await appointmentStore.getHistoryRecords(recordId.value);
+  }
   stateOfHistoryDialog.value = true;
 }
 function selectRecord(record: Record<string, any>) {

@@ -71,6 +71,7 @@ export interface Record {
   magneticGChairRecords: GChairRecord[];
   independentShockWaveShots: number | null; // 獨立預約震波發數
   addOnServiceShockWaveShots: number | null; // 加購震波發數
+
 }
 
 export interface MagneticWavesRecord {
@@ -547,6 +548,14 @@ export async function adjustScheduleTime(clientScheduleId: number, payload: Adju
  */
 export async function fetchHistoryRecords(recordId: number) {
   const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameUserShiftTypeHistoryRecords`);
+  return data;
+}
+
+/**
+ * 取得相同科別歷史紀錄
+ */
+export async function fetchAddOnHistoryRecords({ recordId, serviceType }: { recordId: number; serviceType: AddOnServiceTypes }) {
+  const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameAddOnServiceUserShiftTypeHistoryRecords`, { params: { serviceType } });
   return data;
 }
 

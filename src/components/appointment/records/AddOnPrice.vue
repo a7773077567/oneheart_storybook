@@ -112,7 +112,6 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
 
 <template>
   <div class="add_on">
-    <h3 class="q-mb-md">加價服務管理</h3>
     <QList separator class="add_on_list">
       <QItem v-for="addOn in addOnList" :key="addOn.value">
         <QItemSection>

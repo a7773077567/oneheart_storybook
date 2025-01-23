@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { MachineTypes } from '@/const/general';
-import { MachineShifts, ShiftType, TabMap, Types } from '@/const/general';
+import { MachineShifts, MachineTypes, ShiftType, TabMap, Types } from '@/const/general';
 import { MachineContractMapping } from '@/const/contracts';
 import { useAppointmentStore } from '@/stores';
 import { ContractTypes, getContractShareLink } from '@/api';
@@ -20,13 +19,21 @@ const tabs = computed(() => getTabs());
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
 
+const includesMagneticMachineTreatment = computed(() => (appointmentStore.targetClientSchedule?.machines ?? []).map(m => m.type).includes(MachineTypes['磁波儀器治療']));
+
 function getTabs() {
   const types = Object.values(Types);
   const tabs = types.find(type => type.identifier === userShiftType.value)!.tabs;
   return tabs.map(item => ({
     name: item,
     label: TabMap.get(item),
-  }));
+  })).filter((item) => {
+    if (includesMagneticMachineTreatment.value) {
+      return item;
+    }
+    // 沒有磁波拿掉磁波病例單
+    return item.name !== 'magneticWaveRecord';
+  });
 }
 
 function getRecordModules() {
