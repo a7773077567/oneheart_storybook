@@ -14,7 +14,7 @@ import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
-import { MachineShifts, PhysicalTypes, ShiftType } from '@/const/general';
+import { AddOnServiceTypes, MachineShifts, PhysicalTypes, ShiftType } from '@/const/general';
 import EditMachineForm from './EditMachineForm.vue';
 import type { FormContext } from 'vee-validate';
 import AssignMachineOperator from './AssignMachineOperator.vue';
@@ -218,7 +218,8 @@ const notFinishReminder = computed(() => {
       return '尚未簽署同意書，不可完成服務。';
     case appointmentStore.needToSignMachineContract:
       return '尚未簽署儀器使用同意書，不可完成服務。';
-    case userShift.value.type === ShiftType['震波'] && props.scheduleDetail.record.independentShockWaveShots === null:
+    case userShift.value.type === ShiftType['震波'] && !props.scheduleDetail.record.independentShockWaveShots:
+    case appointmentStore.targetAppointmentAddOns.includes(AddOnServiceTypes['震波']) && !props.scheduleDetail.record.addOnServiceShockWaveShots:
       return '尚未填寫震波發數，不可完成服務';
     default:
       return false;

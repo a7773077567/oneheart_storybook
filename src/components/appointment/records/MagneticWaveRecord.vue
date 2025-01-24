@@ -133,7 +133,7 @@ function selectRecord(record: Record<string, any>) {
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">
-    <MedicalHistoryClipboard :data="appointmentStore.magneticWaveHistoryRecords" @select="selectRecord">
+    <MedicalHistoryClipboard :data="appointmentStore.magneticWaveHistoryRecords" expand-all @select="selectRecord">
       <template #record-content="{ value }">
         <QList separator>
           <QItem v-for="(recordItem, idx) in value" :key="idx">

@@ -100,7 +100,7 @@ function handleMachineSign() {
   handleSign(machineContract.value.contractType);
 }
 
-const addOnCounts = computed(() => appointmentStore.targetClientSchedule?.addOnServices?.filter(service => service.isAddOn)?.length ?? 0);
+const addOnCounts = computed(() => appointmentStore.targetAppointmentAddOns?.length ?? 0);
 </script>
 
 <template>

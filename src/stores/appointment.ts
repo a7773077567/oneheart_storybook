@@ -152,7 +152,7 @@ export const useAppointmentStore = defineStore('appointment', {
         return {
           userShiftType,
           date,
-          record: { magneticWavesRecords: { label: '震波治療紀錄', value: magneticWavesRecords } },
+          record: { magneticWavesRecords: { label: '磁波治療紀錄', value: magneticWavesRecords } },
         };
       });
     },
@@ -171,7 +171,8 @@ export const useAppointmentStore = defineStore('appointment', {
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
     needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
-    needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false,
+    needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
+    targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
   },
   actions: {
     async getUsers(spaceIds: number[]) {
