@@ -69,3 +69,23 @@ export function reduceMinsToHrs<T extends Record<string, any>, K extends keyof T
 export function minsToHrs(val: number) {
   return dayjs.duration(val, 'm').asHours();
 }
+
+export function judgeTimeWithinDuration({ startTime, endTime, min, max }: { startTime?: string; endTime?: string; min: string; max: string }) {
+  const start = startTime && getTimeDate(startTime);
+  const end = endTime && getTimeDate(endTime);
+  const _min = getTimeDate(min);
+  const _max = getTimeDate(max);
+  let result = [];
+
+  if (start) {
+    result.push(start.isSameOrAfter(_min));
+  }
+  if (end) {
+    result.push(end.isSameOrBefore(_max));
+  }
+  if (start && end) {
+    result.push(start.isSameOrBefore(end));
+  }
+
+  return result.every(r => !!r);
+}

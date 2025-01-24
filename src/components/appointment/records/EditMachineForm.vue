@@ -3,59 +3,61 @@ import { computed, ref } from 'vue';
 import { type FormContext, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useOptionStore } from '@/stores';
-import { ShiftType } from '@/const/general';
+import { MachineTypes } from '@/const/general';
 import { number, object, string } from 'zod';
-import type { ReservedMachine, UpdateMachinePayload } from '@/api';
-import dayjs from 'dayjs';
+import { judgeTimeWithinDuration } from '@/utils/date';
+
+interface MachineInfo {
+  machineId: number;
+  startTime: string;
+  endTime: string;
+  shockWaveShots?: number;
+}
 
 const props = withDefaults(defineProps<{
   title: string;
-  initVal: ReservedMachine | null;
-  shiftType: ShiftType;
+  initVal: MachineInfo & { scheduleStartTime: string; scheduleEndTime: string } | null;
+  machineType: MachineTypes;
 }>(), {
   title: '編輯儀器',
 });
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'submit', value: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }): void;
+  (e: 'submit', value: { value: NonNullable<MachineInfo>; setFieldError: FormContext['setFieldError'] }): void;
 }>();
 
 const optionStore = useOptionStore();
 const initialValues = computed(() => {
   if (!props.initVal)
-    return {};
-  const { id, machineStartTime, machineEndTime, independentShockWaveShots } = props.initVal;
-  return {
-    startTime: machineStartTime,
-    endTime: machineEndTime,
-    machineId: id,
-    shockWaveShots: independentShockWaveShots,
-  };
+    return {
+      startTime: '',
+      endTime: '',
+      scheduleStartTime: '',
+      scheduleEndTime: '',
+      shockWaveShots: 0,
+    };
+  return props.initVal;
 });
 
-const today = dayjs().format('YYYY-MM-DD');
 const schema = computed(() => {
   return object({
     machineId: number().min(1, 'machine is required'),
     startTime: string()
       .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
-      .refine(val => dayjs(`${today} ${val}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${val}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`), { message: '請選擇預約單內的時段' }),
+      .refine(val =>
+        judgeTimeWithinDuration({ startTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
     endTime: string()
       .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
-      .refine(val => dayjs(`${today} ${val}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${val}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`), { message: '請選擇預約單內的時段' }),
+      .refine(val => judgeTimeWithinDuration({ endTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
     shockWaveShots: number().optional()
       .refine((val) => {
-        if (props.shiftType !== ShiftType['震波'])
+        if (props.machineType !== MachineTypes['震波儀器治療'])
           return true;
         return (!!val);
       }, { message: 'independentShockWaveShots is required' }),
   }).refine((vals) => {
-    const startTimeWithinPeriod = dayjs(`${today} ${vals.startTime}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${vals.startTime}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`);
-
-    const endTimeWithinPeriod = dayjs(`${today} ${vals.endTime}`).isSameOrAfter(`${today} ${initialValues.value.startTime}`) && dayjs(`${today} ${vals.endTime}`).isSameOrBefore(`${today} ${initialValues.value.endTime}`);
-
-    return startTimeWithinPeriod && endTimeWithinPeriod;
+    return judgeTimeWithinDuration({ startTime: vals.startTime, endTime: vals.endTime, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime });
   }, { message: `請選擇預約單內的時段 ${initialValues.value?.startTime} - ${initialValues.value?.endTime}`, path: ['period'] });
 });
 
@@ -64,14 +66,14 @@ const { handleSubmit, setFieldError, errors } = useForm({
   initialValues: initialValues.value,
 });
 const periodNote = computed(() => {
-  return 'period' in errors.value ? errors.value.period : `請選擇預約單內的時段 ${props.initVal?.machineStartTime} - ${props.initVal?.machineEndTime}`;
+  return 'period' in errors.value ? errors.value.period : `請選擇預約單內的時段 ${props.initVal?.scheduleStartTime} - ${props.initVal?.scheduleEndTime}`;
 });
 
 const onSubmit = handleSubmit((v) => {
   emit('submit', { value: v, setFieldError });
 });
 
-const machineList = computed(() => optionStore.machineList.filter(machine => machine.type === props.initVal?.type));
+const machineList = computed(() => optionStore.machineList.filter(machine => machine.type === props.machineType));
 </script>
 
 <template>
@@ -80,7 +82,7 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
       <h2 class="device_form--title">{{ title }}</h2>
     </QCardSection>
     <QCardSection class="q-py-lg">
-      <h3 class="device_form--subtitle">{{ ShiftType[shiftType] }}儀器治療</h3>
+      <h3 class="device_form--subtitle">{{ MachineTypes[machineType] }}儀器治療</h3>
       <form @submit.prevent>
         <OSelect
           name="machineId" label="機台*" option-value="id" option-label="name" :options="machineList"
@@ -94,7 +96,7 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
         </div>
         <p class="note" :class="{ error: 'period' in errors }">{{ periodNote }}</p>
         <OInput
-          v-if="shiftType === ShiftType['震波']" name="shockWaveShots" inside-label="發數*"
+          v-if="machineType === MachineTypes['震波儀器治療']" name="shockWaveShots" inside-label="發數*"
           type="number"
           error-message=""
         />

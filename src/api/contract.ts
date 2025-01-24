@@ -1,5 +1,5 @@
+import type { AddOnServiceTypes } from '@/const/general';
 import { api } from '@/utils/api';
-import { ShiftType } from '@/const/general';
 
 export enum ContractTypes {
   儲值治療類合約 = 1,
@@ -10,13 +10,6 @@ export enum ContractTypes {
   射頻儀器治療同意書 = 6,
   G動椅儀器治療同意書 = 7,
 }
-
-export const ShiftContractMapping = {
-  [ShiftType.震波]: ContractTypes['聚焦式震波療程同意書'],
-  [ShiftType.磁波]: ContractTypes['SIS超磁場治療儀療程前注意事項'],
-  [ShiftType.射頻]: ContractTypes['射頻儀器治療同意書'],
-  [ShiftType.G動椅]: ContractTypes['G動椅儀器治療同意書'],
-};
 
 export interface ContractParam {
   redirectUrl: string;
@@ -44,5 +37,15 @@ export async function updateClientFirstVisitContract({ clientId, clientScheduleI
 // 修改排程獨立預約儀器合約
 export async function updateIndependentMachineContract({ clientScheduleId, dottedsignTaskId }: { clientScheduleId: number; dottedsignTaskId: string }) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/update-independentMachine-contract`, { dottedsignTaskId });
+  return data;
+}
+
+// 更新儀器加購服務合約資料
+export async function updateAddOnServiceContract({ clientScheduleId, contractTaskId, serviceType }: { clientScheduleId: number; contractTaskId: number; serviceType: AddOnServiceTypes }) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/addOnService-contract`, {
+    contractTaskId,
+    serviceType,
+    contractStatus: 'success',
+  });
   return data;
 }

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { ClientSchedule } from '@/api/appointment';
 import { getTypeLabel } from '@/utils/mappers';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { ScheduleStateMap } from '@/const/appointment';
+import { MachineShifts } from '@/const/general';
 
 interface Props {
   data: ClientSchedule;
@@ -40,6 +41,8 @@ const rearrangeTableData = new Map([
   ['科別', () => getTypeLabel(props.data.userShift.type)],
   ['治療師', () => props.data.userShift.user.name],
 ]);
+
+const includesMachineTreatment = computed(() => MachineShifts.includes(props.data.userShift.type) || props.data.addOnServices.some(service => service.isAddOn));
 </script>
 
 <template>
@@ -67,7 +70,7 @@ const rearrangeTableData = new Map([
     <div v-if="showActions" class="table__actions">
       <template v-if="!props.historyMode">
         <QBtn label="取消預約" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('cancel', data.id)" />
-        <QBtn label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('rearrange', data)" />
+        <QBtn v-if="!includesMachineTreatment" label="預約改期" outline rounded dense color="grey-9" padding="6px 9px" style="border-radius: 8px;" @click="$emit('rearrange', data)" />
       </template>
       <QBtn v-if="showRecoveryBtn" label="復原" outline rounded dense color="grey-9" padding="6px 23px" style="border-radius: 8px;" @click="$emit('restore', data.id)" />
     </div>
