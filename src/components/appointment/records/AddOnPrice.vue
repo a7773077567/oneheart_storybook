@@ -163,7 +163,7 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
         </QItemSection>
       </QItem>
     </QList>
-    <QDialog v-model="isEditingMachine">
+    <QDialog v-model="isEditingMachine" persistent>
       <EditMachineForm
         title="編輯儀器治療" :init-val="serviceInitVal" :machine-type="serviceInitVal.machineType"
         @cancel="isEditingMachine = false" @submit="updateMachineInfo"

@@ -6,6 +6,7 @@ import { useOptionStore } from '@/stores';
 import { MachineTypes } from '@/const/general';
 import { number, object, string } from 'zod';
 import { judgeTimeWithinDuration } from '@/utils/date';
+import { error } from 'node:console';
 
 interface MachineInfo {
   machineId: number;
@@ -40,29 +41,27 @@ const initialValues = computed(() => {
   return props.initVal;
 });
 
-const schema = computed(() => {
-  return object({
-    machineId: number().min(1, 'machine is required'),
-    startTime: string()
-      .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
-      .refine(val =>
-        judgeTimeWithinDuration({ startTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
-    endTime: string()
-      .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
-      .refine(val => judgeTimeWithinDuration({ endTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
-    shockWaveShots: number().optional()
-      .refine((val) => {
-        if (props.machineType !== MachineTypes['震波儀器治療'])
-          return true;
-        return (!!val);
-      }, { message: 'independentShockWaveShots is required' }),
-  }).refine((vals) => {
-    return judgeTimeWithinDuration({ startTime: vals.startTime, endTime: vals.endTime, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime });
-  }, { message: `請選擇預約單內的時段 ${initialValues.value?.startTime} - ${initialValues.value?.endTime}`, path: ['period'] });
-});
+const schema = object({
+  machineId: number().min(1, 'machine is required'),
+  startTime: string()
+    .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
+    .refine(val =>
+      judgeTimeWithinDuration({ startTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
+  endTime: string()
+    .refine(val => val.length === 5, { message: '請輸入HH:mm格式' })
+    .refine(val => judgeTimeWithinDuration({ endTime: val, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime }), { message: '請選擇預約單內的時段' }),
+  shockWaveShots: number().optional()
+    .refine((val) => {
+      if (props.machineType !== MachineTypes['震波儀器治療'])
+        return true;
+      return (!!val);
+    }, { message: 'independentShockWaveShots is required' }),
+}).refine((vals) => {
+  return judgeTimeWithinDuration({ startTime: vals.startTime, endTime: vals.endTime, min: initialValues.value.scheduleStartTime, max: initialValues.value.scheduleEndTime });
+}, { message: `請選擇預約單內的時段 ${initialValues.value?.startTime} - ${initialValues.value?.endTime}`, path: ['period'] });
 
 const { handleSubmit, setFieldError, errors } = useForm({
-  validationSchema: toTypedSchema(schema.value),
+  validationSchema: toTypedSchema(schema),
   initialValues: initialValues.value,
 });
 const periodNote = computed(() => {
@@ -89,9 +88,9 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
           error-message=""
         />
         <div class="input-box">
-          <OTime name="startTime" now-btn label="開始時間" error-message="" />
+          <OTime name="startTime" now-btn label="開始時間" error-message="" :error="'period' in errors" />
           <span style="translate:0 -10px;">至</span>
-          <OTime name="endTime" now-btn label="結束時間" error-message="" />
+          <OTime name="endTime" now-btn label="結束時間" error-message="" :error="'period' in errors" />
           <span style="translate:0 -10px;">止</span>
         </div>
         <p class="note" :class="{ error: 'period' in errors }">{{ periodNote }}</p>

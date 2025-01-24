@@ -383,7 +383,7 @@ const checkinReminder = computed(() => {
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
   </QDialog>
-  <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine">
+  <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine" persistent>
     <EditMachineForm
       title="編輯儀器治療"
       :init-val="machineInitVal"
