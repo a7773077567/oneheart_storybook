@@ -8,6 +8,7 @@ export const clientRoutes: RouteRecordRaw[] = [{
     label: '客戶管理',
     requiredAuth: true,
     permission: true,
+    icon: 'o_groups',
   },
   redirect: { name: 'clientList' },
   children: [

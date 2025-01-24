@@ -10,6 +10,7 @@ export const userRoutes: RouteRecordRaw[] = [
       label: '人員設定',
       requiredAuth: true,
       permission: false,
+      icon: 'o_manage_accounts',
     },
     children: [
       {

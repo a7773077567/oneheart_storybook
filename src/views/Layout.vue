@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
+import { SimpleSelect } from '@/components/shared';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
 import { useHandoverStore, useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
@@ -33,33 +34,7 @@ watch(currentSpaceId, async (newSpaceId) => {
   }
 }, { immediate: true });
 
-function optionDisable(option: any): boolean {
-  return option.value === currentSpaceId.value;
-}
-
-const { navTabs } = useLayoutRoute();
 const drawerOpen = ref(true);
-
-const permissionControlTabs = computed(() => {
-  let _filteredPages = navTabs.value?.map((group) => {
-    if (group && group.children) {
-      return ({ ...group, children: group?.children?.filter(subpage => !subpage.meta?.hide) });
-    }
-    return group;
-  }) ?? [];
-
-  if (!userStore.canI('READ_HANDOVER')) {
-    _filteredPages = _filteredPages.filter((route) => {
-      return route.name !== 'cashDropHandover';
-    });
-  }
-
-  if (!userStore.canI('VIEW_USER_SETTING')) {
-    return _filteredPages.filter(route => route?.meta?.permission);
-  }
-
-  return _filteredPages;
-});
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value;
@@ -77,27 +52,19 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
 
 <template>
   <QLayout view="hHh LpR lFf">
-    <QHeader class="bg-surface text-black q-px-sm q-pt-sm une no-shadow" height-hint="98">
-      <QToolbar style="flex-wrap:wrap; gap: 4px">
-        <div class="flex items-center no-wrap">
-          <QBtn dense flat round icon="menu" @click="toggleDrawer" />
+    <QHeader height-hint="98">
+      <QToolbar>
+        <div class="toolbar">
+          <QBtn dense flat round icon="menu" color="on-surface-variant" @click="toggleDrawer" />
           <div style="height: 45px;"><img :src="logoUrl" style="height: 100%; width:100%; object-fit:contain"> </div>
+          <SimpleSelect v-model="currentSpaceId" :options="spaceOptions" />
         </div>
 
         <QSpace />
         <div class="row q-gutter-lg items-center q-ml-auto">
-          <QSelect v-model="currentSpaceId" :options="spaceOptions" emit-value map-options hide-dropdown-icon hide-bottom-space borderless :option-disable="optionDisable" class="space-selector" popup-content-class="no-border-radius" />
           <Avatar @log-out="logout" />
         </div>
       </QToolbar>
-      <QTabs>
-        <QRouteTab
-          v-for="(tab, index) in permissionControlTabs"
-          :key="index"
-          :to="{ name: tab.route }"
-          :label="tab.label"
-        />
-      </QTabs>
     </QHeader>
     <Drawer v-model="drawerOpen" />
     <QPageContainer>
@@ -113,17 +80,6 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
 </template>
 
 <style lang="scss" scoped>
-:deep(.space-selector) {
-  .q-field__control {
-    min-height: fit-content;
-  }
-  .q-field__native {
-    min-height: fit-content;
-    padding: 4.5px 38px;
-    background-color: #ddd;
-    border-radius: 15px 15px 0 0;
-  }
-}
 main.q-page {
   height: calc(100vh - 211px);
   min-height: initial !important;
@@ -145,12 +101,34 @@ main.q-page {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 0 20px 20px 0;
+  padding: 0 20px 20px 20px;
+  padding-top: 86px !important;
 }
 
 .page-box {
   background-color: white;
   border-radius: 28px;
   flex-grow: 1;
+  overflow: hidden;
+}
+
+.q-header {
+  padding: 12px 20px;
+  background-color: $surface;
+}
+
+.q-toolbar {
+  padding: 0;
+}
+
+.toolbar {
+  // padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+:deep(.q-toolbar .q-btn__content) {
+  padding: 12px;
 }
 </style>

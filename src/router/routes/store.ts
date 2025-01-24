@@ -9,6 +9,7 @@ export const storeRoutes: RouteRecordRaw[] = [
       label: '商城',
       requiredAuth: true,
       permission: false,
+      icon: 'o_storefront',
     },
   },
 ];

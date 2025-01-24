@@ -18,19 +18,19 @@ function goUserSettings() {
 <template>
   <QAvatar class="cursor-pointer">
     <img :src="userStore?.userInfo?.avatarUrl ?? ''">
-    <QMenu style="border-radius: 20px;">
-      <QCard class="q-pa-md bg-grey-1" style="width: 270px">
-        <QCardSection class="column flex-center q-gutter-sm q-pa-none">
-          <span class="text-body2 text-grey-9">
-            {{ userStore.userInfo?.email }}
-          </span>
+    <QMenu :offset="[0, 12]" style="border-radius: 20px;">
+      <QCard class="card">
+        <QCardSection class="row flex-center">
           <QAvatar size="80px">
             <img :src="userStore?.userInfo?.avatarUrl ?? ''">
           </QAvatar>
         </QCardSection>
-        <QCardActions vertical>
-          <QBtn label="編輯" color="white" unelevated text-color="black" rounded class="q-mb-xs" @click="goUserSettings" />
-          <QBtn label="登出" color="white" unelevated text-color="black" rounded @click="() => $emit('logOut')" />
+        <QCardSection class="mail">
+          {{ userStore.userInfo?.email }}
+        </QCardSection>
+        <QCardActions vertical style="padding: 0;">
+          <QBtn label="修改密碼" color="secondary-container" unelevated text-color="black" rounded class="btn" @click="goUserSettings" />
+          <QBtn label="登出" color="secondary-container" unelevated text-color="black" rounded class="btn" @click="() => $emit('logOut')" />
         </QCardActions>
       </QCard>
     </QMenu>
@@ -38,7 +38,37 @@ function goUserSettings() {
 </template>
 
 <style lang="scss" scoped>
+.card {
+  width: 296px;
+  padding: 24px;
+  background-color: $surface-bright;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mail {
+  @include title-small($on-surface);
+  text-align: center;
+}
+
+.btn {
+  padding: 10px 24px;
+  border-radius: 100px;
+  :deep(.block) {
+    @include label-large($on-secondary-container);
+  }
+}
+
 :deep(.q-field__native) {
   justify-content: center;
+}
+
+:deep(.q-card__actions--vert > .q-btn-item + .q-btn-item) {
+  margin-top: 12px;
+}
+
+:deep(.q-card__section--vert) {
+  padding: 0;
 }
 </style>

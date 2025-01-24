@@ -2,3 +2,7 @@
 @use './vendors';
 // @use 'variables' as *;
 @use 'utilities';
+
+body {
+  font-family: "Noto Sans TC", serif;
+}

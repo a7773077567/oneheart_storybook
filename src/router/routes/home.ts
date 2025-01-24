@@ -11,6 +11,7 @@ export const homeRoutes: RouteRecordRaw[] = [
       label: '首頁',
       requiredAuth: true,
       permission: true,
+      icon: 'o_home',
     },
     children: [
       {
