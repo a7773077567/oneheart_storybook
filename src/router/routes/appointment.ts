@@ -10,6 +10,7 @@ export const appointmentRoutes: RouteRecordRaw[] = [
       label: '客戶預約',
       requiredAuth: true,
       permission: true,
+      icon: 'o_today',
     },
     children: [
       {

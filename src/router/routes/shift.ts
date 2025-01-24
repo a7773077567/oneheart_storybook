@@ -9,6 +9,7 @@ export const shiftRoutes: RouteRecordRaw[] = [
       label: '排班',
       requiredAuth: true,
       permission: true,
+      icon: 'event_note',
     },
     children: [
       {

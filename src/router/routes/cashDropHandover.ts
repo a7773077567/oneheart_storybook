@@ -7,6 +7,7 @@ export const cashDropHandoverRoutes = [
       label: '投庫交班',
       requiredAuth: true,
       permission: true,
+      icon: 'img:/images/safe-box.svg',
     },
     children: [
       {
