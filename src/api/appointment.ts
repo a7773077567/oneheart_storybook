@@ -4,8 +4,8 @@ import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
 import type { ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
-import type { AddOnServiceTypes, MachineTypes } from '@/const/general';
-import { ShiftType } from '@/const/general';
+import type { MachineTypes } from '@/const/general';
+import { AddOnServiceTypes, ShiftType } from '@/const/general';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -279,6 +279,7 @@ export interface Available {
 }
 
 export interface CreateAppointmentPayload {
+  addOnUserShiftTypes?: AddOnServiceTypes[];
   bookingClientIds: number[];
   date: string | null;
   endTime: string;
@@ -287,8 +288,8 @@ export interface CreateAppointmentPayload {
   note?: string | null;
   spaceId: number;
   startTime: string;
-  userShiftType: ShiftType;
   userShiftId: number;
+  userShiftType: ShiftType;
 }
 
 export interface CreateAppointmentRearrangePayload {
@@ -601,6 +602,7 @@ export const availableReqSchema = z.object({
   date: z.string(),
   startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+  addOnUserShiftTypes: z.array(z.nativeEnum(AddOnServiceTypes)).optional(),
 })
   .refine(({ startTime, endTime }) => {
     const start = getTimeDate(startTime);

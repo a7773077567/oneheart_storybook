@@ -76,6 +76,7 @@ function getCalendarStyle() {
         <div class="pad" style="width: 164px;" />
       </slot>
     </div>
+    <slot name="middle" />
     <div class="calendar__body">
       <QCalendarResource
         ref="calendar"

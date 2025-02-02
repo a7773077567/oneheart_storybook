@@ -8,6 +8,7 @@ import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
 import { useUserStore } from './user';
+import type { AddOnServiceTypes } from '@/const/general';
 
 interface State {
   users: User[];
@@ -173,6 +174,7 @@ export const useAppointmentStore = defineStore('appointment', {
     needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
     needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
     targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
+    queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],
   },
   actions: {
     async getUsers(spaceIds: number[]) {

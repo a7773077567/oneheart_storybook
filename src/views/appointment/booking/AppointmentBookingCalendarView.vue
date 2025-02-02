@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { AppointmentAdder, AppointmentBox, AppointmentBoxRearranged } from '@/components/appointment';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { useQuasar } from 'quasar';
 import type { Available, AvailableReq } from '@/api/appointment';
 import { getTimeDate } from '@/utils/date';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
+import { AddOnServiceTypes, ShiftType } from '@/const/general';
 
 interface CalendarInterval {
   available?: Available;
@@ -133,6 +134,9 @@ function getDate() {
   const target = appointmentStore.availableQuery || appointmentStore.rearrangeQuery;
   return target!.date;
 }
+
+const queryAddOns = computed(() => appointmentStore.queryAddOns.map(addOn => AddOnServiceTypes[addOn]));
+const queryAppointmentType = computed(() => appointmentStore.availableQuery?.userShiftType && ShiftType[appointmentStore.availableQuery?.userShiftType]);
 </script>
 
 <template>
@@ -158,6 +162,9 @@ function getDate() {
           @add="() => OpenAppointmentDialog(interval.available!)"
         />
       </template>
+      <template #middle>
+        <h3 v-if="!!queryAddOns && queryAddOns.length > 0" class="sm_title">{{ queryAppointmentType }}｜加購儀器 {{ queryAddOns.join('、') }} </h3>
+      </template>
     </ResourceCalendar>
     <QDialog v-model="stateOfAppointmentDialog" persistent>
       <AppointmentBoxRearranged v-if="appointmentStore.rearrangeMode" @close="stateOfAppointmentDialog = false" @appointment="afterAppointment" />
@@ -167,7 +174,11 @@ function getDate() {
 </template>
 
 <style lang="scss" scoped>
-  :deep(.q-calendar-resource__head--interval) {
+.sm_title {
+  @include title-small($on-surface-variant);
+  margin: 16px 0;
+}
+:deep(.q-calendar-resource__head--interval) {
   font-size: 14px;
   font-weight: 500;
 }

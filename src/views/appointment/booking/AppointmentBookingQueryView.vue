@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useForm } from 'vee-validate';
+import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
@@ -8,7 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
-import { MachineTypes, ShiftType } from '@/const/general';
+import { AddOnServiceTypes, MachineTypes, PhysicalTypes, ShiftType } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -27,8 +27,20 @@ const { handleSubmit, values, setFieldValue } = useForm({
     date: dayjs().format('YYYY-MM-DD'),
     startTime: '09:00',
     endTime: '21:00',
+    addOnUserShiftTypes: [],
   },
 });
+const { push, remove } = useFieldArray<AddOnServiceTypes>('addOnUserShiftTypes');
+
+function selectAddOn(addOn: AddOnServiceTypes) {
+  if (values.addOnUserShiftTypes?.includes(addOn)) {
+    const idx = values.addOnUserShiftTypes?.findIndex(a => a === addOn);
+    remove(idx);
+  }
+  else {
+    push(addOn);
+  }
+}
 
 watch(() => values.userShiftType, (newShiftType) => {
   const shiftDetails = getType(newShiftType!)!;
@@ -94,6 +106,31 @@ const onSubmit = handleSubmit(async (values) => {
       <OTime name="endTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">止</span>
     </InputBox>
+    <fieldset v-if="values.userShiftType && PhysicalTypes.some(type => type === values.userShiftType)">
+      <legend>物理治療可加購儀器，是否加購？</legend>
+      <p class="remark">(至多可選兩項)</p>
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
+        label="震波"
+        class="q-pr-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['震波'])"
+      />
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['射頻'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['射頻'])"
+        label="射頻"
+        class="q-pa-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['射頻'])"
+      />
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['磁波'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['磁波'])"
+        label="磁波"
+        class="q-pa-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['磁波'])"
+      />
+    </fieldset>
     <QBtn label="搜尋" outline style="width: 126px;" @click="onSubmit" />
   </div>
 </template>
@@ -116,6 +153,16 @@ const onSubmit = handleSubmit(async (values) => {
 
   .input-box {
     margin-bottom: 20px;
+  }
+
+  fieldset {
+    legend {
+      @include body-large($on-surface);
+      margin-bottom: 8px;
+    }
+    .remark {
+      @include body-small($on-surface-variant);
+    }
   }
 }
 </style>
