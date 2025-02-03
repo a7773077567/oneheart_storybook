@@ -173,7 +173,7 @@ async function getRecordList(query: Query) {
   const { data, meta } = await getPayments(_query);
   rows.value = data;
 
-  paging.value = { max: meta!.pageCount, modelValue: meta!.page } as QPagination['$props'];
+  paging.value = { max: meta!.pageCount, modelValue: meta!.page } ;
 }
 
 watch(() => paging.value.modelValue, async (page) => {
