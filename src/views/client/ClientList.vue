@@ -48,8 +48,8 @@ const cols: QTableProps['columns'] = [
 await getData();
 async function getData(query = {}) {
   const { meta, data } = await fetchClients(query);
-  // paging.value = { max: meta?.pageCount ?? 1, modelValue: meta?.page ?? 1 }
-  paging.value = { max: meta?.pageCount ?? 1, modelValue: meta?.page ?? 1 } as QPagination['$props'];
+  paging.value = { max: meta?.pageCount ?? 1, modelValue: meta?.page ?? 1 };
+  // paging.value = { max: meta?.pageCount ?? 1, modelValue: meta?.page ?? 1 } as QPagination['$props'];
   rows.value = data;
 }
 
