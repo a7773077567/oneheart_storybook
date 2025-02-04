@@ -57,13 +57,12 @@ const logoUrl = computed(() => Logo);
       <QToolbar>
         <div class="toolbar">
           <QBtn dense flat round icon="menu" color="on-surface-variant" @click="toggleDrawer" />
-          <div class="logo"><img :src="logoUrl" style="height: 100%; width:100%; object-fit:contain"> </div>
+          <div class="logo">
+            <img :src="logoUrl">
+          </div>
           <SimpleSelect v-model="currentSpaceId" :options="spaceOptions" />
-        </div>
-
-        <QSpace />
-        <div class="row q-gutter-lg items-center q-ml-auto">
-          <Avatar @log-out="logout" />
+          <QSpace />
+          <Avatar class="avatar" @log-out="logout" />
         </div>
       </QToolbar>
     </QHeader>
@@ -99,12 +98,36 @@ main.q-page {
   flex-direction: column;
 }
 
+.q-toolbar {
+  padding: 0;
+}
+
+.toolbar {
+  // padding: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+}
+
 .logo {
+  width: fit-content;
+  flex: 0 1 auto;
   height: 45px;
   display: none;
   @include rwd($md) {
     display: block;
   }
+
+  > img {
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.avatar {
+  justify-self: flex-end;
 }
 
 :deep(.q-page-container) {
@@ -126,17 +149,6 @@ main.q-page {
 .q-header {
   padding: 12px 20px;
   background-color: $surface;
-}
-
-.q-toolbar {
-  padding: 0;
-}
-
-.toolbar {
-  // padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 20px;
 }
 
 :deep(.q-toolbar .q-btn__content) {
