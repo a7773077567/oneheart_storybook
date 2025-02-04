@@ -127,7 +127,7 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
           <QItemLabel>機台 {{ addOn.machine }}</QItemLabel>
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
-          <QItemLabel>時間 {{ addOn.machine }}</QItemLabel>
+          <QItemLabel>時間 {{ addOn.startTime }} - {{ addOn.endTime }}</QItemLabel>
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
           <div v-if="addOn.serviceType === AddOnServiceTypes['震波']" class="flex" style="width: max-content">
