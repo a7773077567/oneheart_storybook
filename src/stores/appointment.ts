@@ -8,7 +8,7 @@ import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
 import { useUserStore } from './user';
-import type { AddOnServiceTypes } from '@/const/general';
+import { type AddOnServiceTypes, MachineShifts, ShiftType } from '@/const/general';
 
 interface State {
   users: User[];
@@ -175,6 +175,26 @@ export const useAppointmentStore = defineStore('appointment', {
     needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
     targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
     queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],
+    machineOnlyAppointment: (state) => {
+      if (state.machineSchedules.length === 0)
+        return [];
+
+      return state.machineSchedules.reduce((list, appointment) => {
+        if (MachineShifts.includes(appointment.userShift.type)) {
+          list.push(appointment);
+        }
+        else if (appointment.machines.length > 0) {
+          const individualMachines = appointment.machines.map(machine => ({
+            ...appointment,
+            scheduleStartTime: machine.machineStartTime,
+            scheduleEndTime: machine.machineEndTime,
+            machine,
+          }));
+          list.push(...individualMachines);
+        }
+        return list;
+      }, [] as MachineSchedule[]);
+    },
   },
   actions: {
     async getUsers(spaceIds: number[]) {

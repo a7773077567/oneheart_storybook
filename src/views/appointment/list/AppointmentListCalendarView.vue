@@ -122,9 +122,7 @@ function getMachineAppointment(scope: any) {
       bottom: 10,
       count: item.length,
       isAllCheckout,
-      showMachineCard: item[0].userShift.type === ShiftType['射頻']
-      || item[0].userShift.type === ShiftType['磁波']
-      || item[0].userShift.type === ShiftType['震波'],
+      showMachineCard: item[0].userShift.type !== ShiftType['G動椅'], // 除G動椅預約單外其他都顯示灰色儀器卡片
     };
   },
   );
