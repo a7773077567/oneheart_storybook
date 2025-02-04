@@ -50,7 +50,8 @@ function logout() {
   router.go(0);
 }
 
-const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : TestingLogo);
+// const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : TestingLogo);
+const logoUrl = computed(() => Logo);
 </script>
 
 <template>
@@ -59,7 +60,7 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
       <QToolbar>
         <div class="toolbar">
           <QBtn dense flat round icon="menu" color="on-surface-variant" @click="toggleDrawer" />
-          <div style="height: 45px;"><img :src="logoUrl" style="height: 100%; width:100%; object-fit:contain"> </div>
+          <div class="logo"><img :src="logoUrl" style="height: 100%; width:100%; object-fit:contain"> </div>
           <SimpleSelect v-model="currentSpaceId" :options="spaceOptions" />
         </div>
 
@@ -83,6 +84,8 @@ const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : Te
 </template>
 
 <style lang="scss" scoped>
+@use '@/assets/scss/variables/breakpoints';
+
 main.q-page {
   height: calc(100vh - 211px);
   min-height: initial !important;
@@ -97,6 +100,14 @@ main.q-page {
 .q-layout {
   display: flex;
   flex-direction: column;
+}
+
+.logo {
+  height: 45px;
+  display: none;
+  @include rwd($md) {
+    display: block;
+  }
 }
 
 :deep(.q-page-container) {
