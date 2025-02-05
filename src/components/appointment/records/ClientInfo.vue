@@ -234,6 +234,10 @@ const checkinReminder = computed(() => {
   return null;
 },
 );
+
+// 預約單時間編輯判斷
+// 儀器內含預約不可編輯
+const includeMachineAddons = computed(() => schedule.value.addOnServices.some(machine => machine.isAddOn));
 </script>
 
 <template>
@@ -331,7 +335,7 @@ const checkinReminder = computed(() => {
               <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
             </div>
             <div class="time__actions">
-              <QBtn v-if="!isEditingTime && !isMachineOnlyShifts" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+              <QBtn v-if="!isEditingTime && !includeMachineAddons" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
         </template>
@@ -386,6 +390,7 @@ const checkinReminder = computed(() => {
   <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine" persistent>
     <EditMachineForm
       title="編輯儀器治療"
+      disable-time
       :init-val="machineInitVal"
       :machine-type="machineInitVal!.machineType"
       @cancel="isEditingMachine = false"

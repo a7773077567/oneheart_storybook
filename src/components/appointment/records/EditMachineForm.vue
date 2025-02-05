@@ -6,7 +6,6 @@ import { useOptionStore } from '@/stores';
 import { MachineTypes } from '@/const/general';
 import { number, object, string } from 'zod';
 import { judgeTimeWithinDuration } from '@/utils/date';
-import { error } from 'node:console';
 
 interface MachineInfo {
   machineId: number;
@@ -19,6 +18,7 @@ const props = withDefaults(defineProps<{
   title: string;
   initVal: MachineInfo & { scheduleStartTime: string; scheduleEndTime: string } | null;
   machineType: MachineTypes;
+  disableTime?: boolean;
 }>(), {
   title: '編輯儀器',
 });
@@ -81,16 +81,16 @@ const machineList = computed(() => optionStore.machineList.filter(machine => mac
       <h2 class="device_form--title">{{ title }}</h2>
     </QCardSection>
     <QCardSection class="q-py-lg">
-      <h3 class="device_form--subtitle">{{ MachineTypes[machineType] }}儀器治療</h3>
+      <h3 class="device_form--subtitle">{{ MachineTypes[machineType] }}</h3>
       <form @submit.prevent>
         <OSelect
           name="machineId" label="機台*" option-value="id" option-label="name" :options="machineList"
           error-message=""
         />
         <div class="input-box">
-          <OTime name="startTime" now-btn label="開始時間" error-message="" :error="'period' in errors" />
+          <OTime :disable="disableTime" name="startTime" now-btn label="開始時間" error-message="" :error="'period' in errors" />
           <span style="translate:0 -10px;">至</span>
-          <OTime name="endTime" now-btn label="結束時間" error-message="" :error="'period' in errors" />
+          <OTime :disable="disableTime" name="endTime" now-btn label="結束時間" error-message="" :error="'period' in errors" />
           <span style="translate:0 -10px;">止</span>
         </div>
         <p class="note" :class="{ error: 'period' in errors }">{{ periodNote }}</p>
