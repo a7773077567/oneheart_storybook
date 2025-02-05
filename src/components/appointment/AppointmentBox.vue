@@ -72,7 +72,6 @@ async function appointment() {
     const { userShiftId, startTime, endTime, date, machine, space, type } = targetAvailable;
 
     await createAppointment({
-      addOnUserShiftTypes: appointmentStore.queryAddOns,
       isEmployeePrice: isEmployeePrice.value,
       userShiftId,
       bookingClientIds: [targetClient.id],
@@ -83,6 +82,7 @@ async function appointment() {
       machineId: machine?.id ?? null,
       spaceId: space.id,
       userShiftType: type,
+      ...(appointmentStore.queryAddOns.length > 0 ? { addOnUserShiftTypes: appointmentStore.queryAddOns } : {}),
     });
     await appointmentStore.getAvailable(appointmentStore.availableQuery!);
     // router.push({ name: 'appointmentListCalendar', query: { date: targetAvailable.date } });
