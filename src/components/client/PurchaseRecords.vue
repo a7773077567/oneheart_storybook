@@ -114,7 +114,7 @@ async function checkReceipt(paymentId: number) {
   switch (type) {
     case TransactionTypes.門診費用:
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }, ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : [])];
+      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }, ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []), ...data.addOnServices.some(a => a.isAddOn) ? [{ name: 'addOn', label: '加購服務', value: data.addOnServices.filter(a => a.isAddOn).map(a => a.serviceName).join('、') }] : []];
       break;
     case TransactionTypes.團課券購買:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
@@ -151,10 +151,10 @@ const targetPaymentDetails = ref<InstanceType<typeof PaymentDetail>['$props']['d
 const showDetail = ref(false);
 
 async function checkPaymentDetail(val: any) {
-  showDetail.value = true;
   targetPaymentDetails.value = val;
   const data = await getClientPaymentDetail({ clientId: +props.clientId, paymentId: val.id });
   targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data, clientName: data.client?.name };
+  showDetail.value = true;
 }
 </script>
 

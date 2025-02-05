@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
-import { ShiftType, Types } from '@/const/general';
+import { CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
+import { AddOnServiceTypes, PointTypes, ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref, watch } from 'vue';
 import { calcReceiptAmount } from '@/utils/helpers';
@@ -37,6 +37,7 @@ const shiftType = computed(() => Object.values(Types).find(item => item.identifi
 const totalAmount = ref(2000);
 const payments = ref<Payments>([]);
 
+const addOnList = computed(() => addOnServices.filter(addOn => addOn.isAddOn));
 const info: CheckTableData = [
   { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
@@ -44,24 +45,34 @@ const info: CheckTableData = [
   { key: 'userName', value: userShift?.user.name, label: '治療師' },
   { key: 'type', value: shiftType.value?.label, label: '項目' },
   ...(userShift.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
+  ...(addOnList.value.length > 0 ? [{ key: 'addOns', label: '加購服務', value: addOnList.value.map(addOn => addOn.serviceName).join('、') }] : []),
 ];
 
-const hasAddOn = computed(() => addOnServices.some(addOn => addOn.isAddOn));
-const addOns: CheckTableData = [
-  { key: 'title', value: '加購服務', span: true, custom: false },
-  { key: 'item1', value: '儀器治療', label: '項目' },
-];
-
+const allowMultiPointPayment = computed(() => addOnList.value.length > 0);
 const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
   const appointmentGroupType = Object.values(Types).find(type => type.identifier === userShift.type)?.pointType;
+
+  if (allowMultiPointPayment.value) {
+    const addOnPointType = addOnList.value.map((addOn) => {
+      switch (addOn.serviceType) {
+        case AddOnServiceTypes['射頻']:
+          return PointTypes['射頻'];
+        case AddOnServiceTypes['磁波']:
+          return PointTypes['磁波'];
+        case AddOnServiceTypes['震波']:
+          return PointTypes['震波'];
+        default:
+          return null;
+      }
+    });
+    return group.type === appointmentGroupType || addOnPointType.includes(group.type);
+  }
   return group.type === appointmentGroupType;
 }).map(item => ({
   label: item.name,
   value: item.id,
   points: item.points,
 }));
-
-// const spaceName = computed(() => userShift.space?.name);
 
 const receiptData = computed(() => {
   return [
@@ -74,6 +85,7 @@ const receiptData = computed(() => {
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
     ...(userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
+    ...addOnList.value.length > 0 ? [{ name: 'addOn', label: '加購服務', value: addOnList.value.map(a => a.serviceName).join('、') }] : [],
   ];
 });
 
@@ -133,12 +145,10 @@ watch(payments, (chosenPayments) => {
       </template>
     </CheckTable>
 
-    <AddOnTable v-if="hasAddOn" :data="addOns" />
-
     <PriceTags :list="priceTags" />
 
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
-    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
+    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" :multi-point="allowMultiPointPayment" />
   </div>
 </template>
 
