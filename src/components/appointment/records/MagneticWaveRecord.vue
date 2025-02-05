@@ -121,7 +121,7 @@ function selectRecord(record: Record<string, any>) {
         <QBtn
           flat
           icon="add"
-          label="新增一列訓練記錄"
+          label="新增一列記錄"
           color="blue"
           @click="push(singleRecord)"
         />
