@@ -183,17 +183,22 @@ export const useAppointmentStore = defineStore('appointment', {
         if (MachineShifts.includes(appointment.userShift.type)) {
           list.push(appointment);
         }
+        // 內含儀器預約，需前端另外拆預約單 per 儀器
         else if (appointment.machines.length > 0) {
           const individualMachines = appointment.machines.map(machine => ({
             ...appointment,
             scheduleStartTime: machine.machineStartTime,
             scheduleEndTime: machine.machineEndTime,
-            machine,
+            machines: [
+              {
+                ...machine,
+              },
+            ],
           }));
           list.push(...individualMachines);
         }
         return list;
-      }, [] as MachineSchedule[]);
+      }, [] as (MachineSchedule)[]);
     },
   },
   actions: {

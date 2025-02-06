@@ -99,8 +99,7 @@ const displayMachineList = computed(() => optionStore.machineList.filter(m => se
 function getMachineAppointment(scope: any) {
   const machineId = scope.resource.id;
 
-  // machine 陣列如果是加購的話需要另外處理
-  const bookings = appointmentStore.machineSchedules.filter(item => item.machines[0].id === machineId);
+  const bookings = appointmentStore.machineOnlyAppointment.filter(item => item.machines[0].id === machineId);
   const bookingGroup = bookings.reduce((acc, item) => {
     const startTime = item.scheduleStartTime;
     const group = acc[startTime] ?? [];
