@@ -7,7 +7,7 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
+import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, HighConversionOpportunity, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
@@ -40,7 +40,7 @@ const duration = computed(() => ({
   start: schedule.value.scheduleStartTime,
   end: schedule.value.scheduleEndTime,
 }));
-const isCheckedOut = computed(() => schedule.value.paymentState === 2);
+const isCheckedOut = computed(() => schedule.value.paymentState === PaymentState['已結帳']);
 const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
 const isMachineOnlyShifts = computed(() => MachineShifts.includes(userShift.value.type));
 
@@ -181,6 +181,7 @@ async function handleDownload(contractUrl: string) {
 }
 
 // 儀器
+const includeMachineTreatment = computed(() => (schedule.value.machines ?? []).length > 0);
 const isEditingMachine = ref(false);
 const machineInitVal = computed(() => {
   if (!schedule.value?.machines?.[0])
@@ -362,7 +363,13 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
     <div class="client-info__actions">
       <div class="actions">
         <QBtn v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
-        <QBtn v-if="!isMachineOnlyShifts" class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+
+        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment" outline style="width: 127px;" @click="rearrangeClientSchedule">
+          <QTooltip v-if="includeMachineTreatment" class="bg-black" anchor="top left" self="bottom middle">
+            本預約包含儀器治療，不可預約改期
+          </QTooltip>
+        </QBtn>
+
         <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">

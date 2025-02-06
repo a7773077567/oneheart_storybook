@@ -10,6 +10,7 @@ import { getDuration } from '@/utils/date';
 import MachineCalendar from '@/components/appointment/MachineCalendar.vue';
 import MachineCard from '@/components/appointment/MachineCard.vue';
 import { ShiftType } from '@/const/general';
+import { PaymentState } from '@/const/appointment';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -66,7 +67,7 @@ function getBookings(scope: any) {
 
   return Object.values(bookingGroup).map((item) => {
     const { scheduleStartTime, scheduleEndTime } = item[0];
-    const isAllCheckout = item.every(el => el.paymentState === 2);
+    const isAllCheckout = item.every(el => el.paymentState === PaymentState['已結帳']);
     const duration = getDuration(scheduleStartTime, scheduleEndTime, 'm');
     const durationWidth = scope.timeDurationWidth(duration) - 20;
     const cardMinWidth = 105;
@@ -109,7 +110,7 @@ function getMachineAppointment(scope: any) {
 
   return Object.values(bookingGroup).map((item) => {
     const { scheduleStartTime, scheduleEndTime } = item[0];
-    const isAllCheckout = item.every(el => el.paymentState === 2);
+    const isAllCheckout = item.every(el => el.paymentState === PaymentState['已結帳']);
     const duration = getDuration(scheduleStartTime, scheduleEndTime, 'm');
     const durationWidth = scope.timeDurationWidth(duration) - 20;
     const cardMinWidth = 105;

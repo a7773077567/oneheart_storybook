@@ -3,14 +3,14 @@ import type { ClientSchedule } from '@/api/appointment';
 import { HighConversionOpportunity } from '@/components/appointment/index';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
+import { PaymentState, SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
 import { ShiftType, Types } from '@/const/general';
 
 interface Props {
   data: ClientSchedule;
 }
 const props = defineProps<Props>();
-const isCheckedOut = computed(() => props.data.paymentState === 2);
+const isCheckedOut = computed(() => props.data.paymentState === PaymentState['已結帳']);
 const beforeCheckIn = computed(() => props.data.state === 1);
 
 const router = useRouter();

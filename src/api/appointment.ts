@@ -2,7 +2,7 @@ import { api } from '@/utils/api';
 import { z } from 'zod';
 import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
-import type { ScheduleVisitState } from '@/const/appointment';
+import type { PaymentState, ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
 import type { MachineTypes } from '@/const/general';
 import { AddOnServiceTypes, ShiftType } from '@/const/general';
@@ -217,7 +217,7 @@ export interface ClientSchedule {
   isUsingAutoRecommend: boolean;
   isValidForRestore: boolean;
   note: string;
-  paymentState: number;
+  paymentState: PaymentState;
   rearrangeClientSchedule: ClientSchedule | null;
   scheduleEndTime: string;
   scheduleStartTime: string;

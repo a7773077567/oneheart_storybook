@@ -9,6 +9,7 @@ import { AddOnServiceTypes } from '@/const/general';
 import type { FormContext } from 'vee-validate';
 import EditMachineForm from './EditMachineForm.vue';
 import { MachineContractMapping } from '@/const/contracts';
+import { PaymentState } from '@/const/appointment';
 import { GenericDialog } from '@/components/shared';
 
 const props = defineProps<{
@@ -27,6 +28,7 @@ const addOnList = computed(
 );
 // 發數要從 record 拿，不存在加購項目中
 const shockWaveShots = computed(() => props.scheduleDetail.record?.addOnServiceShockWaveShots ?? 0);
+const isCheckedOut = computed(() => props.scheduleDetail.paymentState === PaymentState['已結帳']);
 
 const $q = useQuasar();
 async function addItem(item: typeof addOnList.value[number]) {
@@ -140,7 +142,11 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
         </QItemSection>
         <QItemSection side>
           <div v-if="addOn.isAdded" class="flex">
-            <QBtn label="移除" icon="o_delete" flat color="primary" class="q-px-md" @click="rmItem(addOn)" />
+            <QBtn :disable="isCheckedOut" label="移除" icon="o_delete" flat color="primary" class="q-px-md" @click="rmItem(addOn)">
+              <QTooltip v-if="isCheckedOut" class="bg-black" anchor="top middle" self="top middle">
+                此交易已結帳完成
+              </QTooltip>
+            </QBtn>
             <QBtn
               label="編輯" icon="o_edit" outline rounded color="primary" class="q-px-md"
               @click="(isEditingMachine = true), (serviceInitVal = {
@@ -157,9 +163,13 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
             />
           </div>
           <QBtn
-            v-else rounded icon="add" label="添加" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="primary" class="q-px-lg"
+            v-else rounded icon="add" label="添加" :disable="isCheckedOut" color="primary" class="q-px-lg"
             @click="addItem(addOn)"
-          />
+          >
+            <QTooltip v-if="isCheckedOut" class="bg-black" anchor="top middle" self="top middle">
+              此交易已結帳完成
+            </QTooltip>
+          </QBtn>
         </QItemSection>
       </QItem>
     </QList>
