@@ -46,6 +46,7 @@ const info: CheckTableData = [
   { key: 'type', value: shiftType.value?.label, label: '項目' },
   ...(userShift.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
   ...(addOnList.value.length > 0 ? [{ key: 'addOns', label: '加購服務', value: addOnList.value.map(addOn => addOn.serviceName).join('、') }] : []),
+  ...(addOnList.value.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ key: 'addOnServiceShockWaveShots', label: '加購發數', value: `${record.addOnServiceShockWaveShots ?? '0'}發` }] : []),
 ];
 
 const allowMultiPointPayment = computed(() => addOnList.value.length > 0);
@@ -86,6 +87,7 @@ const receiptData = computed(() => {
     { name: 'userName', label: '治療師', value: userShift.user.name },
     ...(userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
     ...addOnList.value.length > 0 ? [{ name: 'addOn', label: '加購服務', value: addOnList.value.map(a => a.serviceName).join('、') }] : [],
+    ...(addOnList.value.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ name: 'addOnServiceShockWaveShots', label: '加購發數', value: `${record.addOnServiceShockWaveShots ?? '0'}發` }] : []),
   ];
 });
 

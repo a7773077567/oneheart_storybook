@@ -16,16 +16,19 @@ type CheckTableData = InstanceType<typeof CheckTable>['$props']['data'];
 const purchaseDetail = computed<CheckTableData>(() => {
   const data = props.detail;
   switch (data.type) {
-    case TransactionTypes.門診費用:
+    case TransactionTypes.門診費用:{
+      const addOnList = data.addOnServices?.filter(service => service.isAddOn);
       return [
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
         { key: 'type', value: data.userShift?.type ? ShiftType[data.userShift.type] : '', label: '項目' },
         { key: 'userName', value: data.userShift?.user.name ?? '', label: '治療師' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
-        { key: 'addOnServices', value: data.addOnServices?.filter(service => service.isAddOn)?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務' },
+        { key: 'addOnServices', value: addOnList?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務' },
+        ...(!!data.userShift?.type && addOnList.length > 0 ? [{ key: 'addOnServiceShockWaveShots', label: '加購發數', value: `${data?.record?.addOnServiceShockWaveShots ?? 0}發` }] : []),
         ...(!!data.userShift?.type && data.userShift?.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []),
       ];
+    }
     case TransactionTypes.團課券購買:
       return [
         { key: 'date', value: data.date, span: true, custom: true },

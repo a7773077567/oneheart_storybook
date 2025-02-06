@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { QTableProps } from 'quasar';
 import { type PurchaseRecord, getClientPaymentDetail, getClientPayments, getSinglePayment } from '@/api';
 import type { PointTypes } from '@/const/general';
-import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { AddOnServiceTypes, PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { Receipt } from '@/components/appointment';
 import { calcReceiptAmount, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
@@ -112,9 +112,20 @@ async function checkReceipt(paymentId: number) {
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
   switch (type) {
-    case TransactionTypes.門診費用:
+    case TransactionTypes.門診費用:{
+      const addOnList = data.addOnServices.filter(a => a.isAddOn);
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }, ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []), ...data.addOnServices.some(a => a.isAddOn) ? [{ name: 'addOn', label: '加購服務', value: data.addOnServices.filter(a => a.isAddOn).map(a => a.serviceName).join('、') }] : []];
+      extraFields = [
+        { name: 'amount', label: '總額', value: `$${amount}` },
+        { name: 'declaration', label: '健保申報', value: '無' },
+        { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' },
+        { name: 'userName', label: '治療師', value: userShift?.user?.name },
+        { name: 'date', label: '日期', value: date },
+        ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []),
+        ...addOnList.length > 0 ? [{ name: 'addOn', label: '加購服務', value: addOnList.map(a => a.serviceName).join('、') }] : [],
+        ...addOnList.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ name: 'addOn', label: '加購發數', value: `${data?.record?.addOnServiceShockWaveShots ?? 0}發` }] : [],
+      ];
+    }
       break;
     case TransactionTypes.團課券購買:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
