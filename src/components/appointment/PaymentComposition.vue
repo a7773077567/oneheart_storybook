@@ -71,7 +71,7 @@ watch(values, () => {
 const selectedMethods = computed(() => values.payments.map(payment => payment.payMethod));
 
 function updateSelectedGroup(group: GroupOption, field: any) {
-  update(+field.key, { ...field.value, clientGroupId: group.value, amount: null, pointType: group.pointType });
+  update(+field.key, { ...field.value, clientGroupId: group.value, amount: null });
 }
 
 function addPayment() {
@@ -116,9 +116,9 @@ function showExtra(method: number) {
 
 const pointGroupRemainings = computed(() => {
   return (props.groupOptions ?? []).reduce((calc, pointG) => {
-    calc[pointG.value] = pointG.points;
+    calc[pointG.value] = { point: pointG.points, unit: pointUnit[pointG.pointType] };
     return calc;
-  }, {} as { [key: number]: number });
+  }, {} as { [key: number]: { point: number; unit: string } });
 });
 </script>
 
@@ -137,7 +137,7 @@ const pointGroupRemainings = computed(() => {
               <OInput :readonly="readonly" :name="`payments[${idx}].groupClassTicketUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else-if="field.value.payMethod === PaymentMethod['堂數']">
-              <div class="input__label">堂數</div>
+              <div class="input__label"> {{ field.value.clientGroupId ? pointGroupRemainings[field.value.clientGroupId].unit : '堂' }} 數</div>
               <OInput :readonly="readonly" :name="`payments[${idx}].pointUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else>
@@ -155,7 +155,7 @@ const pointGroupRemainings = computed(() => {
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
             <template v-if="!readonly">
               <QSelect :readonly="readonly" :model-value="field.value.clientGroupId" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="(groupOption: GroupOption) => updateSelectedGroup(groupOption, field)" />
-              <p class="group__label">剩餘{{ 'pointType' in field.value ? pointUnit[field.value!.pointType as keyof typeof pointUnit] : '堂' }}數：<span>{{ field.value.clientGroupId && pointGroupRemainings[field.value.clientGroupId] }}</span></p>
+              <p class="group__label">剩餘{{ field.value.clientGroupId ? pointGroupRemainings[field.value.clientGroupId].unit : '堂' }}數：<span>{{ field.value.clientGroupId && pointGroupRemainings[field.value.clientGroupId].point }}</span></p>
             </template>
             <template v-else>
               <OInput readonly :name="`payments[${idx}].clientGroupName`" inside-label="群組" dense outlined style="background-color: white;" />
