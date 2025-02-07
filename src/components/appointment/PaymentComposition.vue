@@ -3,6 +3,8 @@ import type { Checkout } from '@/api';
 import { PaymentMethod } from '@/const/appointment';
 import { useFieldArray, useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
+import type { PointTypes } from '@/const/general';
+import { pointUnit } from '@/const/points';
 
 type Payment = Checkout['multiChannelPay'][number];
 interface Option {
@@ -11,6 +13,7 @@ interface Option {
 }
 interface GroupOption extends Option {
   points: number;
+  pointType: PointTypes;
 }
 
 const props = withDefaults(defineProps<{
@@ -68,7 +71,7 @@ watch(values, () => {
 const selectedMethods = computed(() => values.payments.map(payment => payment.payMethod));
 
 function updateSelectedGroup(group: GroupOption, field: any) {
-  update(+field.key, { ...field.value, clientGroupId: group.value, amount: null });
+  update(+field.key, { ...field.value, clientGroupId: group.value, amount: null, pointType: group.pointType });
 }
 
 function addPayment() {
@@ -152,7 +155,7 @@ const pointGroupRemainings = computed(() => {
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
             <template v-if="!readonly">
               <QSelect :readonly="readonly" :model-value="field.value.clientGroupId" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="(groupOption: GroupOption) => updateSelectedGroup(groupOption, field)" />
-              <p class="group__label">剩餘堂數：<span>{{ field.value.clientGroupId && pointGroupRemainings[field.value.clientGroupId] }}</span></p>
+              <p class="group__label">剩餘{{ 'pointType' in field.value ? pointUnit[field.value!.pointType as keyof typeof pointUnit] : '堂' }}數：<span>{{ field.value.clientGroupId && pointGroupRemainings[field.value.clientGroupId] }}</span></p>
             </template>
             <template v-else>
               <OInput readonly :name="`payments[${idx}].clientGroupName`" inside-label="群組" dense outlined style="background-color: white;" />

@@ -73,6 +73,7 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
   label: item.name,
   value: item.id,
   points: item.points,
+  pointType: item.type,
 }));
 
 const receiptData = computed(() => {
