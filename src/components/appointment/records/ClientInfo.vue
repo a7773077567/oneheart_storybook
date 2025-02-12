@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
@@ -6,15 +7,17 @@ import type { ScheduleVisitState } from '@/const/appointment';
 import { PaymentState, ScheduleStateMap } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
-import { type ClientScheduleDetail, RoleType, adjustEmployeePriceState, adjustFirstScheduleState, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, downloadContract, updateNote } from '@/api';
-import { computed, ref } from 'vue';
+import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
 import { OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, HighConversionOpportunity, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
 import FirstScheduleForm from './FirstScheduleForm.vue';
 import EmployeePriceForm from './EmployeePriceForm.vue';
-import { PhysicalTypes } from '@/const/general';
+import { AddOnServiceTypes, MachineShifts, PhysicalTypes, ShiftType } from '@/const/general';
+import EditMachineForm from './EditMachineForm.vue';
+import type { FormContext } from 'vee-validate';
+import AssignMachineOperator from './AssignMachineOperator.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -37,13 +40,15 @@ const duration = computed(() => ({
   start: schedule.value.scheduleStartTime,
   end: schedule.value.scheduleEndTime,
 }));
-const isCheckedOut = computed(() => schedule.value.paymentState === 2);
+const isCheckedOut = computed(() => schedule.value.paymentState === PaymentState['已結帳']);
 const canCheckout = computed(() => ScheduleStateMap.get(schedule.value.state)?.canCheckout);
-// const beforeCheckIn = computed(() => schedule.value.state === 1);
+const isMachineOnlyShifts = computed(() => MachineShifts.includes(userShift.value.type));
 
 const data = computed(() => {
   const all = [
+    ...(isMachineOnlyShifts.value ? [{ key: 'device', label: '儀器', value: props.scheduleDetail }] : []),
     { key: 'name', label: '姓名', value: client.value.name },
+    { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
@@ -54,7 +59,6 @@ const data = computed(() => {
     { key: 'date', label: '日期', value: dayjs(schedule.value.date).format('YYYY/MM/DD') },
     { key: 'time', label: '時間', value: getDurationLabel(schedule.value.scheduleStartTime, schedule.value.scheduleEndTime) },
     { key: 'location', label: '地點', value: userShift.value.space?.name ?? '' },
-    { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
     { key: 'firstVisitContract', label: '預約就診須知', value: client.value?.firstVisitContractUrl ?? null },
     { key: 'note', label: '預約備註', value: schedule.value.note, custom: true },
   ];
@@ -175,12 +179,73 @@ async function handleDownload(contractUrl: string) {
 
   window.open(contractUrl);
 }
+
+// 儀器
+const includeMachineTreatment = computed(() => (schedule.value.machines ?? []).length > 0);
+const isEditingMachine = ref(false);
+const machineInitVal = computed(() => {
+  if (!schedule.value?.machines?.[0])
+    return null;
+  const { id, machineStartTime, machineEndTime, type } = schedule.value.machines[0];
+  return ({
+    machineId: id,
+    startTime: machineStartTime,
+    endTime: machineEndTime,
+    machineType: type,
+    scheduleStartTime: schedule.value.scheduleStartTime,
+    scheduleEndTime: schedule.value.scheduleEndTime,
+    ...userShift.value.type === ShiftType['震波'] ? { shockWaveShots: schedule.value.record.independentShockWaveShots ?? 0 } : {},
+  });
+});
+async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachinePayload; setFieldError: FormContext['setFieldError'] }) {
+  try {
+    await adjustIndependentMachineInfo(props.scheduleId, value);
+    await appointmentStore.getClientSchedule(schedule.value.id);
+    isEditingMachine.value = false;
+  }
+  catch (error) {
+    setFieldError('period', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+    setFieldError('startTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+    setFieldError('endTime', '此時間已有其他預約占用此儀器，請選擇其他可用時段`');
+  }
+}
+
+const isEditingOperator = ref(false);
+
+// 以下情況 disable 完成服務：尚未簽署初診同意書、尚未簽署儀器使用同意書、尚未填寫震波發數
+const notFinishReminder = computed(() => {
+  switch (true) {
+    case appointmentStore.needToSignFirstVisit:
+      return '尚未簽署同意書，不可完成服務。';
+    case appointmentStore.needToSignMachineContract:
+      return '尚未簽署儀器使用同意書，不可完成服務。';
+    case userShift.value.type === ShiftType['震波'] && !props.scheduleDetail.record.independentShockWaveShots:
+    case appointmentStore.targetAppointmentAddOns.includes(AddOnServiceTypes['震波']) && !props.scheduleDetail.record.addOnServiceShockWaveShots:
+      return '尚未填寫震波發數，不可完成服務';
+    default:
+      return false;
+  }
+});
+
+// G動椅尚未指派治療師前，disable 報到
+const checkinReminder = computed(() => {
+  if (userShift.value.type === ShiftType['G動椅'] && !userShift.value.user.id) {
+    return '尚未指派治療師不可報到';
+  }
+  return null;
+},
+);
+
+// 預約單時間編輯判斷
+// 儀器內含預約不可編輯
+const includeMachineAddons = computed(() => schedule.value.addOnServices.some(machine => machine.isAddOn));
 </script>
 
 <template>
   <div class="client-info">
     <div class="client-info__header">
       <div class="misc">
+        <h3>{{ ShiftType[scheduleDetail.userShift.type] }}</h3>
         <p class="member-id">
           <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
         </p>
@@ -193,12 +258,31 @@ async function handleDownload(contractUrl: string) {
     </div>
     <div class="client-info__body">
       <ClientInfoTable :data="data">
+        <template #device="{ row }">
+          <div class="device_info">
+            <div>機台 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.name }}</div>
+            <div>時間 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineStartTime }} - {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineEndTime }}</div>
+            <div v-if="+userShift.type === ShiftType['震波']">
+              發數
+              <QBadge v-if="!(row.value as ClientScheduleDetail)?.record?.independentShockWaveShots" style="background-color: #F8C9CB; color:#C2351A" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">發數未填寫</QBadge>
+              <span>{{ (row.value as ClientScheduleDetail)?.record?.independentShockWaveShots }}</span>
+            </div>
+            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingMachine = true" />
+          </div>
+        </template>
         <template #name="{ row }">
           <div class="name">
             <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
+          </div>
+        </template>
+        <template #doctor="{ row }">
+          <div class="flex items-center justify-between">
+            <span v-if="row.value">{{ row.value }}</span>
+            <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-px-sm q-py-xs text-weight-medium">未指派</QBadge>
+            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingOperator = true" />
           </div>
         </template>
         <template #isFirstClientSchedule="{ row }">
@@ -252,7 +336,7 @@ async function handleDownload(contractUrl: string) {
               <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
             </div>
             <div class="time__actions">
-              <QBtn v-if="!isEditingTime" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+              <QBtn v-if="!isEditingTime && !includeMachineAddons" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
             </div>
           </div>
         </template>
@@ -279,12 +363,26 @@ async function handleDownload(contractUrl: string) {
     <div class="client-info__actions">
       <div class="actions">
         <QBtn v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
-        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule" outline style="width: 127px;" @click="rearrangeClientSchedule" />
+
+        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment" outline style="width: 127px;" @click="rearrangeClientSchedule">
+          <QTooltip v-if="includeMachineTreatment" class="bg-black" anchor="top left" self="bottom middle">
+            本預約包含儀器治療，不可預約改期
+          </QTooltip>
+        </QBtn>
+
         <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
-          <QBtn v-if="scheduleState === '預約'" label="報到" color="black" style="width: 127px;" @click="checkIn" />
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="appointmentStore.needToSignFirstVisit" @click="finishService" />
+          <QBtn v-if="scheduleState === '預約'" :disable="!!checkinReminder" label="報到" color="black" style="width: 127px;" @click="checkIn">
+            <QTooltip v-if="!!checkinReminder" class="bg-black" anchor="top left" self="bottom middle">
+              {{ checkinReminder }}
+            </QTooltip>
+          </QBtn>
+          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="!!notFinishReminder" @click="finishService">
+            <QTooltip v-if="notFinishReminder" class="bg-black" anchor="top left" self="bottom middle">
+              {{ notFinishReminder }}
+            </QTooltip>
+          </QBtn>
           <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
         </div>
       </div>
@@ -295,6 +393,26 @@ async function handleDownload(contractUrl: string) {
   </QDialog>
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
+  </QDialog>
+  <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine" persistent>
+    <EditMachineForm
+      title="編輯儀器治療"
+      disable-time
+      :init-val="machineInitVal"
+      :machine-type="machineInitVal!.machineType"
+      @cancel="isEditingMachine = false"
+      @submit="updateMachineInfo"
+    />
+  </QDialog>
+  <QDialog v-if="userShift.type === ShiftType['G動椅']" v-model="isEditingOperator">
+    <AssignMachineOperator
+      title="指派治療師"
+      :init-val="{ userId: userShift.userId }"
+      :shift-type="userShift.type"
+      :client-schedule-id="scheduleId"
+      @save="(isEditingOperator = false), (appointmentStore.getClientSchedule(+props.scheduleId))"
+      @cancel="isEditingOperator = false"
+    />
   </QDialog>
 </template>
 
@@ -404,6 +522,7 @@ async function handleDownload(contractUrl: string) {
 .misc {
   display: grid;
   grid-template-columns: auto 1fr auto;
+  align-items: center;
 }
 
 .liffIntroducerName {
@@ -416,5 +535,10 @@ async function handleDownload(contractUrl: string) {
     display: flex;
     align-items: center;
   }
+}
+
+.device_info {
+  display: flex;
+  gap: 32px;
 }
 </style>

@@ -4,7 +4,7 @@ import { RouterView, useRouter } from 'vue-router';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { SimpleSelect } from '@/components/shared';
 import { Avatar, Breadcrumbs, Drawer } from '@/components/layout';
-import { useHandoverStore, useUserStore } from '@/stores';
+import { useHandoverStore, useOptionStore, useUserStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { spaceLogin } from '@/api/user';
 import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
@@ -12,6 +12,7 @@ import Logo from '/images/one-heart.png';
 import TestingLogo from '/images/development-one-heart.png';
 import ShiftChangeReminder from '@/components/layout/ShiftChangeReminder.vue';
 
+const optionStore = useOptionStore();
 const userStore = useUserStore();
 const handoverStore = useHandoverStore();
 const { userInfo, currentSpaceId } = storeToRefs(userStore);
@@ -22,6 +23,7 @@ const spaceOptions = userInfo.value?.spaces?.map(({ name, id }) => {
 });
 currentSpaceId.value = getCookie('lastSpaceId') ? +getCookie('lastSpaceId')! : spaceOptions?.[0].value ?? null;
 
+// detect if current login space is changed
 watch(currentSpaceId, async (newSpaceId) => {
   const oriSpaceId = getCookie('lastSpaceId');
 
@@ -32,6 +34,7 @@ watch(currentSpaceId, async (newSpaceId) => {
     setCookie('lastSpaceId', newSpaceId);
     router.push({ name: 'home' });
   }
+  optionStore.getSpaceOptions();
 }, { immediate: true });
 
 const drawerOpen = ref(true);

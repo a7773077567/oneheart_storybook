@@ -3,10 +3,14 @@ import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 import duration, { type DurationUnitType } from 'dayjs/plugin/duration';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 dayjs.extend(objectSupport);
 dayjs.extend(duration);
 dayjs.extend(quarterOfYear);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 export function getWeekDay(weekDay: number) {
   const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -64,4 +68,24 @@ export function reduceMinsToHrs<T extends Record<string, any>, K extends keyof T
 
 export function minsToHrs(val: number) {
   return dayjs.duration(val, 'm').asHours();
+}
+
+export function judgeTimeWithinDuration({ startTime, endTime, min, max }: { startTime?: string; endTime?: string; min: string; max: string }) {
+  const start = startTime && getTimeDate(startTime);
+  const end = endTime && getTimeDate(endTime);
+  const _min = getTimeDate(min);
+  const _max = getTimeDate(max);
+  let result = [];
+
+  if (start) {
+    result.push(start.isSameOrAfter(_min));
+  }
+  if (end) {
+    result.push(end.isSameOrBefore(_max));
+  }
+  if (start && end) {
+    result.push(start.isSameOrBefore(end));
+  }
+
+  return result.every(r => !!r);
 }

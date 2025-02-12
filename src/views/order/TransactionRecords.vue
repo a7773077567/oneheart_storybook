@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { QPagination, type QTableProps } from 'quasar';
 import type { PointTypes } from '@/const/general';
-import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { AddOnServiceTypes, PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
 import { deletePayment, getPayments, getSinglePayment } from '@/api';
 import type { MedicalPaymentRecord, PointsPaymentRecord, VoucherPaymentRecord } from '@/api';
 import dayjs from 'dayjs';
@@ -191,14 +191,27 @@ const isReceiptDialogOpen = ref(false);
 const space = ref<string>('');
 
 async function checkReceipt(paymentId: number) {
-  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName, pointPaymentClientGroupType } = await getSinglePayment(paymentId);
+  const data = await getSinglePayment(paymentId);
+  const { type, client, date, userShift, clientSchedulePaymentMultiChannelPay, groupClassTicketPaymentMultiChannelPay, pointPaymentMultiChannelPay, paidPointGained, giftPointGained, groupClassName, pointPaymentPlan, pointPaymentClientGroupName, ticketGained, spaceName, pointPaymentClientGroupType } = data;
   space.value = spaceName!;
   let amount = 0;
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
+
   switch (type) {
-    case TransactionTypes.門診費用:
+    case TransactionTypes.門診費用:{
+      const addOnList = data.addOnServices.filter(addOn => addOn.isAddOn);
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
-      extraFields = [{ name: 'amount', label: '總額', value: `$${amount}` }, { name: 'declaration', label: '健保申報', value: '無' }, { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' }, { name: 'userName', label: '治療師', value: userShift?.user?.name }, { name: 'date', label: '日期', value: date }];
+      extraFields = [
+        { name: 'amount', label: '總額', value: `$${amount}` },
+        { name: 'declaration', label: '健保申報', value: '無' },
+        { name: 'selfPay', label: '自費項目', value: userShift?.type ? ShiftType[userShift.type] : '-' },
+        { name: 'userName', label: '治療師', value: userShift?.user?.name },
+        { name: 'date', label: '日期', value: date },
+        ...(addOnList.length > 0 ? [{ name: 'addOn', label: '加購服務', value: addOnList.map(a => a?.serviceName).join('、') }] : []),
+        ...(addOnList.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ name: 'addOnServiceShockWaveShots', label: '加購發數', value: `${data?.record?.addOnServiceShockWaveShots ?? 0}發` }] : []),
+        ...(!!userShift && userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []),
+      ];
+    }
       break;
     case TransactionTypes.團課券購買:
       amount = calcReceiptAmount(groupClassTicketPaymentMultiChannelPay);
@@ -235,10 +248,10 @@ const targetPaymentDetails = ref<InstanceType<typeof PaymentDetail>['$props']['d
 const showDetail = ref(false);
 
 async function checkPaymentDetail(val: any) {
-  showDetail.value = true;
   targetPaymentDetails.value = val;
   const data = await getSinglePayment(val.id);
   targetPaymentDetails.value = { ...targetPaymentDetails.value, ...data };
+  showDetail.value = true;
 }
 
 const showCancelConfirm = ref(false);

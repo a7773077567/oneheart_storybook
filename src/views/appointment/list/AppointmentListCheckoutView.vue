@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAppointmentStore } from '@/stores';
-import { AddOnTable, CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
-import { ShiftType, Types } from '@/const/general';
+import { CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
+import { AddOnServiceTypes, PointTypes, ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref, watch } from 'vue';
 import { calcReceiptAmount } from '@/utils/helpers';
@@ -30,37 +30,51 @@ if (!appointmentStore.isSameSpaceClinicSchedule) {
   onCancel(() => router.push({ name: 'appointmentListCalendar' }));
 }
 
-const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule } = (appointmentStore.targetClientSchedule!);
+const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule, record } = (appointmentStore.targetClientSchedule!);
 
 await appointmentStore.getClientGroup(client.id);
 const shiftType = computed(() => Object.values(Types).find(item => item.identifier === userShift.type)!);
 const totalAmount = ref(2000);
 const payments = ref<Payments>([]);
 
+const addOnList = computed(() => addOnServices.filter(addOn => addOn.isAddOn));
 const info: CheckTableData = [
   { key: 'date', value: scheduleDate, span: true, custom: true },
   { key: 'name', value: client.name, label: '姓名' },
   { key: 'phone', value: client.phone, label: '電話' },
-  { key: 'userName', value: userShift?.user.name, label: '治療師', span: true },
-  { key: 'type', value: shiftType.value?.label, label: '項目', span: true },
+  { key: 'userName', value: userShift?.user.name, label: '治療師' },
+  { key: 'type', value: shiftType.value?.label, label: '項目' },
+  ...(userShift.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
+  ...(addOnList.value.length > 0 ? [{ key: 'addOns', label: '加購服務', value: addOnList.value.map(addOn => addOn.serviceName).join('、') }] : []),
+  ...(addOnList.value.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ key: 'addOnServiceShockWaveShots', label: '加購發數', value: `${record.addOnServiceShockWaveShots ?? '0'}發` }] : []),
 ];
 
-const hasAddOn = computed(() => addOnServices.some(addOn => addOn.isAddOn));
-const addOns: CheckTableData = [
-  { key: 'title', value: '加購服務', span: true, custom: false },
-  { key: 'item1', value: '儀器治療', label: '項目' },
-];
-
+const allowMultiPointPayment = computed(() => addOnList.value.length > 0);
 const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
   const appointmentGroupType = Object.values(Types).find(type => type.identifier === userShift.type)?.pointType;
+
+  if (allowMultiPointPayment.value) {
+    const addOnPointType = addOnList.value.map((addOn) => {
+      switch (addOn.serviceType) {
+        case AddOnServiceTypes['射頻']:
+          return PointTypes['射頻'];
+        case AddOnServiceTypes['磁波']:
+          return PointTypes['磁波'];
+        case AddOnServiceTypes['震波']:
+          return PointTypes['震波'];
+        default:
+          return null;
+      }
+    });
+    return group.type === appointmentGroupType || addOnPointType.includes(group.type);
+  }
   return group.type === appointmentGroupType;
 }).map(item => ({
   label: item.name,
   value: item.id,
   points: item.points,
+  pointType: item.type,
 }));
-
-// const spaceName = computed(() => userShift.space?.name);
 
 const receiptData = computed(() => {
   return [
@@ -72,6 +86,9 @@ const receiptData = computed(() => {
     { name: 'declaration', label: '健保申報', value: '無' },
     { name: 'selfPay', label: '自費項目', value: ShiftType[userShift.type] },
     { name: 'userName', label: '治療師', value: userShift.user.name },
+    ...(userShift.type === ShiftType['震波'] ? [{ name: 'independentShockWaveShots', label: '發數', value: `${record.independentShockWaveShots ?? '0'}發` }] : []),
+    ...addOnList.value.length > 0 ? [{ name: 'addOn', label: '加購服務', value: addOnList.value.map(a => a.serviceName).join('、') }] : [],
+    ...(addOnList.value.some(addOn => addOn.serviceType === AddOnServiceTypes['震波']) ? [{ name: 'addOnServiceShockWaveShots', label: '加購發數', value: `${record.addOnServiceShockWaveShots ?? '0'}發` }] : []),
   ];
 });
 
@@ -119,7 +136,10 @@ watch(payments, (chosenPayments) => {
 <template>
   <div class="checkout">
     <QDialog v-model="isReceiptDialogOpen" persistent>
-      <Receipt :rows="receiptData" :space-name="userShift?.space.name" :space-id="userShift.spaceId" @checkout="onCheckout" />
+      <Receipt
+        :rows="receiptData" :space-name="userShift?.space.name" :space-id="userShift.spaceId"
+        @checkout="onCheckout"
+      />
     </QDialog>
 
     <CheckTable :data="info">
@@ -128,12 +148,10 @@ watch(payments, (chosenPayments) => {
       </template>
     </CheckTable>
 
-    <AddOnTable v-if="hasAddOn" :data="addOns" />
-
     <PriceTags :list="priceTags" />
 
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
-    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" />
+    <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" :multi-point="allowMultiPointPayment" />
   </div>
 </template>
 
@@ -147,6 +165,7 @@ watch(payments, (chosenPayments) => {
 
 .slot-padding {
   padding: 10px;
+
   &--payment {
     @extend .slot-padding;
     padding: 18px 10px;
@@ -169,6 +188,7 @@ watch(payments, (chosenPayments) => {
   display: flex;
   align-items: center;
   gap: 5px;
+
   &__input {
     width: 134px;
     padding: 10px;
@@ -188,11 +208,13 @@ watch(payments, (chosenPayments) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
   &__item {
     display: flex;
     justify-content: space-between;
   }
 }
+
 .checkout-btn {
   display: flex;
   justify-content: flex-end;

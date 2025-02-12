@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MedicalHistoryRecord } from '@/api';
+import { fetchAddOnHistoryRecords, fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getMachineScheduleInprogress, getUploadS3Url, upload2awsS3 } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MachineSchedule } from '@/api';
 import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift, fetchUserShifts } from '@/api/shift';
@@ -8,6 +8,7 @@ import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
 import { useUserStore } from './user';
+import { type AddOnServiceTypes, MachineShifts, ShiftType } from '@/const/general';
 
 interface State {
   users: User[];
@@ -33,6 +34,7 @@ interface State {
   appointmentCalendarInitOption: number[];
   userShifts: UserShift[];
   historyRecords: HistoryRecord[];
+  machineSchedules: MachineSchedule[];
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -60,6 +62,7 @@ export const useAppointmentStore = defineStore('appointment', {
     appointmentCalendarInitOption: [],
     userShifts: [],
     historyRecords: [],
+    machineSchedules: [],
   }),
   getters: {
     userOptions(state) {
@@ -144,11 +147,59 @@ export const useAppointmentStore = defineStore('appointment', {
         };
       });
     },
+    magneticWaveHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { magneticWavesRecords, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: { magneticWavesRecords: { label: '磁波治療紀錄', value: magneticWavesRecords } },
+        };
+      });
+    },
+    GChariHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { magneticGChairRecords, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: { magneticGChairRecords: { label: 'G動椅治療紀錄', value: magneticGChairRecords } },
+        };
+      });
+    },
     isSameSpaceClinicSchedule: (state) => {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
     needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
+    needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
+    targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
+    queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],
+    machineOnlyAppointment: (state) => {
+      if (state.machineSchedules.length === 0)
+        return [];
+
+      return state.machineSchedules.reduce((list, appointment) => {
+        if (MachineShifts.includes(appointment.userShift.type)) {
+          list.push(appointment);
+        }
+        // 內含儀器預約，需前端另外拆預約單 per 儀器
+        else if (appointment.machines.length > 0) {
+          const individualMachines = appointment.machines.map(machine => ({
+            ...appointment,
+            scheduleStartTime: machine.machineStartTime,
+            scheduleEndTime: machine.machineEndTime,
+            machines: [
+              {
+                ...machine,
+              },
+            ],
+          }));
+          list.push(...individualMachines);
+        }
+        return list;
+      }, [] as (MachineSchedule)[]);
+    },
   },
   actions: {
     async getUsers(spaceIds: number[]) {
@@ -229,6 +280,14 @@ export const useAppointmentStore = defineStore('appointment', {
     },
     async getHistoryRecords(recordId: number) {
       const data = await fetchHistoryRecords(recordId);
+      this.historyRecords = data;
+    },
+    async getMachineScheduleInprogress(query: Parameters<typeof getMachineScheduleInprogress>[0]) {
+      const data = await getMachineScheduleInprogress(query);
+      this.machineSchedules = data;
+    },
+    async getAddOnHistoryRecords(query: Parameters<typeof fetchAddOnHistoryRecords>[0]) {
+      const data = await fetchAddOnHistoryRecords(query);
       this.historyRecords = data;
     },
   },

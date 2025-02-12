@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, watch } from 'vue';
-import { ContractTypes, updateClientFirstVisitContract } from '@/api';
+import { ContractTypes, updateAddOnServiceContract, updateClientFirstVisitContract, updateIndependentMachineContract } from '@/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -18,11 +18,33 @@ watch(contractDetail, (contract) => {
   if (!contract)
     return;
 
-  updateClientFirstVisitContract({
-    clientId: +contract.clientId,
-    clientScheduleId: +contract.scheduleId,
-    firstVisitContractDottedsignTaskId: contract.taskId,
-  });
+  switch (contractDetail.value?.contractType) {
+    case ContractTypes['物理治療初診就診須知']:
+      return updateClientFirstVisitContract({
+        clientId: +contract.clientId,
+        clientScheduleId: +contract.scheduleId,
+        firstVisitContractDottedsignTaskId: contract.taskId,
+      });
+    case ContractTypes['聚焦式震波療程同意書']:
+    case ContractTypes['SIS超磁場治療儀療程前注意事項']:
+    case ContractTypes['G動椅儀器治療同意書']:
+    case ContractTypes['射頻儀器治療同意書']:
+    {
+      if (contract.isAddOn) {
+        updateAddOnServiceContract({
+          clientScheduleId: +contract.scheduleId,
+          contractTaskId: +contract.taskId,
+          serviceType: +contract.serviceType,
+        });
+        return;
+      }
+      return updateIndependentMachineContract({
+        clientScheduleId: +contract.scheduleId,
+        dottedsignTaskId: contract.taskId,
+      });
+    }
+    default:
+  }
 }, {
   immediate: true,
 });
@@ -44,6 +66,10 @@ async function handleRedirect() {
         content: JSON.stringify(contractDetail.value),
       } });
     case ContractTypes['物理治療初診就診須知']:
+    case ContractTypes['聚焦式震波療程同意書']:
+    case ContractTypes['SIS超磁場治療儀療程前注意事項']:
+    case ContractTypes['G動椅儀器治療同意書']:
+    case ContractTypes['射頻儀器治療同意書']:
     default:{
       if (!contractDetail.value.scheduleId) {
         return router.push({ name: 'appointmentListCalendar' });

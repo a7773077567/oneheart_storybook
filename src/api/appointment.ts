@@ -1,8 +1,11 @@
 import { api } from '@/utils/api';
 import { z } from 'zod';
-import type { Client, UserShiftDetail } from '@/api';
+import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
-import type { ScheduleVisitState } from '@/const/appointment';
+import type { PaymentState, ScheduleVisitState } from '@/const/appointment';
+import type { MachineSchedule } from './machine';
+import type { MachineTypes } from '@/const/general';
+import { AddOnServiceTypes, ShiftType } from '@/const/general';
 
 export interface TherapyTypesRes {
   therapyTypes: string[];
@@ -64,8 +67,22 @@ export interface Record {
     },
   ];
   advice: string;
+  magneticWavesRecords: MagneticWavesRecord[];
+  magneticGChairRecords: GChairRecord[];
+  independentShockWaveShots: number | null; // 獨立預約震波發數
+  addOnServiceShockWaveShots: number | null; // 加購震波發數
+
 }
 
+export interface MagneticWavesRecord {
+  sequence: string; // 程序
+  bodyPart: string; // 部位
+  intensity: string; // 強度
+};
+export interface GChairRecord {
+  sequence: string; // 程序
+  intensity: string; // 強度
+};
 export interface Attachment {
   originalFileName: string; // 原始檔案名稱
   fileName: string; // UUID
@@ -184,30 +201,31 @@ export interface SportConsultation {
 
 export interface ClientSchedule {
   addOnServices: AddOnService[];
-  id: number;
-  clientId: number;
-  client: Client;
-  date: string;
-  userShiftId: number;
-  userShift: UserShiftDetail;
-  userShiftSlotId: number;
-  userShiftAppointmentId: number;
-  scheduleStartTime: string;
-  scheduleEndTime: string;
   bookedNumber: number;
-  paymentState: number;
-  state: number;
+  client: Client;
+  clientId: number;
+  clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
+  date: string;
+  id: number;
   isBeenRearranged: boolean;
   isEmployeePrice: boolean;
   isFirstClientSchedule: boolean;
-  isRearrangedClientSchedule: boolean;
-  isValidForRestore: boolean;
-  isUsingAutoRecommend: boolean;
-  rearrangeClientSchedule: ClientSchedule | null;
-  note: string;
-  clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
-  isSignedFirstVisitContract: boolean | null;
   isHighSalesOpportunity: boolean;
+  isRearrangedClientSchedule: boolean;
+  isSignedFirstVisitContract: boolean | null;
+  isSignedIndependentMachineContract?: boolean; // 判斷獨立儀器是否已經簽約
+  isUsingAutoRecommend: boolean;
+  isValidForRestore: boolean;
+  note: string;
+  paymentState: PaymentState;
+  rearrangeClientSchedule: ClientSchedule | null;
+  scheduleEndTime: string;
+  scheduleStartTime: string;
+  state: number;
+  userShift: UserShiftDetail;
+  userShiftAppointmentId: number;
+  userShiftId: number;
+  userShiftSlotId: number;
 }
 
 export interface ClientSchedulesModifyHistory {
@@ -246,7 +264,7 @@ export interface AppointmentStatus {
 export interface Available {
   slotId: number;
   userShiftId: number;
-  type: number;
+  type: ShiftType;
   name: string;
   date: string;
   startTime: string;
@@ -256,15 +274,22 @@ export interface Available {
     name: string;
   };
   appointmentStatus: AppointmentStatus | null;
+  machine: null | MachineInfo;
+  space: Space;
 }
 
 export interface CreateAppointmentPayload {
-  isEmployeePrice: boolean;
-  userShiftId: number;
+  addOnUserShiftTypes?: AddOnServiceTypes[];
   bookingClientIds: number[];
-  note?: string | null;
-  startTime: string;
+  date: string | null;
   endTime: string;
+  isEmployeePrice: boolean;
+  machineId: number | null; // G動椅才需要，其他科別帶 null
+  note?: string | null;
+  spaceId: number;
+  startTime: string;
+  userShiftId: number;
+  userShiftType: ShiftType;
 }
 
 export interface CreateAppointmentRearrangePayload {
@@ -277,6 +302,7 @@ export interface CreateAppointmentRearrangePayload {
 export interface ClientScheduleDetail extends ClientSchedule {
   medicalAndTrainingRecordId: number;
   record: Record & { userShiftType: number };
+  machines?: MachineSchedule['machines'];
 };
 
 interface UploadInfo {
@@ -321,8 +347,16 @@ export interface Checkout {
 }
 
 export interface AddOnService {
-  serviceName: string;
+  contractStatus: string;
+  contractTaskId: number | null;
+  endTime: string;
   isAddOn: boolean;
+  machine: string;
+  machineId: number | null;
+  serviceName: string;
+  serviceType: AddOnServiceTypes;
+  startTime: string;
+  type: MachineTypes;
 }
 
 export interface AdjustScheduleTimePayload {
@@ -462,13 +496,49 @@ export async function updateNote(clientScheduleId: number, note: string) {
 }
 
 /**
- * 更新排程加購服務
- * @param clientScheduleId
+ * 新增排程加購
+ * @param {object} params - The parameters for adding the service.
+ * @param {number} params.clientScheduleId - The ID of the client's schedule.
+ * @param {AddOnServiceTypes} params.serviceType - The type of additional service to add.
  */
-export async function updateAddOnServices(clientScheduleId: number, addOnServices: AddOnService[]) {
-  await api.patch(`/clientSchedules/${clientScheduleId}/update-addOnServices`, { addOnServices });
+export async function addOnService({ clientScheduleId, serviceType }: { clientScheduleId: number; serviceType: AddOnServiceTypes }) {
+  await api.post(`/clientSchedules/${clientScheduleId}/addOnService`, { serviceType });
 }
 
+export interface UpdateAddOnMachinePayload {
+  serviceType: AddOnServiceTypes;
+  machineId:	number;
+  startTime: string;
+  endTime: string;
+  addOnServiceShockWaveShots?:	number;
+}
+/**
+ * 更新排程加購服務
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.clientScheduleId - 排程 id
+ * @param {AddOnService[]} params.addOnServices - The list of add-on services to update.
+ */
+export async function updateAddOnServices({ clientScheduleId, addOnService }: { clientScheduleId: number; addOnService: UpdateAddOnMachinePayload }) {
+  await api.patch(`/clientSchedules/${clientScheduleId}/addOnService`, { ...addOnService });
+}
+
+/**
+ * 移除排程加購
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.clientScheduleId - 排程 id
+ * @param {AddOnServiceTypes} params.serviceType - 加購服務
+ */
+export async function deleteAddOnService({ clientScheduleId, serviceType }: { clientScheduleId: number; serviceType: AddOnServiceTypes }) {
+  await api.delete(`clientSchedules/${clientScheduleId}/addOnService/${serviceType}`);
+}
+
+/**
+ * 調整排程時間
+ *
+ * @param clientScheduleId - The ID of the client schedule to adjust.
+ * @param payload - The payload containing the new schedule time details.
+ * @returns The updated schedule data.
+ */
 export async function adjustScheduleTime(clientScheduleId: number, payload: AdjustScheduleTimePayload) {
   const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/adjust-scheduleTime`, payload);
   return data;
@@ -479,6 +549,14 @@ export async function adjustScheduleTime(clientScheduleId: number, payload: Adju
  */
 export async function fetchHistoryRecords(recordId: number) {
   const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameUserShiftTypeHistoryRecords`);
+  return data;
+}
+
+/**
+ * 取得相同科別歷史紀錄
+ */
+export async function fetchAddOnHistoryRecords({ recordId, serviceType }: { recordId: number; serviceType: AddOnServiceTypes }) {
+  const { data } = await api.get<HistoryRecord[]>(`/medicalAndTrainingRecords/${recordId}/sameAddOnServiceUserShiftTypeHistoryRecords`, { params: { serviceType } });
   return data;
 }
 
@@ -498,14 +576,33 @@ export async function adjustEmployeePriceState({ clientScheduleId, isEmployeePri
   return data;
 }
 
+/**
+ * 取得排程無綁定人員儀器作人員
+ * 當天有排班的User，且人員的角色為 type=2~5(院長、副院長、物理治療師組長、物理治療師）。加上角色為 type=10(櫃檯)
+ */
+export async function getMachineOperatingUsers(clientScheduleId: number) {
+  const { data } = await api.get<User[]>(`/clientSchedules/${clientScheduleId}/get-machineOperatingUsers`);
+  return data;
+}
+
+/**
+ * 綁定排程治療師
+ * 當天有排班的User，且人員的角色為 type=2~5(院長、副院長、物理治療師組長、物理治療師）。加上角色為 type=10(櫃檯)
+ */
+export async function updateMachineOperatingUsers(clientScheduleId: number, userId: number) {
+  const { data } = await api.patch(`/clientSchedules/${clientScheduleId}/update-machine-operator`, { userId });
+  return data;
+}
+
 // ========== Schemas ==========
 export const availableReqSchema = z.object({
-  userShiftType: z.number({ required_error: '必填' }),
+  userShiftType: z.nativeEnum(ShiftType, { required_error: '必填' }),
   userIds: z.number().array().optional(),
   // .min(1, { message: '至少選擇1名治療師' }),
   date: z.string(),
   startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
+  addOnUserShiftTypes: z.array(z.nativeEnum(AddOnServiceTypes)).optional(),
 })
   .refine(({ startTime, endTime }) => {
     const start = getTimeDate(startTime);

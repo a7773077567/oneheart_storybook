@@ -26,6 +26,10 @@ export const TherapyTypes = {
   group: '團課',
   physicalTrial: '物理治療體驗門診',
   InternshipClinic: '新人實習門診',
+  shockWave: '震波',
+  radioFrequency: '射頻',
+  magneticWave: '磁波',
+  GChair: 'G動椅',
 };
 
 // 場館類別
@@ -42,8 +46,8 @@ export const SportTherapyTypes = {
 
 type TypeName = keyof typeof TherapyTypes;
 
-const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlan', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic', 'addOnPrice', 'pointsGroup'] as const;
-const TabLabels = ['客戶資料', '病歷單', '身體組成表', 'MEMO', '諮詢表', '附件', '運動訓練單', '運動諮詢', '團體課程單', '營養諮詢單', '足壓門診單', '睡眠門診單', '加價服務', '群組與堂數'] as const;
+const TabNames = ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'memo', 'physicalConsultation', 'consultationAttachment', 'trainingPlan', 'sportClinic', 'groupClass', 'nutritionClinic', 'footPressure', 'sleepClinic', 'addOnPrice', 'pointsGroup', 'magneticWaveRecord', 'gChairRecord'] as const;
+const TabLabels = ['客戶資料', '病歷單', '身體組成表', 'MEMO', '諮詢表', '附件', '運動訓練單', '運動諮詢', '團體課程單', '營養諮詢單', '足壓門診單', '睡眠門診單', '加價服務', '群組與堂數', '磁波病例單', 'G動椅病例單'] as const;
 export const TabMap = new Map(TabNames.map((item, idx) => [item, TabLabels[idx]]));
 
 export enum ShiftType {
@@ -60,26 +64,26 @@ export enum ShiftType {
   團課 = 11,
   物理治療體驗門診 = 12,
   新人實習門診 = 13,
-  // '震波' = 14,
-  // '射頻' = 15,
-  // '磁波' = 16,
-  // 'G動椅' = 17,
+  震波 = 14,
+  射頻 = 15,
+  磁波 = 16,
+  G動椅 = 17,
 }
-const ShiftTypeConst = {
-  物理諮詢門診: 1,
-  物理治療門診: 2,
-  足壓門診: 3,
-  營養門診: 4,
-  睡眠門診: 5,
-  院長評估門診: 6,
-  院長物理治療: 7,
-  營養諮詢門診: 8,
-  教練課: 9,
-  運動諮詢: 10,
-  團課: 11,
-  物理治療體驗門診: 12,
-  新人實習門診: 13,
-} as const;
+// const ShiftTypeConst = {
+//   物理諮詢門診: 1,
+//   物理治療門診: 2,
+//   足壓門診: 3,
+//   營養門診: 4,
+//   睡眠門診: 5,
+//   院長評估門診: 6,
+//   院長物理治療: 7,
+//   營養諮詢門診: 8,
+//   教練課: 9,
+//   運動諮詢: 10,
+//   團課: 11,
+//   物理治療體驗門診: 12,
+//   新人實習門診: 13,
+// } as const;
 
 // 物理治療項目：只有以下 5 個科別屬於物理治療項目
 // https://www.notion.so/enginelin/fe29a884eab74700a7c01e75875f72ff?pvs=4
@@ -90,6 +94,14 @@ export const PhysicalTypes = [
   ShiftType['院長評估門診'],
   ShiftType['物理治療體驗門診'],
 ] as const;
+
+// 儀器治療項目
+export const MachineShifts = [
+  ShiftType['G動椅'],
+  ShiftType['射頻'],
+  ShiftType['磁波'],
+  ShiftType['震波'],
+];
 
 export const TherapyRoles = [
   RoleType['系統管理者'],
@@ -108,7 +120,8 @@ export const CoachRoles = [
 
 type TabName = typeof TabNames[number];
 export interface Type {
-  identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
+  // identifier: typeof ShiftTypeConst[keyof typeof ShiftTypeConst];
+  identifier: ShiftType;
   name: string;
   label: string;
   tabs: TabName[];
@@ -128,7 +141,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['物理諮詢門診'],
     name: 'physicalConsultation',
     label: '物理諮詢門診',
-    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'physicalConsultation', 'magneticWaveRecord', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 200,
     spaceType: SpaceType['物理診所'],
@@ -142,7 +155,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['物理治療門診'],
     name: 'physicalTherapy',
     label: '物理治療門診',
-    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'medicalRecord', 'magneticWaveRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
@@ -156,7 +169,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['足壓門診'],
     name: 'footPressure',
     label: '足壓門診',
-    tabs: ['clientInfo', 'footPressure', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'footPressure', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 2000,
     spaceType: SpaceType['物理診所'],
@@ -169,7 +182,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['營養門診'],
     name: 'nutrition',
     label: '營養門診',
-    tabs: ['clientInfo', 'nutritionClinic', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
@@ -182,7 +195,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['睡眠門診'],
     name: 'sleep',
     label: '睡眠門診',
-    tabs: ['clientInfo', 'sleepClinic', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'sleepClinic', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 2000,
     spaceType: SpaceType['物理診所'],
@@ -195,7 +208,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['院長評估門診'],
     name: 'deanConsultation',
     label: '院長評估門診',
-    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'physicalConsultation', 'magneticWaveRecord', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 699,
     spaceType: SpaceType['物理診所'],
@@ -208,7 +221,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['院長物理治療'],
     name: 'deanTherapy',
     label: '院長物理治療',
-    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'medicalRecord', 'magneticWaveRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 3000,
     spaceType: SpaceType['物理診所'],
@@ -222,7 +235,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['營養諮詢門診'],
     name: 'nutritionConsultation',
     label: '營養諮詢門診',
-    tabs: ['clientInfo', 'nutritionClinic', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'nutritionClinic', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 499,
     spaceType: SpaceType['物理診所'],
@@ -236,7 +249,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['教練課'],
     name: 'coachClass',
     label: '教練課',
-    tabs: ['clientInfo', 'trainingPlan', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'trainingPlan', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: true,
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
@@ -250,7 +263,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['運動諮詢'],
     name: 'sportConsultation',
     label: '運動諮詢',
-    tabs: ['clientInfo', 'sportClinic', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'sportClinic', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 200, // to be confirmed
     spaceType: SpaceType['運動場館'],
@@ -263,7 +276,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['團課'],
     name: 'groupClass',
     label: '團課',
-    tabs: ['clientInfo', 'groupClass', 'addOnPrice', 'pointsGroup'],
+    tabs: ['clientInfo', 'groupClass', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
@@ -276,7 +289,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['物理治療體驗門診'],
     name: 'physicalTrial',
     label: '物理治療體驗門診',
-    tabs: ['clientInfo', 'physicalConsultation', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'physicalConsultation', 'magneticWaveRecord', 'consultationAttachment', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 200,
     spaceType: SpaceType['物理診所'],
@@ -289,7 +302,7 @@ export const Types: Record<TypeName, Type> = {
     identifier: ShiftType['新人實習門診'],
     name: 'physicalTherapy',
     label: '新人實習門診',
-    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
     canUsePoint: false,
     calcAmount: () => 200,
     spaceType: SpaceType['物理診所'],
@@ -297,6 +310,62 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+  },
+  shockWave: {
+    identifier: ShiftType['震波'],
+    name: 'shockWave',
+    label: '震波儀器治療',
+    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+    pointType: PointTypes['震波'],
+  },
+  radioFrequency: {
+    identifier: ShiftType['射頻'],
+    name: 'radioFrequency',
+    label: '射頻儀器治療',
+    tabs: ['clientInfo', 'medicalRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+    pointType: PointTypes['射頻'],
+  },
+  magneticWave: {
+    identifier: ShiftType['磁波'],
+    name: 'magneticWave',
+    label: '磁波儀器治療',
+    tabs: ['clientInfo', 'magneticWaveRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+    pointType: PointTypes['磁波'],
+  },
+  GChair: {
+    identifier: ShiftType['G動椅'],
+    name: 'GChair',
+    label: 'G動椅儀器治療',
+    tabs: ['clientInfo', 'gChairRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: true,
+    calcAmount: () => 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+    pointType: PointTypes['G動椅'],
   },
 };
 
@@ -328,3 +397,18 @@ export enum PaymentTypes {
 }
 
 export const genderOptions = ['生理男', '生理女'].map(o => ({ label: o, value: o }));
+
+// 儀器
+export enum MachineTypes {
+  震波儀器治療 = 1,
+  射頻儀器治療 = 2,
+  磁波儀器治療 = 3,
+  G動椅儀器治療 = 4,
+}
+
+// 可加購項目
+export enum AddOnServiceTypes {
+  震波 = 14,
+  射頻 = 15,
+  磁波 = 16,
+}

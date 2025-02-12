@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { api } from '@/utils/api';
 import { useUserStore } from '@/stores';
+import type { SpaceType } from '@/const/general';
 
 export interface LoginRes {
   accessToken: string;
@@ -82,7 +83,7 @@ export const newPasswordSchema = z.object({
 export interface Space {
   id: number;
   name: string;
-  type: number;
+  type: SpaceType;
 }
 
 // ========== Requests ==========

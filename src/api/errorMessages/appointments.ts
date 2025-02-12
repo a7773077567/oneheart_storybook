@@ -11,6 +11,8 @@ const messages: [string, string][] = [
   ['ClientSchedule not found', '此預約單並非此場館，無法進行此操作'],
   ['Schedule not found', '此預約單並非此場館，無法進行此操作'],
   ['The schedule has been paid. Please cancel the payment first; only then can the schedule be canceled.', '此預約單已經結帳，請先取消此筆交易再進行取消預約單的操作'],
+  ['Can\'t appointment machine without firstSchedule', '初診不可預約儀器治療'],
+  ['AddOnService maxItemNumber is 2', '您的治療時間已達上限，無法再加購此儀器治療服務。'],
 ];
 
 export default messages;

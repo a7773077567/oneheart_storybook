@@ -210,8 +210,3 @@ export async function getClientPaymentDetail({ clientId, paymentId }: { clientId
   const { data } = await api.get<PaymentDetail>(`clients/${clientId}/payments/${paymentId}`);
   return data;
 }
-
-// 修改客戶就診須知
-export async function updateClientFirstVisitContract({ clientId, clientScheduleId, firstVisitContractDottedsignTaskId }: { clientId: number; clientScheduleId: number; firstVisitContractDottedsignTaskId: number }) {
-  await api.patch(`clients/${clientId}/update-firstVisitContract`, { clientScheduleId, firstVisitContractDottedsignTaskId });
-}

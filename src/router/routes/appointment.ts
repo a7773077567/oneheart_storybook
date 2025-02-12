@@ -85,6 +85,21 @@ export const appointmentRoutes: RouteRecordRaw[] = [
               }
             },
           },
+          {
+            path: 'machine-calendar/:machineType',
+            name: 'machineBookingCalendar',
+            props: true,
+            component: () => import('@/views/appointment/booking/MachineBookingCalendarView.vue'),
+            meta: {
+              label: '選擇可預約時間',
+              requireAuth: true,
+            },
+            beforeEnter: (to, from) => {
+              if (!from.name) {
+                return { name: 'appointmentBookingQuery' };
+              }
+            },
+          },
         ],
       },
       {

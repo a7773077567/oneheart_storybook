@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useForm } from 'vee-validate';
+import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ import { availableReqSchema } from '@/api/appointment';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
+import { AddOnServiceTypes, MachineTypes, PhysicalTypes, ShiftType } from '@/const/general';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -26,8 +27,20 @@ const { handleSubmit, values, setFieldValue } = useForm({
     date: dayjs().format('YYYY-MM-DD'),
     startTime: '09:00',
     endTime: '21:00',
+    addOnUserShiftTypes: [],
   },
 });
+const { push, remove } = useFieldArray<AddOnServiceTypes>('addOnUserShiftTypes');
+
+function selectAddOn(addOn: AddOnServiceTypes) {
+  if (values.addOnUserShiftTypes?.includes(addOn)) {
+    const idx = values.addOnUserShiftTypes?.findIndex(a => a === addOn);
+    remove(idx);
+  }
+  else {
+    push(addOn);
+  }
+}
 
 watch(() => values.userShiftType, (newShiftType) => {
   const shiftDetails = getType(newShiftType!)!;
@@ -46,7 +59,18 @@ const onSubmit = handleSubmit(async (values) => {
     $q.loading.show();
     await appointmentStore.getAvailable(appointmentStore.availableQuery);
     appointmentStore.querySent = true;
-    await router.push({ name: 'appointmentBookingCalendar' });
+
+    // G動椅是另外的 Machine Calendar 顯示
+    await router.push(values.userShiftType === ShiftType['G動椅']
+      ? {
+          name: 'machineBookingCalendar',
+          params: {
+            machineType: MachineTypes['G動椅儀器治療'],
+          },
+        }
+      : {
+          name: 'appointmentBookingCalendar',
+        });
   }
   catch (err) {
     console.log(err);
@@ -64,27 +88,81 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
   <div class="booking-query">
     <InputBox label="選擇項目">
-      <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" />
+      <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" hide-bottom-space />
     </InputBox>
     <InputBox :label="`選擇${selectLabel}`">
-      <OSelect name="userIds" :label="`選擇${selectLabel}`" :options="therapistOptions" multiple />
+      <OSelect
+        :disable="values.userShiftType === ShiftType['G動椅']" name="userIds" :label="`選擇${selectLabel}`"
+        :options="therapistOptions" multiple hide-bottom-space
+      />
     </InputBox>
+    <p v-if="values.userShiftType === ShiftType['G動椅']" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     <InputBox label="選擇日期" class="gutter">
-      <DatePicker name="date" />
+      <DatePicker name="date" hide-bottom-space />
     </InputBox>
     <InputBox label="選擇預約時間" class="gutter">
-      <OTime name="startTime" now-btn />
+      <OTime name="startTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">至</span>
-      <OTime name="endTime" now-btn />
+      <OTime name="endTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">止</span>
     </InputBox>
+    <fieldset v-if="values.userShiftType && PhysicalTypes.some(type => type === values.userShiftType)">
+      <legend>物理治療可加購儀器，是否加購？</legend>
+      <p class="remark">(至多可選兩項)</p>
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
+        label="震波"
+        class="q-pr-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['震波'])"
+      />
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['射頻'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['射頻'])"
+        label="射頻"
+        class="q-pa-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['射頻'])"
+      />
+      <QCheckbox
+        :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['磁波'])"
+        :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['磁波'])"
+        label="磁波"
+        class="q-pa-md"
+        @update:model-value="selectAddOn(AddOnServiceTypes['磁波'])"
+      />
+    </fieldset>
     <QBtn label="搜尋" outline style="width: 126px;" @click="onSubmit" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .booking-query {
-  width: 356px;
+  min-width: 356px;
+  width: fit-content;
   padding: 20px;
+
+  .note {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1b21;
+    white-space: nowrap;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    padding-left: 16px;
+  }
+
+  .input-box {
+    margin-bottom: 20px;
+  }
+
+  fieldset {
+    legend {
+      @include body-large($on-surface);
+      margin-bottom: 8px;
+    }
+    .remark {
+      @include body-small($on-surface-variant);
+    }
+  }
 }
 </style>

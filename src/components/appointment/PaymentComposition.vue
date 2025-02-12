@@ -3,6 +3,8 @@ import type { Checkout } from '@/api';
 import { PaymentMethod } from '@/const/appointment';
 import { useFieldArray, useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
+import type { PointTypes } from '@/const/general';
+import { pointUnit } from '@/const/points';
 
 type Payment = Checkout['multiChannelPay'][number];
 interface Option {
@@ -11,6 +13,7 @@ interface Option {
 }
 interface GroupOption extends Option {
   points: number;
+  pointType: PointTypes;
 }
 
 const props = withDefaults(defineProps<{
@@ -18,6 +21,7 @@ const props = withDefaults(defineProps<{
   methodOptions: Option[];
   groupOptions?: GroupOption[];
   readonly?: boolean;
+  multiPoint?: boolean;
 }>(), {
   readonly: false,
 });
@@ -65,11 +69,9 @@ watch(values, () => {
 });
 
 const selectedMethods = computed(() => values.payments.map(payment => payment.payMethod));
-const selectedGroup = ref();
 
 function updateSelectedGroup(group: GroupOption, field: any) {
-  selectedGroup.value = group;
-  update(+field.key, { ...field.value, clientGroupId: selectedGroup.value.value, amount: null });
+  update(+field.key, { ...field.value, clientGroupId: group.value, amount: null });
 }
 
 function addPayment() {
@@ -86,6 +88,8 @@ function addPayment() {
 }
 
 function disableOption(opt: { label: string; value: any }) {
+  if (props.multiPoint && opt.label === '堂數')
+    return false;
   return selectedMethods.value.includes(opt.value);
 }
 
@@ -109,6 +113,13 @@ function showExtra(method: number) {
 //   }, 0);
 //   return total;
 // }
+
+const pointGroupRemainings = computed(() => {
+  return (props.groupOptions ?? []).reduce((calc, pointG) => {
+    calc[pointG.value] = { point: pointG.points, unit: pointUnit[pointG.pointType] };
+    return calc;
+  }, {} as { [key: number]: { point: number; unit: string } });
+});
 </script>
 
 <template>
@@ -126,7 +137,7 @@ function showExtra(method: number) {
               <OInput :readonly="readonly" :name="`payments[${idx}].groupClassTicketUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else-if="field.value.payMethod === PaymentMethod['堂數']">
-              <div class="input__label">堂數</div>
+              <div class="input__label"> {{ field.value.clientGroupId ? pointGroupRemainings[field.value.clientGroupId].unit : '堂' }} 數</div>
               <OInput :readonly="readonly" :name="`payments[${idx}].pointUsed`" type="number" style="background-color: white;" />
             </template>
             <template v-else>
@@ -143,8 +154,8 @@ function showExtra(method: number) {
         <div v-if="showExtra(field.value.payMethod)" class="payment__extra">
           <div v-if="field.value.payMethod === PaymentMethod['堂數']" class="group">
             <template v-if="!readonly">
-              <QSelect :readonly="readonly" :model-value="selectedGroup" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="(groupOption: GroupOption) => updateSelectedGroup(groupOption, field)" />
-              <p class="group__label">剩餘堂數：<span>{{ selectedGroup?.points }}</span></p>
+              <QSelect :readonly="readonly" :model-value="field.value.clientGroupId" :options="groupOptions" label="群組" dense outlined map-options style="width: 150px;" bg-color="white" @update:model-value="(groupOption: GroupOption) => updateSelectedGroup(groupOption, field)" />
+              <p class="group__label">剩餘{{ field.value.clientGroupId ? pointGroupRemainings[field.value.clientGroupId].unit : '堂' }}數：<span>{{ field.value.clientGroupId && pointGroupRemainings[field.value.clientGroupId].point }}</span></p>
             </template>
             <template v-else>
               <OInput readonly :name="`payments[${idx}].clientGroupName`" inside-label="群組" dense outlined style="background-color: white;" />
