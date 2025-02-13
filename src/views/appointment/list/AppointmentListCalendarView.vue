@@ -237,13 +237,16 @@ function getMachineAppointment(scope: any) {
   flex-direction: column;
   gap: 32px;
   height: 100%;
+  width: 100%;
   .appointment_calendar {
     flex: 1 1 60%;
     height: 0;
+    width: 100%;
   }
   .device_container {
     flex: 1 1 40%;
     height: 0;
+    width: 100%;
     .device_select {
       margin-bottom: 20px;
     }

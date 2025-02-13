@@ -129,6 +129,8 @@ function getCalendarStyle() {
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 16px;
   }
   &__body {
     flex: 1;
