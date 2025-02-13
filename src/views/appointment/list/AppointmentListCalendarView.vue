@@ -236,6 +236,7 @@ function getMachineAppointment(scope: any) {
   display: flex;
   flex-direction: column;
   gap: 32px;
+  height: 100%;
   .appointment_calendar {
     flex: 1 1 60%;
     height: 0;
