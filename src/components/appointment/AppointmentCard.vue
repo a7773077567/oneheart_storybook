@@ -26,7 +26,7 @@ const specialOffers = computed(() => [
   { label: '員工價', value: props.data.isEmployeePrice },
   { label: '自動推薦', value: props.data.isUsingAutoRecommend },
 ]);
-const tooltipInfo = [
+const tooltipInfo = computed(() => [
   { label: null, value: `${props.data.scheduleStartTime} - ${props.data.scheduleEndTime}` },
   ...(props.data.isFirstClientSchedule ? [{ label: null, value: '初診' }] : []),
   {
@@ -44,7 +44,7 @@ const tooltipInfo = [
       }]
     : []),
   ...(props.data.userShift.type === ShiftType['G動椅'] ? [{ label: '治療師', value: props.data.userShift.user?.id ? props.data.userShift.user?.name : '未指派' }] : []),
-];
+]);
 </script>
 
 <template>
@@ -68,7 +68,7 @@ const tooltipInfo = [
 
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
-    <QTooltip :key="data.id" class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
+    <QTooltip :id="`tooltip-${data.id}`" :key="data.id" class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
       <div v-for="(item, idx) in tooltipInfo" :key="idx" class="tooltip_info">
         <div v-if="!!item.label" class="label">{{ item.label }}：</div>
         <div class="value">{{ item.value }}</div>
