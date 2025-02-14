@@ -68,7 +68,7 @@ const tooltipInfo = [
 
     <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
 
-    <QTooltip class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
+    <QTooltip :key="data.id" class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
       <div v-for="(item, idx) in tooltipInfo" :key="idx" class="tooltip_info">
         <div v-if="!!item.label" class="label">{{ item.label }}：</div>
         <div class="value">{{ item.value }}</div>
