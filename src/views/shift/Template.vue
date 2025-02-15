@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { ShiftCard, ShiftTemplateEditor } from '@/components/shift';
 import { type CreateShiftTemplate, createShiftTemplate, deleteShiftTemplate, fetchShiftTemplate, updateShiftTemplate } from '@/api/shift';
 import { useShiftStore } from '@/stores';
+import { ShiftType } from '@/const/general';
 
 const shiftStore = useShiftStore();
 const $q = useQuasar();
@@ -50,6 +51,8 @@ function closeShiftTemplateEditor() {
   isEditorOpen.value = false;
   shiftStore.targetShiftTemplate = null;
 }
+
+const shiftOptions = computed(() => shiftStore.spaceShiftOptions.filter(shift => shift.value !== ShiftType['G動椅']));
 </script>
 
 <template>
@@ -60,7 +63,7 @@ function closeShiftTemplateEditor() {
       </h2>
       <QBtn label="新增" icon="add" outline @click="openEditor" />
       <QDialog v-model="isEditorOpen" persistent>
-        <ShiftTemplateEditor :data="shiftStore.targetShiftTemplate" :shift-type-options="shiftStore.spaceShiftOptions" @cancel="isEditorOpen = false" @confirm="onEditorConfirm" @close="closeShiftTemplateEditor" />
+        <ShiftTemplateEditor :data="shiftStore.targetShiftTemplate" :shift-type-options="shiftOptions" @cancel="isEditorOpen = false" @confirm="onEditorConfirm" @close="closeShiftTemplateEditor" />
       </QDialog>
     </div>
     <div class="shift__body ">
