@@ -38,7 +38,7 @@ const rows = computed(() => {
       chiefComplaint,
       clientScheduleId,
     };
-  }).reverse();
+  });
 });
 
 function getFilterOptions() {
