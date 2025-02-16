@@ -6,6 +6,7 @@ import { useAppointmentStore } from '@/stores';
 import { ContractTypes, getContractShareLink } from '@/api';
 import { Dialog, Loading, QBadge } from 'quasar';
 import { GenericDialog } from '@/components/shared';
+import { useRoute } from 'vue-router';
 
 const props = defineProps<{
   scheduleId: string;
@@ -15,6 +16,7 @@ const appointmentStore = useAppointmentStore();
 await appointmentStore.getClientSchedule(+props.scheduleId);
 const userShiftType = computed(() => appointmentStore.targetClientSchedule?.userShift.type);
 const tabs = computed(() => getTabs());
+const route = useRoute();
 
 const currentTab = ref('clientInfo');
 const recordModules = getRecordModules();
@@ -104,7 +106,7 @@ const addOnCounts = computed(() => appointmentStore.targetAppointmentAddOns?.len
 </script>
 
 <template>
-  <QBtn label="返回" icon="chevron_left" color="primary" flat style="width: fit-content; margin: 4px 0; padding: 4px 8px; " @click="$router.push({ name: 'appointmentListCalendar' })" />
+  <QBtn label="返回" icon="chevron_left" color="primary" flat style="width: fit-content; margin: 4px 0; padding: 4px 8px; " @click="$router.push({ name: 'appointmentListCalendar', query: { date: route.query.date } })" />
   <QTabs v-model="currentTab" align="left" dense>
     <QTab v-for="(tab, idx) in tabs" :key="idx" :name="tab.name" :label="tab.label" :disable="tab.name === 'addOnPrice' && isMachineOnlyTreatment">
       <QTooltip v-if="tab.name === 'addOnPrice' && isMachineOnlyTreatment" anchor="top middle" self="center middle" class="bg-black">

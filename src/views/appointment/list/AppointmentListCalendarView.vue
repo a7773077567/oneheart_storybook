@@ -158,7 +158,7 @@ function getMachineAppointment(scope: any) {
               v-if="item.count === 1"
               :data="item.bookings[0]"
               :style="getStyle(item)"
-              @click="router.push({ name: 'appointmentListInfo', params: { scheduleId: item.bookings[0].id } })"
+              @click="router.push({ name: 'appointmentListInfo', params: { scheduleId: item.bookings[0].id }, query: { date: selectedDate } })"
             />
             <AppointmentCountCard
               v-else
