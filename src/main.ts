@@ -1,6 +1,10 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
+
+// must import before router, to access router in interceptor
+import '@/utils/api';
+
 import router from './router';
 
 // Quasar

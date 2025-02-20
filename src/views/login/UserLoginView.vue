@@ -31,8 +31,9 @@ async function onMicrosoftLogin() {
 }
 
 async function goHome(loginFunc: () => Promise<LoginRes>) {
-  const { accessToken: firstToken } = await loginFunc();
+  const { accessToken: firstToken, refreshToken } = await loginFunc();
   setCookie('firstToken', firstToken);
+  setCookie('refreshToken', refreshToken);
 
   router.push({ name: 'spaceLogin' });
 }

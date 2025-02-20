@@ -1,10 +1,12 @@
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Dialog, Loading } from 'quasar';
-import { getCookie } from '@/utils/helpers';
+import { getCookie, updateCookie } from '@/utils/helpers';
 import { ErrorMessages } from '@/api/errorMessages';
 import { ResponseErrorDialog } from '@/components/shared';
 import { useAppointmentStore } from '@/stores';
+import createAuthRefreshInterceptor, { type AxiosAuthRefreshOptions } from 'axios-auth-refresh';
+import { useRouter } from 'vue-router';
 
 // ========== Types ==========
 interface APIResponse<T, D = any> {
@@ -17,6 +19,7 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 30000,
 });
+
 instance.interceptors.request.use(
   requestInterceptor,
   requestInterceptorCatch,
@@ -25,6 +28,51 @@ instance.interceptors.response.use(
   responseInterceptor,
   responseInterceptorCatch,
 );
+
+// ========== Token refresh ==========
+// 需要另外創建 instance 避免 401 重複 loop
+const authInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: 30000,
+});
+
+async function refreshAuthLogic(): Promise<any> {
+  try {
+    const _refreshToken = getCookie('refreshToken');
+    if (!_refreshToken) {
+      return Promise.reject(new Error('no refresh id'));
+    }
+
+    const { data: { data: { accessToken: firstToken, refreshToken } } } = await authInstance.post('users/login-with-refresh-token', { refreshToken: _refreshToken });
+    updateCookie('firstToken', firstToken);
+    updateCookie('refreshToken', refreshToken);
+
+    const newSpaceId = getCookie('lastSpaceId');
+    if (!newSpaceId) {
+      return Promise.reject(new Error('no space id'));
+    }
+
+    const payload = { spaceId: +newSpaceId };
+    const _first = getCookie('firstToken');
+    const { data: { data: { accessToken: secondToken } } } = await authInstance.post('spaces/login', payload, {
+      headers: {
+        Authorization: `Bearer ${_first}`,
+      },
+    });
+    updateCookie('secondToken', secondToken);
+    return Promise.resolve();
+  }
+  catch (error) {
+    console.log('🚀 ~ refreshAuthLogic ~ error:', error);
+    const router = useRouter();
+    router.push({ name: 'userLogin' });
+  }
+}
+
+const refreshConfig: AxiosAuthRefreshOptions = {
+  statusCodes: [401],
+};
+createAuthRefreshInterceptor(instance, refreshAuthLogic, refreshConfig);
 
 // ========== Request Methods ==========
 export const api = {
@@ -142,18 +190,14 @@ interface ErrorResponse {
 }
 
 async function responseInterceptorCatch(error: AxiosError<ErrorResponse>) {
-  const {
-    status,
-    data,
-    config,
-  } = error.response!;
-
-  const url = config.url;
-  if (url === 'users/me' && status === 401) {
+  if (!error.response || error.response.status === 401) {
     return Promise.reject(error);
   }
+  const {
+    data,
+  } = error.response!;
 
-  const resMsg = data.data.message;
+  const resMsg = data?.data?.message ?? [];
   let errMsg;
   if (Array.isArray(resMsg)) {
     errMsg = getMultipleErrorMessages(resMsg);
