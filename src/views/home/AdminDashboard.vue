@@ -78,10 +78,11 @@ async function onGroupRequest(props: Record<string, any>) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   const sortingClientGroupType = ClientGroupSortTypes[sortBy];
-  let params: Parameters<typeof adminStore.getTherapistClientGroupStatistics>[0] = { page, take: rowsPerPage };
+  let params: Parameters<typeof adminStore.getTherapistClientGroupStatistics>[0] = { page, take: rowsPerPage, sortingType: 'clientId', order: 'ASC' };
 
-  if (sortBy && !!sortingClientGroupType) {
-    params = { ...params, sortingClientGroupType: +sortingClientGroupType, order: descending ? 'DESC' : 'ASC' };
+  if (sortBy) {
+    params = { ...params, order: descending ? 'DESC' : 'ASC', ...(sortingClientGroupType ? { sortingType: 'clientGroup', sortingClientGroupType: +sortingClientGroupType } : { sortingType: 'clientId' }),
+    };
     adminStore.clientGroup.pagination = { ...adminStore.clientGroup.pagination, descending, sortBy };
   }
   await adminStore.getTherapistClientGroupStatistics(params);

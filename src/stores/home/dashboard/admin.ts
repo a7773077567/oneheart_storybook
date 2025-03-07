@@ -89,7 +89,7 @@ export const useAdminStore = defineStore('admin', {
           page: 1,
           rowsPerPage: 4,
           rowsNumber: 0,
-          descending: true,
+          descending: false,
           sortBy: 'clientId',
         },
       },
@@ -461,6 +461,7 @@ export const useAdminStore = defineStore('admin', {
       take?: number;
       order?: 'ASC' | 'DESC';
       sortingClientGroupType?: ClientGroupSortTypes;
+      sortingType: 'clientId' | 'clientGroup';
     }) {
       const { data, meta } = await api.get<TherapistClientGroupStatistic[], PageMeta>('dashboard/therapistClientGroupStatistics', { params });
       this.clientGroup.data = data;
