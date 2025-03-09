@@ -7,6 +7,9 @@ import { omit, pick } from 'radash';
 import { type Client, updateClient, updateIntroducer } from '@/api';
 import { useQuasar } from 'quasar';
 import { ShiftType, genderOptions } from '@/const/general';
+import { howToKnowOptions } from '@/const/client';
+import { clientSchema } from '@/schemas';
+import { toTypedSchema } from '@vee-validate/zod';
 
 const props = defineProps<{
   clientId: string;
@@ -15,10 +18,13 @@ const props = defineProps<{
 const clientStore = useClientStore();
 await Promise.allSettled([clientStore.getClientInfo(+props.clientId), clientStore.getDepInChargeTherapist(+props.clientId)]);
 
-const initialValues = computed<Partial<Client>>(() => clientStore.targetClient
-  ? { ...pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'introducer', 'liffIntroducerName']), introducer: clientStore.targetClient.introducer?.id ?? null }
+const initialValues = computed(() => clientStore.targetClient
+  ? { ...pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'liffIntroducerName']), introducerClientId: clientStore.targetClient.introducer?.id ?? null }
   : {});
-const { handleSubmit } = useForm({ initialValues: initialValues.value });
+const { handleSubmit } = useForm({
+  initialValues: initialValues.value,
+  validationSchema: toTypedSchema(clientSchema),
+});
 
 const isEdit = ref(false);
 
@@ -33,12 +39,13 @@ const showNoIntroducerRemind = computed(() => {
 
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
-  const apiValues = omit(value as Client, ['howToKnowUs', 'introducer', 'liffIntroducerName']);
+  const isIntroducerChanged = (initialValues.value as typeof value).introducerClientId !== value.introducerClientId;
+
+  const apiValues = omit(value as Client & { introducerClientId: number }, ['introducerClientId', 'liffIntroducerName']);
   const fetch = [updateClient(props.clientId, apiValues)];
 
-  const isIntroducerChanged = initialValues.value.introducer !== value.introducer;
   if (isIntroducerChanged) {
-    fetch.push(updateIntroducer(+props.clientId, { introducerClientId: value.introducer ? +value.introducer : null }));
+    fetch.push(updateIntroducer(+props.clientId, { introducerClientId: value.introducerClientId ? +value.introducerClientId : null }));
   }
   await Promise.all(fetch);
   await clientStore.getClientInfo(+props.clientId);
@@ -76,11 +83,11 @@ const departmentTherapists = computed(() => [{
       <form class="client_basic_info_form row q-col-gutter-md" @submit.prevent>
         <fieldset class="col-12 col-md-6">
           <span class="label">姓名</span>
-          <OInput name="name" hide-bottom-space :readonly="!isEdit" class="col-grow" />
+          <OInput name="name" hide-bottom-space :readonly="!isEdit" class="col-grow" error-message="" />
         </fieldset>
         <fieldset class="col-12 col-md-6">
           <span class="label">電話</span>
-          <OInput name="phone" hide-bottom-space :readonly="!isEdit" class="col-grow" />
+          <OInput name="phone" hide-bottom-space :readonly="!isEdit" class="col-grow" error-message="" />
         </fieldset>
         <fieldset class="col-12 col-md-6">
           <span class="label">性別</span>
@@ -102,7 +109,7 @@ const departmentTherapists = computed(() => [{
         </fieldset>
         <fieldset class="col-12">
           <span class="label">從哪裡知道我們</span>
-          <OInput name="howToKnowUs" hide-bottom-space class="full-width" readonly />
+          <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" error-message="" />
         </fieldset>
         <fieldset v-if="isByRecommemd" class="col-12">
           <span class="label">客戶填寫的介紹人</span>
@@ -110,8 +117,8 @@ const departmentTherapists = computed(() => [{
         </fieldset>
         <fieldset class="col-12">
           <span class="label">後台綁定的介紹人</span>
-          <OMemberSearch v-if="isEdit" name="introducer" class="full-width" :readonly="!isEdit" />
-          <QInput v-else :model-value="clientStore.targetClient?.introducer?.name" outlined dense readonly style="background:white" />
+          <OMemberSearch v-if="isEdit" name="introducerClientId" class="full-width" :readonly="!isEdit" />
+          <QInput v-else name="introducerClientId" :model-value="clientStore.targetClient?.introducer?.name" outlined dense readonly style="background:white" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">備註</span>
