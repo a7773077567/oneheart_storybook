@@ -6,6 +6,9 @@ import type { QSelectProps } from 'quasar';
 import dayjs from 'dayjs';
 import type { TherapistEducationPoint, TherapistOverviewStatistic } from '@/types/home/dashboard/admin';
 import { RangeSelectOptions } from '@/const/dashboard';
+import IndicatorList from './IndicatorList.vue';
+import ScoreLight from './ScoreLight.vue';
+import type { TrafficLightStatistic } from '@/api';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
@@ -21,6 +24,7 @@ const props = defineProps<{
   hideEducationPoint?: boolean;
   overview: TherapistOverviewStatistic;
   isManagement: boolean;
+  trafficLightOverview: TrafficLightStatistic;
 }>();
 
 const emit = defineEmits<{
@@ -90,6 +94,8 @@ const dateRange = computed(() => {
   const startDate = today.startOf('month');
   return `${startDate.format('MM/DD')}-${today.format('MM/DD')}(今日)`;
 });
+
+const overAllTherapist = computed(() => props.therapistSelectOptions?.find(option => option.label === '所有治療師')?.value);
 </script>
 
 <template>
@@ -112,18 +118,31 @@ const dateRange = computed(() => {
       <div class="overview__body-separator" />
 
       <div class="info">
-        <div class="info__header">
-          <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
-          <div class="date-range">{{ dateRange }}</div>
-        </div>
-        <div class="info__body">
-          <!-- <SignalLight :predicted="2" :current="0" /> -->
-          <InfoCard :data="info">
-            <template #educationPoint>
-              <EducationPointEdit v-model="educationPointModel" />
-            </template>
-          </InfoCard>
-        </div>
+        <template v-if="therapistSelectModel !== overAllTherapist">
+          <div class="traffic-light-section info__header">
+            <h3 class="title">紅綠燈分數</h3>
+            <QBtn flat style="color: #1A7AB3" label="紅綠燈指數詳情" icon-right="chevron_right" @click="$router.push({ name: 'TrafficLightOverview' })" />
+          </div>
+          <div class="info__body">
+            <ScoreLight label="目前總分" :score="trafficLightOverview.currentPoint" />
+            <ScoreLight label="預測總分" :score="trafficLightOverview.predictionPoint" />
+            <IndicatorList :overview="trafficLightOverview" />
+          </div>
+        </template>
+        <template v-else>
+          <div class="info__header">
+            <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
+            <div class="date-range">{{ dateRange }}</div>
+          </div>
+          <div class="info__body">
+            <SignalLight :predicted="2" :current="0" />
+            <InfoCard :data="info">
+              <template #educationPoint>
+                <EducationPointEdit v-model="educationPointModel" />
+              </template>
+            </InfoCard>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -175,6 +194,16 @@ const dateRange = computed(() => {
   }
   &__body {
     padding: 24px;
+  }
+  .traffic-light-section {
+    display: flex;
+    justify-content: space-between;
+    .title {
+      @include title-medium($on-surface-variant);
+    }
+    a {
+      text-decoration: none;
+    }
   }
 }
 

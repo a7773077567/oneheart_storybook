@@ -35,6 +35,7 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
   await Promise.all([
     adminStore.getTherapistClientScheduleStatics({ userId: therapistSelect.value || undefined, dateRange: therapistRangeSelect.value }),
     adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
+    adminStore.getTherapistTrafficLight({ userId: therapistSelect.value }),
   ]);
   $q.loading.hide();
 });
@@ -53,6 +54,7 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
       :checkout-plan="adminStore.checkoutPlanStatistics"
       :overview="adminStore.therapistOverviewStatistics"
       :is-management="adminStore.roleQuery.isManagement"
+      :traffic-light-overview="adminStore.targetTherapistTrafficLight"
     />
   </div>
 </template>

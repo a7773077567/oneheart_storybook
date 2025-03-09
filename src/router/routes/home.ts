@@ -25,6 +25,17 @@ export const homeRoutes: RouteRecordRaw[] = [
           label: '儀表板',
           requiredAuth: true,
         },
+        children: [
+          {
+            path: 'traffic-light-overview',
+            component: import('@/views/home/TrafficLightOverview.vue'),
+            name: 'TrafficLightOverview',
+            meta: {
+              label: '紅綠燈分數詳情',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
         path: 'personal-appointments',

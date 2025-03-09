@@ -66,3 +66,33 @@ export interface NewGoal {
 export async function updateCoachOperationGoal(params: NewGoal) {
   await api.post(`dashboard/coachOperatingObjective`, params);
 }
+
+// 取得治療師紅綠燈
+interface IndicatorPoint {
+  predictionPoint: number;
+  currentPoint: number;
+  totalPoint: number;
+}
+
+interface SignalRange {
+  light: 'red' | 'yellow' | 'green';
+  min: number;
+  max: number | null;
+}
+
+export interface TrafficLightStatistic {
+  isWorkOverThreeMonth: boolean; // 判斷是否到職3個月
+  predictionPoint: number;
+  currentPoint: number;
+  rules: SignalRange[];
+  executionCount: IndicatorPoint; // 執行數
+  returnVisitRate: IndicatorPoint; // 回診率
+  presonalRevenue: IndicatorPoint; // 個人營業額
+  referralCount: IndicatorPoint; // 轉介數
+  educationPoint: IndicatorPoint; // 教育積分
+  googleCommentCount: IndicatorPoint; // Google評論數
+}
+export async function getTherapistTrafficLight(params: { userId: number }) {
+  const { data } = await api.get<TrafficLightStatistic>(`dashboard/therapistTrafficlight`, { params });
+  return data;
+}
