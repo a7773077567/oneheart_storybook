@@ -17,7 +17,7 @@ const newClientSchema = z.object({
   address: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
   introducerClientId: z.number().nullable().optional(),
-  howToKnowUs: z.string().nullable(),
+  howToKnowUs: z.string(),
 });
 
 const { handleSubmit, resetForm, errors } = useForm({
@@ -70,7 +70,7 @@ const onSubmit = handleSubmit(async (values) => {
         <OMemberSearch name="introducerClientId" class="full-width" />
       </fieldset>
       <fieldset class="col-12">
-        <span class="label">從哪裡知道我們</span>
+        <span class="label">從哪裡知道我們*</span>
         <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" :error="!!errors.howToKnowUs" error-message="" />
       </fieldset>
       <fieldset class="col-12">
