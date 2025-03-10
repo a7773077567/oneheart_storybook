@@ -109,7 +109,7 @@ const departmentTherapists = computed(() => [{
         </fieldset>
         <fieldset class="col-12">
           <span class="label">從哪裡知道我們</span>
-          <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" error-message="" />
+          <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" error-message="" :readonly="!isEdit" />
         </fieldset>
         <fieldset v-if="isByRecommemd" class="col-12">
           <span class="label">客戶填寫的介紹人</span>
@@ -162,7 +162,7 @@ const departmentTherapists = computed(() => [{
       flex: 1;
     }
     .q-field.q-field--readonly {
-      background: #e0e0e0;
+      background: white;
     }
   }
 }
