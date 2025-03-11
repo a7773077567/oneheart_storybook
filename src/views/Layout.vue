@@ -9,7 +9,6 @@ import { storeToRefs } from 'pinia';
 import { spaceLogin } from '@/api/user';
 import { getCookie, removeCookie, setCookie } from '@/utils/helpers';
 import Logo from '/images/one-heart.png';
-import TestingLogo from '/images/development-one-heart.png';
 import ShiftChangeReminder from '@/components/layout/ShiftChangeReminder.vue';
 
 const optionStore = useOptionStore();
@@ -47,10 +46,9 @@ function logout() {
   removeCookie('firstToken');
   removeCookie('secondToken');
   removeCookie('lastSpaceId');
+  removeCookie('refreshToken');
   router.go(0);
 }
-
-// const logoUrl = computed(() => import.meta.env.MODE === 'production' ? Logo : TestingLogo);
 const logoUrl = computed(() => Logo);
 </script>
 

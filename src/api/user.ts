@@ -5,6 +5,7 @@ import type { SpaceType } from '@/const/general';
 
 export interface LoginRes {
   accessToken: string;
+  refreshToken: string;
 };
 
 export interface Role {

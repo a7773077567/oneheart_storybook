@@ -10,6 +10,7 @@ interface AllCookies {
   firstToken: string;
   secondToken: string;
   lastSpaceId: number;
+  refreshToken: string;
 };
 
 interface SelectOption {
@@ -27,6 +28,11 @@ export function setCookie(key: keyof AllCookies, value: any) {
 
 export function removeCookie(key: keyof AllCookies) {
   Cookies.remove(key, { path: '/' });
+}
+
+export function updateCookie(key: keyof AllCookies, value: any) {
+  Cookies.remove(key, { path: '/' });
+  Cookies.set(key, value, { path: '/' });
 }
 
 export function getUrl(path: string) {

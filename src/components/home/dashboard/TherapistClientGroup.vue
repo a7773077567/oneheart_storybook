@@ -20,15 +20,15 @@ const paginationModel = computed({
 
 const table = ref<QTable | null>(null);
 const columns: QTableColumn[] = [
-  { name: 'clientName', field: 'clientName', label: '客戶', align: 'left', style: 'width: 170px' },
-  { name: '物理治療', field: '物理治療', label: '物理治療', align: 'center' },
-  { name: '院長物理治療', field: '院長物理治療', label: '院長物理治療', align: 'center' },
-  { name: '營養', field: '營養', label: '營養', align: 'center' },
-  { name: '教練課', field: '教練課', label: '教練課', align: 'center' },
-  { name: '震波', field: '震波', label: '震波', align: 'center' },
-  { name: '射頻', field: '射頻', label: '射頻', align: 'center' },
-  { name: '磁波', field: '磁波', label: '磁波', align: 'center' },
-  { name: 'G動椅', field: 'G動椅', label: 'G動椅', align: 'center' },
+  { name: 'clientName', field: 'clientName', label: '客戶', align: 'left', style: 'width: 170px', sortable: true },
+  { name: '物理治療', field: '物理治療', label: '物理治療', align: 'center', sortable: true },
+  { name: '院長物理治療', field: '院長物理治療', label: '院長物理治療', align: 'center', sortable: true },
+  { name: '教練課', field: '教練課', label: '教練課', align: 'center', sortable: true },
+  { name: '營養', field: '營養', label: '營養', align: 'center', sortable: true },
+  { name: '震波', field: '震波', label: '震波', align: 'center', sortable: true },
+  { name: '射頻', field: '射頻', label: '射頻', align: 'center', sortable: true },
+  { name: '磁波', field: '磁波', label: '磁波', align: 'center', sortable: true },
+  { name: 'G動椅', field: 'G動椅', label: 'G動椅', align: 'center', sortable: true },
 ];
 
 onMounted(() => {
@@ -49,6 +49,7 @@ onMounted(() => {
         :columns="columns"
         :rows="rows"
         class="table"
+        binary-state-sort
         @request="$emit('request', $event)"
       />
     </div>

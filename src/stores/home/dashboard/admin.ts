@@ -3,7 +3,7 @@ import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
 import { ShiftType } from '@/const/general';
 import { useUserStore } from '@/stores/user';
-import type { PageMeta, TherapistClientGroupStatistic, TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TodayBusinessStatus } from '@/types/home/dashboard/admin';
+import type { ClientGroupSortTypes, PageMeta, TherapistClientGroupStatistic, TherapistClientScheduleStatics, TherapistEducationPoint, TherapistOverviewStatistic, TherapistTurnoverStatistic, TherapistTurnoverStatisticsDetailsData, TodayBusinessStatus } from '@/types/home/dashboard/admin';
 import { api } from '@/utils/api';
 import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
@@ -37,6 +37,8 @@ interface State {
       page: number;
       rowsPerPage: number;
       rowsNumber: number;
+      descending: boolean;
+      sortBy: string;
     };
   };
 }
@@ -87,6 +89,8 @@ export const useAdminStore = defineStore('admin', {
           page: 1,
           rowsPerPage: 4,
           rowsNumber: 0,
+          descending: false,
+          sortBy: 'clientId',
         },
       },
     };
@@ -456,6 +460,8 @@ export const useAdminStore = defineStore('admin', {
       page?: number;
       take?: number;
       order?: 'ASC' | 'DESC';
+      sortingClientGroupType?: ClientGroupSortTypes;
+      sortingType: 'clientId' | 'clientGroup';
     }) {
       const { data, meta } = await api.get<TherapistClientGroupStatistic[], PageMeta>('dashboard/therapistClientGroupStatistics', { params });
       this.clientGroup.data = data;

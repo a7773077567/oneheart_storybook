@@ -4,6 +4,7 @@ import { computed, ref, watch, watchEffect } from 'vue';
 import { useShiftStore } from '@/stores';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
+import { ClientGroupSortTypes } from '@/types/home/dashboard/admin';
 
 const $q = useQuasar();
 const shiftStore = useShiftStore();
@@ -74,11 +75,17 @@ async function onDetailsRequest(props: Record<string, any>) {
 }
 
 async function onGroupRequest(props: Record<string, any>) {
-  const { page, rowsPerPage } = props.pagination;
-  await adminStore.getTherapistClientGroupStatistics({
-    page,
-    take: rowsPerPage,
-  });
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
+
+  const sortingClientGroupType = ClientGroupSortTypes[sortBy];
+  let params: Parameters<typeof adminStore.getTherapistClientGroupStatistics>[0] = { page, take: rowsPerPage, sortingType: 'clientId', order: 'ASC' };
+
+  if (sortBy) {
+    params = { ...params, order: descending ? 'DESC' : 'ASC', ...(sortingClientGroupType ? { sortingType: 'clientGroup', sortingClientGroupType: +sortingClientGroupType } : { sortingType: 'clientId' }),
+    };
+    adminStore.clientGroup.pagination = { ...adminStore.clientGroup.pagination, descending, sortBy };
+  }
+  await adminStore.getTherapistClientGroupStatistics(params);
 }
 </script>
 
@@ -116,6 +123,8 @@ async function onGroupRequest(props: Record<string, any>) {
     <TherapistClientGroup
       v-model:pagination="adminStore.clientGroup.pagination"
       :rows="adminStore.clientGroupRows"
+      row-key="clientId"
+      custom-sort
       @request="onGroupRequest"
     />
   </div>

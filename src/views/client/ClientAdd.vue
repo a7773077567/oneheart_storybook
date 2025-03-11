@@ -6,6 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useQuasar } from 'quasar';
 import { genderOptions } from '@/const/general';
 import { OMemberSearch } from '@/components/shared';
+import { howToKnowOptions } from '@/const/client';
 
 const newClientSchema = z.object({
   name: z.string().min(1),
@@ -16,7 +17,7 @@ const newClientSchema = z.object({
   address: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
   introducerClientId: z.number().nullable().optional(),
-  howToKnowUs: z.string().nullable().optional(),
+  howToKnowUs: z.string(),
 });
 
 const { handleSubmit, resetForm, errors } = useForm({
@@ -33,8 +34,6 @@ const onSubmit = handleSubmit(async (values) => {
     resetForm();
   });
 });
-
-const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram', 'Youtube', 'Google map', '搜尋引擎', '實體活動', 'Threads', '賴ki', 'Ruby', 'Line'];
 </script>
 
 <template>
@@ -71,7 +70,7 @@ const howToKnowOptions = ['家人推薦', '朋友推薦', 'Facebook', 'Instagram
         <OMemberSearch name="introducerClientId" class="full-width" />
       </fieldset>
       <fieldset class="col-12">
-        <span class="label">從哪裡知道我們</span>
+        <span class="label">從哪裡知道我們*</span>
         <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" :error="!!errors.howToKnowUs" error-message="" />
       </fieldset>
       <fieldset class="col-12">
