@@ -6,8 +6,7 @@ import type { QSelectProps } from 'quasar';
 import dayjs from 'dayjs';
 import type { TherapistEducationPoint, TherapistOverviewStatistic } from '@/types/home/dashboard/admin';
 import { RangeSelectOptions } from '@/const/dashboard';
-import IndicatorList from './IndicatorList.vue';
-import ScoreLight from './ScoreLight.vue';
+import TrafficLightStatics from './TrafficLightStatics.vue';
 import type { TrafficLightStatistic } from '@/api';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
@@ -119,15 +118,7 @@ const overAllTherapist = computed(() => props.therapistSelectOptions?.find(optio
 
       <div class="info">
         <template v-if="therapistSelectModel !== overAllTherapist">
-          <div class="traffic-light-section info__header">
-            <h3 class="title">紅綠燈分數</h3>
-            <QBtn flat style="color: #1A7AB3" label="紅綠燈指數詳情" icon-right="chevron_right" @click="$router.push({ name: 'TrafficLightOverview' })" />
-          </div>
-          <div class="info__body">
-            <ScoreLight label="目前總分" :score="trafficLightOverview.currentPoint" />
-            <ScoreLight label="預測總分" :score="trafficLightOverview.predictionPoint" />
-            <IndicatorList :overview="trafficLightOverview" />
-          </div>
+          <TrafficLightStatics :user-id="therapistSelect" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" />
         </template>
         <template v-else>
           <div class="info__header">
@@ -194,16 +185,6 @@ const overAllTherapist = computed(() => props.therapistSelectOptions?.find(optio
   }
   &__body {
     padding: 24px;
-  }
-  .traffic-light-section {
-    display: flex;
-    justify-content: space-between;
-    .title {
-      @include title-medium($on-surface-variant);
-    }
-    a {
-      text-decoration: none;
-    }
   }
 }
 
