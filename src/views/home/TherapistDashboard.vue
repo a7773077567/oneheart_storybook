@@ -1,14 +1,15 @@
 <script setup lang='ts'>
 import { TherapistOverview } from '@/components/home/dashboard';
 import { computed, ref, watch, watchEffect } from 'vue';
-import { useShiftStore } from '@/stores';
+import { useShiftStore, useUserStore } from '@/stores';
 import { useAdminStore } from '@/stores/home/dashboard/admin';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
 const shiftStore = useShiftStore();
 const adminStore = useAdminStore();
-const therapistSelect = ref(0);
+const userStore = useUserStore();
+const therapistSelect = ref(userStore.userInfo?.id ?? 0);
 
 await adminStore.getTherapistEducationPoint({ userId: adminStore.userId });
 
@@ -32,11 +33,15 @@ const educationPointModel = computed({
 
 watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => {
   $q.loading.show();
+
   await Promise.all([
     adminStore.getTherapistClientScheduleStatics({ userId: therapistSelect.value || undefined, dateRange: therapistRangeSelect.value }),
     adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
+    adminStore.getTherapistTrafficLight({ userId: therapistSelect.value }),
   ]);
   $q.loading.hide();
+}, {
+  immediate: true,
 });
 </script>
 
@@ -53,6 +58,7 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
       :checkout-plan="adminStore.checkoutPlanStatistics"
       :overview="adminStore.therapistOverviewStatistics"
       :is-management="adminStore.roleQuery.isManagement"
+      :traffic-light-overview="adminStore.targetTherapistTrafficLight"
     />
   </div>
 </template>

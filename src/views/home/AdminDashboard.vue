@@ -44,6 +44,7 @@ watch([therapistSelect, therapistRangeSelect, therapistTypeSelect], async () => 
     adminStore.getTherapistClientScheduleStatics({ userId: therapistSelect.value || undefined, dateRange: therapistRangeSelect.value }),
     adminStore.getTherapistOverviewStatistics({ userId: therapistSelect.value || undefined, userShiftTypes: therapistTypeSelect.value }),
     therapistSelect.value !== 0 && adminStore.getTherapistEducationPoint({ userId: therapistSelect.value }),
+    therapistSelect.value !== 0 && adminStore.getTherapistTrafficLight({ userId: therapistSelect.value }),
   ]);
   $q.loading.hide();
 });
@@ -103,6 +104,7 @@ async function onGroupRequest(props: Record<string, any>) {
       :hide-education-point="hideEducationPoint"
       :overview="adminStore.therapistOverviewStatistics"
       :is-management="adminStore.roleQuery.isManagement"
+      :traffic-light-overview="adminStore.targetTherapistTrafficLight"
     />
 
     <AdminTodayBusinessStatus

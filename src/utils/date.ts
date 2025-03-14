@@ -89,3 +89,10 @@ export function judgeTimeWithinDuration({ startTime, endTime, min, max }: { star
 
   return result.every(r => !!r);
 }
+
+export function getMonthDifference(year: number, month: number): number {
+  const inputDate = dayjs(`${year}-${month}-01`); // 將輸入的年、月轉為 dayjs 物件
+  const currentDate = dayjs().startOf('month'); // 取得當前月份的第一天，確保比較準確
+
+  return currentDate.diff(inputDate, 'month'); // 計算月份差異
+}
