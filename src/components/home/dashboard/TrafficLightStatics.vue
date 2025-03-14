@@ -8,6 +8,7 @@ const props = defineProps<{
   currentPoint: number;
   predictPoint: number;
   indicatorList: TrafficLightStatistic;
+  noData: boolean;
 }>();
 
 const list = computed(() => [
@@ -51,15 +52,23 @@ const list = computed(() => [
 </script>
 
 <template>
-  <div class="traffic-light-statics">
+  <div class="traffic-light-statics" :class="{ empty_state: noData }">
     <div class="traffic-light-statics__header">
       <h3 class="title">紅綠燈分數</h3>
-      <QBtn flat style="color: #1A7AB3" label="紅綠燈指標詳情" icon-right="chevron_right" @click="$router.push({ name: 'trafficLightOverview', params: { userId } })" />
+      <QBtn :disable="noData" flat :style="{ color: noData ? '#767680' : '#1A7AB3' }" label="紅綠燈指標詳情" icon-right="chevron_right" @click="$router.push({ name: 'trafficLightOverview', params: { userId } })" />
     </div>
+    <QBanner dense rounded class="q-py-xs q-mb-md" style="background:rgba(26, 122, 179, 0.16)">
+      <template #avatar>
+        <QIcon flat name="o_info" size="sm" color="primary" />
+      </template>
+      <template #default>
+        <p class="text-weight-medium">資料不足三個月，無法統計紅綠燈分數。</p>
+      </template>
+    </QBanner>
     <div class="traffic-light-statics__body">
       <div>
-        <ScoreLight label="目前總分" :score="currentPoint" class="q-mb-sm" />
-        <ScoreLight label="預測總分" :score="predictPoint" />
+        <ScoreLight label="目前總分" :score="currentPoint" class="q-mb-sm" :no-data="noData" />
+        <ScoreLight label="預測總分" :score="predictPoint" :no-data="noData" />
       </div>
       <div class="indicator-list">
         <QList separator>
@@ -85,6 +94,15 @@ const list = computed(() => [
 <style scoped lang="scss">
 .traffic-light-statics {
   padding: 24px;
+  &.empty_state {
+    .indicator-list {
+      &__header :deep(.q-item__section),
+      &__body :deep(.q-item__section) {
+        color: $outline;
+      }
+      color: #767680 !important;
+    }
+  }
   &__header {
     display: flex;
     align-items: center;

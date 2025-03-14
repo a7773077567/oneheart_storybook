@@ -118,7 +118,7 @@ const overAllTherapist = computed(() => props.therapistSelectOptions?.find(optio
 
       <div class="info">
         <template v-if="therapistSelectModel !== overAllTherapist">
-          <TrafficLightStatics :user-id="therapistSelect" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" />
+          <TrafficLightStatics :user-id="therapistSelect" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" />
         </template>
         <template v-else>
           <div class="info__header">
@@ -126,7 +126,6 @@ const overAllTherapist = computed(() => props.therapistSelectOptions?.find(optio
             <div class="date-range">{{ dateRange }}</div>
           </div>
           <div class="info__body">
-            <SignalLight :predicted="2" :current="0" />
             <InfoCard :data="info">
               <template #educationPoint>
                 <EducationPointEdit v-model="educationPointModel" />

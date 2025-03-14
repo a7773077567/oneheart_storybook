@@ -56,11 +56,11 @@ const barColor = computed(() => color.value.bar);
 
     <QCardSection horizontal class="items-center justify-between q-mb-md">
       <div class="subtitle">目前得分 <span class="caption text-on-surface-variant">（前三個月）</span></div>
-      <div class="text-subtitle2">{{ current }}分</div>
+      <div class="title-medium">{{ current }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between q-mb-sm">
       <div class="subtitle">預測得分 <span class="caption text-on-surface-variant">（近三個月）</span></div>
-      <div class="text-subtitle2" :style="{ color: color.text }">{{ predict }}分</div>
+      <div class="title-medium" :style="{ color: color.text }">{{ predict }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between">
       <progress id="progress_bar" :max="total" :value="predict" />
@@ -87,6 +87,9 @@ const barColor = computed(() => color.value.bar);
   }
   .subtitle {
     @include body-large($on-surface);
+  }
+  .title-medium {
+    @include title-medium($on-surface);
   }
 }
 #progress_bar {

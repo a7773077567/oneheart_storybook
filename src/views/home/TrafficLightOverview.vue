@@ -42,7 +42,7 @@ const indicatorList = computed(() => [
 
 <template>
   <div class="traffic_light_detail">
-    <h2 class="q-mb-md">紅綠燈詳情</h2>
+    <h2 class="q-my-md">紅綠燈詳情</h2>
     <section class="traffic_light_detail__header">
       <ScoreLight full-info label="目前總分" :score="trafficLightStore.targetTherapistTrafficLight.currentPoint" :caption="currentScoreRange" />
       <ScoreLight full-info label="預測總分" :score="trafficLightStore.targetTherapistTrafficLight.predictionPoint" :caption="predictScoreRange" />
@@ -50,16 +50,16 @@ const indicatorList = computed(() => [
       <ul class="traffic_light_rules">
         <li v-for="rule in trafficLightStore.targetTherapistTrafficLight.rules" :key="rule.light" class="rule_item">
           <div :class="`signal_${rule.light}`" class="signal" />
-          <p v-if="rule.light === 'green'">綠燈: {{ rule.min }}  &#8804; 總分 </p>
-          <p v-else-if="rule.light === 'yellow'">黃燈: {{ rule.min }} &#8804; 總分 &#60; {{ rule.max }}</p>
-          <p v-else>紅燈: 總分 &#60; {{ rule.max }}</p>
+          <p v-if="rule.light === 'green'">綠燈： {{ rule.min }}  &#8804; 總分 </p>
+          <p v-else-if="rule.light === 'yellow'">黃燈： {{ rule.min }} &#8804; 總分 &#60; {{ rule.max }}</p>
+          <p v-else>紅燈： 總分 &#60; {{ rule.max }}</p>
         </li>
       </ul>
     </section>
     <QSeparator class="q-mb-lg" />
     <section class="traffic_light_detail__footer">
       <h3 class="q-mb-sm">紅綠燈由以下六項指標得分加總</h3>
-      <p class="caption">分為 預測 和 目前 得分。預測得分採近三個月數據計算，反映未來趨勢；目前得分則採用前三個月數據，呈現已達成的表現。</p>
+      <p class="caption">分為 <b>預測</b> 和 目前 <b>得分</b>。預測得分採近三個月數據計算，反映未來趨勢；目前得分則採用前三個月數據，呈現已達成的表現。</p>
       <section class="row indicator_list">
         <div v-for="({ detailPage, name, ...cardProps }) in indicatorList" :key="name" class="col">
           <IndicatorCard v-bind="{ name, ...cardProps }" @check-detail="$router.push({ name: detailPage, params: { userId } })" />

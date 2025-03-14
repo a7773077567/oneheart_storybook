@@ -19,7 +19,7 @@ const scoreCols: QTableProps['columns'] = [
     label: '月份',
     field: 'month',
     align: 'left',
-    format: (val: number, row) => getMonthDifference(row.year, val) === 0 ? `${row.year} / ${val}(本月)` : `${row.year} / ${val}`,
+    format: (val: number, row) => getMonthDifference(row.year, val) === 0 ? `${row.year} / ${val} (本月)` : `${row.year} / ${val}`,
     headerStyle: 'font-size: 14px',
   },
   {
@@ -107,7 +107,7 @@ await Promise.all([
 
 <template>
   <div class="referral_detail">
-    <h2>轉介數詳情</h2>
+    <h2>轉介數計分詳情</h2>
     <h3>計分說明</h3>
     <p class="note">初診客戶的推薦人為您的既有客戶。客戶 A 為您的客戶，並推薦客戶 B 進行服務，當客戶 B 完成治療，您的轉介數 +1。</p>
     <QSeparator style="margin: 32px 0" />
@@ -141,8 +141,8 @@ await Promise.all([
       </section>
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
-        <span class="label_larget q-mb-sm">得分標準</span>
-        <p class="body_medium q-mb-sm">您本月職階為 {{ overview.currentPTLevel }}，得分標準如下：</p>
+        <h4 class="label_large q-mb-sm">得分標準</h4>
+        <p class="body_medium q-mb-sm">您本月職階為 PT {{ overview.currentPTLevel }}，得分標準如下：</p>
         <RuleList :rules="overview.rules" unit="人" class="q-mb-sm" />
         <p class="body_medium q-mb-sm">*職階由管理者設定，每月可能變動</p>
       </section>
@@ -185,8 +185,9 @@ await Promise.all([
   .note {
     @include title-small($on-surface);
   }
-  .label_larget {
+  .label_large {
     @include label-large($on-surface);
+    font-weight: 700;
   }
   .title_medium {
     @include title-medium($on-surface);
