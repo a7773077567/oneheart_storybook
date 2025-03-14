@@ -36,7 +36,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/referral-count',
+            path: 'traffic-light-overview/:userId/referral-count',
             component: () => import('@/views/home/indicator/ReferralCountView.vue'),
             name: 'referralCountView',
             props: true,

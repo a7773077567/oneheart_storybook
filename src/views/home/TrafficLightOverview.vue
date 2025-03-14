@@ -28,6 +28,7 @@ const predictScoreRange = computed(() => {
 const indicatorList = computed(() => [
   {
     name: 'referralCount',
+    detailPage: 'referralCountView',
     label: '轉介數',
     caption: '各月人數加總後換算得分',
     total: trafficLightStore.targetTherapistTrafficLight.referralCount.totalPoint,
@@ -60,8 +61,8 @@ const indicatorList = computed(() => [
       <h3 class="q-mb-sm">紅綠燈由以下六項指標得分加總</h3>
       <p class="caption">分為 預測 和 目前 得分。預測得分採近三個月數據計算，反映未來趨勢；目前得分則採用前三個月數據，呈現已達成的表現。</p>
       <section class="row indicator_list">
-        <div v-for="indicator in indicatorList" :key="indicator.name" class="col">
-          <IndicatorCard v-bind="indicator" />
+        <div v-for="({ detailPage, name, ...cardProps }) in indicatorList" :key="name" class="col">
+          <IndicatorCard v-bind="{ name, ...cardProps }" @check-detail="$router.push({ name: detailPage, params: { userId } })" />
         </div>
       </section>
     </section>

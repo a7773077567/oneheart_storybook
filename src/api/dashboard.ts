@@ -96,3 +96,42 @@ export async function getTherapistTrafficLight(params: { userId: number }) {
   const { data } = await api.get<TrafficLightStatistic>(`dashboard/therapistTrafficlight`, { params });
   return data;
 }
+
+export interface ReferralOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  currentPTLevel: number;
+  rules: {
+    score: number;
+    min: number;
+    max: number | null;
+  }[];
+  detailList: {
+    year: number;
+    month: number;
+    referralCount: number;
+  }[];
+}
+// 取得治療師紅綠燈指標-轉介數｜計分詳情與資料-概覽
+export async function getReferralStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<ReferralOverview>(`dashboard/therapistTrafficlight-referralStatistics-overview`, { params });
+  return data;
+}
+
+export interface ReferralDetail {
+  clientId: number;
+  clientName: string;
+  userShiftType: number;
+  referralClientName: string;
+}
+interface ReferralListQuery {
+  order?: 'ASC' | 'DESC';
+  page?: number;
+  take?: number;
+  userId: number;
+}
+// 取得治療師紅綠燈指標-轉介數｜計分詳情與資料-列表`
+export async function getReferralStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<ReferralDetail[], PagingMeta>(`dashboard/therapistTrafficlight-referralStatistics-list`, { params });
+  return { data, meta };
+}

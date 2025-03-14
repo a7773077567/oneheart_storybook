@@ -2,12 +2,15 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  name: string;
   label: string;
   caption: string;
   current: number;
   predict: number;
   total: number;
+}>();
+
+defineEmits<{
+  (e: 'checkDetail'): void;
 }>();
 
 const color = computed(() => {
@@ -31,14 +34,6 @@ const color = computed(() => {
   }
 });
 const barColor = computed(() => color.value.bar);
-
-const detailPageName = computed(() => {
-  switch (props.name) {
-    case 'referralCount':
-    default:
-      return 'referralCountView';
-  }
-});
 </script>
 
 <template>
@@ -47,7 +42,7 @@ const detailPageName = computed(() => {
       <div class="title">{{ label }}</div>
       <QBtn
         flat align="between" icon-right="chevron_right" style="color: #1A7AB3; width: 120px;" class="q-px-sm"
-        @click="$router.push({ name: detailPageName })"
+        @click="$emit('checkDetail')"
       >
         計分詳情
       </QBtn>
