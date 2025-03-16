@@ -25,6 +25,16 @@ export enum ScheduleVisitState {
   複診 = 2,
 }
 
+export enum AppointmentState {
+  預約 = 1,
+  報到 = 2,
+  完成服務 = 3,
+  病例完成 = 4,
+  預約取消 = 5,
+  預約改期 = 6,
+  刪除 = 7,
+}
+
 export const PaymentMethods = {
   cash: {
     identifier: PaymentMethod['現金'],
