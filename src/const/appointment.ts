@@ -37,7 +37,6 @@ export enum AppointmentState {
   刪除 = 7,
 }
 
-// topup payment options: https://www.notion.so/enginelin/97b8b2abdaf8489684329c95974d54dd?pvs=4
 export const PaymentMethods = {
   cash: {
     identifier: PaymentMethod['現金'],
