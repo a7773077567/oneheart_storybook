@@ -2,7 +2,7 @@ import { api } from '@/utils/api';
 import { z } from 'zod';
 import type { Client, MachineInfo, Space, User, UserShiftDetail } from '@/api';
 import { getTimeDate } from '@/utils/date';
-import type { PaymentState, ScheduleVisitState } from '@/const/appointment';
+import type { AppointmentState, PaymentState, ScheduleVisitState } from '@/const/appointment';
 import type { MachineSchedule } from './machine';
 import type { MachineTypes } from '@/const/general';
 import { AddOnServiceTypes, ShiftType } from '@/const/general';
@@ -221,7 +221,7 @@ export interface ClientSchedule {
   rearrangeClientSchedule: ClientSchedule | null;
   scheduleEndTime: string;
   scheduleStartTime: string;
-  state: number;
+  state: AppointmentState;
   userShift: UserShiftDetail;
   userShiftAppointmentId: number;
   userShiftId: number;
@@ -245,7 +245,7 @@ export interface BookingItem {
   isBooked: boolean;
   available: boolean;
   location: number;
-  state: number;
+  state: AppointmentState;
   isCheckout: boolean;
   employee: any;
   client: Client;
