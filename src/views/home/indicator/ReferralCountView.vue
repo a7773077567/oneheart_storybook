@@ -71,7 +71,7 @@ const referralDetailCols: QTableProps['columns'] = [
 ];
 
 const pagination = ref({
-  page: 10,
+  page: 1,
   rowsPerPage: 10,
   rowsNumber: 1,
 });
