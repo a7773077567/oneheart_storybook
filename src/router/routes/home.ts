@@ -65,6 +65,15 @@ export const homeRoutes: RouteRecordRaw[] = [
           requiredAuth: true,
         },
       },
+      {
+        path: 'google-review',
+        name: 'googleReview',
+        component: () => import('@/views/home/GoogleReviewView.vue'),
+        meta: {
+          label: 'Google評論管理',
+          requiredAuth: true,
+        },
+      },
     ],
   },
 ];
