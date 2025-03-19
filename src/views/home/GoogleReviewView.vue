@@ -3,55 +3,63 @@ import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
 import type { QTableProps } from 'quasar';
 import { type ReviewListContent, getGoogleReviewList } from '@/api';
-import ReviewForm from '@/components/home/googleReview/ReviewForm.vue';
+import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
+import dayjs from 'dayjs';
 
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
 
 const selectedTherapist = ref(trafficLightStore.therapistOptions[0].value);
 const reviewList = ref<ReviewListContent[]>([]);
-const userId = ref(null);
+
+const stateOfreviewForm = ref(false);
+const formType = ref<'add' | 'edit'>('add');
+const reviewInfo = ref(null);
+const role = computed(() => userStore.role);
+
 const pagination = ref({
   page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 1,
 });
 const cols: QTableProps['columns'] = [
   {
-    name: 'date',
+    name: 'user',
     required: true,
     label: '治療師(得分者)',
     align: 'left',
     style: 'width:150px',
-    field: row => row.date,
+    field: row => row.user.name,
   },
   {
-    name: 'contractUrl',
+    name: 'title',
     required: true,
     label: '項目名稱',
     align: 'left',
-    field: row => row.contractUrl,
+    field: 'title',
   },
   {
-    name: 'date',
+    name: 'reviewDateTime',
     required: true,
     label: '上傳日期',
     align: 'left',
     style: 'width:150px',
-    field: row => row.date,
+    field: row => dayjs(row.reviewDateTime).format('YYYY-MM-DD'),
   },
   {
-    name: 'contractUrl',
+    name: 'reviewTime',
     required: true,
     label: '上傳時間',
     align: 'left',
-    field: row => row.contractUrl,
+    field: row => dayjs(row.reviewDateTime).format('hh:mm'),
   },
   {
-    name: 'contractUrl',
+    name: 'reviewScreenshotUrl',
     required: true,
     label: '截圖',
     align: 'left',
-    field: row => row.contractUrl,
+    field: 'reviewScreenshotUrl',
   },
   {
     name: 'action',
@@ -60,19 +68,22 @@ const cols: QTableProps['columns'] = [
     field: 'action',
   },
 ];
-const stateOfreviewForm = ref(false);
 
+// before mounted
 trafficLightStore.getTherapistList();
-if (userId.value !== null) {
-  const { data, meta } = await getGoogleReviewList({ userId: 1, ...pagination.value });
-  reviewList.value = data;
-  pagination.value.page = meta?.page ?? 1;
+console.log(selectedTherapist.value);
+
+if (selectedTherapist.value !== null) {
+  getReviewList();
 }
 
-const formType = ref<'add' | 'edit'>('add');
-const reviewInfo = ref(null);
-
-const role = computed(() => userStore.role);
+async function getReviewList() {
+  console.log('getReviewListgetReviewListgetReviewList');
+  const { data, meta } = await getGoogleReviewList({ page: pagination.value.page, take: pagination.value.rowsPerPage });
+  reviewList.value = data;
+  pagination.value.page = meta?.page ?? 1;
+  pagination.value.rowsNumber = meta?.page ?? 1;
+}
 </script>
 
 <template>
@@ -89,10 +100,13 @@ const role = computed(() => userStore.role);
         :columns="cols"
         :rows="reviewList"
         row-key="id"
-        hide-pagination
         class="no-shadow"
-        :rows-per-page-options="[0]"
+        :rows-per-page-options="[10, 20, 50]"
+        @request="getReviewList"
       >
+        <template #body-cell-reviewScreenshotUrl="{ value }">
+          <img :src="value" alt="screen shot" style="height:30px;width:60px">
+        </template>
         <template #body-cell-action>
           <QBtn flat icon="edit" />
           <QBtn flat icon="delete" />
@@ -101,7 +115,7 @@ const role = computed(() => userStore.role);
     </section>
   </div>
   <QDialog v-model="stateOfreviewForm">
-    <ReviewForm :type="formType" :init-val="reviewInfo" :role="role" @cancel="stateOfreviewForm = false" />
+    <ReviewForm :type="formType" :init-val="reviewInfo" :role="role" :therapist-options="trafficLightStore.scorerOptions" @cancel="stateOfreviewForm = false" @create="getReviewList" />
   </QDialog>
 </template>
 

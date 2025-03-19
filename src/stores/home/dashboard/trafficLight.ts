@@ -1,6 +1,7 @@
 import type { TrafficLightStatistic, User } from '@/api';
 import { defineStore } from 'pinia';
 import { RoleType, fetchUsers, getReferralStatsList, getTherapistTrafficLight } from '@/api';
+import { useUserStore } from '@/stores/user';
 
 interface State {
   targetTherapistTrafficLight: TrafficLightStatistic;
@@ -92,6 +93,15 @@ export const useTrafficLight = defineStore('traffic-light', {
       const options = state.therapistList?.map(item => ({ label: item.name, value: item.id }));
 
       return [{ label: '所有治療師', value: 0 }, ...options];
+    },
+    scorerOptions: (state) => {
+      const userStore = useUserStore();
+      let options = state.therapistList?.map(item => ({ label: item.name, value: item.id }));
+      if (userStore.role === RoleType['物理治療師']) {
+        options.filter(therapist => therapist.value === userStore.userInfo?.id);
+      }
+
+      return options;
     },
   },
   actions: {

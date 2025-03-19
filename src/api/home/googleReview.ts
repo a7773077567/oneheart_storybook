@@ -19,7 +19,7 @@ export interface GoogleReview {
   reviewDateTime: string;
 }
 
-export async function getGoogleReviewList(params: { userId: number } & PageQuery) {
+export async function getGoogleReviewList(params: { userId?: number } & PageQuery) {
   const { data, meta } = await api.get<ReviewListContent[], PagingMeta >('GoogleReviews', { params });
   return { data, meta };
 }
@@ -50,7 +50,7 @@ interface S3UploadInfo {
   maxFileSizeInMB: number;
   fileName: string;
 }
-export async function getGoogleUploadURL({ googleReviewId }: { googleReviewId: number }) {
-  const { data } = await api.get<S3UploadInfo>(`GoogleReviews/${googleReviewId}/screenShot/write-url`);
+export async function getGoogleUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`GoogleReviews/${userId}/screenShot/write-url`);
   return data;
 }

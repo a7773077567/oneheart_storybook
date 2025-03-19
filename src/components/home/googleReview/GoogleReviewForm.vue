@@ -2,30 +2,32 @@
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import type { GoogleReview } from '@/api';
+import { type GoogleReview, createGoogleReview, getGoogleUploadURL, upload2awsS3 } from '@/api';
 import { computed, ref } from 'vue';
-import type { RoleType } from '@/api/user';
+import { RoleType } from '@/api/user';
 import dayjs from 'dayjs';
+import { extractUuidFromS3Url } from '@/utils/helpers';
 
 const props = defineProps<{
   type: T;
   initVals?: T extends 'edit' ? GoogleReview : null;
   role: RoleType;
+  therapistOptions: { label: string; value: number }[];
 }>();
 
-defineEmits<{
-  (e: 'cancel', state: boolean): void;
+const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'create'): void;
 }>();
 
 const schema = z.object({
   userId: z.number(),
   title: z.string(),
-  reviewScreenshot: z.string(),
   reviewDate: z.string(),
   reviewTime: z.string(),
 });
 
-const newUploadPhoto = ref(null);
+const newUploadPhoto = ref<null | File>(null);
 const initialValues = computed(() => {
   if (props.type === 'edit')
     return props.initVals;
@@ -33,16 +35,43 @@ const initialValues = computed(() => {
   return {
     reviewDate: dayjs().format('YYYY-MM-DD'),
     reviewTime: dayjs().format('hh:mm'),
+    userId: props.role === RoleType['物理治療師'] ? props.therapistOptions[0].value : undefined,
   };
 });
-// const files = computed(()=> props.initVals.reviewScreenshot)
-const { handleSubmit } = useForm({
+
+const { handleSubmit, meta } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initialValues.value,
 });
+const ifDisableSubmit = computed(() => {
+  if (props.type === 'add' && !newUploadPhoto.value)
+    return false;
+  return meta.value.valid;
+});
 
 const onSubmit = handleSubmit(async (values) => {
-  console.log(values, newUploadPhoto.value);
+  let fileUUID = null;
+  // upload img first
+  try {
+    if (newUploadPhoto.value) {
+      const { fileName, url, maxFileSizeInMB } = await getGoogleUploadURL({ userId: values.userId });
+      await upload2awsS3(url, newUploadPhoto.value, maxFileSizeInMB);
+      fileUUID = extractUuidFromS3Url(fileName);
+      if (!fileUUID)
+        throw new Error('no file');
+    }
+
+    await createGoogleReview({
+      reviewScreenshot: fileUUID as string,
+      reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+      userId: values.userId,
+      title: values.title,
+    });
+    emit('create');
+  }
+  catch (error) {
+    console.error('Error during submission:', error);
+  }
 });
 
 function replaceUpload(scope: any) {
@@ -58,7 +87,7 @@ function replaceUpload(scope: any) {
     <QCardSection class="q-pa-lg">
       <form>
         <OInput name="title" inside-label="項目名稱*" error-message="" />
-        <OSelect name="userId" label="治療者(得分者)*" error-message="" />
+        <OSelect name="userId" label="治療者(得分者)*" error-message="" :options="therapistOptions" />
         <OInput date-mode name="reviewDate" inside-label="上傳日期*" mask="date" :rules="['date']" />
         <OTime name="reviewTime" now-btn label="上傳時間" error-message="" />
 
@@ -80,8 +109,8 @@ function replaceUpload(scope: any) {
       </form>
     </QCardSection>
     <QCardSection class="q-pa-lg row justify-end">
-      <QBtn flat rounded label="取消" class="q-mr-sm" @click="$emit('cancel', false)" />
-      <QBtn rounded color="primary" label="確定" @click="onSubmit" />
+      <QBtn flat rounded label="取消" class="q-mr-sm" @click="$emit('close')" />
+      <QBtn :disable="ifDisableSubmit" rounded color="primary" label="確定" @click="onSubmit" />
     </QCardSection>
   </QCard>
 </template>
