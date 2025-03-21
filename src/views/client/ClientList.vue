@@ -53,11 +53,11 @@ async function getData(query = {}) {
 }
 
 function handleSearch() {
-  getData({ ...(search.value && { nameOrPhone: search.value }) });
+  getData({ page: 1, ...(search.value && { nameOrPhone: search.value }) });
 }
 
 function handlePageChange(page: number) {
-  getData({ page });
+  getData({ page, ...(search.value && { nameOrPhone: search.value }) });
 }
 </script>
 
@@ -66,19 +66,21 @@ function handlePageChange(page: number) {
     <section class="q-mb-md flex">
       <div class="flex">
         <OInput v-model="search" placeholder="輸入客戶名稱或電話" hide-bottom-space class="q-mr-md" clearable />
-        <QBtn icon="search" size="14px" outline class="cursor-pointer q-px-md" label="搜尋" @click="handleSearch" @keyup:enter="handleSearch" />
+        <QBtn
+          icon="search" size="14px" outline class="cursor-pointer q-px-md" label="搜尋" @click="handleSearch"
+          @keyup:enter="handleSearch"
+        />
       </div>
       <div class="flex flex-center q-ml-auto">
-        <QPagination
-          v-model="paging.modelValue"
-          :max="paging.max"
-          input
-          @update:model-value="handlePageChange"
-        />
+        <QPagination v-model="paging.modelValue" :max="paging.max" input @update:model-value="handlePageChange" />
       </div>
     </section>
 
-    <QTable :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list" :rows-per-page-options="[0]" bordered @row-click="(_, row) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })" />
+    <QTable
+      :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list"
+      :rows-per-page-options="[0]" bordered
+      @row-click="(_: any, row: any) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })"
+    />
   </div>
   <RouterView />
 </template>
