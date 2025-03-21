@@ -101,7 +101,7 @@ async function getAppointmentList() {
   pagination.value = {
     ...pagination.value,
     page: meta?.page ?? 1,
-    rowsNumber: meta?.pageCount ?? 1,
+    rowsNumber: meta?.itemCount ?? 1,
     rowsPerPage: meta?.take ?? 10,
   };
 }
