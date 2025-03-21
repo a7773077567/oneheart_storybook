@@ -2,22 +2,17 @@
 import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { type ReviewListContent, getGoogleReviewList } from '@/api';
+import { type GoogleReview, type ReviewListContent, getAGoogleReview, getGoogleReviewList } from '@/api';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
+import type { ExtractPropTypes } from 'vue';
 
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
 
 const selectedTherapist = ref(trafficLightStore.therapistOptions[0].value);
 const reviewList = ref<ReviewListContent[]>([]);
-
-const stateOfreviewForm = ref(false);
-const formType = ref<'add' | 'edit'>('add');
-const reviewInfo = ref(null);
-const role = computed(() => userStore.role);
-
 const pagination = ref({
   page: 1,
   rowsPerPage: 10,
@@ -66,6 +61,7 @@ const cols: QTableProps['columns'] = [
     label: '',
     align: 'right',
     field: 'action',
+    // headerStyle: '120px',
   },
 ];
 
@@ -78,11 +74,32 @@ if (selectedTherapist.value !== null) {
 }
 
 async function getReviewList() {
-  console.log('getReviewListgetReviewListgetReviewList');
   const { data, meta } = await getGoogleReviewList({ page: pagination.value.page, take: pagination.value.rowsPerPage });
   reviewList.value = data;
   pagination.value.page = meta?.page ?? 1;
   pagination.value.rowsNumber = meta?.page ?? 1;
+}
+
+const stateOfReviewForm = ref(false);
+const formType = ref<'add' | 'edit'>('add');
+;
+
+const reviewInfo = ref<any>(null);
+const targetReview = ref();
+const role = computed(() => userStore.role);
+
+async function editReview(reviewId: number) {
+  const data = await getAGoogleReview({ id: reviewId });
+  targetReview.value = data.id;
+  reviewInfo.value = {
+    title: data.title,
+    userId: data.user.id,
+    reviewDate: dayjs(data.reviewDateTime).format('YYYY-MM-DD'),
+    reviewTime: dayjs(data.reviewDateTime).format('hh:mm'),
+    reviewScreenshot: data.reviewScreenshotUrl,
+  };
+  formType.value = 'edit';
+  stateOfReviewForm.value = true;
 }
 </script>
 
@@ -94,7 +111,7 @@ async function getReviewList() {
     <section class="google-review-content">
       <div class="google-review-content__header">
         <OptionSelect v-model="selectedTherapist" :options="trafficLightStore.therapistOptions" />
-        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfreviewForm = true), (formType = 'add')" />
+        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
       </div>
       <QTable
         :columns="cols"
@@ -105,17 +122,27 @@ async function getReviewList() {
         @request="getReviewList"
       >
         <template #body-cell-reviewScreenshotUrl="{ value }">
-          <img :src="value" alt="screen shot" style="height:30px;width:60px">
+          <QTd>
+            <img :src="value" alt="screen shot" style="height:30px;width:60px">
+          </QTd>
         </template>
-        <template #body-cell-action>
-          <QBtn flat icon="edit" />
-          <QBtn flat icon="delete" />
+        <template #body-cell-action="{ row }">
+          <QTd auto-width>
+            <QBtn flat round icon="delete" class="q-mr-sm" />
+            <QBtn flat round icon="edit" @click="editReview(row.id)" />
+          </QTd>
         </template>
       </QTable>
     </section>
   </div>
-  <QDialog v-model="stateOfreviewForm">
-    <ReviewForm :type="formType" :init-val="reviewInfo" :role="role" :therapist-options="trafficLightStore.scorerOptions" @cancel="stateOfreviewForm = false" @create="getReviewList" />
+  <QDialog v-model="stateOfReviewForm">
+    <ReviewForm
+      :type="formType" :init-vals="reviewInfo" :role="role"
+      :review-id="targetReview"
+      :therapist-options="trafficLightStore.scorerOptions"
+      @close="stateOfReviewForm = false"
+      @create="(stateOfReviewForm = false), (getReviewList())"
+    />
   </QDialog>
 </template>
 

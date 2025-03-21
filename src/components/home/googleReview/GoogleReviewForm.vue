@@ -1,18 +1,21 @@
 <script setup lang='ts' generic="T extends 'add' | 'edit'">
-import { useForm } from 'vee-validate';
+import { Field, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { type GoogleReview, createGoogleReview, getGoogleUploadURL, upload2awsS3 } from '@/api';
+import { type GoogleReview, createGoogleReview, getGoogleUploadURL, updateGoogleReview, upload2awsS3 } from '@/api';
 import { computed, ref } from 'vue';
 import { RoleType } from '@/api/user';
 import dayjs from 'dayjs';
 import { extractUuidFromS3Url } from '@/utils/helpers';
+import { OImgPreview } from '@/components/shared';
+import type { QUploader as UploaderScope } from 'quasar';
 
 const props = defineProps<{
   type: T;
-  initVals?: T extends 'edit' ? GoogleReview : null;
+  initVals: T extends 'edit' ? FormTypes : null;
   role: RoleType;
   therapistOptions: { label: string; value: number }[];
+  reviewId: T extends 'edit' ? number : undefined;
 }>();
 
 const emit = defineEmits<{
@@ -22,10 +25,13 @@ const emit = defineEmits<{
 
 const schema = z.object({
   userId: z.number(),
-  title: z.string(),
+  title: z.string().min(1),
   reviewDate: z.string(),
   reviewTime: z.string(),
+  reviewScreenshot: z.string(),
 });
+
+type FormTypes = typeof schema & { reviewScreenshot?: string | undefined };
 
 const newUploadPhoto = ref<null | File>(null);
 const initialValues = computed(() => {
@@ -39,14 +45,28 @@ const initialValues = computed(() => {
   };
 });
 
-const { handleSubmit, meta } = useForm({
+const { handleSubmit, meta, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initialValues.value,
 });
+
+const showFileErrorMsg = ref(false);
+function handleUpload([file]: [File]) {
+  showFileErrorMsg.value = false;
+  newUploadPhoto.value = file;
+  const previewURL = URL.createObjectURL(file);
+  setFieldValue('reviewScreenshot', previewURL);
+}
+
 const ifDisableSubmit = computed(() => {
   if (props.type === 'add' && !newUploadPhoto.value)
-    return false;
-  return meta.value.valid;
+    return true;
+
+  if (props.type === 'edit' && (!values?.reviewScreenshot)) {
+    return true;
+  }
+
+  return !meta.value.valid;
 });
 
 const onSubmit = handleSubmit(async (values) => {
@@ -61,12 +81,22 @@ const onSubmit = handleSubmit(async (values) => {
         throw new Error('no file');
     }
 
-    await createGoogleReview({
-      reviewScreenshot: fileUUID as string,
-      reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
-      userId: values.userId,
-      title: values.title,
-    });
+    if (props.type === 'edit' && !!props.reviewId) {
+      await updateGoogleReview({ id: props.reviewId }, {
+        reviewScreenshot: newUploadPhoto.value ? (fileUUID as string) : extractUuidFromS3Url(values.reviewScreenshot) as string,
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        userId: values.userId,
+        title: values.title,
+      });
+    }
+    else {
+      await createGoogleReview({
+        reviewScreenshot: fileUUID as string,
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        userId: values.userId,
+        title: values.title,
+      });
+    }
     emit('create');
   }
   catch (error) {
@@ -74,8 +104,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
 });
 
-function replaceUpload(scope: any) {
+function removeImg(scope: UploaderScope) {
   scope.removeQueuedFiles();
+  newUploadPhoto.value = null;
+  setFieldValue('reviewScreenshot', '');
 }
 </script>
 
@@ -90,22 +122,29 @@ function replaceUpload(scope: any) {
         <OSelect name="userId" label="治療者(得分者)*" error-message="" :options="therapistOptions" />
         <OInput date-mode name="reviewDate" inside-label="上傳日期*" mask="date" :rules="['date']" />
         <OTime name="reviewTime" now-btn label="上傳時間" error-message="" />
-
-        <QUploader
-          flat
-          style="max-width: 300px"
-          :multiple="false"
-          :max-files="1"
-          :files="[]"
-          @added="newUploadPhoto = $event"
-        >
-          <template #header="scope">
-            <QBtn v-if="scope.canAddFiles || scope.canUpload" unelevated rounded color="blue-1" text-color="dark" icon="add" label="上傳截圖" @click="scope?.queuedFiles?.length >= 1 ? replaceUpload(scope) : scope.pickFiles">
-              <QUploaderAddTrigger />
-            </QBtn>
-            <p v-if="scope?.queuedFiles?.length === 0" style="color: rgba(69, 70, 79, 1)" class="q-mt-md">*必填。每次限傳一張，格式須為 JPG 或 PNG，檔案大小不得超過 1MB</p>
-          </template>
-        </QUploader>
+        <Field v-slot="{ field }" name="reviewScreenshot">
+          <QUploader
+            flat
+            style="max-width: 300px"
+            :multiple="false"
+            :max-files="1"
+            accept=".jpg, .pdf, image/*"
+            :max-file-size="1048576"
+            @added="handleUpload"
+            @rejected="showFileErrorMsg = true"
+          >
+            <template #header="scope">
+              <QBtn v-if="scope.canAddFiles || scope.canUpload" unelevated rounded color="blue-1" text-color="dark" icon="add" label="上傳截圖" @click="scope?.queuedFiles?.length >= 1 ? scope.removeQueuedFiles : scope.pickFiles">
+                <QUploaderAddTrigger />
+              </QBtn>
+              <p v-if="showFileErrorMsg" style="color: red">圖片尺寸太大</p>
+              <p v-if="!field.value" style="color: rgba(69, 70, 79, 1)" class="q-mt-md">*必填。每次限傳一張，格式須為 JPG 或 PNG，檔案大小不得超過 1MB</p>
+            </template>
+            <template #list="scope">
+              <OImgPreview v-if="field.value" :url="field.value" @remove="removeImg(scope)" />
+            </template>
+          </QUploader>
+        </Field>
       </form>
     </QCardSection>
     <QCardSection class="q-pa-lg row justify-end">

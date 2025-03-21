@@ -20,6 +20,7 @@ declare module '@vue/runtime-core' {
     CalendarMonth: typeof import('@/components/shared')['CalendarMonth']
     GenericDialog: typeof import('@/components/shared')['GenericDialog']
     SimpleTable: typeof import('@/components/shared')['SimpleTable']
+    OImgPreview: typeof import('@/components/shared')['OImgPreview']
   }
 }
 

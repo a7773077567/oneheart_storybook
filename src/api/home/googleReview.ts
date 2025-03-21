@@ -24,7 +24,7 @@ export async function getGoogleReviewList(params: { userId?: number } & PageQuer
   return { data, meta };
 }
 export async function getAGoogleReview({ id }: { id: number }) {
-  const { data } = await api.get<GoogleReview>(`GoogleReviews/${id}`);
+  const { data } = await api.get<ReviewListContent>(`GoogleReviews/${id}`);
   return data;
 }
 
@@ -33,8 +33,8 @@ export async function createGoogleReview(payload: GoogleReview) {
   return data;
 }
 
-export async function updateGoogleReview({ id }: { id: number }) {
-  const { data } = await api.patch<GoogleReview>(`GoogleReviews/${id}`);
+export async function updateGoogleReview({ id }: { id: number }, payload: GoogleReview) {
+  const { data } = await api.patch<GoogleReview>(`GoogleReviews/${id}`, payload);
   return data;
 }
 
