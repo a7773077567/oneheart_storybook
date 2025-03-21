@@ -13,11 +13,7 @@ const trafficLightStore = useTrafficLight();
 
 const selectedTherapist = ref(trafficLightStore.therapistOptions[0].value);
 const reviewList = ref<ReviewListContent[]>([]);
-const pagination = ref({
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 1,
-});
+
 const cols: QTableProps['columns'] = [
   {
     name: 'user',
@@ -65,19 +61,32 @@ const cols: QTableProps['columns'] = [
   },
 ];
 
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 1,
+});
+
 // before mounted
 trafficLightStore.getTherapistList();
-console.log(selectedTherapist.value);
 
 if (selectedTherapist.value !== null) {
   getReviewList();
 }
 
+const onRequest: QTableProps['onRequest'] = async (props) => {
+  const { page, rowsPerPage } = props.pagination;
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  getReviewList();
+};
+
 async function getReviewList() {
-  const { data, meta } = await getGoogleReviewList({ page: pagination.value.page, take: pagination.value.rowsPerPage });
+  const userId = selectedTherapist.value || null;
+  const { data, meta } = await getGoogleReviewList({ ...(userId && { userId }), page: pagination.value.page, take: pagination.value.rowsPerPage });
   reviewList.value = data;
   pagination.value.page = meta?.page ?? 1;
-  pagination.value.rowsNumber = meta?.page ?? 1;
+  pagination.value.rowsNumber = meta?.itemCount ?? 1;
 }
 
 const stateOfReviewForm = ref(false);
@@ -110,16 +119,17 @@ async function editReview(reviewId: number) {
     <QSeparator />
     <section class="google-review-content">
       <div class="google-review-content__header">
-        <OptionSelect v-model="selectedTherapist" :options="trafficLightStore.therapistOptions" />
+        <OptionSelect v-model="selectedTherapist" :options="trafficLightStore.therapistOptions" @update:model-value="getReviewList" />
         <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
       </div>
       <QTable
+        v-model:pagination="pagination"
         :columns="cols"
         :rows="reviewList"
         row-key="id"
         class="no-shadow"
-        :rows-per-page-options="[10, 20, 50]"
-        @request="getReviewList"
+        :rows-per-page-options="[1, 10, 20, 50]"
+        @request="onRequest"
       >
         <template #body-cell-reviewScreenshotUrl="{ value }">
           <QTd>
