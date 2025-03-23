@@ -40,7 +40,7 @@ const initialValues = computed(() => {
 
   return {
     reviewDate: dayjs().format('YYYY-MM-DD'),
-    reviewTime: dayjs().format('hh:mm'),
+    reviewTime: dayjs().format('HH:mm'),
     userId: props.role === RoleType['物理治療師'] ? props.therapistOptions[0].value : undefined,
   };
 });
@@ -86,7 +86,7 @@ const onSubmit = handleSubmit(async (values) => {
     if (props.type === 'edit' && !!props.reviewId) {
       await updateGoogleReview({ id: props.reviewId }, {
         reviewScreenshot: newUploadPhoto.value ? (fileUUID as string) : extractUuidFromS3Url(values.reviewScreenshot) as string,
-        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss'),
         userId: values.userId,
         title: values.title,
       });
@@ -94,7 +94,7 @@ const onSubmit = handleSubmit(async (values) => {
     else {
       await createGoogleReview({
         reviewScreenshot: fileUUID as string,
-        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss'),
         userId: values.userId,
         title: values.title,
       });

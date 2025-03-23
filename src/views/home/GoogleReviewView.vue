@@ -42,7 +42,7 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '上傳時間',
     align: 'left',
-    field: row => dayjs(row.reviewDateTime).format('hh:mm'),
+    field: row => dayjs(row.reviewDateTime).format('HH:mm'),
   },
   {
     name: 'reviewScreenshotUrl',
@@ -101,7 +101,7 @@ async function editReview(reviewId: number) {
     title: data.title,
     userId: data.user.id,
     reviewDate: dayjs(data.reviewDateTime).format('YYYY-MM-DD'),
-    reviewTime: dayjs(data.reviewDateTime).format('hh:mm'),
+    reviewTime: dayjs(data.reviewDateTime).format('HH:mm'),
     reviewScreenshot: data.reviewScreenshotUrl,
   };
   formType.value = 'edit';

@@ -53,7 +53,7 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     if (props.type === 'edit' && !!props.reviewId) {
       await updateEducationPoint({ id: props.reviewId }, {
-        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss'),
         userId: values.userId,
         title: values.title,
         point: values.point,
@@ -61,7 +61,7 @@ const onSubmit = handleSubmit(async (values) => {
     }
     else {
       await createEducationPoints({
-        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD hh:mm').format('YYYY-MM-DD HH:mm:ss'),
+        reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss'),
         userId: values.userId,
         title: values.title,
         point: values.point,
