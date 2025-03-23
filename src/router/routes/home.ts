@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import type { PermissionEvents } from '@/const/permission';
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -78,6 +79,7 @@ export const homeRoutes: RouteRecordRaw[] = [
         meta: {
           label: '教育積分管理',
           requiredAuth: true,
+          permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
         },
       },
     ],

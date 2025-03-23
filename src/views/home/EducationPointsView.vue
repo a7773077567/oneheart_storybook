@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
 
-const selectedTherapist = ref(trafficLightStore.therapistFilterOptions[0].value);
+const selectedTherapist = ref(trafficLightStore.therapistFilterOptions?.[0]?.value);
 const reviewList = ref<EducationPointContent[]>([]);
 
 const cols: QTableProps['columns'] = [
@@ -67,11 +67,9 @@ const pagination = ref({
 });
 
 // before mounted
-trafficLightStore.getAvailableTherapistList();
-
-if (selectedTherapist.value !== null) {
-  getReviewList();
-}
+await trafficLightStore.getAvailableTherapistList();
+selectedTherapist.value = trafficLightStore.therapistFilterOptions?.[0]?.value;
+await getReviewList();
 
 const onRequest: QTableProps['onRequest'] = async (props) => {
   const { page, rowsPerPage } = props.pagination;
