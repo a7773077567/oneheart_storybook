@@ -71,15 +71,15 @@ export const homeRoutes: RouteRecordRaw[] = [
           permissions: ['VIEW_GOOGLE_REVIEW'],
         },
       },
-      // {
-      //   path: 'education-review',
-      //   name: 'educationReview',
-      //   component: () => import('@/views/home/EducationReview.vue'),
-      //   meta: {
-      //     label: '教育積分管理',
-      //     requiredAuth: true,
-      //   },
-      // },
+      {
+        path: 'education-points',
+        name: 'educationPoints',
+        component: () => import('@/views/home/EducationPointsView.vue'),
+        meta: {
+          label: '教育積分管理',
+          requiredAuth: true,
+        },
+      },
     ],
   },
 ];
