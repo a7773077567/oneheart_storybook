@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { type GoogleReview, type ReviewListContent, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
+import { type ReviewListContent, RoleType, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
 
-const selectedTherapist = ref(trafficLightStore.therapistOptions[0].value);
+const selectedTherapist = ref(trafficLightStore.therapistFilterOptions?.[0]?.value);
 const reviewList = ref<ReviewListContent[]>([]);
 
 const cols: QTableProps['columns'] = [
@@ -67,11 +67,9 @@ const pagination = ref({
 });
 
 // before mounted
-trafficLightStore.getTherapistList();
-
-if (selectedTherapist.value !== null) {
-  getReviewList();
-}
+await trafficLightStore.getAvailableTherapistList();
+selectedTherapist.value = trafficLightStore.therapistFilterOptions?.[0]?.value;
+await getReviewList();
 
 const onRequest: QTableProps['onRequest'] = async (props) => {
   const { page, rowsPerPage } = props.pagination;
@@ -143,7 +141,7 @@ function deleteConfirm(id: number) {
     <QSeparator />
     <section class="google-review-content">
       <div class="google-review-content__header">
-        <OptionSelect v-model="selectedTherapist" :options="trafficLightStore.therapistOptions" @update:model-value="getReviewList" />
+        <OptionSelect v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
         <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
       </div>
       <QTable
@@ -162,8 +160,8 @@ function deleteConfirm(id: number) {
         </template>
         <template #body-cell-action="{ row }">
           <QTd auto-width>
-            <QBtn flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
-            <QBtn flat round icon="o_edit" @click="editReview(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" flat round icon="o_edit" @click="editReview(row.id)" />
           </QTd>
         </template>
       </QTable>

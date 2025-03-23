@@ -9,7 +9,7 @@ export const userRoutes: RouteRecordRaw[] = [
     meta: {
       label: '人員設定',
       requiredAuth: true,
-      permission: false,
+      permissions: ['VIEW_USER_SETTING'],
       icon: 'o_manage_accounts',
     },
     children: [

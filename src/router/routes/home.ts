@@ -16,10 +16,6 @@ export const homeRoutes: RouteRecordRaw[] = [
         path: 'dashboard',
         name: 'dashboard',
         component: () => import('@/views/home/Dashboard.vue'),
-        // component: () => {
-        //   const userStore = useUserStore();
-        //   return getRoleDashboard(userStore.role);
-        // },
         meta: {
           label: '儀表板',
           requiredAuth: true,
@@ -72,8 +68,18 @@ export const homeRoutes: RouteRecordRaw[] = [
         meta: {
           label: 'Google評論管理',
           requiredAuth: true,
+          permissions: ['VIEW_GOOGLE_REVIEW'],
         },
       },
+      // {
+      //   path: 'education-review',
+      //   name: 'educationReview',
+      //   component: () => import('@/views/home/EducationReview.vue'),
+      //   meta: {
+      //     label: '教育積分管理',
+      //     requiredAuth: true,
+      //   },
+      // },
     ],
   },
 ];
