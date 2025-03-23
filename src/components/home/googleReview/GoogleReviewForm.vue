@@ -69,7 +69,9 @@ const ifDisableSubmit = computed(() => {
   return !meta.value.valid;
 });
 
+const isLoading = ref(false);
 const onSubmit = handleSubmit(async (values) => {
+  isLoading.value = true;
   let fileUUID = null;
   // upload img first
   try {
@@ -97,6 +99,7 @@ const onSubmit = handleSubmit(async (values) => {
         title: values.title,
       });
     }
+    isLoading.value = false;
     emit('create');
   }
   catch (error) {
@@ -149,7 +152,7 @@ function removeImg(scope: UploaderScope) {
     </QCardSection>
     <QCardSection class="q-pa-lg row justify-end">
       <QBtn flat rounded label="取消" class="q-mr-sm" @click="$emit('close')" />
-      <QBtn :disable="ifDisableSubmit" rounded color="primary" label="確定" @click="onSubmit" />
+      <QBtn :disable="ifDisableSubmit" rounded color="primary" label="確定" :loading="isLoading" @click="onSubmit" />
     </QCardSection>
   </QCard>
 </template>

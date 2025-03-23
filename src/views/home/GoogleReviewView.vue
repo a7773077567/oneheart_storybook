@@ -1,12 +1,11 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { QSeparator } from 'quasar';
+import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { type GoogleReview, type ReviewListContent, getAGoogleReview, getGoogleReviewList } from '@/api';
+import { type GoogleReview, type ReviewListContent, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
-import type { ExtractPropTypes } from 'vue';
 
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
@@ -110,6 +109,31 @@ async function editReview(reviewId: number) {
   formType.value = 'edit';
   stateOfReviewForm.value = true;
 }
+
+const $q = useQuasar();
+function uploadReview() {
+  stateOfReviewForm.value = false;
+  $q.notify({ message: `Google評論${formType.value === 'add' ? '上傳' : '編輯'}成功`, timeout: 600, position: 'top' });
+  getReviewList();
+}
+
+function deleteConfirm(id: number) {
+  $q.dialog({
+    title: '確定要刪除評論嗎？',
+    message: '這個動作無法復原。',
+    ok: '確定刪除',
+    cancel: '取消',
+  }).onOk(async () => {
+    try {
+      await deleteGoogleReview({ id });
+      $q.notify({ message: '評論已刪除', timeout: 600, position: 'top' });
+      getReviewList();
+    }
+    catch (err) {
+      console.log(err);
+    }
+  });
+}
 </script>
 
 <template>
@@ -138,8 +162,8 @@ async function editReview(reviewId: number) {
         </template>
         <template #body-cell-action="{ row }">
           <QTd auto-width>
-            <QBtn flat round icon="delete" class="q-mr-sm" />
-            <QBtn flat round icon="edit" @click="editReview(row.id)" />
+            <QBtn flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
+            <QBtn flat round icon="o_edit" @click="editReview(row.id)" />
           </QTd>
         </template>
       </QTable>
@@ -151,7 +175,7 @@ async function editReview(reviewId: number) {
       :review-id="targetReview"
       :therapist-options="trafficLightStore.scorerOptions"
       @close="stateOfReviewForm = false"
-      @create="(stateOfReviewForm = false), (getReviewList())"
+      @create="uploadReview"
     />
   </QDialog>
 </template>
