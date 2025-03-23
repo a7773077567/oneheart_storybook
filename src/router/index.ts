@@ -34,6 +34,7 @@ export const routes: RouteRecordRaw[] = [
       hide: true,
     },
   },
+  { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('@/views/login/UserLoginView.vue') },
 ];
 
 const router = createRouter({
