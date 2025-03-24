@@ -30,12 +30,12 @@ const cols: QTableProps['columns'] = [
     field: 'title',
   },
   {
-    name: 'reviewDateTime',
+    name: 'point',
     required: true,
     label: '教育積分',
-    align: 'left',
+    align: 'right',
     style: 'width:150px',
-    field: row => dayjs(row.reviewDateTime).format('YYYY-MM-DD'),
+    field: 'point',
   },
   {
     name: 'reviewDateTime',
@@ -117,7 +117,7 @@ function uploadReview() {
 
 function deleteConfirm(id: number) {
   $q.dialog({
-    title: '確定要刪除評論嗎？',
+    title: '確定要刪除教育積分嗎？',
     message: '這個動作無法復原。',
     ok: '確定刪除',
     cancel: '取消',
