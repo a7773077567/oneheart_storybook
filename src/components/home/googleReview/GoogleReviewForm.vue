@@ -51,7 +51,10 @@ const { handleSubmit, meta, setFieldValue, values } = useForm({
 });
 
 const showFileErrorMsg = ref(false);
-function handleUpload([file]: [File]) {
+
+// typescript check force to define the types as readonly any[]
+function handleUpload(files: readonly any[]) {
+  const file = files[0];
   showFileErrorMsg.value = false;
   newUploadPhoto.value = file;
   const previewURL = URL.createObjectURL(file);
@@ -131,7 +134,7 @@ function removeImg(scope: UploaderScope) {
             style="max-width: 300px"
             :multiple="false"
             :max-files="1"
-            accept=".jpg, .pdf, image/*"
+            accept=".jpg, .png, image/*"
             :max-file-size="1048576"
             @added="handleUpload"
             @rejected="showFileErrorMsg = true"
