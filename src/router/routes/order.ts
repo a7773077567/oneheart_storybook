@@ -8,7 +8,6 @@ export const orderRoutes: RouteRecordRaw[] = [
     meta: {
       label: '交易管理',
       requiredAuth: true,
-      permission: true,
       icon: 'attach_money',
     },
     redirect: { name: 'pointsTopup' },

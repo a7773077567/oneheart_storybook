@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import type { PermissionEvents } from '@/const/permission';
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -16,10 +17,6 @@ export const homeRoutes: RouteRecordRaw[] = [
         path: 'dashboard',
         name: 'dashboard',
         component: () => import('@/views/home/Dashboard.vue'),
-        // component: () => {
-        //   const userStore = useUserStore();
-        //   return getRoleDashboard(userStore.role);
-        // },
         meta: {
           label: '儀表板',
           requiredAuth: true,
@@ -45,6 +42,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+          {
+            path: 'traffic-light-overview/:userId/return-visit-rate',
+            component: () => import('@/views/home/indicator/ReturnVisitRateView.vue'),
+            name: 'returnVisitRateView',
+            props: true,
+            meta: {
+              label: '回診率計分詳情',
+              requiredAuth: true,
+            },
+          },
         ],
       },
       {
@@ -63,6 +70,26 @@ export const homeRoutes: RouteRecordRaw[] = [
         meta: {
           label: '個人設定',
           requiredAuth: true,
+        },
+      },
+      {
+        path: 'google-review',
+        name: 'googleReview',
+        component: () => import('@/views/home/GoogleReviewView.vue'),
+        meta: {
+          label: 'Google評論管理',
+          requiredAuth: true,
+          permissions: ['VIEW_GOOGLE_REVIEW'],
+        },
+      },
+      {
+        path: 'education-points',
+        name: 'educationPoints',
+        component: () => import('@/views/home/EducationPointsView.vue'),
+        meta: {
+          label: '教育積分管理',
+          requiredAuth: true,
+          permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
         },
       },
     ],

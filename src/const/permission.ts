@@ -1,6 +1,6 @@
 import { RoleType } from '@/api/user';
 
-export type PermissionEvents = 'READ_HANDOVER' | 'EDIT_COACH_OPERATION_TARGET' | 'VIEW_USER_SETTING';
+export type PermissionEvents = 'READ_HANDOVER' | 'EDIT_COACH_OPERATION_TARGET' | 'VIEW_USER_SETTING' | 'VIEW_GOOGLE_REVIEW' | 'EDIT_GOOGLE_REVIEW' | 'READ_EDUCATION_REVIEW' | 'EDIT_EDUCATION_REVIEW';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -8,50 +8,90 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: true,
+    VIEW_GOOGLE_REVIEW: true,
+    EDIT_GOOGLE_REVIEW: true,
+    READ_EDUCATION_REVIEW: true,
+    EDIT_EDUCATION_REVIEW: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: true,
+    VIEW_GOOGLE_REVIEW: true,
+    EDIT_GOOGLE_REVIEW: true,
+    READ_EDUCATION_REVIEW: true,
+    EDIT_EDUCATION_REVIEW: true,
   },
   [RoleType['副院長']]: {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: true,
+    VIEW_GOOGLE_REVIEW: true,
+    EDIT_GOOGLE_REVIEW: true,
+    READ_EDUCATION_REVIEW: true,
+    EDIT_EDUCATION_REVIEW: true,
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: true,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: false,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: false,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['副店長']]: {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: true,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: false,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: false,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['櫃檯']]: {
     READ_HANDOVER: true,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: false,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: false,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['教練組長']]: {
     READ_HANDOVER: false,
     EDIT_COACH_OPERATION_TARGET: true,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: false,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: false,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['教練']]: {
     READ_HANDOVER: false,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: false,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: false,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['物理治療師']]: {
     READ_HANDOVER: false,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: true,
+    EDIT_GOOGLE_REVIEW: false,
+    READ_EDUCATION_REVIEW: true,
+    EDIT_EDUCATION_REVIEW: false,
   },
   [RoleType['物理治療師組長']]: {
     READ_HANDOVER: false,
     EDIT_COACH_OPERATION_TARGET: false,
     VIEW_USER_SETTING: false,
+    VIEW_GOOGLE_REVIEW: true,
+    EDIT_GOOGLE_REVIEW: true,
+    READ_EDUCATION_REVIEW: true,
+    EDIT_EDUCATION_REVIEW: true,
   },
 };

@@ -1,17 +1,15 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
-import { type ReferralDetail, type ReferralOverview, getReferralStatsList, getReferralStatsOverview } from '@/api';
+import { type ReturnVisitRateDetail, type ReturnVisitRateOverview, getReturnVisitRateStatsList, getReturnVisitRateStatsOverview } from '@/api';
 import { useRoute } from 'vue-router';
-import dayjs from 'dayjs';
 import { getMonthDifference } from '@/utils/date';
 import type { QTableProps } from 'quasar';
 import RuleList from '@/components/home/dashboard/RuleList.vue';
-import { ShiftType } from '@/const/general';
 
 const route = useRoute();
 const userId = computed(() => route.params.userId as string);
-const overview = ref<ReferralOverview>({} as ReferralOverview);
+const overview = ref<ReturnVisitRateOverview>({} as ReturnVisitRateOverview);
 
 const scoreCols: QTableProps['columns'] = [
   {
@@ -23,43 +21,67 @@ const scoreCols: QTableProps['columns'] = [
     headerStyle: 'font-size: 14px',
   },
   {
-    name: 'referralCount',
+    name: 'firstScheduleCount',
     required: true,
-    label: '轉介人數',
-    field: 'referralCount',
-    format: val => `${val} 人`,
+    label: '回診 / 初診人數',
+    field: 'firstScheduleCount',
+    format: (val, row) => `${val} 名 / ${row.returnVisitCount} 名`,
     headerStyle: 'font-size: 14px',
+    align: 'left',
+  },
+  {
+    name: 'returnVisitRate',
+    required: true,
+    label: '回診率',
+    field: 'returnVisitRate',
+    format: val => `${val}%`,
+    headerStyle: 'font-size: 14px',
+    align: 'left',
+  },
+  {
+    name: 'points',
+    required: true,
+    label: '得分',
+    field: 'points',
+    format: val => `${val} 分`,
+    headerStyle: 'font-size: 14px',
+    align: 'right',
   },
 ];
 
 const scoreList = computed(() => overview.value.detailList.map(item => ({ ...item, diff: getMonthDifference(item.year, item.month) })));
-const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.referralCount));
-const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.referralCount));
+const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.points));
+const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.points));
 
-// referral table
-const referralClientTable = ref<ReferralDetail[]>([]);
-const referralDetailCols: QTableProps['columns'] = [
+// return visit rate table
+const returnVisitRateTable = ref<ReturnVisitRateDetail[]>([]);
+const cols: QTableProps['columns'] = [
   {
     name: 'clientName',
     required: true,
-    label: '初診轉介客戶',
+    label: '姓名',
     align: 'left',
     field: 'clientName',
+    headerStyle: 'font-size: 14px',
   },
   {
-    name: 'userShiftType',
+    name: 'clientPhoneNumber',
     required: true,
-    label: '項目',
-    field: 'userShiftType',
+    label: '手機號碼',
+    field: 'clientPhoneNumber',
     align: 'left',
-    format: val => ShiftType[val],
+    headerStyle: 'font-size: 14px',
   },
   {
-    name: 'referralClientName',
+    name: 'isReturning',
     required: true,
-    label: '推薦人',
+    label: '回診狀況',
     align: 'left',
-    field: 'referralClientName',
+    field: 'isReturning',
+    sortable: true,
+    format: val => val ? '已回診' : '未回診',
+    style: row => row.isReturning ? 'color: rgba(231, 93, 0, 1)' : 'color: rgba(26, 27, 33, 1)',
+    headerStyle: 'font-size: 14px',
   },
   {
     name: 'action',
@@ -76,13 +98,13 @@ const pagination = ref({
   rowsNumber: 1,
 });
 
-async function getReferralClientList() {
-  const { data, meta } = await getReferralStatsList({
+async function getReturnVisitRateList() {
+  const { data, meta } = await getReturnVisitRateStatsList({
     userId: +userId.value,
     page: pagination.value.page ?? 1,
     take: pagination.value.rowsPerPage,
   });
-  referralClientTable.value = data;
+  returnVisitRateTable.value = data;
   pagination.value = {
     page: meta?.page ?? 1,
     rowsNumber: meta?.itemCount ?? 0,
@@ -94,22 +116,22 @@ const onRequest: QTableProps['onRequest'] = async (props) => {
 
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
-  getReferralClientList();
+  getReturnVisitRateList();
 };
 
 await Promise.all([
-  getReferralStatsOverview({ userId: +userId.value }),
-  getReferralClientList(),
+  getReturnVisitRateStatsOverview({ userId: +userId.value }),
+  getReturnVisitRateList(),
 ]).then(([data]) => {
   overview.value = data;
 });
 </script>
 
 <template>
-  <div class="referral_detail">
-    <h2>轉介數計分詳情</h2>
+  <div class="return_rate">
+    <h2>回診率計分詳情</h2>
     <h3>計分說明</h3>
-    <p class="note">初診客戶的推薦人為您的既有客戶。客戶 A 為您的客戶，並推薦客戶 B 進行服務，當客戶 B 完成治療，您的轉介數 +1。</p>
+    <p class="note">「初診患者」在 2 個月內的回診比例。</p>
     <QSeparator style="margin: 32px 0" />
     <h3>計分明細</h3>
     <div class="row no-wrap">
@@ -130,12 +152,12 @@ await Promise.all([
             <p class="body_medium_highlight">三個月加總後轉換得分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 {{ previous3Scores.join('+') }} = {{ overview.currentPoint }} 人 =</p>
-            <p class="title_medium">目前得分 {{ overview.currentPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3</p>
+            <p class="title_medium text-right">目前得分{{ overview.currentPoint }}</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 {{ recent3Scores.join('+') }} = {{ overview.predictionPoint }} 人 =</p>
-            <p class="title_medium">預測得分 {{ overview.predictionPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3</p>
+            <p class="title_medium text-right">預測得分{{ overview.predictionPoint }}</p>
           </div>
         </div>
       </section>
@@ -143,20 +165,20 @@ await Promise.all([
       <section class="col-3">
         <h4 class="label_large q-mb-sm">得分標準</h4>
         <p class="body_medium q-mb-sm">您本月職階為 PT {{ overview.currentPTLevel }}，得分標準如下：</p>
-        <RuleList :rules="overview.rules" unit="人" class="q-mb-sm" label="數值" />
+        <RuleList :rules="overview.rules" class="q-mb-sm" unit="%" label="回診率" />
         <p class="body_medium q-mb-sm">*職階由管理者設定，每月可能變動</p>
       </section>
     </div>
     <QSeparator style="margin:32px 0" />
     <section>
-      <h3>轉介數明細</h3>
-      <p class="title_small q-mb-md">以下為近 4 個月內成功轉介，並影響得分的初診客戶名單。</p>
+      <h3>初診客戶回診明細</h3>
+      <p class="title_small q-mb-md">聯繫「未回診客戶」以提高您本月的回診率得分。</p>
 
       <QTable
         v-model:pagination="pagination"
         flat
-        :rows="referralClientTable"
-        :columns="referralDetailCols"
+        :rows="returnVisitRateTable"
+        :columns="cols"
         row-key="clientId"
         virtual-scroll
         rows-per-page-label="每頁顯示筆數"
@@ -173,7 +195,7 @@ await Promise.all([
 </template>
 
 <style scoped lang="scss">
-.referral_detail {
+.return_rate {
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;
