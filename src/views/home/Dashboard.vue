@@ -8,6 +8,7 @@ import LeadTherapistDashboard from '@/views/home/LeadTherapistDashboard.vue';
 import ReceptionDashboard from '@/views/home/ReceptionDashboard.vue';
 import CoachDashboard from '@/views/home/CoachDashboard.vue';
 import { useLayoutRoute } from '@/composables/layoutRoute';
+import { useRoute, useRouter } from 'vue-router';
 
 const { currentRoute } = useLayoutRoute();
 function getRoleDashboard(role: RoleType) {
@@ -33,9 +34,23 @@ function getRoleDashboard(role: RoleType) {
 
 const userStore = useUserStore();
 const dashboardComponent = computed(() => getRoleDashboard(userStore.role));
+
+const router = useRouter();
+const route = useRoute();
+function handlePrevious() {
+  if (currentRoute.value === 'trafficLightOverview') {
+    router.push({ name: 'dashboard' });
+  }
+  else {
+    router.push({ name: 'trafficLightOverview', params: { userId: route.params.userId } });
+  }
+}
 </script>
 
 <template>
   <Component :is="dashboardComponent" v-if="currentRoute === 'dashboard'" />
-  <RouterView v-else />
+  <div v-else>
+    <QBtn flat dense color="primary" label="返回" icon="chevron_left" @click="handlePrevious" />
+    <RouterView />
+  </div>
 </template>

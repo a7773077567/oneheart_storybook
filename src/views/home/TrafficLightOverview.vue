@@ -81,8 +81,6 @@ const indicatorList = computed(() => [
     predict: trafficLightStore.targetTherapistTrafficLight.googleCommentCount.predictionPoint,
   },
 ]);
-
-// const trafficLightRules = computed(() => trafficLightStore.targetTherapistTrafficLight.rules.map(rule => ({ ...rule, title: rule.light === 'red' ? '紅燈' : rule.light === 'green' ? '綠燈' : '黃燈' })));
 </script>
 
 <template>
