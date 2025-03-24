@@ -131,11 +131,11 @@ await Promise.all([
           </div>
           <div class="col-12 col-md-4">
             <p class="body_medium q-mb-sm">前三個月 {{ previous3Scores.join('+') }} = {{ overview.currentPoint }} 人 =</p>
-            <p class="title_medium">目前得分{{ overview.currentPoint }}</p>
+            <p class="title_medium">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
             <p class="body_medium q-mb-sm">前三個月 {{ recent3Scores.join('+') }} = {{ overview.predictionPoint }} 人 =</p>
-            <p class="title_medium">預測得分{{ overview.predictionPoint }}</p>
+            <p class="title_medium">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
       </section>
@@ -143,7 +143,7 @@ await Promise.all([
       <section class="col-3">
         <h4 class="label_large q-mb-sm">得分標準</h4>
         <p class="body_medium q-mb-sm">您本月職階為 PT {{ overview.currentPTLevel }}，得分標準如下：</p>
-        <RuleList :rules="overview.rules" unit="人" class="q-mb-sm" />
+        <RuleList :rules="overview.rules" unit="人" class="q-mb-sm" label="數值" />
         <p class="body_medium q-mb-sm">*職階由管理者設定，每月可能變動</p>
       </section>
     </div>
@@ -177,6 +177,7 @@ await Promise.all([
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;
+    margin-bottom: 24px;
   }
   h3 {
     @include title-large($on-surface);
