@@ -110,8 +110,6 @@ export const useTrafficLight = defineStore('traffic-light', {
     async getAvailableTherapistList() {
       // 有權限問題，職位為組長、院長、管理者才可拿到全部治療師名單
       const userStore = useUserStore();
-      console.log(userStore.userInfo);
-
       if (userStore.userInfo?.role?.type === RoleType['物理治療師']) {
         return this.therapistList = [{ ...userStore.userInfo }];
       }
