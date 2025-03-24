@@ -27,6 +27,33 @@ const predictScoreRange = computed(() => {
 
 const indicatorList = computed(() => [
   {
+    name: 'returnVisitRate',
+    detailPage: 'returnVisitRateView',
+    label: '回診率',
+    caption: '得分採三個月平均',
+    total: trafficLightStore.targetTherapistTrafficLight.returnVisitRate.totalPoint,
+    current: trafficLightStore.targetTherapistTrafficLight.returnVisitRate.currentPoint,
+    predict: trafficLightStore.targetTherapistTrafficLight.returnVisitRate.predictionPoint,
+  },
+  {
+    name: 'executionCount',
+    detailPage: 'executionCountView',
+    label: '執行數',
+    caption: '得分採三個月平均',
+    total: trafficLightStore.targetTherapistTrafficLight.executionCount.totalPoint,
+    current: trafficLightStore.targetTherapistTrafficLight.executionCount.currentPoint,
+    predict: trafficLightStore.targetTherapistTrafficLight.executionCount.predictionPoint,
+  },
+  {
+    name: 'presonalRevenue',
+    detailPage: 'presonalRevenueView',
+    label: '個人營業額',
+    caption: '得分採三個月平均',
+    total: trafficLightStore.targetTherapistTrafficLight.presonalRevenue.totalPoint,
+    current: trafficLightStore.targetTherapistTrafficLight.presonalRevenue.currentPoint,
+    predict: trafficLightStore.targetTherapistTrafficLight.presonalRevenue.predictionPoint,
+  },
+  {
     name: 'referralCount',
     detailPage: 'referralCountView',
     label: '轉介數',
@@ -34,6 +61,24 @@ const indicatorList = computed(() => [
     total: trafficLightStore.targetTherapistTrafficLight.referralCount.totalPoint,
     current: trafficLightStore.targetTherapistTrafficLight.referralCount.currentPoint,
     predict: trafficLightStore.targetTherapistTrafficLight.referralCount.predictionPoint,
+  },
+  {
+    name: 'educationPoint',
+    detailPage: 'educationPointView',
+    label: '教育積分',
+    caption: '各月積分加總後換算得分',
+    total: trafficLightStore.targetTherapistTrafficLight.educationPoint.totalPoint,
+    current: trafficLightStore.targetTherapistTrafficLight.educationPoint.currentPoint,
+    predict: trafficLightStore.targetTherapistTrafficLight.educationPoint.predictionPoint,
+  },
+  {
+    name: 'googleCommentCount',
+    detailPage: 'googleCommentCountView',
+    label: 'Google 評論數',
+    caption: '得分採三個月平均',
+    total: trafficLightStore.targetTherapistTrafficLight.googleCommentCount.totalPoint,
+    current: trafficLightStore.targetTherapistTrafficLight.googleCommentCount.currentPoint,
+    predict: trafficLightStore.targetTherapistTrafficLight.googleCommentCount.predictionPoint,
   },
 ]);
 
@@ -60,7 +105,7 @@ const indicatorList = computed(() => [
     <section class="traffic_light_detail__footer">
       <h3 class="q-mb-sm">紅綠燈由以下六項指標得分加總</h3>
       <p class="caption">分為 <b>預測</b> 和 目前 <b>得分</b>。預測得分採近三個月數據計算，反映未來趨勢；目前得分則採用前三個月數據，呈現已達成的表現。</p>
-      <section class="row indicator_list">
+      <section class="row indicator_list q-col-gutter-md">
         <div v-for="({ detailPage, name, ...cardProps }) in indicatorList" :key="name" class="col">
           <IndicatorCard v-bind="{ name, ...cardProps }" @check-detail="$router.push({ name: detailPage, params: { userId } })" />
         </div>
@@ -89,7 +134,12 @@ const indicatorList = computed(() => [
   }
   &__footer {
     .indicator_list {
-      gap: 16px;
+      justify-content: left;
+      & > .col {
+        width: fit-content;
+        min-width: fit-content;
+        flex: 0 1 auto;
+      }
     }
   }
   .traffic_light_rules {
