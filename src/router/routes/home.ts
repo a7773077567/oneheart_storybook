@@ -42,6 +42,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+          {
+            path: 'traffic-light-overview/:userId/return-visit-rate',
+            component: () => import('@/views/home/indicator/ReturnVisitRateView.vue'),
+            name: 'returnVisitRateView',
+            props: true,
+            meta: {
+              label: '回診率計分詳情',
+              requiredAuth: true,
+            },
+          },
         ],
       },
       {

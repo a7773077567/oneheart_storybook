@@ -97,15 +97,17 @@ export async function getTherapistTrafficLight(params: { userId: number }) {
   return data;
 }
 
+export interface ScoreRule {
+  score: number;
+  min: number;
+  max: number | null;
+}
+
 export interface ReferralOverview {
   predictionPoint: number;
   currentPoint: number;
   currentPTLevel: number;
-  rules: {
-    score: number;
-    min: number;
-    max: number | null;
-  }[];
+  rules: ScoreRule[];
   detailList: {
     year: number;
     month: number;
@@ -133,5 +135,38 @@ interface ReferralListQuery {
 // 取得治療師紅綠燈指標-轉介數｜計分詳情與資料-列表`
 export async function getReferralStatsList(params: ReferralListQuery) {
   const { data, meta } = await api.get<ReferralDetail[], PagingMeta>(`dashboard/therapistTrafficlight-referralStatistics-list`, { params });
+  return { data, meta };
+}
+
+export interface ReturnVisitRateOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  currentPTLevel: number;
+  rules: ScoreRule[];
+  detailList: {
+    year: number;
+    month: number;
+    returnVisitCount: number;
+    firstScheduleCount: number;
+    returnVisitRate: number;
+    points: number;
+  }[];
+}
+
+// 紅綠燈指標-回診率｜計分詳情與資料-概覽
+export async function getReturnVisitRateStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<ReturnVisitRateOverview>(`dashboard/therapistTrafficlight-returnVisitRateStatistics-overview`, { params });
+  return data;
+}
+
+export interface ReturnVisitRateDetail {
+  clientId: number;
+  clientName: string;
+  clientPhoneNumber: string;
+  isReturning: boolean;
+}
+// 紅綠燈指標-回診率｜計分詳情與資料-列表
+export async function getReturnVisitRateStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<ReturnVisitRateDetail[], PagingMeta>(`dashboard/therapistTrafficlight-returnVisitRateStatistics-list`, { params });
   return { data, meta };
 }
