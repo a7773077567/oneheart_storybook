@@ -6,7 +6,7 @@ import { type GoogleReview, createGoogleReview, getGoogleUploadURL, updateGoogle
 import { computed, ref } from 'vue';
 import { RoleType } from '@/api/user';
 import dayjs from 'dayjs';
-import { extractUuidFromS3Url } from '@/utils/helpers';
+import { extractFilenameFromS3 } from '@/utils/helpers';
 import { OImgPreview } from '@/components/shared';
 import type { QUploader as UploaderScope } from 'quasar';
 
@@ -81,14 +81,14 @@ const onSubmit = handleSubmit(async (values) => {
     if (newUploadPhoto.value) {
       const { fileName, url, maxFileSizeInMB } = await getGoogleUploadURL({ userId: values.userId });
       await upload2awsS3(url, newUploadPhoto.value, maxFileSizeInMB);
-      fileUUID = extractUuidFromS3Url(fileName);
+      fileUUID = extractFilenameFromS3(fileName);
       if (!fileUUID)
         throw new Error('no file');
     }
 
     if (props.type === 'edit' && !!props.reviewId) {
       await updateGoogleReview({ id: props.reviewId }, {
-        reviewScreenshot: newUploadPhoto.value ? (fileUUID as string) : extractUuidFromS3Url(values.reviewScreenshot) as string,
+        reviewScreenshot: newUploadPhoto.value ? (fileUUID as string) : extractFilenameFromS3(values.reviewScreenshot) as string,
         reviewDateTime: dayjs(`${values.reviewDate} ${values.reviewTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss'),
         userId: values.userId,
         title: values.title,
