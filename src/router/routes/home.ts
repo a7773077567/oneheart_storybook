@@ -62,6 +62,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+          {
+            path: 'traffic-light-overview/:userId/personal-revenue',
+            component: () => import('@/views/home/indicator/PersonalRevenueView.vue'),
+            name: 'personalRevenueView',
+            props: true,
+            meta: {
+              label: '個人營業額計分詳情',
+              requiredAuth: true,
+            },
+          },
         ],
       },
       {

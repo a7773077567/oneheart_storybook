@@ -46,7 +46,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'presonalRevenue',
-    detailPage: 'presonalRevenueView',
+    detailPage: 'personalRevenueView',
     label: '個人營業額',
     caption: '得分採三個月平均',
     total: trafficLightStore.targetTherapistTrafficLight.presonalRevenue.totalPoint,

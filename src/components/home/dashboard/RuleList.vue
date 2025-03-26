@@ -1,8 +1,9 @@
 <script setup lang='ts'>
 defineProps<{
-  rules: { score: number; min: number; max: number | null }[];
+  rules: { score: number; min: number | string; max: number | null | string }[];
   unit?: string;
   label: string;
+  frontUnit?: string;
 }>();
 </script>
 
@@ -11,13 +12,13 @@ defineProps<{
     <li v-for="(rule, idx) in rules" :key="idx" class="rule_item">
       {{ rule.score }} 分：
       <template v-if="rule.min === 0">
-        {{ label }} &#60; {{ rule.max }} {{ unit && unit }}
+        {{ label }} &#60; {{ frontUnit && frontUnit }} {{ rule.max }} {{ unit && unit }}
       </template>
       <template v-else-if="rule.max === null">
-        {{ rule.min }} {{ unit && unit }} &#8804; {{ label }}
+        {{ frontUnit && frontUnit }} {{ rule.min }} {{ unit && unit }} &#8804; {{ label }}
       </template>
       <template v-else>
-        {{ rule.min }} {{ unit && unit }} &#8804; {{ label }} &#60; {{ rule.max }} {{ unit && unit }}
+        {{ frontUnit && frontUnit }} {{ rule.min }} {{ unit && unit }} &#8804; {{ label }} &#60; {{ frontUnit && frontUnit }} {{ rule.max }} {{ unit && unit }}
       </template>
     </li>
   </ul>

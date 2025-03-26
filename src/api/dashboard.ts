@@ -1,7 +1,10 @@
 import { api } from '@/utils/api';
 import type { PagingMeta } from '@/types/common';
 import type { Client } from './clientManagement';
-import type { HistoryRecord } from './appointment';
+import type { AddOnService, HistoryRecord } from './appointment';
+import type { ReservedMachine } from './machine';
+import type { TransactionTypes } from '@/const/general';
+import type { User } from './user';
 
 export type CoachStatisticsDateRange = 'today' | 'month';
 
@@ -171,6 +174,7 @@ export async function getReturnVisitRateStatsList(params: ReferralListQuery) {
   return { data, meta };
 }
 
+// 紅綠燈指標-執行數｜計分詳情與資料-概覽
 export interface ExecutionCountOverview {
   predictionPoint: number;
   currentPoint: number;
@@ -183,13 +187,12 @@ export interface ExecutionCountOverview {
     points: number;
   }[];
 }
-
-// 紅綠燈指標-執行數｜計分詳情與資料-概覽
 export async function getExecutionCountStatsOverview(params: { userId: number }) {
   const { data } = await api.get<ExecutionCountOverview>(`dashboard/therapistTrafficlight-executionCountStatistics-overview`, { params });
   return data;
 }
 
+// 紅綠燈指標-執行數｜計分詳情與資料-列表
 export interface ExecutionCountDetail {
   id: number;
   client: Client;
@@ -224,13 +227,7 @@ export interface ExecutionCountDetail {
   bookedNumber: number;
   coachClassClients: Client[];
   note: string;
-  machines: {
-    id: number;
-    name: string;
-    type: number;
-    machineStartTime: string;
-    machineEndTime: string;
-  }[];
+  machines: ReservedMachine[];
   paymentState: boolean;
   state: number;
   isEmployeePrice: boolean;
@@ -239,27 +236,81 @@ export interface ExecutionCountDetail {
   isRearrangedClientSchedule: boolean;
   rearrangeClientSchedule: null | unknown;
   isFirstClientSchedule: boolean;
-  addOnServices: {
-    isAddOn: boolean;
-    contract: string;
-    contractDownloadTime: null | string;
-    contractTaskId: null | number;
-    contractStatus: string;
-    startTime: string;
-    endTime: string;
-    machine: string;
-    machineId: null | number;
-    type: number;
-    serviceName: string;
-    serviceType: number;
-  }[];
+  addOnServices: AddOnService[];
   isUsingAutoRecommend: boolean;
   isUserShiftDeleted: boolean;
   isHighSalesOpportunity: boolean;
   executionCount: number;
 }
-// 紅綠燈指標-執行數｜計分詳情與資料-列表
 export async function getExecutionCountStatsList(params: ReferralListQuery) {
   const { data, meta } = await api.get<ExecutionCountDetail[], PagingMeta>(`dashboard/therapistTrafficlight-executionCountStatistics-list`, { params });
+  return { data, meta };
+}
+
+// 紅綠燈指標-個人營業額｜計分詳情與資料-概覽
+export interface PersonalRevenueOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  currentPTLevel: number;
+  rules: ScoreRule[];
+  detailList: {
+    year: number;
+    month: number;
+    revenue: number;
+    points: number;
+  }[];
+}
+export async function getPersonalRevenueStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<PersonalRevenueOverview>(`dashboard/therapistTrafficlight-personalRevenueStatistics-overview`, { params });
+  return data;
+}
+
+// 紅綠燈指標-個人營業額｜計分詳情與資料-列表
+export interface PersonalRevenueDetail {
+  id: number;
+  date: string;
+  spaceName: string;
+  type: TransactionTypes;
+  amount: number;
+  pointPaymentPlan: string;
+  pointPaymentClientGroupName: string;
+  pointPaymentClientGroupType: number;
+  paidPointGained: number;
+  giftPointGained: number;
+  groupClassName: string;
+  ticketGained: number;
+  pointUsed: number;
+  pointPaymentMultiChannelPay: {
+    payMethod: number;
+    amount: number;
+    authorisationCode: string;
+    receiptNumber: string;
+    details: string;
+  }[];
+  clientSchedulePaymentMultiChannelPay: {
+    payMethod: number;
+    clientGroupName: string;
+    pointUsed: number;
+    amount: number;
+    authorisationCode: string;
+    receiptNumber: string;
+    groupClassTicketUsed: number;
+    details: string;
+  }[];
+  groupClassTicketPaymentMultiChannelPay: {
+    payMethod: number;
+    amount: number;
+    authorisationCode: string;
+    receiptNumber: string;
+    details: string;
+  }[];
+  addOnServices: AddOnService;
+  isDeleted: boolean;
+  clientId: number;
+  clientName: string;
+  seller: User;
+}
+export async function getPersonalRevenueStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<PersonalRevenueDetail[], PagingMeta>(`dashboard/therapistTrafficlight-personalRevenueStatistics-list`, { params });
   return { data, meta };
 }
