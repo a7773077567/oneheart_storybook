@@ -5,6 +5,7 @@ import ScoreLight from './ScoreLight.vue';
 
 const props = defineProps<{
   userId: number;
+  userName: string;
   currentPoint: number;
   predictPoint: number;
   indicatorList: TrafficLightStatistic;
@@ -55,7 +56,7 @@ const list = computed(() => [
   <div class="traffic-light-statics" :class="{ empty_state: noData }">
     <div class="traffic-light-statics__header">
       <h3 class="title">紅綠燈分數</h3>
-      <QBtn :disable="noData" flat :style="{ color: noData ? '#767680' : '#1A7AB3' }" label="紅綠燈指標詳情" icon-right="chevron_right" @click="$router.push({ name: 'trafficLightOverview', params: { userId } })" />
+      <QBtn :disable="noData" flat :style="{ color: noData ? '#767680' : '#1A7AB3' }" label="紅綠燈指標詳情" icon-right="chevron_right" @click="$router.push({ name: 'trafficLightOverview', params: { userId, userName } })" />
     </div>
     <QBanner v-if="noData" dense rounded class="q-py-xs q-mb-md" style="background:rgba(26, 122, 179, 0.16)">
       <template #avatar>

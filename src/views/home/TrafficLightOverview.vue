@@ -9,6 +9,7 @@ import ScoreCheer from '@/components/home/dashboard/ScoreCheer.vue';
 
 const props = defineProps<{
   userId: string;
+  userName: string;
 }>();
 
 const trafficLightStore = useTrafficLight();
@@ -105,7 +106,7 @@ const indicatorList = computed(() => [
       <p class="caption">分為 <b>預測</b> 和 目前 <b>得分</b>。預測得分採近三個月數據計算，反映未來趨勢；目前得分則採用前三個月數據，呈現已達成的表現。</p>
       <section class="row indicator_list q-col-gutter-md">
         <div v-for="({ detailPage, name, ...cardProps }) in indicatorList" :key="name" class="col">
-          <IndicatorCard v-bind="{ name, ...cardProps }" @check-detail="$router.push({ name: detailPage, params: { userId } })" />
+          <IndicatorCard v-bind="{ name, ...cardProps }" @check-detail="$router.push({ name: detailPage, params: { userId, userName } })" />
         </div>
       </section>
     </section>

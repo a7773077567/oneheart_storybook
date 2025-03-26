@@ -23,7 +23,7 @@ export const homeRoutes: RouteRecordRaw[] = [
         },
         children: [
           {
-            path: 'traffic-light-overview/:userId',
+            path: 'traffic-light-overview/:userId-:userName',
             component: () => import('@/views/home/TrafficLightOverview.vue'),
             name: 'trafficLightOverview',
             props: true,
@@ -33,7 +33,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/referral-count',
+            path: 'traffic-light-overview/referral-count/:userId-:userName',
             component: () => import('@/views/home/indicator/ReferralCountDetail.vue'),
             name: 'referralCountDetail',
             props: true,
@@ -43,7 +43,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/return-visit-rate',
+            path: 'traffic-light-overview/return-visit-rate/:userId-:userName',
             component: () => import('@/views/home/indicator/ReturnVisitRateDetail.vue'),
             name: 'returnVisitRateDetail',
             props: true,
@@ -53,7 +53,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/execution-count',
+            path: 'traffic-light-overview/execution-count/:userId-:userName',
             component: () => import('@/views/home/indicator/ExecutionCountDetail.vue'),
             name: 'executionCountDetail',
             props: true,
@@ -63,7 +63,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/personal-revenue',
+            path: 'traffic-light-overview/personal-revenue/:userId-:userName',
             component: () => import('@/views/home/indicator/PersonalRevenueDetail.vue'),
             name: 'personalRevenueDetail',
             props: true,
@@ -73,7 +73,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/education-point',
+            path: 'traffic-light-overview/education-point/:userId-:userName',
             component: () => import('@/views/home/indicator/EducationPointDetail.vue'),
             name: 'educationPointDetail',
             props: true,
@@ -83,7 +83,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'traffic-light-overview/:userId/google-comment-count',
+            path: 'traffic-light-overview/google-comment-count/:userId-:userName',
             component: () => import('@/views/home/indicator/GoogleCommentCountDetail.vue'),
             name: 'googleCommentCountDetail',
             props: true,

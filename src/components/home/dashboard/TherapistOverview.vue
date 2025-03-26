@@ -7,7 +7,9 @@ import dayjs from 'dayjs';
 import type { TherapistEducationPoint, TherapistOverviewStatistic } from '@/types/home/dashboard/admin';
 import { RangeSelectOptions } from '@/const/dashboard';
 import TrafficLightStatics from './TrafficLightStatics.vue';
+import { RoleType } from '@/api';
 import type { TrafficLightStatistic } from '@/api';
+import { useUserStore } from '@/stores';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
@@ -95,6 +97,9 @@ const dateRange = computed(() => {
 });
 
 const overAllTherapist = computed(() => props.therapistSelectOptions?.find(option => option.label === '所有治療師')?.value);
+
+const userStore = useUserStore();
+const selectedName = computed<string>(() => userStore.role === RoleType['物理治療師'] ? userStore.userInfo?.name : props.therapistSelectOptions?.find(option => option.value === therapistSelectModel.value)?.label ?? '');
 </script>
 
 <template>
@@ -118,7 +123,7 @@ const overAllTherapist = computed(() => props.therapistSelectOptions?.find(optio
 
       <div class="info">
         <template v-if="therapistSelectModel !== overAllTherapist">
-          <TrafficLightStatics :user-id="therapistSelect" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" />
+          <TrafficLightStatics :user-id="therapistSelect" :user-name="selectedName" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" />
         </template>
         <template v-else>
           <div class="info__header">

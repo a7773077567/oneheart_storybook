@@ -42,7 +42,7 @@ function handlePrevious() {
     router.push({ name: 'dashboard' });
   }
   else {
-    router.push({ name: 'trafficLightOverview', params: { userId: route.params.userId } });
+    router.push({ name: 'trafficLightOverview', params: { userId: route.params.userId, userName: route.params.userName } });
   }
 }
 </script>

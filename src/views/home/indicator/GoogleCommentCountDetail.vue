@@ -66,7 +66,6 @@ const googleCommentCols: QTableProps['columns'] = [
     required: true,
     label: '上傳時間',
     align: 'left',
-    style: 'width:150px',
     field: 'reviewDateTime',
   },
   {
@@ -183,7 +182,7 @@ async function fetchAllData() {
       <div class="flex items-center q-mb-md justify-between">
         <p class="title_small ">以下為近 4 個月內影響得分的 Google 評論明細。</p>
         <div class="flex">
-          <QBtn color="primary" flat label="Google 評論管理" icon-right="chevron_right" class="q-mr-sm" @click="$router.push({ name: 'googleReview' })" />
+          <QBtn color="primary" flat label="Google 評論管理" icon-right="chevron_right" class="q-mr-sm text-capitalize" @click="$router.push({ name: 'googleReview' })" />
           <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="stateOfReviewForm = true" />
         </div>
       </div>
@@ -213,7 +212,7 @@ async function fetchAllData() {
       <ReviewForm
         type="add"
         :role="RoleType['物理治療師']"
-        :therapist-options="[{ label: '', value: +$route.params.userId }]"
+        :therapist-options="[{ label: $route.params.userName as string, value: +$route.params.userId }]"
         @close="stateOfReviewForm = false"
         @create="uploadReview"
       />

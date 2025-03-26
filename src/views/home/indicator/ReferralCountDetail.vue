@@ -130,12 +130,12 @@ await Promise.all([
             <p class="body_medium_highlight">三個月加總後轉換得分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 {{ previous3Scores.join('+') }} = {{ overview.currentPoint }} 人 =</p>
-            <p class="title_medium">目前得分 {{ overview.currentPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ overview.currentPoint }} 人 =</p>
+            <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 {{ recent3Scores.join('+') }} = {{ overview.predictionPoint }} 人 =</p>
-            <p class="title_medium">預測得分 {{ overview.predictionPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ overview.predictionPoint }} 人 =</p>
+            <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
       </section>
