@@ -314,3 +314,34 @@ export async function getPersonalRevenueStatsList(params: ReferralListQuery) {
   const { data, meta } = await api.get<PersonalRevenueDetail[], PagingMeta>(`dashboard/therapistTrafficlight-personalRevenueStatistics-list`, { params });
   return { data, meta };
 }
+
+// 紅綠燈指標-教育積分｜計分詳情與資料-概覽
+export interface EducationPointOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  currentPTLevel: number;
+  rules: ScoreRule[];
+  detailList: {
+    year: number;
+    month: number;
+    educationPoints: number;
+  }[];
+}
+export async function getEducationPointStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<EducationPointOverview>(`dashboard/therapistTrafficlight-educationPointStatistics-overview`, { params });
+  return data;
+}
+
+// 紅綠燈指標-教育積分｜計分詳情與資料-列表
+
+export interface EducationPointDetail {
+  id: number;
+  title: string;
+  point: number;
+  reviewDateTime: string;
+  user: User;
+}
+export async function getEducationPointStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<EducationPointDetail[], PagingMeta>(`dashboard/therapistTrafficlight-educationPointStatistics-list`, { params });
+  return { data, meta };
+}

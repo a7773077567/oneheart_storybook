@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
 import { type EducationPointContent, deleteEducationPoint, getAEducationPoint, getEducationPointList } from '@/api';
-import EducationReviewForm from '@/components/home/educationPoints/EducationPointsForm.vue';
+import EducationPointsForm from '@/components/home/educationPoints/EducationPointsForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 
@@ -86,7 +86,7 @@ async function getReviewList() {
   pagination.value.rowsNumber = meta?.itemCount ?? 1;
 }
 
-const stateOfReviewForm = ref(false);
+const stateOfPointForm = ref(false);
 const formType = ref<'add' | 'edit'>('add');
 ;
 
@@ -105,12 +105,12 @@ async function editReview(reviewId: number) {
     reviewTime: dayjs(data.reviewDateTime).format('HH:mm'),
   };
   formType.value = 'edit';
-  stateOfReviewForm.value = true;
+  stateOfPointForm.value = true;
 }
 
 const $q = useQuasar();
 function uploadReview() {
-  stateOfReviewForm.value = false;
+  stateOfPointForm.value = false;
   $q.notify({ message: `教育積分${formType.value === 'add' ? '上傳' : '編輯'}成功`, timeout: 600, position: 'top' });
   getReviewList();
 }
@@ -142,7 +142,7 @@ function deleteConfirm(id: number) {
     <section class="education-review-content">
       <div class="education-review-content__header">
         <OptionSelect v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
-        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
+        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfPointForm = true), (formType = 'add')" />
       </div>
       <QTable
         v-model:pagination="pagination"
@@ -167,12 +167,12 @@ function deleteConfirm(id: number) {
       </QTable>
     </section>
   </div>
-  <QDialog v-model="stateOfReviewForm">
-    <EducationReviewForm
+  <QDialog v-model="stateOfPointForm">
+    <EducationPointsForm
       :type="formType" :init-vals="reviewInfo" :role="role"
       :review-id="targetReview"
       :therapist-options="trafficLightStore.scorerOptions"
-      @close="stateOfReviewForm = false"
+      @close="stateOfPointForm = false"
       @create="uploadReview"
     />
   </QDialog>

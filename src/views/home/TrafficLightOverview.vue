@@ -28,7 +28,7 @@ const predictScoreRange = computed(() => {
 const indicatorList = computed(() => [
   {
     name: 'returnVisitRate',
-    detailPage: 'returnVisitRateView',
+    detailPage: 'returnVisitRateDetail',
     label: '回診率',
     caption: '得分採三個月平均',
     total: trafficLightStore.targetTherapistTrafficLight.returnVisitRate.totalPoint,
@@ -37,7 +37,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'executionCount',
-    detailPage: 'executionCountView',
+    detailPage: 'executionCountDetail',
     label: '執行數',
     caption: '得分採三個月平均',
     total: trafficLightStore.targetTherapistTrafficLight.executionCount.totalPoint,
@@ -46,7 +46,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'presonalRevenue',
-    detailPage: 'personalRevenueView',
+    detailPage: 'personalRevenueDetail',
     label: '個人營業額',
     caption: '得分採三個月平均',
     total: trafficLightStore.targetTherapistTrafficLight.presonalRevenue.totalPoint,
@@ -55,7 +55,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'referralCount',
-    detailPage: 'referralCountView',
+    detailPage: 'referralCountDetail',
     label: '轉介數',
     caption: '各月人數加總後換算得分',
     total: trafficLightStore.targetTherapistTrafficLight.referralCount.totalPoint,
@@ -64,7 +64,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'educationPoint',
-    detailPage: 'educationPointView',
+    detailPage: 'educationPointDetail',
     label: '教育積分',
     caption: '各月積分加總後換算得分',
     total: trafficLightStore.targetTherapistTrafficLight.educationPoint.totalPoint,
@@ -73,7 +73,7 @@ const indicatorList = computed(() => [
   },
   {
     name: 'googleCommentCount',
-    detailPage: 'googleCommentCountView',
+    detailPage: 'googleCommentCountDetail',
     label: 'Google 評論數',
     caption: '得分採三個月平均',
     total: trafficLightStore.targetTherapistTrafficLight.googleCommentCount.totalPoint,

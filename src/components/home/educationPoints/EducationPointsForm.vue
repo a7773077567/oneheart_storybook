@@ -9,10 +9,10 @@ import dayjs from 'dayjs';
 
 const props = defineProps<{
   type: T;
-  initVals: T extends 'edit' ? FormTypes : null;
+  initVals?: T extends 'edit' ? Partial<FormTypes> : null;
   role: RoleType;
   therapistOptions: { label: string; value: number }[];
-  reviewId: T extends 'edit' ? number : undefined;
+  reviewId?: T extends 'edit' ? number : undefined;
 }>();
 
 const emit = defineEmits<{
