@@ -149,15 +149,15 @@ await Promise.all([
         <div class="score_calculation row q-col-gutter-md">
           <div class="col-12 col-md-4">
             <span class="body_medium_highlight">計分方式</span>
-            <p class="body_medium_highlight">三個月加總後轉換得分</p>
+            <p class="body_medium_highlight">三個月平均得分</p>
           </div>
           <div class="col-12 col-md-4">
             <p class="body_medium q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3</p>
-            <p class="title_medium text-right">目前得分{{ overview.currentPoint }}</p>
+            <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
             <p class="body_medium q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3</p>
-            <p class="title_medium text-right">預測得分{{ overview.predictionPoint }}</p>
+            <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
       </section>
@@ -182,6 +182,7 @@ await Promise.all([
         row-key="clientId"
         virtual-scroll
         rows-per-page-label="每頁顯示筆數"
+        :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
         <template #body-cell-action="{ row }">
