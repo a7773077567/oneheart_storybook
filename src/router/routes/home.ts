@@ -34,8 +34,8 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
           {
             path: 'traffic-light-overview/:userId/referral-count',
-            component: () => import('@/views/home/indicator/ReferralCountView.vue'),
-            name: 'referralCountView',
+            component: () => import('@/views/home/indicator/ReferralCountDetail.vue'),
+            name: 'referralCountDetail',
             props: true,
             meta: {
               label: '轉介數計分詳情',
@@ -44,8 +44,8 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
           {
             path: 'traffic-light-overview/:userId/return-visit-rate',
-            component: () => import('@/views/home/indicator/ReturnVisitRateView.vue'),
-            name: 'returnVisitRateView',
+            component: () => import('@/views/home/indicator/ReturnVisitRateDetail.vue'),
+            name: 'returnVisitRateDetail',
             props: true,
             meta: {
               label: '回診率計分詳情',
@@ -54,8 +54,8 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
           {
             path: 'traffic-light-overview/:userId/execution-count',
-            component: () => import('@/views/home/indicator/ExecutionCountView.vue'),
-            name: 'executionCountView',
+            component: () => import('@/views/home/indicator/ExecutionCountDetail.vue'),
+            name: 'executionCountDetail',
             props: true,
             meta: {
               label: '執行數計分詳情',
@@ -64,11 +64,31 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
           {
             path: 'traffic-light-overview/:userId/personal-revenue',
-            component: () => import('@/views/home/indicator/PersonalRevenueView.vue'),
-            name: 'personalRevenueView',
+            component: () => import('@/views/home/indicator/PersonalRevenueDetail.vue'),
+            name: 'personalRevenueDetail',
             props: true,
             meta: {
               label: '個人營業額計分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/:userId/education-point',
+            component: () => import('@/views/home/indicator/EducationPointDetail.vue'),
+            name: 'educationPointDetail',
+            props: true,
+            meta: {
+              label: '教育積分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/:userId/google-comment-count',
+            component: () => import('@/views/home/indicator/GoogleCommentCountDetail.vue'),
+            name: 'googleCommentCountDetail',
+            props: true,
+            meta: {
+              label: 'Google評論計分詳情',
               requiredAuth: true,
             },
           },

@@ -42,8 +42,8 @@ const scoreCols: QTableProps['columns'] = [
 ];
 
 const scoreList = computed(() => overview.value.detailList.map(item => ({ ...item, diff: getMonthDifference(item.year, item.month) })));
-const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.executionCount));
-const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.executionCount));
+const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.points));
+const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.points));
 
 // executed reservation table
 const executedReservationTable = ref<ExecutionCountDetail[]>([]);
@@ -166,12 +166,12 @@ await Promise.all([
             <p class="body_medium_highlight">三個月平均得分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 ({{ previous3Scores.join('+') }}) / 3 {{ overview.currentPoint }}</p>
-            <p class="title_medium">目前得分 {{ overview.currentPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3</p>
+            <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm">前三個月 ({{ recent3Scores.join('+') }}) / 3 {{ overview.predictionPoint }}</p>
-            <p class="title_medium">預測得分 {{ overview.predictionPoint }} 分</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3</p>
+            <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
       </section>

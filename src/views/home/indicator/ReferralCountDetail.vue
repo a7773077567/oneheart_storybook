@@ -160,6 +160,7 @@ await Promise.all([
         row-key="clientId"
         virtual-scroll
         rows-per-page-label="每頁顯示筆數"
+        :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
         <template #body-cell-action="{ row }">
