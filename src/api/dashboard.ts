@@ -319,7 +319,6 @@ export async function getPersonalRevenueStatsList(params: ReferralListQuery) {
 export interface EducationPointOverview {
   predictionPoint: number;
   currentPoint: number;
-  currentPTLevel: number;
   rules: ScoreRule[];
   detailList: {
     year: number;
@@ -343,5 +342,36 @@ export interface EducationPointDetail {
 }
 export async function getEducationPointStatsList(params: ReferralListQuery) {
   const { data, meta } = await api.get<EducationPointDetail[], PagingMeta>(`dashboard/therapistTrafficlight-educationPointStatistics-list`, { params });
+  return { data, meta };
+}
+
+// 紅綠燈指標-google 評論｜計分詳情與資料-概覽
+export interface GoogleCommentOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  rules: ScoreRule[];
+  detailList: {
+    year: number;
+    month: number;
+    commentCount: number;
+    points: number;
+  }[];
+}
+export async function getGoogleCommentCountStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<GoogleCommentOverview>(`dashboard/therapistTrafficlight-googleCommentCountStatistics-overview`, { params });
+  return data;
+}
+
+// 紅綠燈指標-google 評論｜計分詳情與資料-列表
+
+export interface GoogleCommentDetail {
+  id: number;
+  title: string;
+  reviewScreenshotUrl: string;
+  reviewDateTime: string;
+  user: User;
+}
+export async function getGoogleCommentCountStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<GoogleCommentDetail[], PagingMeta>(`dashboard/therapistTrafficlight-googleCommentCountStatistics-list`, { params });
   return { data, meta };
 }

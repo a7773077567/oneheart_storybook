@@ -12,10 +12,10 @@ import type { QUploader as UploaderScope } from 'quasar';
 
 const props = defineProps<{
   type: T;
-  initVals: T extends 'edit' ? FormTypes : null;
+  initVals?: T extends 'edit' ? FormTypes : null;
   role: RoleType;
   therapistOptions: { label: string; value: number }[];
-  reviewId: T extends 'edit' ? number : undefined;
+  reviewId?: T extends 'edit' ? number : undefined;
 }>();
 
 const emit = defineEmits<{

@@ -11,8 +11,11 @@ defineProps<{
   <ul class="rule_list">
     <li v-for="(rule, idx) in rules" :key="idx" class="rule_item">
       {{ rule.score }} 分：
-      <template v-if="rule.min === 0">
+      <template v-if="rule.min === 0 && rule.max !== 0">
         {{ label }} &#60; {{ frontUnit && frontUnit }} {{ rule.max }} {{ unit && unit }}
+      </template>
+      <template v-else-if="rule.min === rule.max">
+        {{ label }} = {{ rule.min }}
       </template>
       <template v-else-if="rule.max === null">
         {{ frontUnit && frontUnit }} {{ rule.min }} {{ unit && unit }} &#8804; {{ label }}
