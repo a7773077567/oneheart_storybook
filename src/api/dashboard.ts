@@ -170,3 +170,96 @@ export async function getReturnVisitRateStatsList(params: ReferralListQuery) {
   const { data, meta } = await api.get<ReturnVisitRateDetail[], PagingMeta>(`dashboard/therapistTrafficlight-returnVisitRateStatistics-list`, { params });
   return { data, meta };
 }
+
+export interface ExecutionCountOverview {
+  predictionPoint: number;
+  currentPoint: number;
+  currentPTLevel: number;
+  rules: ScoreRule[];
+  detailList: {
+    year: number;
+    month: number;
+    executionCount: number;
+    points: number;
+  }[];
+}
+
+// 紅綠燈指標-執行數｜計分詳情與資料-概覽
+export async function getExecutionCountStatsOverview(params: { userId: number }) {
+  const { data } = await api.get<ExecutionCountOverview>(`dashboard/therapistTrafficlight-executionCountStatistics-overview`, { params });
+  return data;
+}
+
+export interface ExecutionCountDetail {
+  id: number;
+  client: Client;
+  clientId: number;
+  date: string;
+  userShiftId: number;
+  userShift: {
+    id: number;
+    spaceId: number;
+    userId: number;
+    user: {
+      id: number;
+      name: string;
+      role: {
+        id: number;
+        name: string;
+        type: number;
+      };
+    };
+    type: number;
+    name: string;
+    maxClients: number;
+    space: {
+      id: number;
+      name: string;
+      type: number;
+    };
+  };
+  userShiftAppointmentId: number;
+  scheduleStartTime: string;
+  scheduleEndTime: string;
+  bookedNumber: number;
+  coachClassClients: Client[];
+  note: string;
+  machines: {
+    id: number;
+    name: string;
+    type: number;
+    machineStartTime: string;
+    machineEndTime: string;
+  }[];
+  paymentState: boolean;
+  state: number;
+  isEmployeePrice: boolean;
+  isValidForRestore: boolean;
+  isBeenRearranged: boolean;
+  isRearrangedClientSchedule: boolean;
+  rearrangeClientSchedule: null | unknown;
+  isFirstClientSchedule: boolean;
+  addOnServices: {
+    isAddOn: boolean;
+    contract: string;
+    contractDownloadTime: null | string;
+    contractTaskId: null | number;
+    contractStatus: string;
+    startTime: string;
+    endTime: string;
+    machine: string;
+    machineId: null | number;
+    type: number;
+    serviceName: string;
+    serviceType: number;
+  }[];
+  isUsingAutoRecommend: boolean;
+  isUserShiftDeleted: boolean;
+  isHighSalesOpportunity: boolean;
+  executionCount: number;
+}
+// 紅綠燈指標-執行數｜計分詳情與資料-列表
+export async function getExecutionCountStatsList(params: ReferralListQuery) {
+  const { data, meta } = await api.get<ExecutionCountDetail[], PagingMeta>(`dashboard/therapistTrafficlight-executionCountStatistics-list`, { params });
+  return { data, meta };
+}

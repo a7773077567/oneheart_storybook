@@ -52,6 +52,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               requiredAuth: true,
             },
           },
+          {
+            path: 'traffic-light-overview/:userId/execution-count',
+            component: () => import('@/views/home/indicator/ExecutionCountView.vue'),
+            name: 'executionCountView',
+            props: true,
+            meta: {
+              label: '執行數計分詳情',
+              requiredAuth: true,
+            },
+          },
         ],
       },
       {
