@@ -33,7 +33,9 @@ const scoreCols: QTableProps['columns'] = [
 
 const scoreList = computed(() => overview.value.detailList.map(item => ({ ...item, diff: getMonthDifference(item.year, item.month) })));
 const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.referralCount));
+const previous3ScoresTotal = computed(() => previous3Scores.value.reduce((total, score) => total += score, 0));
 const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.referralCount));
+const recent3ScoresTotal = computed(() => recent3Scores.value.reduce((total, score) => total += score, 0));
 
 // referral table
 const referralClientTable = ref<ReferralDetail[]>([]);
@@ -129,11 +131,11 @@ await Promise.all([
             <p class="body_medium_highlight">三個月加總後轉換得分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ overview.currentPoint }} 人 =</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 人 =</p>
             <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ overview.predictionPoint }} 人 =</p>
+            <p class="body_medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 人 =</p>
             <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
