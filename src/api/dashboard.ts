@@ -129,14 +129,14 @@ export interface ReferralDetail {
   userShiftType: number;
   referralClientName: string;
 }
-interface ReferralListQuery {
+interface IndicatorListQuery {
   order?: 'ASC' | 'DESC';
   page?: number;
   take?: number;
   userId: number;
 }
 // 取得治療師紅綠燈指標-轉介數｜計分詳情與資料-列表`
-export async function getReferralStatsList(params: ReferralListQuery) {
+export async function getReferralStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<ReferralDetail[], PagingMeta>(`dashboard/therapistTrafficlight-referralStatistics-list`, { params });
   return { data, meta };
 }
@@ -169,7 +169,7 @@ export interface ReturnVisitRateDetail {
   isReturning: boolean;
 }
 // 紅綠燈指標-回診率｜計分詳情與資料-列表
-export async function getReturnVisitRateStatsList(params: ReferralListQuery) {
+export async function getReturnVisitRateStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<ReturnVisitRateDetail[], PagingMeta>(`dashboard/therapistTrafficlight-returnVisitRateStatistics-list`, { params });
   return { data, meta };
 }
@@ -242,7 +242,7 @@ export interface ExecutionCountDetail {
   isHighSalesOpportunity: boolean;
   executionCount: number;
 }
-export async function getExecutionCountStatsList(params: ReferralListQuery) {
+export async function getExecutionCountStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<ExecutionCountDetail[], PagingMeta>(`dashboard/therapistTrafficlight-executionCountStatistics-list`, { params });
   return { data, meta };
 }
@@ -310,7 +310,7 @@ export interface PersonalRevenueDetail {
   clientName: string;
   seller: User;
 }
-export async function getPersonalRevenueStatsList(params: ReferralListQuery) {
+export async function getPersonalRevenueStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<PersonalRevenueDetail[], PagingMeta>(`dashboard/therapistTrafficlight-personalRevenueStatistics-list`, { params });
   return { data, meta };
 }
@@ -340,7 +340,7 @@ export interface EducationPointDetail {
   reviewDateTime: string;
   user: User;
 }
-export async function getEducationPointStatsList(params: ReferralListQuery) {
+export async function getEducationPointStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<EducationPointDetail[], PagingMeta>(`dashboard/therapistTrafficlight-educationPointStatistics-list`, { params });
   return { data, meta };
 }
@@ -371,7 +371,7 @@ export interface GoogleCommentDetail {
   reviewDateTime: string;
   user: User;
 }
-export async function getGoogleCommentCountStatsList(params: ReferralListQuery) {
+export async function getGoogleCommentCountStatsList(params: IndicatorListQuery) {
   const { data, meta } = await api.get<GoogleCommentDetail[], PagingMeta>(`dashboard/therapistTrafficlight-googleCommentCountStatistics-list`, { params });
   return { data, meta };
 }

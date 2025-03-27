@@ -142,7 +142,7 @@ await Promise.all([
 </script>
 
 <template>
-  <div class="referral_detail">
+  <div class="execution_detail">
     <h2>執行數計分詳情</h2>
     <h3>計分說明</h3>
     <p class="note">已完成服務與病例的「一般預約」與「射頻治療」時數，依不同權重計算，換算為最終執行數。</p>
@@ -210,7 +210,7 @@ await Promise.all([
 </template>
 
 <style scoped lang="scss">
-.referral_detail {
+.execution_detail {
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;

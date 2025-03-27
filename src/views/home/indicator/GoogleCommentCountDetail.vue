@@ -130,7 +130,7 @@ async function fetchAllData() {
 </script>
 
 <template>
-  <div class="referral_detail">
+  <div class="google_comment_detail">
     <h2>Google 評論計分詳情</h2>
     <h3>計分說明</h3>
     <p class="note">客戶在 Google 的評論次數，由管理者登錄。</p>
@@ -221,7 +221,7 @@ async function fetchAllData() {
 </template>
 
 <style scoped lang="scss">
-.referral_detail {
+.google_comment_detail {
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;

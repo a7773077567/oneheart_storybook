@@ -114,7 +114,7 @@ async function fetchAllData() {
 </script>
 
 <template>
-  <div class="referral_detail">
+  <div class="education_detail">
     <h2>教育積分計分詳情</h2>
     <h3>計分說明</h3>
     <p class="note">參與內部培訓或進修課程的積分，由管理者登錄積分。</p>
@@ -201,7 +201,7 @@ async function fetchAllData() {
 </template>
 
 <style scoped lang="scss">
-.referral_detail {
+.education_detail {
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;

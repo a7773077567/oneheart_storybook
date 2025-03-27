@@ -263,7 +263,7 @@ await Promise.all([
 </script>
 
 <template>
-  <div class="referral_detail">
+  <div class="personal_revenue_detail">
     <h2>個人營業額計分詳情</h2>
     <h3>計分說明</h3>
     <p class="note">預約結帳與堂數營業額。計算「完成結帳」的總金額，並扣除折扣項目。</p>
@@ -344,7 +344,7 @@ await Promise.all([
 </template>
 
 <style scoped lang="scss">
-.referral_detail {
+.personal_revenue_detail {
   h2 {
     @include headline-medium($on-surface);
     padding: 18px 0;

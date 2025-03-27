@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
 import { type ReferralDetail, type ReferralOverview, getReferralStatsList, getReferralStatsOverview } from '@/api';
 import { useRoute } from 'vue-router';
-import dayjs from 'dayjs';
 import { getMonthDifference } from '@/utils/date';
 import type { QTableProps } from 'quasar';
 import RuleList from '@/components/home/dashboard/RuleList.vue';
