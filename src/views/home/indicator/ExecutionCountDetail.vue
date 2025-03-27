@@ -88,14 +88,13 @@ const executedReservationCols: QTableProps['columns'] = [
     },
     label: '加購服務',
     align: 'left',
-    headerStyle: 'width: 50px',
   },
   {
     name: 'executionCount',
     field: 'executionCount',
     label: '執行數',
     align: 'left',
-    headerStyle: 'width: 50px',
+    headerStyle: 'width: 150px',
   },
   {
     name: 'action',
@@ -201,7 +200,7 @@ await Promise.all([
       >
         <template #body-cell-action="{ row }">
           <QTd>
-            <QBtn :disable="!row.userShiftAppointmentId" flat round icon="chevron_right" @click="$router.push({ name: 'appointmentListInfo', params: { scheduleId: row.userShiftAppointmentId } })" />
+            <QBtn :disable="!row.id" flat round icon="chevron_right" @click="$router.push({ name: 'appointmentListInfo', params: { scheduleId: row.id } })" />
           </QTd>
         </template>
       </QTable>
