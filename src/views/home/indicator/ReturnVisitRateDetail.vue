@@ -96,6 +96,8 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 1,
+  descending: false,
+  sortBy: '',
 });
 
 async function getReturnVisitRateList() {
@@ -103,19 +105,24 @@ async function getReturnVisitRateList() {
     userId: +userId.value,
     page: pagination.value.page ?? 1,
     take: pagination.value.rowsPerPage,
+    ...(pagination.value.sortBy ? { order: pagination.value.descending ? 'DESC' : 'ASC' } : {}),
   });
   returnVisitRateTable.value = data;
   pagination.value = {
+    ...pagination.value,
     page: meta?.page ?? 1,
     rowsNumber: meta?.itemCount ?? 0,
     rowsPerPage: meta?.take ?? 10,
   };
 }
 const onRequest: QTableProps['onRequest'] = async (props) => {
-  const { page, rowsPerPage } = props.pagination;
+  const { page, rowsPerPage, descending, sortBy } = props.pagination;
 
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
+
+  pagination.value.descending = descending;
+  pagination.value.sortBy = sortBy;
   getReturnVisitRateList();
 };
 
@@ -173,7 +180,6 @@ await Promise.all([
     <section>
       <h3>初診客戶回診明細</h3>
       <p class="title_small q-mb-md">聯繫「未回診客戶」以提高您本月的回診率得分。</p>
-
       <QTable
         v-model:pagination="pagination"
         flat
