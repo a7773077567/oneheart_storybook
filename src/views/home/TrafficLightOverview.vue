@@ -90,7 +90,7 @@ const indicatorList = computed(() => [
     <section class="traffic_light_detail__header">
       <ScoreLight full-info label="目前總分" :score="trafficLightStore.targetTherapistTrafficLight.currentPoint" :caption="currentScoreRange" />
       <ScoreLight full-info label="預測總分" :score="trafficLightStore.targetTherapistTrafficLight.predictionPoint" :caption="predictScoreRange" />
-      <ScoreCheer :current="trafficLightStore.targetTherapistTrafficLight.currentPoint" />
+      <ScoreCheer :score="trafficLightStore.targetTherapistTrafficLight.predictionPoint" />
       <ul class="traffic_light_rules">
         <li v-for="rule in trafficLightStore.targetTherapistTrafficLight.rules" :key="rule.light" class="rule_item">
           <div :class="`signal_${rule.light}`" class="signal" />

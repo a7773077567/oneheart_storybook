@@ -2,16 +2,17 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  current: number;
+  score: number;
 }>();
 
 const content = computed(() => {
+  const diff = Number.isInteger(props.score) ? (60 - props.score) : (60 - props.score).toFixed(2);
   switch (true) {
-    case props.current < 40:
-      return { text: `離綠燈還差 ${60 - props.current} 分!\n這個月再努力一下!`, color: '#DF5458' };
-    case props.current >= 40 && props.current < 60 :
-      return { text: `離綠燈只差 ${60 - props.current} 分! \n 目標在望囉！`, color: '#dba100' };
-    case props.current >= 60:
+    case props.score < 40:
+      return { text: `離綠燈還差 ${diff} 分!\n這個月再努力一下!`, color: '#DF5458' };
+    case props.score >= 40 && props.score < 60 :
+      return { text: `離綠燈只差 ${diff} 分! \n 目標在望囉！`, color: '#dba100' };
+    case props.score >= 60:
     default:
       return { text: '綠燈達標! \n 保持穩定，挑戰更高目標吧！', color: '#008524' };
   }
