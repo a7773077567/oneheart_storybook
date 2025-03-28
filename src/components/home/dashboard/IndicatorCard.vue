@@ -63,7 +63,7 @@ const barColor = computed(() => color.value.bar);
       <div class="title-medium" :style="{ color: color.text }">{{ predict }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between">
-      <progress id="progress_bar" :max="total" :value="predict" />
+      <progress id="progress_bar" :max="total" :value="predict === total ? 100 : predict" />
     </QCardSection>
   </QCard>
 </template>
