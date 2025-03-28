@@ -132,6 +132,9 @@ function deleteConfirm(id: number) {
     }
   });
 }
+
+const stateOfLightbox = ref(false);
+const lightBoxImg = ref('');
 </script>
 
 <template>
@@ -155,7 +158,7 @@ function deleteConfirm(id: number) {
       >
         <template #body-cell-reviewScreenshotUrl="{ value }">
           <QTd>
-            <img :src="value" alt="screen shot" style="height:30px;width:60px">
+            <img :src="value" alt="screen shot" style="height: 30px; max-width:60px" @click="(lightBoxImg = value), (stateOfLightbox = true)">
           </QTd>
         </template>
         <template #body-cell-action="{ row }">
@@ -176,6 +179,11 @@ function deleteConfirm(id: number) {
       @create="uploadReview"
     />
   </QDialog>
+  <VueEasyLightbox
+    :visible="stateOfLightbox"
+    :imgs="lightBoxImg"
+    @hide="stateOfLightbox = false"
+  />
 </template>
 
 <style scoped lang="scss">

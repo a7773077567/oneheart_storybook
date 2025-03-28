@@ -7,6 +7,7 @@ import { getMonthDifference } from '@/utils/date';
 import type { QTableProps } from 'quasar';
 import RuleList from '@/components/home/dashboard/RuleList.vue';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
+import dayjs from 'dayjs';
 
 const route = useRoute();
 const userId = computed(() => route.params.userId as string);
@@ -43,6 +44,10 @@ const scoreList = computed(() => overview.value.detailList.map(item => ({ ...ite
 const previous3Scores = computed(() => scoreList.value.filter(item => item.diff > 0 && item.diff <= 3).map(month => month.points));
 const recent3Scores = computed(() => scoreList.value.filter(item => item.diff >= 0 && item.diff <= 2).map(month => month.points));
 
+// light box
+const stateOfLightbox = ref(false);
+const lightBoxImg = ref('');
+
 // referral table
 const googleCommentTable = ref<GoogleCommentDetail[]>([]);
 const googleCommentCols: QTableProps['columns'] = [
@@ -67,6 +72,7 @@ const googleCommentCols: QTableProps['columns'] = [
     label: '上傳時間',
     align: 'left',
     field: 'reviewDateTime',
+    format: val => dayjs(val).format('YYYY-MM-DD HH:mm'),
   },
   {
     name: 'reviewScreenshotUrl',
@@ -203,11 +209,16 @@ async function fetchAllData() {
       >
         <template #body-cell-reviewScreenshotUrl="{ row }">
           <QTd>
-            <img :src="row.reviewScreenshotUrl" alt="screen shot" style="height: 100%; max-width: 60px;">
+            <img :src="row.reviewScreenshotUrl" alt="screen shot" style="height: 100%; max-width: 60px;" @click="(lightBoxImg = row.reviewScreenshotUrl), (stateOfLightbox = true)">
           </QTd>
         </template>
       </QTable>
     </section>
+    <VueEasyLightbox
+      :visible="stateOfLightbox"
+      :imgs="lightBoxImg"
+      @hide="stateOfLightbox = false"
+    />
     <QDialog v-model="stateOfReviewForm">
       <ReviewForm
         type="add"

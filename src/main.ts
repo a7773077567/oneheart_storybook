@@ -14,6 +14,7 @@ import '@quasar/extras/material-icons/material-icons.css';
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css';
 import 'quasar/dist/quasar.css';
 import '@/assets/scss/main.scss';
+import VueEasyLightbox from 'vue-easy-lightbox';
 
 // MSW
 import { enableMocking } from '@/mocks/browser';
@@ -27,7 +28,7 @@ import Components from '@/plugins/components';
 const app = createApp(App);
 
 // ========== disable mocking ==========
-app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components).mount('#app');
+app.use(createPinia()).use(router).use(Quasar).use(Zod).use(GoogleLogin).use(Components).use(VueEasyLightbox).mount('#app');
 
 // ========== enable mocking ==========
 // enableMocking()?.then(() => {
