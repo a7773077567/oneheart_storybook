@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { RoleType, createUser, createUserSchema, fetchSpaces, updateUser, uploadAvatar } from '@/api';
-import type { CreateUser } from '@/api';
+import { PTLevel, RoleType, createUser, fetchSpaces, updateUser, uploadAvatar } from '@/api';
+import type { CreateUser, UpdateUser } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
 import { useUserStore } from '@/stores';
@@ -9,6 +9,7 @@ import { extractUuidFromS3Url } from '@/utils/helpers';
 import { omit } from 'radash';
 import { useRouter } from 'vue-router';
 import { toTypedSchema } from '@vee-validate/zod';
+import { z } from 'zod';
 
 const props = defineProps<{
   type: 'add' | 'edit';
@@ -45,39 +46,7 @@ const avatarPreviewUrl = computed(() => {
 });
 
 const classOptions = Array(7).fill(1).map((level, idx) => ({ label: `S${level + idx}`, value: level + idx }));
-
-interface Input {
-  element: 'input';
-  label: string;
-  name: string;
-  type: 'text' | 'textarea';
-  fluid?: boolean;
-}
-
-interface Select {
-  element: 'select';
-  label: string;
-  name: string;
-  options: {
-    label: string;
-    value: any;
-  }[];
-  fluid?: boolean;
-  multiple?: boolean;
-  maxSelection?: number;
-}
-
-type FormItem = Input | Select;
-
-const formItems: FormItem[] = [
-  { label: '姓名', name: 'name', element: 'input', type: 'text' },
-  { label: '權重', name: 'weightForOrder', element: 'select', options: weightForOrderOptions },
-  { label: '職稱', name: 'roleId', element: 'select', options: roleIdOptions },
-  { label: '初診等級', name: 'jobClass', element: 'select', options: classOptions },
-  { label: '場館', name: 'spaceIds', element: 'select', options: spaceOptions, multiple: true, fluid: true },
-  { label: '帳號', name: 'email', element: 'input', type: 'text', fluid: true },
-  { label: '描述', name: 'description', element: 'input', type: 'textarea', fluid: true },
-];
+const PTLevelOptions = Object.keys(PTLevel).slice(7, 15).map(level => ({ label: level, value: PTLevel[level as keyof typeof PTLevel] }));
 
 const addInitialValues = computed(() => ({
   name: '',
@@ -87,6 +56,7 @@ const addInitialValues = computed(() => ({
   spaceIds: [spaceOptions[0].value],
   description: '',
   jobClass: null,
+  PTLevel: PTLevelOptions[0].value,
 }));
 
 const editInitialValues = computed(() => ({
@@ -98,13 +68,49 @@ const editInitialValues = computed(() => ({
   description: targetUser.value.description,
   avatar: targetUser.value.avatarUrl,
   jobClass: targetUser.value.jobClass,
+  PTLevel: targetUser.value.PTLevel,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
+
+const isTherapist = (roleId: RoleType) => roleId === RoleType['物理治療師'] || roleId === RoleType['物理治療師組長'] || roleId === RoleType['院長'] || roleId === RoleType['副院長'];
+const createUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email('請輸入正確格式的email'),
+  weightForOrder: z.number(),
+  description: z.string(),
+  roleId: z.number(),
+  spaceIds: z.number().array(),
+  avatar: z.string().nullish(),
+  jobClass: z.number().nullish(),
+  PTLevel: z.number().nullish(),
+}).refine((data) => {
+  // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
+  if (isTherapist(data.roleId)) {
+    return !!data.jobClass;
+  }
+  return true;
+}, {
+  message: '初診等級必填',
+  path: ['jobClass'], // path of error
+})
+  .refine((data) => {
+  // PT等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
+    if (isTherapist(data.roleId)) {
+      return !!data.PTLevel;
+    }
+    return true;
+  }, {
+    message: '職等等級必填',
+    path: ['PTLevel'], // path of error
+  });
 
 const { handleSubmit, resetForm, values, setFieldValue } = useForm<CreateUser>({
   initialValues: targetInitialValues.value,
   validationSchema: toTypedSchema(createUserSchema),
 });
+
+const isTherapistSelected = computed(() => isTherapist(values.roleId));
+
 const onSubmit = handleSubmit(async (values) => {
   let avatarUuid = null;
 
@@ -112,17 +118,19 @@ const onSubmit = handleSubmit(async (values) => {
     const fileName = await uploadAvatar(targetUser.value.id, avatarPreviewFile.value);
     avatarUuid = extractUuidFromS3Url(fileName);
   }
-  const neededValues = omit(values, ['avatar']);
-  const payload = {
-    ...neededValues,
-    ...(props.type === 'edit' && avatarUuid && { avatar: avatarUuid }),
-  };
+
   try {
     if (props.type === 'add') {
+      const payload = omit(values, ['jobClass', 'PTLevel']);
       await createUser(payload);
       router.push({ name: 'resendActivationEmail' });
     }
     else {
+      const neededValues = omit(values as UpdateUser, ['avatar']);
+      const payload = {
+        ...neededValues,
+        ...(avatarUuid && { avatar: avatarUuid }),
+      };
       await updateUser(targetUser.value.id, payload);
       $q.dialog({
         message: '更新成功',
@@ -141,10 +149,14 @@ const onSubmit = handleSubmit(async (values) => {
 });
 
 // remove jobclass value is not 物理治療師, 院長, 副院長
-watch(() => values.roleId, (selectedRole) => {
-  if (selectedRole !== RoleType['物理治療師'] && selectedRole !== RoleType['院長'] && selectedRole !== RoleType['副院長']) {
+watch(() => values.roleId, () => {
+  if (!isTherapistSelected.value) {
     setFieldValue('jobClass', null);
+    setFieldValue('PTLevel', null);
   }
+  // if (selectedRole !== RoleType['物理治療師'] && selectedRole !== RoleType['院長'] && selectedRole !== RoleType['副院長'] && selectedRole !== RoleType['物理治療師組長']) {
+  //   setFieldValue('jobClass', null);
+  // }
 });
 </script>
 
@@ -152,17 +164,17 @@ watch(() => values.roleId, (selectedRole) => {
   <div class="user-settings row q-col-gutter-md">
     <div class="user-settings__form col-9">
       <div class="form">
-        <div v-for="(input, idx) in formItems" :key="idx" :class="[input.fluid ? 'form__item--fluid' : 'form__item']">
-          <div class="input">
-            <div class="input__item--key">
-              {{ input.label }}
-            </div>
-            <div class="input__item--val">
-              <OInput v-if="input.element === 'input'" :type="input.type" :name="input.name" hide-bottom-space borderless :outlined="false" />
-              <OSelect v-else :name="input.name" :options="input.options" :multiple="input.multiple" :max-values="input.maxSelection" dense hide-bottom-space borderless :outlined="false" />
-            </div>
-          </div>
-        </div>
+        <OInput name="name" inside-label="姓名*" error-message="" />
+        <OInput type="email" name="email" inside-label="帳號*" error-message="" />
+        <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
+        <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
+        <template v-if="isTherapistSelected">
+          <OSelect name="jobClass" label="初診等級*" :options="classOptions" error-message="" hide-bottom-space />
+          <p class="note">初診等級 S1 為最低，S7 為最高。等級將影響治療師的預約自動推薦 KPI 達標率。</p>
+        </template>
+        <OSelect v-if="userStore.canI('READ_PT_LEVEL') && isTherapistSelected" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
+        <OSelect multiple name="spaceIds" label="場館*" :options="spaceOptions" error-message="" />
+        <OInput type="textarea" name="description" inside-label="描述" error-message="" />
       </div>
       <div class="user-settings__actions">
         <QBtn label="儲存" outline style="width: 126px;" @click="onSubmit" />
@@ -223,38 +235,6 @@ watch(() => values.roleId, (selectedRole) => {
   }
 }
 
-.form {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  row-gap: 10px;
-  column-gap: 10px;
-  &__item {
-    &--fluid {
-      @extend .form__item;
-      grid-column: span 2;
-    }
-  }
-}
-
-.input {
-  display: flex;
-  &__item {
-    border: 1px solid #79747e;
-    &--key {
-      @extend .input__item;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-    }
-    &--val {
-      @extend .input__item;
-      flex-grow: 1;
-      padding-left: 10px;
-    }
-  }
-}
-
 .avatar {
   display: flex;
   flex-direction: column;
@@ -284,5 +264,10 @@ watch(() => values.roleId, (selectedRole) => {
 
 .suspend {
   color: #e86969;
+}
+
+.note {
+  @include body-small($on-surface-variant);
+  margin: 8px 0 12px 16px;
 }
 </style>

@@ -60,6 +60,11 @@ export const useUserStore = defineStore('user', {
         return !!RolePermissions[this.role][action];
       };
     },
+    canRoleDo() {
+      return (role: RoleType, action: PermissionEvents): boolean => {
+        return !!RolePermissions[role][action];
+      };
+    },
   },
   actions: {
     async getUserInfo() {

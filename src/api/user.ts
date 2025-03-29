@@ -37,6 +37,16 @@ export enum RoleType {
   教練 = 9,
   櫃檯 = 10,
 }
+
+export enum PTLevel {
+  'PT1' = 1,
+  'PT2' = 2,
+  'PT3' = 3,
+  'PT4' = 4,
+  'PT5' = 5,
+  'PT副院長' = 6,
+  'PT院長' = 7,
+}
 export interface User {
   id: number;
   name: string;
@@ -50,6 +60,7 @@ export interface User {
   weightForOrder: number;
   type: RoleType;
   jobClass: number;
+  PTLevel: PTLevel;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;

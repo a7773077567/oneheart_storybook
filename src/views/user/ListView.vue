@@ -4,7 +4,7 @@ import { useLayoutRoute } from '@/composables/layoutRoute';
 import type { QTableProps } from 'quasar';
 import { useUserStore } from '@/stores';
 import { computed, ref } from 'vue';
-import { AccountState, WorkState } from '@/api';
+import { AccountState, PTLevel, WorkState } from '@/api';
 
 const { currentRoute } = useLayoutRoute();
 const userStore = useUserStore();
@@ -13,9 +13,11 @@ await userStore.getUsers();
 const jobTitleFilter = ref(userStore.userJobTitleOptions.map(item => item.value));
 
 const cols: QTableProps['columns'] = [
-  { name: 'state', label: '狀態', field: 'state', align: 'left', style: 'width: 100px' },
+  { name: 'state', label: '狀態', field: 'state', align: 'left', headerStyle: 'width: 100px' },
   { name: 'name', label: '姓名', field: 'name', align: 'left' },
+  { name: 'date', label: '到職日期', field: 'date', align: 'left' },
   { name: 'jobTitle', label: '職稱', field: 'jobTitle', align: 'left' },
+  { name: 'PTLevel', label: '職階', field: 'PTLevel', align: 'left', format: val => PTLevel[val] },
   { name: 'spaces', label: '場館', field: 'spaces', align: 'left', style: 'text-wrap:wrap; word-break: break-all' },
   { name: 'email', label: '帳號', field: 'email', align: 'left' },
 ];
@@ -36,7 +38,32 @@ const rows = computed(() => userStore.users
       </div>
       <div class="staff-list__body">
         <QTable :columns="cols" :rows="rows" row-key="name" separator="cell" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
-          <template #body="props">
+          <template #body-cell-state="{ row }">
+            <QTd>
+              <div class="row items-center">
+                <template v-if="row.stateOfWork === WorkState['在職']">
+                  <span class="state" :class="{ 'state--active': row.state === AccountState['開通'] }" />
+                  <span>{{ AccountState[row.state] }}</span>
+                </template>
+                <template v-else>
+                  <span class="state" :class="row.stateOfWork === WorkState['停權'] ? 'state--banned' : 'state--resigned'" />
+                  <span>{{ WorkState[row.stateOfWork] }}</span>
+                </template>
+              </div>
+            </QTd>
+          </template>
+          <template #body-cell-email="{ row }">
+            <QTd>
+              <div class="row justify-between items-center">
+                <p>{{ row.email }}</p>
+                <div class="row q-gutter-sm flex-center">
+                  <QBtn icon="o_edit" flat round @click="() => $router.push({ name: 'userEdition', query: { userId: row.id } })" />
+                </div>
+              </div>
+            </QTd>
+          </template>
+
+          <!-- <template #body="props">
             <QTr :props="props">
               <QTd key="state" :props="props" auto-width>
                 <div class="row items-center full-width">
@@ -68,7 +95,7 @@ const rows = computed(() => userStore.users
                 </div>
               </QTd>
             </QTr>
-          </template>
+          </template> -->
         </QTable>
       </div>
     </div>
