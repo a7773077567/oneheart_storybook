@@ -15,7 +15,7 @@ const jobTitleFilter = ref(userStore.userJobTitleOptions.map(item => item.value)
 const cols: QTableProps['columns'] = [
   { name: 'state', label: '狀態', field: 'state', align: 'left', headerStyle: 'width: 100px' },
   { name: 'name', label: '姓名', field: 'name', align: 'left' },
-  { name: 'date', label: '到職日期', field: 'date', align: 'left' },
+  { name: 'hireDate', label: '到職日期', field: 'hireDate', align: 'left' },
   { name: 'jobTitle', label: '職稱', field: 'jobTitle', align: 'left' },
   { name: 'PTLevel', label: '職階', field: 'PTLevel', align: 'left', format: val => PTLevel[val] },
   { name: 'spaces', label: '場館', field: 'spaces', align: 'left', style: 'text-wrap:wrap; word-break: break-all' },

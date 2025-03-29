@@ -9,7 +9,8 @@ export type PermissionEvents =
   | 'READ_EDUCATION_REVIEW'
   | 'EDIT_EDUCATION_REVIEW'
   | 'READ_PT_LEVEL'
-  | 'EDIT_PT_LEVEL';
+  | 'EDIT_PT_LEVEL'
+  | 'EDIT_HIRE_TIME';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -23,6 +24,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: true,
     EDIT_PT_LEVEL: true,
     READ_PT_LEVEL: true,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,
@@ -34,6 +36,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: true,
     EDIT_PT_LEVEL: true,
     READ_PT_LEVEL: true,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['副院長']]: {
     READ_HANDOVER: true,
@@ -45,6 +48,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: true,
     EDIT_PT_LEVEL: true,
     READ_PT_LEVEL: true,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,
@@ -56,6 +60,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: false,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['副店長']]: {
     READ_HANDOVER: true,
@@ -67,6 +72,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: false,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['櫃檯']]: {
     READ_HANDOVER: true,
@@ -78,6 +84,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: false,
+    EDIT_HIRE_TIME: false,
   },
   [RoleType['教練組長']]: {
     READ_HANDOVER: false,
@@ -89,6 +96,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: false,
+    EDIT_HIRE_TIME: true,
   },
   [RoleType['教練']]: {
     READ_HANDOVER: false,
@@ -100,6 +108,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: false,
+    EDIT_HIRE_TIME: false,
   },
   [RoleType['物理治療師']]: {
     READ_HANDOVER: false,
@@ -111,6 +120,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: false,
     EDIT_PT_LEVEL: false,
     READ_PT_LEVEL: true,
+    EDIT_HIRE_TIME: false,
   },
   [RoleType['物理治療師組長']]: {
     READ_HANDOVER: false,
@@ -122,5 +132,6 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_EDUCATION_REVIEW: true,
     EDIT_PT_LEVEL: true,
     READ_PT_LEVEL: true,
+    EDIT_HIRE_TIME: true,
   },
 };

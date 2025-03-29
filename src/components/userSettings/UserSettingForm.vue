@@ -10,6 +10,7 @@ import { omit } from 'radash';
 import { useRouter } from 'vue-router';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
+import dayjs from 'dayjs';
 
 const props = defineProps<{
   type: 'add' | 'edit';
@@ -57,6 +58,7 @@ const addInitialValues = computed(() => ({
   description: '',
   jobClass: null,
   PTLevel: PTLevelOptions[0].value,
+  hireDate: dayjs().format('YYYY/MM/DD'),
 }));
 
 const editInitialValues = computed(() => ({
@@ -69,6 +71,7 @@ const editInitialValues = computed(() => ({
   avatar: targetUser.value.avatarUrl,
   jobClass: targetUser.value.jobClass,
   PTLevel: targetUser.value.PTLevel,
+  hireDate: targetUser.value.hireDate,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
@@ -83,6 +86,7 @@ const createUserSchema = z.object({
   avatar: z.string().nullish(),
   jobClass: z.number().nullish(),
   PTLevel: z.number().nullish(),
+  hireDate: z.string(),
 }).refine((data) => {
   // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
   if (isTherapist(data.roleId)) {
@@ -166,6 +170,7 @@ watch(() => values.roleId, () => {
       <div class="form">
         <OInput name="name" inside-label="姓名*" error-message="" />
         <OInput type="email" name="email" inside-label="帳號*" error-message="" />
+        <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
         <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
         <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
         <template v-if="isTherapistSelected">

@@ -61,6 +61,7 @@ export interface User {
   type: RoleType;
   jobClass: number;
   PTLevel: PTLevel;
+  hireDate: string;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;
