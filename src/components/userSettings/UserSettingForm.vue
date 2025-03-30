@@ -158,9 +158,6 @@ watch(() => values.roleId, () => {
     setFieldValue('jobClass', null);
     setFieldValue('PTLevel', null);
   }
-  // if (selectedRole !== RoleType['物理治療師'] && selectedRole !== RoleType['院長'] && selectedRole !== RoleType['副院長'] && selectedRole !== RoleType['物理治療師組長']) {
-  //   setFieldValue('jobClass', null);
-  // }
 });
 </script>
 
