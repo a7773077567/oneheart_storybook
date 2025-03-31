@@ -54,6 +54,7 @@ const educationPointCols: QTableProps['columns'] = [
     label: '教育積分',
     field: 'point',
     align: 'left',
+    style: 'width: fit-content; max-width: 200px; white-space: pre-wrap',
   },
   {
     name: 'reviewDateTime',

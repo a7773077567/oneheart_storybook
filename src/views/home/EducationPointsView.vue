@@ -28,6 +28,7 @@ const cols: QTableProps['columns'] = [
     label: '項目名稱',
     align: 'left',
     field: 'title',
+    style: 'width: fit-content; max-width: 200px; white-space: pre-wrap',
   },
   {
     name: 'point',
