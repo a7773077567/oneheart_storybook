@@ -127,3 +127,10 @@ export function sortDepTypes<T extends Record<string, any>>(typesArr: T[], key: 
 export function getOpenAccount(user: User) {
   return user.state === AccountState['開通'] && user.stateOfWork === WorkState['在職'];
 }
+
+// format dollar
+export function formatPriceWithComma(value: number): string {
+  const [integerPart, decimalPart] = value.toString().split('.');
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+}

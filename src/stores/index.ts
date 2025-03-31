@@ -8,3 +8,5 @@ export { usePersonalAppointmentStore } from './personalAppointment';
 export { useCashDropStore } from './cashDrop';
 export { useHandoverStore } from './handover';
 export { useOptionStore } from './options';
+export { useTrafficLight } from './home/dashboard/trafficLight';
+export { useAdminStore } from './home/dashboard/admin';

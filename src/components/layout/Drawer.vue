@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 import { useUserStore } from '@/stores';
+import type { PermissionEvents } from '@/const/permission';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -20,22 +21,21 @@ const { currentMatched, drawItems } = useLayoutRoute();
 
 // const drawerItems = computed(() => currentMatched.value[0].children);
 const permissionControlTabs = computed(() => {
+  const canViewPage = (permission: PermissionEvents) => {
+    return userStore.canI(permission);
+  };
   let _filteredPages = drawItems.value?.map((group) => {
+    // permission control
     if (group && group.children) {
-      return ({ ...group, children: group?.children?.filter(subpage => !subpage.meta?.hide) });
+      return ({ ...group, children: group?.children?.filter(subpage => !subpage.meta?.hide).filter((child) => {
+        if (child?.meta?.permissions) {
+          return (child.meta.permissions as PermissionEvents[]).every(canViewPage);
+        }
+        return true;
+      }) });
     }
     return group;
-  }) ?? [];
-
-  if (!userStore.canI('READ_HANDOVER')) {
-    _filteredPages = _filteredPages.filter((route) => {
-      return route.name !== 'cashDropHandover';
-    });
-  }
-
-  if (!userStore.canI('VIEW_USER_SETTING')) {
-    return _filteredPages.filter(route => route?.meta?.permission);
-  }
+  }).filter(route => route.meta?.permissions ? (route.meta.permissions as PermissionEvents[]).every(canViewPage) : true) ?? [];
 
   return _filteredPages;
 });

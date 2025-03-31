@@ -1,4 +1,4 @@
-import type { Space, User } from '@/api';
+import type { Space, TrafficLightStatistic, User } from '@/api';
 import type PieChart from '@/components/shared/PieChart.vue';
 import { LimitColors, LoopColors } from '@/const/dashboard';
 import { ShiftType } from '@/const/general';
@@ -9,6 +9,7 @@ import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
+import { getTherapistTrafficLight } from '@/api'
 
 ;
 
@@ -41,6 +42,7 @@ interface State {
       sortBy: string;
     };
   };
+  targetTherapistTrafficLight: TrafficLightStatistic;
 }
 
 export const useAdminStore = defineStore('admin', {
@@ -91,6 +93,58 @@ export const useAdminStore = defineStore('admin', {
           rowsNumber: 0,
           descending: false,
           sortBy: 'clientId',
+        },
+      },
+      targetTherapistTrafficLight: {
+        isWorkOverThreeMonth: false,
+        predictionPoint: 0,
+        currentPoint: 0,
+        rules: [
+          {
+            light: 'red',
+            min: 0,
+            max: 40,
+          },
+          {
+            light: 'yellow',
+            min: 40,
+            max: 60,
+          },
+          {
+            light: 'green',
+            min: 60,
+            max: null, // Infinity
+          },
+        ],
+        executionCount: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
+        },
+        returnVisitRate: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
+        },
+        presonalRevenue: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
+        },
+        referralCount: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
+        },
+        educationPoint: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
+        },
+        googleCommentCount: {
+          predictionPoint: 0,
+          currentPoint: 0,
+          totalPoint: 0,
         },
       },
     };
@@ -470,6 +524,10 @@ export const useAdminStore = defineStore('admin', {
       this.clientGroup.pagination.page = page;
       this.clientGroup.pagination.rowsNumber = itemCount;
       this.clientGroup.pagination.rowsPerPage = take;
+    },
+    async getTherapistTrafficLight(params: { userId: number }) {
+      const data = await getTherapistTrafficLight(params);
+      this.targetTherapistTrafficLight = data;
     },
   },
 });

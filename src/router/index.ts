@@ -20,8 +20,8 @@ export const routes: RouteRecordRaw[] = [
       ...clientRoutes,
       ...orderRoutes,
       ...userRoutes,
-      ...gymRoutes,
-      ...storeRoutes,
+      // ...gymRoutes,
+      // ...storeRoutes,
     ],
   },
   ...printRoutes,
@@ -34,6 +34,7 @@ export const routes: RouteRecordRaw[] = [
       hide: true,
     },
   },
+  { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('@/views/login/UserLoginView.vue') },
 ];
 
 const router = createRouter({

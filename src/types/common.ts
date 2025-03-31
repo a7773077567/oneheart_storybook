@@ -6,3 +6,9 @@ export interface PagingMeta {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
 }
+
+export interface PageQuery {
+  page: number;
+  take?: number;
+  order?: 'ASC' | 'DESC';
+}

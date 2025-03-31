@@ -8,7 +8,6 @@ export const shiftRoutes: RouteRecordRaw[] = [
     meta: {
       label: '排班',
       requiredAuth: true,
-      permission: true,
       icon: 'event_note',
     },
     children: [

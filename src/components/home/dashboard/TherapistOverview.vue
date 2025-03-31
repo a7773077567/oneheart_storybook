@@ -6,6 +6,10 @@ import type { QSelectProps } from 'quasar';
 import dayjs from 'dayjs';
 import type { TherapistEducationPoint, TherapistOverviewStatistic } from '@/types/home/dashboard/admin';
 import { RangeSelectOptions } from '@/const/dashboard';
+import TrafficLightStatics from './TrafficLightStatics.vue';
+import { RoleType } from '@/api';
+import type { TrafficLightStatistic } from '@/api';
+import { useUserStore } from '@/stores';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
@@ -21,6 +25,7 @@ const props = defineProps<{
   hideEducationPoint?: boolean;
   overview: TherapistOverviewStatistic;
   isManagement: boolean;
+  trafficLightOverview: TrafficLightStatistic;
 }>();
 
 const emit = defineEmits<{
@@ -90,6 +95,11 @@ const dateRange = computed(() => {
   const startDate = today.startOf('month');
   return `${startDate.format('MM/DD')}-${today.format('MM/DD')}(今日)`;
 });
+
+const overAllTherapist = computed(() => props.therapistSelectOptions?.find(option => option.label === '所有治療師')?.value);
+
+const userStore = useUserStore();
+const selectedName = computed<string>(() => userStore.role === RoleType['物理治療師'] ? userStore.userInfo?.name : props.therapistSelectOptions?.find(option => option.value === therapistSelectModel.value)?.label ?? '');
 </script>
 
 <template>
@@ -112,18 +122,22 @@ const dateRange = computed(() => {
       <div class="overview__body-separator" />
 
       <div class="info">
-        <div class="info__header">
-          <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
-          <div class="date-range">{{ dateRange }}</div>
-        </div>
-        <div class="info__body">
-          <!-- <SignalLight :predicted="2" :current="0" /> -->
-          <InfoCard :data="info">
-            <template #educationPoint>
-              <EducationPointEdit v-model="educationPointModel" />
-            </template>
-          </InfoCard>
-        </div>
+        <template v-if="therapistSelectModel !== overAllTherapist">
+          <TrafficLightStatics :user-id="therapistSelect" :user-name="selectedName" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" />
+        </template>
+        <template v-else>
+          <div class="info__header">
+            <MultiOptionSelect v-model="typeSelectModel" :options="typeSelectOptions" label="科別" style="width: 216px;" />
+            <div class="date-range">{{ dateRange }}</div>
+          </div>
+          <div class="info__body">
+            <InfoCard :data="info">
+              <template #educationPoint>
+                <EducationPointEdit v-model="educationPointModel" />
+              </template>
+            </InfoCard>
+          </div>
+        </template>
       </div>
     </div>
   </div>

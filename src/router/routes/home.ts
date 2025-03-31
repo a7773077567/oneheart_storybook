@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { useUserStore } from '@/stores';
-import { RoleType } from '@/api/user';
+import type { PermissionEvents } from '@/const/permission';
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -17,14 +16,83 @@ export const homeRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: () => {
-          const userStore = useUserStore();
-          return getRoleDashboard(userStore.role);
-        },
+        component: () => import('@/views/home/Dashboard.vue'),
         meta: {
           label: '儀表板',
           requiredAuth: true,
         },
+        children: [
+          {
+            path: 'traffic-light-overview/:userId-:userName',
+            component: () => import('@/views/home/TrafficLightOverview.vue'),
+            name: 'trafficLightOverview',
+            props: true,
+            meta: {
+              label: '紅綠燈分數詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/referral-count/:userId-:userName',
+            component: () => import('@/views/home/indicator/ReferralCountDetail.vue'),
+            name: 'referralCountDetail',
+            props: true,
+            meta: {
+              label: '轉介數計分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/return-visit-rate/:userId-:userName',
+            component: () => import('@/views/home/indicator/ReturnVisitRateDetail.vue'),
+            name: 'returnVisitRateDetail',
+            props: true,
+            meta: {
+              label: '回診率計分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/execution-count/:userId-:userName',
+            component: () => import('@/views/home/indicator/ExecutionCountDetail.vue'),
+            name: 'executionCountDetail',
+            props: true,
+            meta: {
+              label: '執行數計分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/personal-revenue/:userId-:userName',
+            component: () => import('@/views/home/indicator/PersonalRevenueDetail.vue'),
+            name: 'personalRevenueDetail',
+            props: true,
+            meta: {
+              label: '個人營業額計分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/education-point/:userId-:userName',
+            component: () => import('@/views/home/indicator/EducationPointDetail.vue'),
+            name: 'educationPointDetail',
+            props: true,
+            meta: {
+              label: '教育積分詳情',
+              requiredAuth: true,
+            },
+          },
+          {
+            path: 'traffic-light-overview/google-comment-count/:userId-:userName',
+            component: () => import('@/views/home/indicator/GoogleCommentCountDetail.vue'),
+            name: 'googleCommentCountDetail',
+            props: true,
+            meta: {
+              label: 'Google評論計分詳情',
+              requiredAuth: true,
+            },
+          },
+        ],
       },
       {
         path: 'personal-appointments',
@@ -44,27 +112,26 @@ export const homeRoutes: RouteRecordRaw[] = [
           requiredAuth: true,
         },
       },
+      {
+        path: 'google-review',
+        name: 'googleReview',
+        component: () => import('@/views/home/GoogleReviewView.vue'),
+        meta: {
+          label: 'Google評論管理',
+          requiredAuth: true,
+          permissions: ['VIEW_GOOGLE_REVIEW'],
+        },
+      },
+      {
+        path: 'education-points',
+        name: 'educationPoints',
+        component: () => import('@/views/home/EducationPointsView.vue'),
+        meta: {
+          label: '教育積分管理',
+          requiredAuth: true,
+          permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
+        },
+      },
     ],
   },
 ];
-
-function getRoleDashboard(role: RoleType) {
-  switch (role) {
-    case RoleType['院長']:
-    case RoleType['副院長']:
-    case RoleType['系統管理者']:
-      return import('@/views/home/AdminDashboard.vue');
-    case RoleType['物理治療師']:
-      return import('@/views/home/TherapistDashboard.vue');
-    case RoleType['物理治療師組長']:
-      return import('@/views/home/LeadTherapistDashboard.vue');
-    case RoleType['櫃檯']:
-      return import('@/views/home/ReceptionDashboard.vue');
-    case RoleType['教練']:
-    case RoleType['教練組長']:
-    case RoleType['店長']:
-    case RoleType['副店長']:
-    default:
-      return import('@/views/home/CoachDashboard.vue');
-  }
-}

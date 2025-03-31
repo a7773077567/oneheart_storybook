@@ -20,7 +20,14 @@ declare module '@vue/runtime-core' {
     CalendarMonth: typeof import('@/components/shared')['CalendarMonth']
     GenericDialog: typeof import('@/components/shared')['GenericDialog']
     SimpleTable: typeof import('@/components/shared')['SimpleTable']
+    OImgPreview: typeof import('@/components/shared')['OImgPreview']
   }
 }
 
 export {}
+
+declare module 'vue-easy-lightbox/dist/external-css/vue-easy-lightbox.esm.min.js' {
+  import VueEasyLightbox from 'vue-easy-lightbox'
+  export * from 'vue-easy-lightbox'
+  export default VueEasyLightbox
+}

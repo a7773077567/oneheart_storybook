@@ -35,3 +35,4 @@ export { default as LineChart } from './LineChart.vue';
 export { default as SwitchBtn } from './SwitchBtn.vue';
 export { default as BasicDialog } from './BasicDialog.vue';
 export { default as SimpleSelect } from './SimpleSelect.vue';
+export { default as OImgPreview } from './OImgPreview.vue';
