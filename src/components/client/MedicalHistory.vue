@@ -23,9 +23,9 @@ watchEffect(async () => {
 });
 
 const columns: QTableProps['columns'] = [
-  { name: 'date', field: 'date', label: '日期', align: 'left', style: 'width: 216px' },
-  { name: 'typeName', field: 'typeName', label: '科別', align: 'left', style: 'width: 216px' },
-  { name: 'chiefComplaint', field: 'chiefComplaint', label: '主訴', align: 'left' },
+  { name: 'date', field: 'date', label: '日期', align: 'left', style: 'width: 150px; white-space: pre-wrap' },
+  { name: 'typeName', field: 'typeName', label: '科別', align: 'left', style: 'width: 100px; white-space: pre-wrap' },
+  { name: 'chiefComplaint', field: 'chiefComplaint', label: '主訴', align: 'left', style: 'max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' },
   { name: 'chevron', field: 'chevron', label: '', align: 'left', style: 'width: 48px' },
 ];
 
