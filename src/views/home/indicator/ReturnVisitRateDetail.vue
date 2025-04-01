@@ -25,7 +25,7 @@ const scoreCols: QTableProps['columns'] = [
     required: true,
     label: '回診 / 初診人數',
     field: 'firstScheduleCount',
-    format: (val, row) => `${val} 名 / ${row.returnVisitCount} 名`,
+    format: (val, row) => `${row.returnVisitCount} 名 / ${val} 名`,
     headerStyle: 'font-size: 14px',
     align: 'left',
   },
