@@ -27,7 +27,6 @@ const scoreCols: QTableProps['columns'] = [
     required: true,
     label: '執行數',
     field: 'executionCount',
-    format: val => `${val} 人`,
     headerStyle: 'font-size: 14px',
     align: 'left',
   },
