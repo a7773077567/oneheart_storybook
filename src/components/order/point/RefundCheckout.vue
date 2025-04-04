@@ -93,7 +93,11 @@ async function onCheckout() {
     onOk(() => {
       nextTick(() => {
       // after success dialog close then do the print
-        window.print();
+      // open the receipt in a new page to get the full-page print layout
+        const printContents = document.querySelector('.receipt')!.innerHTML;
+        localStorage.setItem('printData', JSON.stringify(printContents));
+        window.open(router.resolve({ name: 'receiptPrint' }).href, '_black');
+
         emit('finish');
       });
     },
