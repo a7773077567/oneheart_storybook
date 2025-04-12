@@ -207,8 +207,12 @@ export const useAppointmentStore = defineStore('appointment', {
       const ids = Array.from(new Set(state.available.map(available => available.user.id)));
       return ids.map((id) => {
         const available = state.available.find(a => a.user.id === id);
-        return { ...available?.user, label: available?.user?.name, value: available?.user?.id };
-      });
+        return available?.user;
+      })
+        .filter(user => !!user)
+        .map(user => (
+          { ...user as User }
+        ));
     },
   },
   actions: {
