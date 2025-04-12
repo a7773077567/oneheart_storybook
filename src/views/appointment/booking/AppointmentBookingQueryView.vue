@@ -28,9 +28,12 @@ const { handleSubmit, values, setFieldValue } = useForm({
     startTime: '09:00',
     endTime: '21:00',
     addOnUserShiftTypes: [],
+    autoRecommend: false,
   },
 });
 const { push, remove } = useFieldArray<AddOnServiceTypes>('addOnUserShiftTypes');
+const ifReservingGChair = computed(() => values.userShiftType === ShiftType['G動椅']);
+const ifUsingAutoRecommend = computed(() => values.autoRecommend);
 
 function selectAddOn(addOn: AddOnServiceTypes) {
   if (values.addOnUserShiftTypes?.includes(addOn)) {
@@ -39,6 +42,12 @@ function selectAddOn(addOn: AddOnServiceTypes) {
   }
   else {
     push(addOn);
+  }
+}
+
+function selectAutoRecommend(ifAuto: boolean) {
+  if (ifAuto) {
+    setFieldValue('userIds', []);
   }
 }
 
@@ -52,7 +61,7 @@ watch(() => values.userShiftType, (newShiftType) => {
 }, { immediate: true });
 
 const onSubmit = handleSubmit(async (values) => {
-  appointmentStore.appointmentCalendarInitOption = values.userIds!;
+  appointmentStore.appointmentCalendarInitOption = values.userIds ?? [];
   appointmentStore.availableQuery = { ...values, userIds: appointmentStore.activeUsers.map(user => user.id) };
 
   try {
@@ -60,8 +69,13 @@ const onSubmit = handleSubmit(async (values) => {
     await appointmentStore.getAvailable(appointmentStore.availableQuery);
     appointmentStore.querySent = true;
 
+    // 自動推薦僅顯示可預約治療師
+    if (ifUsingAutoRecommend.value) {
+      appointmentStore.appointmentCalendarInitOption = appointmentStore.autoRecommendTherpistIds;
+      appointmentStore.availableQuery = { ...appointmentStore.availableQuery, userIds: appointmentStore.autoRecommendTherpistIds };
+    }
     // G動椅是另外的 Machine Calendar 顯示
-    await router.push(values.userShiftType === ShiftType['G動椅']
+    await router.push(ifReservingGChair.value
       ? {
           name: 'machineBookingCalendar',
           params: {
@@ -90,13 +104,20 @@ const onSubmit = handleSubmit(async (values) => {
     <InputBox label="選擇項目">
       <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" hide-bottom-space />
     </InputBox>
+    <OCheckbox
+      name="autoRecommend"
+      :disable="ifReservingGChair"
+      label="自動推薦治療師"
+      class="q-pb-md"
+      @update:model-value="selectAutoRecommend"
+    />
+    <p v-if="ifReservingGChair" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     <InputBox :label="`選擇${selectLabel}`">
       <OSelect
-        :disable="values.userShiftType === ShiftType['G動椅']" name="userIds" :label="`選擇${selectLabel}`"
+        :disable="ifUsingAutoRecommend || ifReservingGChair" name="userIds" :label="`選擇${selectLabel}`"
         :options="therapistOptions" multiple hide-bottom-space
       />
     </InputBox>
-    <p v-if="values.userShiftType === ShiftType['G動椅']" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" hide-bottom-space />
     </InputBox>
@@ -148,7 +169,6 @@ const onSubmit = handleSubmit(async (values) => {
     white-space: nowrap;
     margin-top: -8px;
     margin-bottom: 16px;
-    padding-left: 16px;
   }
 
   .input-box {

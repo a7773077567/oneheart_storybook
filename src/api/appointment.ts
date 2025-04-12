@@ -276,6 +276,7 @@ export interface Available {
   appointmentStatus: AppointmentStatus | null;
   machine: null | MachineInfo;
   space: Space;
+  autoRecommand: boolean;
 }
 
 export interface CreateAppointmentPayload {
@@ -290,6 +291,7 @@ export interface CreateAppointmentPayload {
   startTime: string;
   userShiftId: number;
   userShiftType: ShiftType;
+  isUsingAutoRecommend: boolean;
 }
 
 export interface CreateAppointmentRearrangePayload {
@@ -603,6 +605,7 @@ export const availableReqSchema = z.object({
   startTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   addOnUserShiftTypes: z.array(z.nativeEnum(AddOnServiceTypes)).optional(),
+  autoRecommend: z.boolean().optional(),
 })
   .refine(({ startTime, endTime }) => {
     const start = getTimeDate(startTime);

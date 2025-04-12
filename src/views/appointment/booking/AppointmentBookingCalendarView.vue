@@ -24,6 +24,12 @@ await appointmentStore.getUsers([userStore.currentSpaceId!]);
 const selectedDate = ref(getDate());
 const stateOfAppointmentDialog = ref(false);
 
+const queryAddOns = computed(() => appointmentStore.queryAddOns.map(addOn => AddOnServiceTypes[addOn]));
+const queryAppointmentType = computed(() => appointmentStore.availableQuery?.userShiftType && ShiftType[appointmentStore.availableQuery?.userShiftType]);
+const ifAutoRecommend = computed(() => appointmentStore.availableQuery?.autoRecommend);
+
+const therapistOptions = computed(() => ifAutoRecommend.value ? appointmentStore.autoRecommendTherpists : appointmentStore.activeUsers);
+
 onBeforeUnmount(() => {
   appointmentStore.rearrangeMode = false;
 });
@@ -99,7 +105,7 @@ function getIntervals(scope: any): CalendarInterval[] {
 }
 
 function OpenAppointmentDialog(available: Available) {
-  appointmentStore.targetAvailable = available;
+  appointmentStore.targetAvailable = { ...available, autoRecommand: !!ifAutoRecommend.value };
   stateOfAppointmentDialog.value = true;
 }
 
@@ -134,20 +140,18 @@ function getDate() {
   const target = appointmentStore.availableQuery || appointmentStore.rearrangeQuery;
   return target!.date;
 }
-
-const queryAddOns = computed(() => appointmentStore.queryAddOns.map(addOn => AddOnServiceTypes[addOn]));
-const queryAppointmentType = computed(() => appointmentStore.availableQuery?.userShiftType && ShiftType[appointmentStore.availableQuery?.userShiftType]);
 </script>
 
 <template>
   <div class="booking-calendar">
     <ResourceCalendar
       v-model="selectedDate"
-      v-model:model-resources="appointmentStore.activeUsers"
+      v-model:model-resources="therapistOptions"
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
       :init-options="appointmentStore.appointmentCalendarInitOption"
       :interval-minutes="30"
+      :disable-filter="ifAutoRecommend"
       @model-resources="appointmentStore.users = $event"
     >
       <template #nav-right>
@@ -163,7 +167,10 @@ const queryAppointmentType = computed(() => appointmentStore.availableQuery?.use
         />
       </template>
       <template #middle>
-        <h3 v-if="!!queryAddOns && queryAddOns.length > 0" class="sm_title">{{ queryAppointmentType }}｜加購儀器 {{ queryAddOns.join('、') }} </h3>
+        <h3 class="sm_title">
+          <template v-if="!!queryAddOns && queryAddOns.length > 0">{{ queryAppointmentType }}｜加購儀器 {{ queryAddOns.join('、') }} </template>
+          <template v-else-if="ifAutoRecommend">{{ queryAppointmentType }} (自動推薦治療師)</template>
+        </h3>
       </template>
     </ResourceCalendar>
     <QDialog v-model="stateOfAppointmentDialog" persistent>

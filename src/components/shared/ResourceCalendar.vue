@@ -15,6 +15,7 @@ interface Props {
   intervalCount?: number;
   intervalMinutes?: number;
   resourceWidth?: number;
+  disableFilter?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,6 +64,7 @@ function getCalendarStyle() {
         v-model="selected"
         label="治療師"
         :options="options"
+        :disable="disableFilter"
       />
       <div class="column items-center q-gutter-md">
         <DatePicker v-model="model" />
