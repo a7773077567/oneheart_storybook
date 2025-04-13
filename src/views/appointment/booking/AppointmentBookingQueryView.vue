@@ -32,8 +32,10 @@ const { handleSubmit, values, setFieldValue } = useForm({
   },
 });
 const { push, remove } = useFieldArray<AddOnServiceTypes>('addOnUserShiftTypes');
+
 const ifReservingGChair = computed(() => values.userShiftType === ShiftType['G動椅']);
 const ifUsingAutoRecommend = computed(() => values.autoRecommend);
+const canSelectMachine = computed(() => values.userShiftType && PhysicalTypes.includes(values.userShiftType as any) && !ifUsingAutoRecommend.value);
 
 function selectAddOn(addOn: AddOnServiceTypes) {
   if (values.addOnUserShiftTypes?.includes(addOn)) {
@@ -48,6 +50,7 @@ function selectAddOn(addOn: AddOnServiceTypes) {
 function selectAutoRecommend(ifAuto: boolean) {
   if (ifAuto) {
     setFieldValue('userIds', []);
+    setFieldValue('addOnUserShiftTypes', []);
   }
 }
 
@@ -127,7 +130,7 @@ const onSubmit = handleSubmit(async (values) => {
       <OTime name="endTime" now-btn hide-bottom-space />
       <span style="translate:0 -10px;">止</span>
     </InputBox>
-    <fieldset v-if="values.userShiftType && PhysicalTypes.some(type => type === values.userShiftType)">
+    <fieldset v-if="canSelectMachine">
       <legend>物理治療可加購儀器，是否加購？</legend>
       <p class="remark">(至多可選兩項)</p>
       <QCheckbox
