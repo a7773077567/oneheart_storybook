@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Client } from '@/api';
 import { createAppointment, createAppointmentRearrange } from '@/api/appointment';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
@@ -69,7 +68,8 @@ async function appointment() {
   }
   if (!appointmentStore.rearrangeMode) {
     const { targetAvailable, targetClient } = appointmentStore;
-    const { userShiftId, startTime, endTime, date, machine, space, type } = targetAvailable;
+    const { userShiftId, startTime, endTime, date, machine, space, type, autoRecommand } = targetAvailable;
+    console.log({ autoRecommand });
 
     await createAppointment({
       isEmployeePrice: isEmployeePrice.value,
@@ -82,6 +82,7 @@ async function appointment() {
       machineId: machine?.id ?? null,
       spaceId: space.id,
       userShiftType: type,
+      isUsingAutoRecommend: autoRecommand,
       ...(appointmentStore.queryAddOns.length > 0 ? { addOnUserShiftTypes: appointmentStore.queryAddOns } : {}),
     });
     await appointmentStore.getAvailable(appointmentStore.availableQuery!);
