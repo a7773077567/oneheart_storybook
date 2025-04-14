@@ -65,7 +65,9 @@ watch(() => values.userShiftType, (newShiftType) => {
 
 const onSubmit = handleSubmit(async (values) => {
   appointmentStore.appointmentCalendarInitOption = values.userIds ?? [];
-  appointmentStore.availableQuery = { ...values, userIds: appointmentStore.activeUsers.map(user => user.id) };
+  appointmentStore.availableQuery = { ...values, userIds: values.autoRecommend
+    ? []
+    : appointmentStore.activeUsers.map(user => user.id) }; // refactor, 改成 api 篩選治療師，非前端篩選
 
   try {
     $q.loading.show();
@@ -75,7 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
     // 自動推薦僅顯示可預約治療師
     if (ifUsingAutoRecommend.value) {
       appointmentStore.appointmentCalendarInitOption = appointmentStore.autoRecommendTherpistIds;
-      appointmentStore.availableQuery = { ...appointmentStore.availableQuery, userIds: appointmentStore.autoRecommendTherpistIds };
+      appointmentStore.availableQuery = { ...appointmentStore.availableQuery, userIds: values.autoRecommend ? [] : appointmentStore.autoRecommendTherpistIds };
     }
     // G動椅是另外的 Machine Calendar 顯示
     await router.push(ifReservingGChair.value

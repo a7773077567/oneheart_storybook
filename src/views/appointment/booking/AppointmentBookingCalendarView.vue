@@ -43,7 +43,15 @@ watch(selectedDate, async (newDate) => {
     }
     else {
       appointmentStore.availableQuery = { ...appointmentStore.availableQuery ?? {} as AvailableReq, date: newDate };
+      const apiQuery = { ...appointmentStore.availableQuery };
+      if (apiQuery.autoRecommend) {
+        delete apiQuery.userIds;
+      }
       await appointmentStore.getAvailable(appointmentStore.availableQuery);
+
+      if (apiQuery.autoRecommend) {
+        appointmentStore.appointmentCalendarInitOption = appointmentStore.autoRecommendTherpistIds; // refactor, 拿掉 initOptions 用法
+      }
     }
     appointmentStore.querySent = true;
   }

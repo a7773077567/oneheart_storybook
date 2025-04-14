@@ -3,7 +3,7 @@ import { QCalendarResource } from '@quasar/quasar-ui-qcalendar';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarVariables.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass';
 import '@quasar/quasar-ui-qcalendar/src/QCalendarResource.sass';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { User } from '@/api/user';
 import MultiOptionSelect from './MultiOptionSelect.vue';
 
@@ -45,6 +45,9 @@ const options = computed(() => resources.value.map(({ id, name }) => ({
   value: id,
 })));
 const selected = ref(props.initOptions ?? options.value.map(option => option.value));
+watch(() => props.initOptions, () => {
+  selected.value = props.initOptions ?? options.value.map(option => option.value);
+});
 const selectedResources = computed(() => {
   return resources.value.filter(item => selected.value.includes(item.id));
 });
