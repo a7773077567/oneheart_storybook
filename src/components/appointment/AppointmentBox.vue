@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createAppointment, createAppointmentRearrange } from '@/api/appointment';
+import { type Client, createAppointment, createAppointmentRearrange } from '@/api';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
 import { getDateLabel, getTypeLabel } from '@/utils/mappers';
@@ -7,6 +7,8 @@ import { getDurationLabel } from '@/utils/date';
 import { useRouter } from 'vue-router';
 import { OInput, OMemberSearch } from '@/components/shared';
 import { useNotify } from '@/composables/notify';
+import { useDialog } from '@/composables/dialog';
+import { useQuasar } from 'quasar';
 
 interface Column<T> {
   key: keyof T | string;
@@ -69,7 +71,6 @@ async function appointment() {
   if (!appointmentStore.rearrangeMode) {
     const { targetAvailable, targetClient } = appointmentStore;
     const { userShiftId, startTime, endTime, date, machine, space, type, autoRecommand } = targetAvailable;
-    console.log({ autoRecommand });
 
     await createAppointment({
       isEmployeePrice: isEmployeePrice.value,
@@ -111,6 +112,31 @@ async function appointment() {
   emit('appointment');
 }
 
+const showBlacklistAlert = ref(false);
+const $q = useQuasar();
+async function handleSelection(client: Client | null) {
+  appointmentStore.targetClient = client;
+
+  if (client?.isBlacklisted) {
+    showBlacklistAlert.value = true;
+    // const { onOk } = await useDialog({ type: 'confirm', title: '確定刪除此群組', message: '一但刪除群組，則無法復原，如確認無誤請按確定。' });
+    // onOk(async () => {
+
+    // });
+    $q.dialog({
+      title: '該客戶被設置為黑名單',
+      message: '此客戶於客戶管理頁面設置為黑名單，僅作提醒，您仍可完成預約。',
+      ok: {
+        label: '我瞭解了',
+        rounded: true,
+        color: 'primary',
+        style: 'padding: 10px 24px',
+      },
+      style: 'width: 312px; padding:8px 8px 16px; border-radius: 28px',
+    });
+  }
+}
+
 // to refactor, need to get clients first
 appointmentStore.getClients();
 </script>
@@ -127,7 +153,7 @@ appointmentStore.getClients();
         left-label
         class="self-start q-pa-sm"
       />
-      <OMemberSearch v-model="pickedClientId" placeholder="電話或姓名搜尋會員" @update:full-info="appointmentStore.targetClient = $event" />
+      <OMemberSearch v-model="pickedClientId" placeholder="電話或姓名搜尋會員" @update:full-info="handleSelection" />
       <template v-if="appointmentStore.targetClient">
         <span class="q-pa-sm">會員編號 {{ appointmentStore.targetClient.identityNumber || 1234567890 }} </span>
         <OTable :data="clientTableData" />

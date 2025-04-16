@@ -30,6 +30,7 @@ export interface Client {
   introducer: Pick<Client, 'associations' | 'email' | 'id' | 'inBodyFiles' | 'introducer' | 'lineUserId' | 'name' | 'phone' | 'relationTypeName'> | null;
   inBodyFileUrls: string[];
   inBodyFiles: InbodyFile[];
+  isBlacklisted: boolean;
   lineUserId: string;
   liffIntroducerName: string | null;
   name: string;
@@ -209,4 +210,9 @@ export async function getAllContract(clientId: number) {
 export async function getClientPaymentDetail({ clientId, paymentId }: { clientId: number;paymentId: number }) {
   const { data } = await api.get<PaymentDetail>(`clients/${clientId}/payments/${paymentId}`);
   return data;
+}
+
+// 更新客戶是否為黑名單
+export async function updateIsBlackList(clientId: number, body: { isBlacklisted: boolean }) {
+  await api.patch(`clients/${clientId}/update-isBlacklisted`, body);
 }
