@@ -127,7 +127,7 @@ const onSubmit = handleSubmit(async (values) => {
       />
     </fieldset>
     <fieldset>
-      <OInput date-mode name="date" hide-bottom-space inside-label="選擇日期" mask="date" :rules="['date']" error-message="" />
+      <OInput date-mode name="date" hide-bottom-space inside-label="選擇日期" mask="####-##-##" error-message="" />
     </fieldset>
     <fieldset>
       <div class="flex items-center q-gutter-x-sm">
