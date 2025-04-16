@@ -269,7 +269,7 @@ watch(() => values.roleId, () => {
 }
 
 .note {
-  @include body-small($on-surface-variant);
+  @include text-style($body-small, $on-surface-variant);
   margin: 8px 0 12px 16px;
 }
 </style>

@@ -42,7 +42,7 @@ const popupContentStyle = computed(() => {
 
 <style lang="scss" scoped>
 :deep(.q-field__native > span) {
-  @include title-medium($on-surface-variant);
+  @include text-style($title-medium, $on-surface-variant);
 }
 
 :global(.simple-select-content) {
@@ -70,7 +70,7 @@ const popupContentStyle = computed(() => {
     padding: 0;
   }
   .q-item__label {
-    @include body-large($on-surface);
+    @include text-style($body-large, $on-surface);
     line-height: 28px !important;
   }
 }

@@ -69,10 +69,10 @@ const list = computed(() => [
 <style scoped lang="scss">
 .indicator-list {
   &__header :deep(.q-item__section) {
-    @include label-large($on-surface-variant);
+    @include text-style($label-large, $on-surface-variant);
   }
   &__body :deep(.q-item__section) {
-    @include title-medium($on-surface);
+    @include text-style($title-medium, $on-surface);
   }
   .score {
     width: 50px;

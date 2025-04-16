@@ -105,36 +105,41 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <div class="booking-query">
-    <InputBox label="選擇項目">
+  <h3 class="text-headline-small">預約</h3>
+  <form class="booking-query">
+    <fieldset>
       <OSelect name="userShiftType" label="選擇項目" :options="shiftStore.spaceShiftOptions" hide-bottom-space />
-    </InputBox>
-    <OCheckbox
-      name="autoRecommend"
-      :disable="ifReservingGChair"
-      label="自動推薦治療師"
-      class="q-pb-md"
-      @update:model-value="selectAutoRecommend"
-    />
-    <p v-if="ifReservingGChair" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
-    <InputBox :label="`選擇${selectLabel}`">
+    </fieldset>
+    <fieldset>
+      <OCheckbox
+        name="autoRecommend"
+        :disable="ifReservingGChair"
+        label="自動推薦治療師"
+        class="q-px-none"
+        @update:model-value="selectAutoRecommend"
+      />
+      <p v-if="ifReservingGChair" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
+    </fieldset>
+    <fieldset>
       <OSelect
         :disable="ifUsingAutoRecommend || ifReservingGChair" name="userIds" :label="`選擇${selectLabel}`"
         :options="therapistOptions" multiple hide-bottom-space
       />
-    </InputBox>
-    <InputBox label="選擇日期" class="gutter">
-      <DatePicker name="date" hide-bottom-space />
-    </InputBox>
-    <InputBox label="選擇預約時間" class="gutter">
-      <OTime name="startTime" now-btn hide-bottom-space />
-      <span style="translate:0 -10px;">至</span>
-      <OTime name="endTime" now-btn hide-bottom-space />
-      <span style="translate:0 -10px;">止</span>
-    </InputBox>
+    </fieldset>
+    <fieldset>
+      <OInput date-mode name="date" hide-bottom-space inside-label="選擇日期" mask="date" :rules="['date']" error-message="" />
+    </fieldset>
+    <fieldset>
+      <div class="flex items-center q-gutter-x-sm">
+        <OTime name="startTime" now-btn hide-bottom-space label="開始時間" />
+        <span>至</span>
+        <OTime name="endTime" now-btn hide-bottom-space label="結束時間" />
+        <span>止</span>
+      </div>
+    </fieldset>
     <fieldset v-if="canSelectMachine">
       <legend>物理治療可加購儀器，是否加購？</legend>
-      <p class="remark">(至多可選兩項)</p>
+      <p class="remark text-body-small text-on-surface-variant">(至多可選兩項)</p>
       <QCheckbox
         :model-value="!!values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
         :disable="(values.addOnUserShiftTypes ?? []).length >= 2 && !values.addOnUserShiftTypes?.includes(AddOnServiceTypes['震波'])"
@@ -157,36 +162,31 @@ const onSubmit = handleSubmit(async (values) => {
         @update:model-value="selectAddOn(AddOnServiceTypes['磁波'])"
       />
     </fieldset>
-    <QBtn label="搜尋" outline style="width: 126px;" @click="onSubmit" />
-  </div>
+    <QBtn label="查詢" rounded color="primary" unelevated icon="search" @click="onSubmit" />
+  </form>
 </template>
 
 <style lang="scss" scoped>
 .booking-query {
   min-width: 356px;
   width: fit-content;
-  padding: 20px;
+  padding: 20px 0;
+  fieldset + fieldset {
+    margin-top: 20px;
+  }
 
   .note {
     font-size: 12px;
     font-weight: 500;
     color: #1a1b21;
     white-space: nowrap;
-    margin-top: -8px;
-    margin-bottom: 16px;
-  }
-
-  .input-box {
-    margin-bottom: 20px;
+    margin-top: 8px;
   }
 
   fieldset {
     legend {
-      @include body-large($on-surface);
+      @include text-style($body-large, $on-surface);
       margin-bottom: 8px;
-    }
-    .remark {
-      @include body-small($on-surface-variant);
     }
   }
 }

@@ -140,8 +140,8 @@ const lightBoxImg = ref('');
 
 <template>
   <div class="google-review">
-    <h2>Google評論管理</h2>
-    <p class="note">Google 評論數為 KPI 紅綠燈分數中的評分項目</p>
+    <h2 class="text-headline-medium text-on-surface">Google評論管理</h2>
+    <p class="note text-body-medium text-on-surface-variant">Google 評論數為 KPI 紅綠燈分數中的評分項目</p>
     <QSeparator />
     <section class="google-review-content">
       <div class="google-review-content__header">
@@ -191,10 +191,8 @@ const lightBoxImg = ref('');
 .google-review {
   h2 {
     margin-bottom: 12px;
-    @include headline-medium($on-surface);
   }
   .note {
-    @include body-medium($on-surface-variant);
     margin-bottom: 18px;
   }
   &-content {

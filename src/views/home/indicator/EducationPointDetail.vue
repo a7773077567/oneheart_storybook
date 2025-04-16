@@ -120,11 +120,11 @@ async function fetchAllData() {
 
 <template>
   <div class="education_detail">
-    <h2>教育積分計分詳情</h2>
-    <h3>計分說明</h3>
-    <p class="note">參與內部培訓或進修課程的積分，由管理者登錄積分。</p>
+    <h2 class="text-headline-medium text-on-surface">教育積分計分詳情</h2>
+    <h3 class="text-title-large text-on-surface">計分說明</h3>
+    <p class="note text-title-small text-on-surface">參與內部培訓或進修課程的積分，由管理者登錄積分。</p>
     <QSeparator style="margin: 32px 0" />
-    <h3>計分明細</h3>
+    <h3 class="text-title-large text-on-surface">計分明細</h3>
     <div class="row no-wrap">
       <section class="col-7">
         <div v-if="isLoading" class="text-center">
@@ -147,20 +147,20 @@ async function fetchAllData() {
               <p class="body_medium_highlight">三個月加總後轉換得分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="body_medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 積分 =</p>
-              <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
+              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 積分 =</p>
+              <p class="text-title_medium text-on-surface text-right">目前得分 {{ overview.currentPoint }} 分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="body_medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
-              <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
+              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
+              <p class="text-title-medium text-on-surface text-right">預測得分 {{ overview.predictionPoint }} 分</p>
             </div>
           </div>
         </template>
       </section>
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
-        <h4 class="label_large q-mb-sm">得分標準</h4>
-        <p class="body_medium q-mb-sm">教育積準適用統一得分標準不受職階影響</p>
+        <h4 class="q-mb-sm text-label-large text-on-surface">得分標準</h4>
+        <p class="text-body-medium q-mb-sm">教育積準適用統一得分標準不受職階影響</p>
         <div v-if="isLoading" class="text-center">
           <QSpinner />
         </div>
@@ -169,9 +169,9 @@ async function fetchAllData() {
     </div>
     <QSeparator style="margin:32px 0" />
     <section class="education_point_table">
-      <h3>教育積分明細</h3>
+      <h3 class="text-title-large text-on-surface">教育積分明細</h3>
       <div class="education_point_table--header q-mb-md">
-        <p class="title_small">以下為近 4 個月內影響得分的教育積分明細。</p>
+        <p class="text-title-small text-on-surface">以下為近 4 個月內影響得分的教育積分明細。</p>
         <div>
           <QBtn color="primary" flat label="教育積分管理" icon-right="chevron_right" class="q-mr-sm" @click="$router.push({ name: 'educationPoints' })" />
           <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="stateOfPointForm = true" />
@@ -208,29 +208,11 @@ async function fetchAllData() {
 <style scoped lang="scss">
 .education_detail {
   h2 {
-    @include headline-medium($on-surface);
     padding: 18px 0;
     margin-bottom: 24px;
   }
   h3 {
-    @include title-large($on-surface);
     margin-bottom: 16px;
-  }
-  .note {
-    @include title-small($on-surface);
-  }
-  .label_large {
-    @include label-large($on-surface);
-    font-weight: 700;
-  }
-  .title_medium {
-    @include title-medium($on-surface);
-  }
-  .title_small {
-    @include title-small($on-surface);
-  }
-  .body_medium {
-    @include body-medium($on-surface);
   }
   .body_medium_highlight {
     font-size: 14px;

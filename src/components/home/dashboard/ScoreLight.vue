@@ -18,11 +18,11 @@ const lightSignals = computed(() => [
 
 <template>
   <div class="signal" :class="{ signal_detail: fullInfo, empty_state: noData }">
-    <div v-if="fullInfo" class="signal__header">
+    <div v-if="fullInfo" class="signal__header text-label-large text-on-surface">
       {{ caption }}
     </div>
     <div class="signal__content">
-      <span class="label">{{ label }} {{ noData ? '-' : score }} 分</span>
+      <span class="text-title-medium text-on-surface-variant">{{ label }} {{ noData ? '-' : score }} 分</span>
       <div class="light-container">
         <div v-for="light in lightSignals" :key="light.name" class="light" :class="[light.name, { isChecked: !noData && light.isMatched }]">
           <QIcon v-if="!noData && light.isMatched" name="check" size="18px" color="white" />
@@ -66,7 +66,6 @@ const lightSignals = computed(() => [
   &__header {
     text-align: center;
     margin-bottom: 4px;
-    @include label-large($on-surface);
   }
   &__content {
     display: flex;
@@ -77,9 +76,6 @@ const lightSignals = computed(() => [
     background: $on-primary;
     min-width: 275px;
     width: 100%;
-    .label {
-      @include title-medium($on-surface-variant);
-    }
     .light-container {
       display: flex;
       gap: 4px;

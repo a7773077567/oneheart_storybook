@@ -138,11 +138,11 @@ async function fetchAllData() {
 
 <template>
   <div class="google_comment_detail">
-    <h2>Google 評論計分詳情</h2>
-    <h3>計分說明</h3>
-    <p class="note">客戶在 Google 的評論次數，由管理者登錄。</p>
+    <h2 class="text-headline-medium text-on-surface">Google 評論計分詳情</h2>
+    <h3 class="text-title-large text-on-surface">計分說明</h3>
+    <p class="note text-title-small text-on-surface">客戶在 Google 的評論次數，由管理者登錄。</p>
     <QSeparator style="margin: 32px 0" />
-    <h3>計分明細</h3>
+    <h3 class="text-title-large text-on-surface">計分明細</h3>
     <div class="row no-wrap">
       <section class="col-7">
         <div v-if="isLoading" class="text-center"> <QSpinner /></div>
@@ -159,24 +159,24 @@ async function fetchAllData() {
           <QSeparator class="q-mb-md" />
           <div class="score_calculation row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <span class="body_medium_highlight">計分方式</span>
-              <p class="body_medium_highlight">三個月平均得分</p>
+              <span class="text-body-medium-highlight">計分方式</span>
+              <p class="text-body-medium-highlight">三個月平均得分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="body_medium q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3 </p>
-              <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
+              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3 </p>
+              <p class="text-title-medium text-on-surface text-right">目前得分 {{ overview.currentPoint }} 分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="body_medium q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3 </p>
-              <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
+              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3 </p>
+              <p class="text-title-medium text-on-surface text-right">預測得分 {{ overview.predictionPoint }} 分</p>
             </div>
           </div>
         </template>
       </section>
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
-        <h4 class="label_large q-mb-sm">得分標準</h4>
-        <p class="body_medium q-mb-sm">Google 評論適用統一得分標準不受職階影響</p>
+        <h4 class="text-label-large-perminent text-on-surface q-mb-sm">得分標準</h4>
+        <p class="text-body-medium text-on-surface q-mb-sm">Google 評論適用統一得分標準不受職階影響</p>
         <div v-if="isLoading" class="text-center">
           <QSpinner />
         </div>
@@ -185,9 +185,9 @@ async function fetchAllData() {
     </div>
     <QSeparator style="margin:32px 0" />
     <section>
-      <h3>Google 評論明細</h3>
+      <h3 class="text-title-large text-on-surface">Google 評論明細</h3>
       <div class="flex items-center q-mb-md justify-between">
-        <p class="title_small ">以下為近 4 個月內影響得分的 Google 評論明細。</p>
+        <p class="text-title-small text-on-surface">以下為近 4 個月內影響得分的 Google 評論明細。</p>
         <div class="flex">
           <QBtn color="primary" flat label="Google 評論管理" icon-right="chevron_right" class="q-mr-sm text-capitalize" @click="$router.push({ name: 'googleReview' })" />
           <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="stateOfReviewForm = true" />
@@ -235,35 +235,11 @@ async function fetchAllData() {
 <style scoped lang="scss">
 .google_comment_detail {
   h2 {
-    @include headline-medium($on-surface);
     padding: 18px 0;
     margin-bottom: 24px;
   }
   h3 {
-    @include title-large($on-surface);
     margin-bottom: 16px;
-  }
-  .note {
-    @include title-small($on-surface);
-  }
-  .label_large {
-    @include label-large($on-surface);
-    font-weight: 700;
-  }
-  .title_medium {
-    @include title-medium($on-surface);
-  }
-  .title_small {
-    @include title-small($on-surface);
-  }
-  .body_medium {
-    @include body-medium($on-surface);
-  }
-  .body_medium_highlight {
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 24px; /* 171.429% */
   }
 }
 </style>

@@ -101,7 +101,7 @@ const onSubmit = handleSubmit(async (values) => {
 .education-review-form {
   min-width: 480px;
   &--title {
-    @include headline-small($on-surface);
+    @include text-style($headline-small, $on-surface);
   }
 }
 </style>

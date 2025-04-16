@@ -125,7 +125,7 @@ function isRouteFocused(route: string) {
 }
 
 :deep(.q-item__label) {
-  @include label-large($on-surface-variant);
+  @include text-style($label-large, $on-surface-variant);
   line-height: 20px !important;
 }
 
