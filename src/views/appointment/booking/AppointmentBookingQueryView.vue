@@ -61,6 +61,10 @@ watch(() => values.userShiftType, (newShiftType) => {
   therapistOptions.value = newTherapistOptions;
   setFieldValue('userIds', []);
   selectLabel.value = shiftDetails.selectLabel;
+
+  if (newShiftType === ShiftType['G動椅']) {
+    setFieldValue('autoRecommend', false);
+  }
 }, { immediate: true });
 
 const onSubmit = handleSubmit(async (values) => {
@@ -118,13 +122,14 @@ const onSubmit = handleSubmit(async (values) => {
         class="q-px-none"
         @update:model-value="selectAutoRecommend"
       />
-      <p v-if="ifReservingGChair" class="note">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
+      <p v-if="ifReservingGChair" class="text-body-small text-on-surface-variant">此項目不需提前指定治療師，當天現場於「客戶預約單」指定。</p>
     </fieldset>
     <fieldset>
       <OSelect
         :disable="ifUsingAutoRecommend || ifReservingGChair" name="userIds" :label="`選擇${selectLabel}`"
         :options="therapistOptions" multiple hide-bottom-space
       />
+      <p v-show="ifUsingAutoRecommend" class="text-body-small text-on-surface-variant q-pl-md q-pt-xs"> 已勾選「自動推薦治療師」，不須選擇治療師。</p>
     </fieldset>
     <fieldset>
       <OInput date-mode name="date" hide-bottom-space inside-label="選擇日期" mask="####-##-##" error-message="" />
@@ -162,7 +167,7 @@ const onSubmit = handleSubmit(async (values) => {
         @update:model-value="selectAddOn(AddOnServiceTypes['磁波'])"
       />
     </fieldset>
-    <QBtn label="查詢" rounded color="primary" unelevated icon="search" @click="onSubmit" />
+    <QBtn label="查詢" rounded color="primary" unelevated icon="search" class="q-mt-lg" @click="onSubmit" />
   </form>
 </template>
 
