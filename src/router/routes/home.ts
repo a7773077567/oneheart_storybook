@@ -114,8 +114,9 @@ export const homeRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'points-bonus-manage',
-        name: 'pointsNBonuses',
+        name: 'pointsNBonus',
         component: () => import('@/views/home/pointsNBonus/Index.vue'),
+        redirect: { name: 'googleReview' },
         meta: {
           label: '積分與獎金管理',
           requiredAuth: true,

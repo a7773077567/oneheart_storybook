@@ -120,11 +120,67 @@ async function fetchAllData() {
 
 <template>
   <div class="education_detail">
-    <h2 class="text-headline-medium text-on-surface">教育積分計分詳情</h2>
-    <h3 class="text-title-large text-on-surface">計分說明</h3>
-    <p class="note text-title-small text-on-surface">參與內部培訓或進修課程的積分，由管理者登錄積分。</p>
+    <h2 class="text-headline-medium">教育積分計分詳情</h2>
+    <h3 class="text-title-large">計分說明</h3>
+    <p class="text-title-small q-mb-md">參與內部培訓或進修課程的積分，可於 <span class="text-primary text-title-small cursor-pointer" @click="$router.push({ name: 'educationPoints' })">積分與獎金管理</span> 登錄積分。</p>
+    <div class="row q-col-gutter-lg flex-wrap">
+      <div class="col-12 col-md-4">
+        <QTable
+          flat
+          :rows="[{ name: '參加繼續教育培訓', point: '2 / 場' }, { name: '開設繼續教育課程', point: '4 / 場' }]"
+          :columns="[{
+            name: 'name',
+            field: 'name',
+            label: '所外教育積分項目 / 積分',
+            align: 'left',
+            headerClasses: 'text-label-large',
+          }, {
+            name: 'point',
+            field: 'point',
+            label: '',
+            headerClasses: 'text-label-large',
+          }]"
+          row-key="index"
+          virtual-scroll
+          :rows-per-page-options="[0]"
+          hide-pagination
+        />
+      </div>
+      <div class="col-12 col-md-8">
+        <QTable
+          flat
+          :rows="[{ col1: '參加培訓', col2: '2 / 場', col3: '開設內部培訓', col4: '2 / 場' }, { col1: '培訓新治療師 (PT0) 當月', col2: '4 / 位 / 月', col3: '培訓治療師 (PT1) 當月', col4: '2  / 位 / 月' }]"
+          :columns="[{
+            name: 'col1',
+            field: 'col1',
+            label: '所內及總部教育積分項目 / 積分',
+            align: 'left',
+            headerClasses: 'text-label-large',
+          }, {
+            name: 'col2',
+            field: 'col2',
+            label: '',
+            align: 'left',
+            headerClasses: 'text-label-large',
+            style: 'width: fit-content',
+          }, {
+            name: 'col3',
+            field: 'col3',
+            label: '',
+            align: 'left',
+            headerClasses: 'text-label-large',
+          }, {
+            name: 'col4',
+            field: 'col4',
+            label: '',
+            align: 'left',
+            headerClasses: 'text-label-large',
+          }]"
+        />
+      </div>
+    </div>
     <QSeparator style="margin: 32px 0" />
-    <h3 class="text-title-large text-on-surface">計分明細</h3>
+    <h3 class="text-title-large">計分明細</h3>
     <div class="row no-wrap">
       <section class="col-7">
         <div v-if="isLoading" class="text-center">
@@ -147,19 +203,19 @@ async function fetchAllData() {
               <p class="body_medium_highlight">三個月加總後轉換得分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 積分 =</p>
-              <p class="text-title_medium text-on-surface text-right">目前得分 {{ overview.currentPoint }} 分</p>
+              <p class="text-body-medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 積分 =</p>
+              <p class="text-title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
-              <p class="text-title-medium text-on-surface text-right">預測得分 {{ overview.predictionPoint }} 分</p>
+              <p class="text-body-medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
+              <p class="text-title-medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
             </div>
           </div>
         </template>
       </section>
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
-        <h4 class="q-mb-sm text-label-large text-on-surface">得分標準</h4>
+        <h4 class="q-mb-sm text-label-large">得分標準</h4>
         <p class="text-body-medium q-mb-sm">教育積準適用統一得分標準不受職階影響</p>
         <div v-if="isLoading" class="text-center">
           <QSpinner />
@@ -169,9 +225,9 @@ async function fetchAllData() {
     </div>
     <QSeparator style="margin:32px 0" />
     <section class="education_point_table">
-      <h3 class="text-title-large text-on-surface">教育積分明細</h3>
+      <h3 class="text-title-large">教育積分明細</h3>
       <div class="education_point_table--header q-mb-md">
-        <p class="text-title-small text-on-surface">以下為近 4 個月內影響得分的教育積分明細。</p>
+        <p class="text-title-small">以下為近 4 個月內影響得分的教育積分明細。</p>
         <div>
           <QBtn color="primary" flat label="教育積分管理" icon-right="chevron_right" class="q-mr-sm" @click="$router.push({ name: 'educationPoints' })" />
           <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="stateOfPointForm = true" />

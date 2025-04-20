@@ -1,11 +1,21 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const tabs = [
   { name: 'googleReview', label: 'Google 評論管理' },
   { name: 'educationPoints', label: '教育積分' },
 ];
 const currentTab = ref(tabs[0].name);
+const route = useRoute();
+
+watch(() => route.name, (page) => {
+  if (page && page !== currentTab.value) {
+    currentTab.value = page as string;
+  }
+}, {
+  immediate: true,
+});
 </script>
 
 <template>
