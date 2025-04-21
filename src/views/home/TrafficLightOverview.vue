@@ -91,7 +91,7 @@ const indicatorList = computed(() => [
       <ScoreLight full-info label="目前總分" :score="trafficLightStore.targetTherapistTrafficLight.currentPoint" :caption="currentScoreRange" :rules="trafficLightStore.trafficLightRules" />
       <ScoreLight full-info label="預測總分" :score="trafficLightStore.targetTherapistTrafficLight.predictionPoint" :caption="predictScoreRange" :rules="trafficLightStore.trafficLightRules" />
       <ScoreCheer :score="trafficLightStore.targetTherapistTrafficLight.predictionPoint" />
-      <ul class="traffic_light_rules">
+      <ul v-if="!trafficLightStore.isHighestPT" class="traffic_light_rules">
         <li v-for="rule in trafficLightStore.targetTherapistTrafficLight.rules" :key="rule.light" class="rule_item text-body-small text-on-surface-variant">
           <div :class="`signal_${rule.light}`" class="signal" />
           <p v-if="rule.light === 'green'">綠燈： {{ rule.min }}  &#8804; 總分 </p>

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
-import { type ExecutionCountDetail, type ExecutionCountOverview, getExecutionCountStatsList, getExecutionCountStatsOverview } from '@/api';
+import { type ExecutionCountDetail, type ExecutionCountOverview, PTLevel, getExecutionCountStatsList, getExecutionCountStatsOverview } from '@/api';
 import { useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { getMonthDifference } from '@/utils/date';
@@ -176,8 +176,11 @@ await Promise.all([
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
         <h4 class="text-label-large text-on-surface q-mb-sm" style="font-weight: 700;">得分標準</h4>
-        <p class="text-body-medium text-on-surface q-mb-sm">您本月職階為 PT {{ overview.currentPTLevel }}，得分標準如下：</p>
-        <RuleList :rules="overview.rules" class="q-mb-sm" label="執行數" />
+        <p class="text-body-medium text-on-surface q-mb-sm">
+          您本月職階為 {{ PTLevel[overview.currentPTLevel] }}
+          <template v-if="overview.currentPTLevel !== PTLevel['PT院長']">，得分標準如下：</template>
+        </p>
+        <RuleList v-if="overview.currentPTLevel !== PTLevel['PT院長']" :rules="overview.rules" class="q-mb-sm" label="執行數" />
         <p class="text-body-medium text-on-surface q-mb-sm">*職階由管理者設定，每月可能變動</p>
       </section>
     </div>

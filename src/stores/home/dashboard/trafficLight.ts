@@ -1,4 +1,4 @@
-import { RoleType, fetchUsers, getTherapistTrafficLight } from '@/api';
+import { PTLevel, RoleType, fetchUsers, getTherapistTrafficLight } from '@/api';
 import type { SignalRange, TrafficLightStatistic, User, getReferralStatsList } from '@/api';
 import { defineStore } from 'pinia';
 import { useUserStore } from '@/stores/user';
@@ -62,14 +62,13 @@ export const useTrafficLight = defineStore('traffic-light', {
           currentPoint: 0,
           totalPoint: 0,
         },
+        currentPTLevel: PTLevel.PT1,
       },
       therapistList: [],
     };
   },
   getters: {
     trafficLightRules: (state): SignalRange[] => {
-      console.log(state.targetTherapistTrafficLight);
-
       return state.targetTherapistTrafficLight.rules?.length === 0 ? [{
         light: 'red',
         min: 0,
@@ -96,6 +95,7 @@ export const useTrafficLight = defineStore('traffic-light', {
       let options = state.therapistList?.map(item => ({ label: item.name, value: item.id })) ?? [];
       return options;
     },
+    isHighestPT: state => state.targetTherapistTrafficLight.currentPTLevel === PTLevel['PT院長'],
   },
   actions: {
     async getTherapistTrafficLight(params: { userId: number }) {
