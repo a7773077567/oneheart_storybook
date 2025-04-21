@@ -4,8 +4,8 @@ import { computed, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useClientStore } from '@/stores';
 import { omit, pick } from 'radash';
-import { type Client, updateClient, updateIntroducer } from '@/api';
-import { useQuasar } from 'quasar';
+import { type Client, updateClient, updateIntroducer, updateIsBlackList } from '@/api';
+import { QSeparator, useQuasar } from 'quasar';
 import { ShiftType, genderOptions } from '@/const/general';
 import { howToKnowOptions } from '@/const/client';
 import { clientSchema } from '@/schemas';
@@ -19,7 +19,7 @@ const clientStore = useClientStore();
 await Promise.allSettled([clientStore.getClientInfo(+props.clientId), clientStore.getDepInChargeTherapist(+props.clientId)]);
 
 const initialValues = computed(() => clientStore.targetClient
-  ? { ...pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'liffIntroducerName']), introducerClientId: clientStore.targetClient.introducer?.id ?? null }
+  ? { ...pick(clientStore.targetClient, ['name', 'phone', 'identityNumber', 'birthDate', 'gender', 'address', 'note', 'howToKnowUs', 'liffIntroducerName', 'isBlacklisted']), introducerClientId: clientStore.targetClient.introducer?.id ?? null }
   : {});
 const { handleSubmit } = useForm({
   initialValues: initialValues.value,
@@ -40,12 +40,17 @@ const showNoIntroducerRemind = computed(() => {
 const $q = useQuasar();
 const onSubmit = handleSubmit(async (value) => {
   const isIntroducerChanged = (initialValues.value as typeof value).introducerClientId !== value.introducerClientId;
+  const isBlackListedChanged = (initialValues.value as typeof value).isBlacklisted !== value.isBlacklisted;
 
-  const apiValues = omit(value as Client & { introducerClientId: number }, ['introducerClientId', 'liffIntroducerName']);
+  const apiValues = omit(value as Client & { introducerClientId: number }, ['introducerClientId', 'liffIntroducerName', 'isBlacklisted']);
   const fetch = [updateClient(props.clientId, apiValues)];
 
   if (isIntroducerChanged) {
     fetch.push(updateIntroducer(+props.clientId, { introducerClientId: value.introducerClientId ? +value.introducerClientId : null }));
+  }
+
+  if (isBlackListedChanged) {
+    fetch.push(updateIsBlackList(+props.clientId, { isBlacklisted: !!value.isBlacklisted }));
   }
   await Promise.all(fetch);
   await clientStore.getClientInfo(+props.clientId);
@@ -117,16 +122,21 @@ const departmentTherapists = computed(() => [{
         </fieldset>
         <fieldset class="col-12">
           <span class="label">後台綁定的介紹人</span>
-          <OMemberSearch v-if="isEdit" name="introducerClientId" class="full-width" :readonly="!isEdit" />
-          <QInput v-else name="introducerClientId" :model-value="clientStore.targetClient?.introducer?.name" outlined dense readonly style="background:white" />
+          <OMemberSearch v-show="isEdit" name="introducerClientId" class="full-width" :readonly="!isEdit" />
+          <QInput v-if="!isEdit" name="introducerClientId" :model-value="`${clientStore.targetClient?.introducer?.name}（會員編號#${clientStore.targetClient?.introducer?.id}）`" outlined dense readonly style="background:white" />
         </fieldset>
         <fieldset class="col-12">
           <span class="label">備註</span>
           <OInput name="note" hide-bottom-space type="textarea" class="full-width" :readonly="!isEdit" />
         </fieldset>
+        <fieldset>
+          <OCheckbox name="isBlacklisted" :dense="false" :disable="!isEdit">
+            <span class="text-body-large">黑名單設置</span>
+          </OCheckbox>
+        </fieldset>
       </form>
     </section>
-
+    <QSeparator class="q-my-lg" />
     <section>
       <h3 class="subtitle q-mb-md">科別負責人員</h3>
       <div class="department_list">

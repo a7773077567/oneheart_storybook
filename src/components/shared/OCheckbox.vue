@@ -17,7 +17,11 @@ const { value } = useField<string>(() => props.name || 'field', undefined, {
   <QCheckbox
     v-model="value"
     dense
-  />
+  >
+    <template #default>
+      <slot name="default" />
+    </template>
+  </QCheckbox>
 </template>
 
 <style lang="scss" scoped>

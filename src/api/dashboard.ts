@@ -4,7 +4,7 @@ import type { Client } from './clientManagement';
 import type { AddOnService, HistoryRecord } from './appointment';
 import type { ReservedMachine } from './machine';
 import type { TransactionTypes } from '@/const/general';
-import type { User } from './user';
+import type { PTLevel, User } from './user';
 
 export type CoachStatisticsDateRange = 'today' | 'month';
 
@@ -77,7 +77,7 @@ interface IndicatorPoint {
   totalPoint: number;
 }
 
-interface SignalRange {
+export interface SignalRange {
   light: 'red' | 'yellow' | 'green';
   min: number;
   max: number | null;
@@ -94,6 +94,7 @@ export interface TrafficLightStatistic {
   referralCount: IndicatorPoint; // 轉介數
   educationPoint: IndicatorPoint; // 教育積分
   googleCommentCount: IndicatorPoint; // Google評論數
+  currentPTLevel: PTLevel;
 }
 export async function getTherapistTrafficLight(params: { userId: number }) {
   const { data } = await api.get<TrafficLightStatistic>(`dashboard/therapistTrafficlight`, { params });
@@ -109,7 +110,7 @@ export interface ScoreRule {
 export interface ReferralOverview {
   predictionPoint: number;
   currentPoint: number;
-  currentPTLevel: number;
+  currentPTLevel: PTLevel;
   rules: ScoreRule[];
   detailList: {
     year: number;
@@ -144,7 +145,7 @@ export async function getReferralStatsList(params: IndicatorListQuery) {
 export interface ReturnVisitRateOverview {
   predictionPoint: number;
   currentPoint: number;
-  currentPTLevel: number;
+  currentPTLevel: PTLevel;
   rules: ScoreRule[];
   detailList: {
     year: number;
@@ -178,7 +179,7 @@ export async function getReturnVisitRateStatsList(params: IndicatorListQuery) {
 export interface ExecutionCountOverview {
   predictionPoint: number;
   currentPoint: number;
-  currentPTLevel: number;
+  currentPTLevel: PTLevel;
   rules: ScoreRule[];
   detailList: {
     year: number;
@@ -251,7 +252,7 @@ export async function getExecutionCountStatsList(params: IndicatorListQuery) {
 export interface PersonalRevenueOverview {
   predictionPoint: number;
   currentPoint: number;
-  currentPTLevel: number;
+  currentPTLevel: PTLevel;
   rules: ScoreRule[];
   detailList: {
     year: number;

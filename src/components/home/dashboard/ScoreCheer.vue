@@ -33,7 +33,7 @@ const content = computed(() => {
   padding: 2px 16px;
   height: fit-content;
   white-space: break-spaces;
-  @include body-medium($inverse-on-surface);
+  @include text-style($body-medium, $inverse-on-surface);
   .cheer_triangle {
     position: absolute;
     content: '';

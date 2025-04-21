@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
+import type { SignalRange } from '@/api/dashboard';
 
 const props = defineProps<{
   label: string;
@@ -7,25 +8,25 @@ const props = defineProps<{
   fullInfo?: boolean;
   caption?: string;
   noData?: boolean;
+  rules: SignalRange[];
 }>();
 
-const lightSignals = computed(() => [
-  { name: 'red', isMatched: props.score < 40 },
-  { name: 'yellow', isMatched: props.score >= 40 && props.score < 60 },
-  { name: 'green', isMatched: props.score >= 60 },
-]);
+const lightSignals = computed(() => {
+  return props.rules.map(range => ({ ...range, isWithin:
+    range.min === 0 ? props.score < (range.max ?? 0) : (range.max === null ? props.score > range.min : props.score > range.min && props.score < range.max) }));
+});
 </script>
 
 <template>
   <div class="signal" :class="{ signal_detail: fullInfo, empty_state: noData }">
-    <div v-if="fullInfo" class="signal__header">
+    <div v-if="fullInfo" class="signal__header text-label-large text-on-surface">
       {{ caption }}
     </div>
     <div class="signal__content">
-      <span class="label">{{ label }} {{ noData ? '-' : score }} 分</span>
+      <span class="text-title-medium text-on-surface-variant">{{ label }} {{ noData ? '-' : score }} 分</span>
       <div class="light-container">
-        <div v-for="light in lightSignals" :key="light.name" class="light" :class="[light.name, { isChecked: !noData && light.isMatched }]">
-          <QIcon v-if="!noData && light.isMatched" name="check" size="18px" color="white" />
+        <div v-for="signal in lightSignals" :key="signal.light" class="light" :class="[signal.light, { isChecked: !noData && signal.isWithin }]">
+          <QIcon v-if="!noData && signal.isWithin" name="check" size="18px" color="white" />
         </div>
       </div>
     </div>
@@ -66,7 +67,6 @@ const lightSignals = computed(() => [
   &__header {
     text-align: center;
     margin-bottom: 4px;
-    @include label-large($on-surface);
   }
   &__content {
     display: flex;
@@ -77,9 +77,6 @@ const lightSignals = computed(() => [
     background: $on-primary;
     min-width: 275px;
     width: 100%;
-    .label {
-      @include title-medium($on-surface-variant);
-    }
     .light-container {
       display: flex;
       gap: 4px;

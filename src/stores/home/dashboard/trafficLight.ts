@@ -1,6 +1,6 @@
-import type { TrafficLightStatistic, User } from '@/api';
+import { PTLevel, RoleType, fetchUsers, getTherapistTrafficLight } from '@/api';
+import type { SignalRange, TrafficLightStatistic, User, getReferralStatsList } from '@/api';
 import { defineStore } from 'pinia';
-import { RoleType, fetchUsers, getReferralStatsList, getTherapistTrafficLight } from '@/api';
 import { useUserStore } from '@/stores/user';
 
 interface State {
@@ -62,32 +62,26 @@ export const useTrafficLight = defineStore('traffic-light', {
           currentPoint: 0,
           totalPoint: 0,
         },
+        currentPTLevel: PTLevel.PT1,
       },
       therapistList: [],
     };
   },
   getters: {
-    trafficLightRules: (state) => {
-      return [
-        [
-          {
-            light: 'red',
-            min: 0,
-            max: 40,
-          },
-          {
-            light: 'yellow',
-            min: 40,
-            max: 60,
-          },
-          {
-            light: 'green',
-            min: 60,
-            max: null, // Infinity
-          },
-          ...state.targetTherapistTrafficLight.rules,
-        ],
-      ];
+    trafficLightRules: (state): SignalRange[] => {
+      return state.targetTherapistTrafficLight.rules?.length === 0 ? [{
+        light: 'red',
+        min: 0,
+        max: 40,
+      }, {
+        light: 'yellow',
+        min: 40,
+        max: 60,
+      }, {
+        light: 'green',
+        min: 60,
+        max: null, // Infinity
+      }] : state.targetTherapistTrafficLight.rules;
     },
     therapistFilterOptions: (state) => {
       const userStore = useUserStore();
@@ -101,6 +95,7 @@ export const useTrafficLight = defineStore('traffic-light', {
       let options = state.therapistList?.map(item => ({ label: item.name, value: item.id })) ?? [];
       return options;
     },
+    isHighestPT: state => state.targetTherapistTrafficLight.currentPTLevel === PTLevel['PT院長'],
   },
   actions: {
     async getTherapistTrafficLight(params: { userId: number }) {

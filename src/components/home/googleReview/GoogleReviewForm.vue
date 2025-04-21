@@ -164,7 +164,7 @@ function removeImg(scope: UploaderScope) {
 .google_review_form {
   min-width: 480px;
   &--title {
-    @include headline-small($on-surface);
+    @include text-style($headline-small, $on-surface);
   }
   :deep(.q-uploader) {
     .q-uploader__header {

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { QSeparator } from 'quasar';
-import { type ReturnVisitRateDetail, type ReturnVisitRateOverview, getReturnVisitRateStatsList, getReturnVisitRateStatsOverview } from '@/api';
+import { PTLevel, type ReturnVisitRateDetail, type ReturnVisitRateOverview, getReturnVisitRateStatsList, getReturnVisitRateStatsOverview } from '@/api';
 import { useRoute } from 'vue-router';
 import { getMonthDifference } from '@/utils/date';
 import type { QTableProps } from 'quasar';
@@ -136,11 +136,11 @@ await Promise.all([
 
 <template>
   <div class="return_rate">
-    <h2>回診率計分詳情</h2>
-    <h3>計分說明</h3>
-    <p class="note">「初診患者」在 2 個月內的回診比例。</p>
+    <h2 class="text-headline-medium text-on-surface">回診率計分詳情</h2>
+    <h3 class="text-title-large text-on-surface">計分說明</h3>
+    <p class="text-title-small text-on-surface">「初診患者」在 2 個月內的回診比例。</p>
     <QSeparator style="margin: 32px 0" />
-    <h3>計分明細</h3>
+    <h3 class="text-title-large text-on-surface">計分明細</h3>
     <div class="row no-wrap">
       <section class="col-7">
         <QTable
@@ -155,31 +155,34 @@ await Promise.all([
         <QSeparator class="q-mb-md" />
         <div class="score_calculation row q-col-gutter-md">
           <div class="col-12 col-md-4">
-            <span class="body_medium_highlight">計分方式</span>
-            <p class="body_medium_highlight">三個月平均得分</p>
+            <span class="text-body-medium-highlight">計分方式</span>
+            <p class="text-body-medium-highlight">三個月平均得分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3</p>
-            <p class="title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
+            <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 ({{ previous3Scores.join('+') }}) / 3</p>
+            <p class="text-title-medium text-on-surface text-right">目前得分 {{ overview.currentPoint }} 分</p>
           </div>
           <div class="col-12 col-md-4">
-            <p class="body_medium q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3</p>
-            <p class="title_medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
+            <p class="text-body-medium text-on-surface q-mb-sm text-right">前三個月 ({{ recent3Scores.join('+') }}) / 3</p>
+            <p class="text-title-medium text-on-surface text-right">預測得分 {{ overview.predictionPoint }} 分</p>
           </div>
         </div>
       </section>
       <QSeparator style="margin:0 24px" vertical />
       <section class="col-3">
-        <h4 class="label_large q-mb-sm">得分標準</h4>
-        <p class="body_medium q-mb-sm">您本月職階為 PT {{ overview.currentPTLevel }}，得分標準如下：</p>
-        <RuleList :rules="overview.rules" class="q-mb-sm" unit="%" label="回診率" />
-        <p class="body_medium q-mb-sm">*職階由管理者設定，每月可能變動</p>
+        <h4 class="text-label-large-perminent text-on-surface q-mb-sm">得分標準</h4>
+        <p class="text-body-medium text-on-surface q-mb-sm">
+          您本月職階為 {{ PTLevel[overview.currentPTLevel] }}
+          <template v-if="overview.currentPTLevel !== PTLevel['PT院長']">，得分標準如下：</template>
+        </p>
+        <RuleList v-if="overview.currentPTLevel !== PTLevel['PT院長']" :rules="overview.rules" class="q-mb-sm" unit="%" label="回診率" />
+        <p class="text-body-medium text-on-surface q-mb-sm">*職階由管理者設定，每月可能變動</p>
       </section>
     </div>
     <QSeparator style="margin:32px 0" />
     <section>
-      <h3>初診客戶回診明細</h3>
-      <p class="title_small q-mb-md">聯繫「未回診客戶」以提高您本月的回診率得分。</p>
+      <h3 class="text-title-large text-on-surface">初診客戶回診明細</h3>
+      <p class="text-title-small text-on-surface q-mb-md">聯繫「未回診客戶」以提高您本月的回診率得分。</p>
       <QTable
         v-model:pagination="pagination"
         flat
@@ -204,35 +207,11 @@ await Promise.all([
 <style scoped lang="scss">
 .return_rate {
   h2 {
-    @include headline-medium($on-surface);
     padding: 18px 0;
     margin-bottom: 24px;
   }
   h3 {
-    @include title-large($on-surface);
     margin-bottom: 16px;
-  }
-  .note {
-    @include title-small($on-surface);
-  }
-  .label_large {
-    @include label-large($on-surface);
-    font-weight: 700;
-  }
-  .title_medium {
-    @include title-medium($on-surface);
-  }
-  .title_small {
-    @include title-small($on-surface);
-  }
-  .body_medium {
-    @include body-medium($on-surface);
-  }
-  .body_medium_highlight {
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 24px; /* 171.429% */
   }
 }
 </style>

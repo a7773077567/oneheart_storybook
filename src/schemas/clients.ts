@@ -10,4 +10,5 @@ export const clientSchema = z.object({
   note: z.string().nullable().optional(),
   introducerClientId: z.number().nullable().optional(),
   howToKnowUs: z.string(),
+  isBlacklisted: z.boolean(),
 });

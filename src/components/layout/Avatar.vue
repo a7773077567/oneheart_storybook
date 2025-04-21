@@ -48,7 +48,7 @@ function goUserSettings() {
 }
 
 .mail {
-  @include title-small($on-surface);
+  @include text-style($title-small, $on-surface);
   text-align: center;
 }
 
@@ -56,7 +56,7 @@ function goUserSettings() {
   padding: 10px 24px;
   border-radius: 100px;
   :deep(.block) {
-    @include label-large($on-secondary-container);
+    @include text-style($label-large, $on-secondary-container);
   }
 }
 

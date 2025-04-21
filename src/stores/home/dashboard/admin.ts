@@ -9,7 +9,7 @@ import { minsToHrs, reduceMinsToHrs } from '@/utils/date';
 import { calcPercentage } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
-import { getTherapistTrafficLight } from '@/api'
+import { PTLevel, getTherapistTrafficLight } from '@/api'
 
 ;
 
@@ -146,6 +146,7 @@ export const useAdminStore = defineStore('admin', {
           currentPoint: 0,
           totalPoint: 0,
         },
+        currentPTLevel: PTLevel.PT1,
       },
     };
   },

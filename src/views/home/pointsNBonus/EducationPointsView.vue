@@ -137,7 +137,7 @@ function deleteConfirm(id: number) {
 
 <template>
   <div class="education-review">
-    <h2>教育積分管理</h2>
+    <h2 class="text-headline-medium">教育積分管理</h2>
     <p class="note">教育積分為 KPI 紅綠燈分數中的評分項目</p>
     <QSeparator />
     <section class="education-review-content">
@@ -183,10 +183,9 @@ function deleteConfirm(id: number) {
 .education-review {
   h2 {
     margin-bottom: 12px;
-    @include headline-medium($on-surface);
   }
   .note {
-    @include body-medium($on-surface-variant);
+    @include text-style($body-medium, $on-surface-variant);
     margin-bottom: 18px;
   }
   &-content {

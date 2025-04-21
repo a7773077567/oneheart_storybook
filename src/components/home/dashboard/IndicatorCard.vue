@@ -39,7 +39,7 @@ const barColor = computed(() => color.value.bar);
 <template>
   <QCard flat bordered class="indicator_card">
     <QCardSection horizontal class="indicator_card__title q-pa-none items-center justify-between">
-      <div class="title">{{ label }}</div>
+      <div class="text-title-large text-on-surface">{{ label }}</div>
       <QBtn
         flat align="between" icon-right="chevron_right" style="color: #1A7AB3; width: 120px;" class="q-px-sm"
         @click="$emit('checkDetail')"
@@ -48,19 +48,19 @@ const barColor = computed(() => color.value.bar);
       </QBtn>
     </QCardSection>
     <QCardSection horizontal class="q-pa-none items-center justify-between">
-      <div class="caption">{{ caption }}</div>
+      <div class="text-body-medium text-on-surface">{{ caption }}</div>
       <div class="text-subtitle2">滿分 {{ total }} 分</div>
     </QCardSection>
 
     <QSeparator class="q-mt-sm q-mb-md" />
 
     <QCardSection horizontal class="items-center justify-between q-mb-md">
-      <div class="subtitle">目前得分 <span class="caption text-on-surface-variant">（前三個月）</span></div>
-      <div class="title-medium">{{ current }} 分</div>
+      <div class="text-body-large text-on-surface">目前得分 <span class="text-body-medium text-on-surface text-on-surface-variant">（前三個月）</span></div>
+      <div class="text-title-medium text-on-surface">{{ current }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between q-mb-sm">
-      <div class="subtitle">預測得分 <span class="caption text-on-surface-variant">（近三個月）</span></div>
-      <div class="title-medium" :style="{ color: color.text }">{{ predict }} 分</div>
+      <div class="text-body-large text-on-surface">預測得分 <span class="text-body-medium text-on-surface text-on-surface-variant">（近三個月）</span></div>
+      <div class="text-title-medium text-on-surface" :style="{ color: color.text }">{{ predict }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between">
       <progress id="progress_bar" :max="total" :value="predict === total ? 100 : predict" />
@@ -78,18 +78,6 @@ const barColor = computed(() => color.value.bar);
   border-radius: 16px;
   &__title {
     margin-bottom: 20px;
-  }
-  .title {
-    @include title-large($on-surface);
-  }
-  .caption {
-    @include body-medium($on-surface);
-  }
-  .subtitle {
-    @include body-large($on-surface);
-  }
-  .title-medium {
-    @include title-medium($on-surface);
   }
 }
 #progress_bar {

@@ -190,7 +190,7 @@ function getDate() {
 
 <style lang="scss" scoped>
 .sm_title {
-  @include title-small($on-surface-variant);
+  @include text-style($title-small, $on-surface-variant);
   margin: 16px 0;
 }
 :deep(.q-calendar-resource__head--interval) {
