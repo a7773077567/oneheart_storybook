@@ -113,24 +113,37 @@ export const homeRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'google-review',
-        name: 'googleReview',
-        component: () => import('@/views/home/GoogleReviewView.vue'),
+        path: 'points-bonus-manage',
+        name: 'pointsNBonus',
+        component: () => import('@/views/home/pointsNBonus/Index.vue'),
+        redirect: { name: 'googleReview' },
         meta: {
-          label: 'Google評論管理',
+          label: '積分與獎金管理',
           requiredAuth: true,
-          permissions: ['VIEW_GOOGLE_REVIEW'],
+          permissions: ['VIEW_POINTS_BONUS'],
         },
-      },
-      {
-        path: 'education-points',
-        name: 'educationPoints',
-        component: () => import('@/views/home/EducationPointsView.vue'),
-        meta: {
-          label: '教育積分管理',
-          requiredAuth: true,
-          permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
-        },
+        children: [
+          {
+            path: 'google-review',
+            name: 'googleReview',
+            component: () => import('@/views/home/pointsNBonus/GoogleReviewView.vue'),
+            meta: {
+              label: 'Google評論管裡',
+              requiredAuth: true,
+              permissions: ['VIEW_GOOGLE_REVIEW'],
+            },
+          },
+          {
+            path: 'education-points',
+            name: 'educationPoints',
+            component: () => import('@/views/home/pointsNBonus/EducationPointsView.vue'),
+            meta: {
+              label: '教育積分管理',
+              requiredAuth: true,
+              permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
+            },
+          },
+        ],
       },
     ],
   },
