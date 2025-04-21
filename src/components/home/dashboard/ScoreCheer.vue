@@ -1,18 +1,22 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
+import type { SignalRange } from '@/api/dashboard';
 
 const props = defineProps<{
   score: number;
+  rules: SignalRange[];
 }>();
 
+const lowTarget = computed(() => props.rules[0].max ?? 40);
+const hightTarget = computed(() => props.rules[2].min ?? 60);
 const content = computed(() => {
-  const diff = Number.isInteger(props.score) ? (60 - props.score) : (60 - props.score).toFixed(2);
+  const diff = Number.isInteger(props.score) ? (hightTarget.value - props.score) : (hightTarget.value - props.score).toFixed(2);
   switch (true) {
-    case props.score < 40:
+    case props.score < lowTarget.value:
       return { text: `離綠燈還差 ${diff} 分!\n這個月再努力一下!`, color: '#DF5458' };
-    case props.score >= 40 && props.score < 60 :
+    case props.score >= lowTarget.value && props.score < hightTarget.value :
       return { text: `離綠燈只差 ${diff} 分! \n 目標在望囉！`, color: '#dba100' };
-    case props.score >= 60:
+    case props.score >= hightTarget.value:
     default:
       return { text: '綠燈達標! \n 保持穩定，挑戰更高目標吧！', color: '#008524' };
   }
