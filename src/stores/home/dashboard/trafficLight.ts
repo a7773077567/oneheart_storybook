@@ -1,6 +1,6 @@
-import type { TrafficLightStatistic, User } from '@/api';
+import { RoleType, fetchUsers, getTherapistTrafficLight } from '@/api';
+import type { SignalRange, TrafficLightStatistic, User, getReferralStatsList } from '@/api';
 import { defineStore } from 'pinia';
-import { RoleType, fetchUsers, getReferralStatsList, getTherapistTrafficLight } from '@/api';
 import { useUserStore } from '@/stores/user';
 
 interface State {
@@ -67,27 +67,22 @@ export const useTrafficLight = defineStore('traffic-light', {
     };
   },
   getters: {
-    trafficLightRules: (state) => {
-      return [
-        [
-          {
-            light: 'red',
-            min: 0,
-            max: 40,
-          },
-          {
-            light: 'yellow',
-            min: 40,
-            max: 60,
-          },
-          {
-            light: 'green',
-            min: 60,
-            max: null, // Infinity
-          },
-          ...state.targetTherapistTrafficLight.rules,
-        ],
-      ];
+    trafficLightRules: (state): SignalRange[] => {
+      console.log(state.targetTherapistTrafficLight);
+
+      return state.targetTherapistTrafficLight.rules?.length === 0 ? [{
+        light: 'red',
+        min: 0,
+        max: 40,
+      }, {
+        light: 'yellow',
+        min: 40,
+        max: 60,
+      }, {
+        light: 'green',
+        min: 60,
+        max: null, // Infinity
+      }] : state.targetTherapistTrafficLight.rules;
     },
     therapistFilterOptions: (state) => {
       const userStore = useUserStore();

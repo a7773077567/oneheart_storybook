@@ -9,7 +9,7 @@ import { RangeSelectOptions } from '@/const/dashboard';
 import TrafficLightStatics from './TrafficLightStatics.vue';
 import { RoleType } from '@/api';
 import type { TrafficLightStatistic } from '@/api';
-import { useUserStore } from '@/stores';
+import { useTrafficLight, useUserStore } from '@/stores';
 
 type ChartData = InstanceType<typeof PieChart>['$props'];
 
@@ -34,6 +34,8 @@ const emit = defineEmits<{
   (e: 'update:typeSelect', val: number[]): void;
   (e: 'update:educationPoint', val: TherapistEducationPoint): void;
 }>();
+
+const trafficLightStore = useTrafficLight();
 
 const therapistSelectModel = computed({
   get: () => props.therapistSelect,
@@ -123,7 +125,7 @@ const selectedName = computed<string>(() => userStore.role === RoleType['物理�
 
       <div class="info">
         <template v-if="therapistSelectModel !== overAllTherapist">
-          <TrafficLightStatics :user-id="therapistSelect" :user-name="selectedName" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" />
+          <TrafficLightStatics :user-id="therapistSelect" :user-name="selectedName" :current-point="trafficLightOverview.currentPoint" :predict-point="trafficLightOverview.predictionPoint" :indicator-list="trafficLightOverview" :no-data="!trafficLightOverview.isWorkOverThreeMonth" :rules="trafficLightStore.trafficLightRules" />
         </template>
         <template v-else>
           <div class="info__header">

@@ -77,7 +77,7 @@ interface IndicatorPoint {
   totalPoint: number;
 }
 
-interface SignalRange {
+export interface SignalRange {
   light: 'red' | 'yellow' | 'green';
   min: number;
   max: number | null;

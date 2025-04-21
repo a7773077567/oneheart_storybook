@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
-import type { TrafficLightStatistic } from '@/api';
+import type { SignalRange, TrafficLightStatistic } from '@/api';
 import ScoreLight from './ScoreLight.vue';
 
 const props = defineProps<{
@@ -10,6 +10,7 @@ const props = defineProps<{
   predictPoint: number;
   indicatorList: TrafficLightStatistic;
   noData: boolean;
+  rules: SignalRange[];
 }>();
 
 const list = computed(() => [
@@ -68,8 +69,8 @@ const list = computed(() => [
     </QBanner>
     <div class="traffic-light-statics__body">
       <div>
-        <ScoreLight label="目前總分" :score="currentPoint" class="q-mb-sm" :no-data="noData" />
-        <ScoreLight label="預測總分" :score="predictPoint" :no-data="noData" />
+        <ScoreLight label="目前總分" :score="currentPoint" class="q-mb-sm" :no-data="noData" :rules="rules" />
+        <ScoreLight label="預測總分" :score="predictPoint" :no-data="noData" :rules="rules" />
       </div>
       <div class="indicator-list">
         <QList separator>
