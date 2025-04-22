@@ -173,9 +173,9 @@ const onSubmit = handleSubmit(async (values) => {
 
 <style lang="scss" scoped>
 .booking-query {
-  min-width: 356px;
   width: fit-content;
   padding: 20px 0;
+  overflow: auto;
   fieldset + fieldset {
     margin-top: 20px;
   }
