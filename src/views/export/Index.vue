@@ -21,6 +21,7 @@ watch(() => route.name, (page) => {
 
 <template>
   <div class="report_export">
+    <h3 class="q-py-md q-pl-xs text-headline-small">匯出報表</h3>
     <QTabs
       v-model="currentTab"
       align="left"
@@ -37,6 +38,7 @@ watch(() => route.name, (page) => {
         @click="$router.push({ name: tab.name })"
       />
     </QTabs>
+    <QSeparator />
     <div class="report_export--page">
       <RouterView />
     </div>
@@ -46,7 +48,7 @@ watch(() => route.name, (page) => {
 <style scoped lang="scss">
 .report_export {
   &--page {
-    padding: 18px 24px;
+    padding: 24px;
   }
 }
 </style>
