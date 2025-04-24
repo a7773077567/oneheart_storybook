@@ -49,28 +49,48 @@ function isRouteFocused(route: string) {
   <QDrawer v-if="permissionControlTabs?.length" v-model="drawerOpen" show-if-above side="left" :width="288" class="drawer">
     <QScrollArea class="fit">
       <QList>
-        <QExpansionItem
-          v-for="tab in permissionControlTabs"
-          :key="tab.label"
-          :label="tab.label"
-          :icon="tab.icon"
-          dense-toggle
-          :model-value="isRouteFocused(tab.route as string)"
-        >
-          <QItem
-            v-for="item in tab.children"
-            :key="item.label"
-            :to="{ name: item.route }"
-            clickable
-            :focused="isRouteFocused(item.route as string)"
+        <template v-for="tab in permissionControlTabs">
+          <QExpansionItem
+            v-if="tab.children && tab.children?.length > 0"
+            :key="tab.label"
+            :label="tab.label"
+            :icon="tab.icon"
+            dense-toggle
+            :model-value="isRouteFocused(tab.route as string)"
           >
+            <QItem
+              v-for="item in tab.children"
+              :key="item.label"
+              :to="{ name: item.route }"
+              clickable
+              :focused="isRouteFocused(item.route as string)"
+            >
+              <QItemSection>
+                <QItemLabel>
+                  {{ item.label }}
+                </QItemLabel>
+              </QItemSection>
+            </QItem>
+          </QExpansionItem>
+
+          <QItem
+            v-else
+            :key="tab.name"
+            :to="{ name: tab.route }"
+            clickable
+            :focused="isRouteFocused(tab.route as string)"
+          >
+            <QItemSection side>
+              <QIcon :name="tab.icon" />
+            </QItemSection>
+
             <QItemSection>
               <QItemLabel>
-                {{ item.label }}
+                {{ tab.label }}
               </QItemLabel>
             </QItemSection>
           </QItem>
-        </QExpansionItem>
+        </template>
       </QList>
 
       <!-- <QList>
