@@ -30,6 +30,7 @@ export const TherapyTypes = {
   radioFrequency: '射頻',
   magneticWave: '磁波',
   GChair: 'G動椅',
+  familyAssessment: '家庭評估門診',
 };
 
 // 場館類別
@@ -68,22 +69,8 @@ export enum ShiftType {
   射頻 = 15,
   磁波 = 16,
   G動椅 = 17,
+  家庭評估門診 = 18,
 }
-// const ShiftTypeConst = {
-//   物理諮詢門診: 1,
-//   物理治療門診: 2,
-//   足壓門診: 3,
-//   營養門診: 4,
-//   睡眠門診: 5,
-//   院長評估門診: 6,
-//   院長物理治療: 7,
-//   營養諮詢門診: 8,
-//   教練課: 9,
-//   運動諮詢: 10,
-//   團課: 11,
-//   物理治療體驗門診: 12,
-//   新人實習門診: 13,
-// } as const;
 
 // 物理治療項目：只有以下 5 個科別屬於物理治療項目
 // https://www.notion.so/enginelin/fe29a884eab74700a7c01e75875f72ff?pvs=4
@@ -93,6 +80,7 @@ export const PhysicalTypes = [
   ShiftType['院長物理治療'],
   ShiftType['院長評估門診'],
   ShiftType['物理治療體驗門診'],
+  ShiftType['家庭評估門診'],
 ] as const;
 
 // 儀器治療項目
@@ -367,9 +355,22 @@ export const Types: Record<TypeName, Type> = {
     selectLabel: '治療師',
     pointType: PointTypes['G動椅'],
   },
+  familyAssessment: {
+    identifier: ShiftType['家庭評估門診'],
+    name: 'familyAssessment',
+    label: '家庭評估門診',
+    tabs: ['clientInfo', 'medicalRecord', 'magneticWaveRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
+    canUsePoint: false,
+    calcAmount: usePoint => usePoint ? 1 : 2000,
+    spaceType: SpaceType['物理診所'],
+    showInOptions: true,
+    canEditTime: true,
+    roles: TherapyRoles,
+    selectLabel: '治療師',
+  },
 };
 
-export const pointsGroupOptions = Object.keys(PointTypes).slice(8, 16).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
+export const pointsGroupOptions = Object.keys(PointTypes).slice(8, 17).map(group => ({ label: group, value: PointTypes[group as keyof typeof PointTypes] }));
 
 // 交易項目
 export enum TransactionTypes {
