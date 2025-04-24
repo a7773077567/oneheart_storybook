@@ -117,7 +117,7 @@ export interface Type {
   calcAmount: (usePoint?: boolean) => number;
   spaceType: SpaceType;
   showInOptions: boolean;
-  pointType?: number;
+  pointType?: number[];
   canEditTime: boolean;
   hideInOptions?: boolean;
   roles: number[];
@@ -148,7 +148,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
-    pointType: PointTypes['物理治療'],
+    pointType: [PointTypes['物理治療'], PointTypes['院長物理治療']],
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
@@ -214,7 +214,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: usePoint => usePoint ? 1 : 3000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
-    pointType: PointTypes['院長物理治療'],
+    pointType: [PointTypes['物理治療'], PointTypes['院長物理治療']],
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
@@ -228,7 +228,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: () => 499,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
-    pointType: PointTypes['營養'],
+    pointType: [PointTypes['營養']],
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
@@ -242,7 +242,7 @@ export const Types: Record<TypeName, Type> = {
     calcAmount: () => 1650, // to be confirmed
     spaceType: SpaceType['運動場館'],
     showInOptions: true,
-    pointType: PointTypes['教練課'],
+    pointType: [PointTypes['教練課']],
     canEditTime: true,
     roles: CoachRoles,
     selectLabel: '教練',
@@ -291,13 +291,14 @@ export const Types: Record<TypeName, Type> = {
     name: 'physicalTherapy',
     label: '新人實習門診',
     tabs: ['clientInfo', 'medicalRecord', 'bodyAnalysis', 'addOnPrice', 'memo', 'pointsGroup'],
-    canUsePoint: false,
+    canUsePoint: true,
     calcAmount: () => 200,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: [PointTypes['物理治療'], PointTypes['院長物理治療']],
   },
   shockWave: {
     identifier: ShiftType['震波'],
@@ -311,7 +312,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
-    pointType: PointTypes['震波'],
+    pointType: [PointTypes['震波']],
   },
   radioFrequency: {
     identifier: ShiftType['射頻'],
@@ -325,7 +326,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
-    pointType: PointTypes['射頻'],
+    pointType: [PointTypes['射頻']],
   },
   magneticWave: {
     identifier: ShiftType['磁波'],
@@ -339,7 +340,7 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
-    pointType: PointTypes['磁波'],
+    pointType: [PointTypes['磁波']],
   },
   GChair: {
     identifier: ShiftType['G動椅'],
@@ -353,20 +354,21 @@ export const Types: Record<TypeName, Type> = {
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
-    pointType: PointTypes['G動椅'],
+    pointType: [PointTypes['G動椅']],
   },
   familyAssessment: {
     identifier: ShiftType['家庭評估門診'],
     name: 'familyAssessment',
     label: '家庭評估門診',
     tabs: ['clientInfo', 'medicalRecord', 'magneticWaveRecord', 'addOnPrice', 'bodyAnalysis', 'memo', 'pointsGroup'],
-    canUsePoint: false,
+    canUsePoint: true,
     calcAmount: usePoint => usePoint ? 1 : 2000,
     spaceType: SpaceType['物理診所'],
     showInOptions: true,
     canEditTime: true,
     roles: TherapyRoles,
     selectLabel: '治療師',
+    pointType: [PointTypes['物理治療'], PointTypes['院長物理治療']],
   },
 };
 
