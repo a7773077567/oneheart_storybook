@@ -56,7 +56,7 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
   let addOnPointType: Partial<PointTypes>[] = [];
   // 內含加購包含儀器治療，也可使用儀器相關點數群組
   if (allowMultiPointPayment.value) {
-    addOnPointType = addOnList.value.map((addOn) => {
+    const list = addOnList.value.map((addOn) => {
       switch (addOn.serviceType) {
         case AddOnServiceTypes['射頻']:
           return PointTypes['射頻'];
@@ -67,7 +67,8 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
         default:
           return null;
       }
-    }).filter(g => !!g);
+    }).filter(g => g !== null);
+    addOnPointType = list as Partial<PointTypes>[];
   }
   return availablePointGroupTypes?.includes(group.type) || addOnPointType.includes(group.type);
 }).map(item => ({
