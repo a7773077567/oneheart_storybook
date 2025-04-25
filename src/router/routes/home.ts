@@ -153,6 +153,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
             },
           },
+          {
+            path: 'writing-allowance',
+            name: 'writingAllowance',
+            component: () => import('@/views/home/pointsNBonus/WritingAllowance.vue'),
+            meta: {
+              label: '寫作津貼',
+              requiredAuth: true,
+              permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
+            },
+          },
         ],
       },
     ],

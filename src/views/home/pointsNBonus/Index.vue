@@ -7,6 +7,7 @@ const tabs = [
   { name: 'googleReview', label: 'Google 評論管理' },
   { name: 'educationPoints', label: '教育積分' },
   { name: 'relocationBonus', label: '外派獎金' },
+  { name: 'writingAllowance', label: '寫作津貼' },
 ];
 const currentTab = ref(tabs[0].name);
 const route = useRoute();
