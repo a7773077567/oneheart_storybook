@@ -173,6 +173,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
             },
           },
+          {
+            path: 'support-bonus',
+            name: 'supportBonus',
+            component: () => import('@/views/home/pointsNBonus/SupportBonus.vue'),
+            meta: {
+              label: '支援獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
+            },
+          },
         ],
       },
     ],

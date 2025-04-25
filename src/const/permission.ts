@@ -17,7 +17,9 @@ export type PermissionEvents =
   | 'VIEW_WRITING_ALLOWANCE'
   | 'EDIT_WRITING_ALLOWANCE'
   | 'VIEW_TRAINING_ALLOWANCE'
-  | 'EDIT_TRAINING_ALLOWANCE';
+  | 'EDIT_TRAINING_ALLOWANCE'
+  | 'VIEW_SUPPORT_BONUS'
+  | 'EDIT_SUPPORT_BONUS';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -39,6 +41,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: true,
     VIEW_TRAINING_ALLOWANCE: true,
     EDIT_TRAINING_ALLOWANCE: true,
+    VIEW_SUPPORT_BONUS: true,
+    EDIT_SUPPORT_BONUS: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,
@@ -58,6 +62,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: true,
     VIEW_TRAINING_ALLOWANCE: true,
     EDIT_TRAINING_ALLOWANCE: true,
+    VIEW_SUPPORT_BONUS: true,
+    EDIT_SUPPORT_BONUS: true,
   },
   [RoleType['副院長']]: {
     READ_HANDOVER: true,
@@ -77,6 +83,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: true,
     VIEW_TRAINING_ALLOWANCE: true,
     EDIT_TRAINING_ALLOWANCE: true,
+    VIEW_SUPPORT_BONUS: true,
+    EDIT_SUPPORT_BONUS: true,
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,
@@ -96,6 +104,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: false,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: false,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['副店長']]: {
     READ_HANDOVER: true,
@@ -115,6 +125,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: false,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: false,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['櫃檯']]: {
     READ_HANDOVER: true,
@@ -134,6 +146,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: false,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: false,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['教練組長']]: {
     READ_HANDOVER: false,
@@ -153,6 +167,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: false,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: false,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['教練']]: {
     READ_HANDOVER: false,
@@ -172,6 +188,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: false,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: false,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['物理治療師']]: {
     READ_HANDOVER: false,
@@ -191,6 +209,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: false,
     VIEW_TRAINING_ALLOWANCE: true,
     EDIT_TRAINING_ALLOWANCE: false,
+    VIEW_SUPPORT_BONUS: true,
+    EDIT_SUPPORT_BONUS: false,
   },
   [RoleType['物理治療師組長']]: {
     READ_HANDOVER: false,
@@ -210,5 +230,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     EDIT_WRITING_ALLOWANCE: true,
     VIEW_TRAINING_ALLOWANCE: true,
     EDIT_TRAINING_ALLOWANCE: true,
+    VIEW_SUPPORT_BONUS: true,
+    EDIT_SUPPORT_BONUS: true,
   },
 };

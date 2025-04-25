@@ -149,3 +149,52 @@ export async function updateTrainingAllowance(id: number, payload: NewRelocation
 export async function deleteTrainingAllowance(id: number) {
   await api.delete(`trainingAllowances/${id}`);
 }
+
+/** 支援獎金 */
+export interface SupportBonus {
+  id: number;
+  title: string;
+  amount: number;
+  reviewDateTime: string;
+  user: User;
+}
+
+export interface NewSupportBonus {
+  userId: number;
+  title: string;
+  amount: number;
+  reviewDateTime: string;
+}
+// 單一支援獎金
+export async function getSupportBonus(id: number) {
+  const { data } = await api.get<SupportBonus>(`supportBonuses/${id}`);
+  return data;
+};
+
+// 支援獎金列表
+interface BonusQuery {
+  order?: 'ASC' | 'DESC';
+  page?: number;
+  take?: number;
+  userId?: number;
+}
+export async function getSupportBonusList(params: BonusQuery) {
+  const { data, meta } = await api.get<SupportBonus[], PagingMeta>(`supportBonuses`, { params });
+  return { data, meta };
+};
+
+// 建立支援獎金
+export async function createSupportBonus(payload: NewSupportBonus) {
+  await api.post('supportBonuses', payload);
+}
+
+// 更新支援獎金
+export async function updateSupportBonus(id: number, payload: NewRelocationBonus) {
+  const { data } = await api.patch(`supportBonuses/${id}`, payload);
+  return data;
+}
+
+// 刪除支援獎金
+export async function deleteSupportBonus(id: number) {
+  await api.delete(`supportBonuses/${id}`);
+}
