@@ -43,7 +43,7 @@ const cols: QTableProps['columns'] = [
     label: '金額',
     align: 'right',
     style: 'width:150px',
-    field: 'amount',
+    field: row => `$${row.amount}`,
   },
   {
     name: 'reviewDateTime',
@@ -145,7 +145,7 @@ await getReviewList();
     <QSeparator />
     <section>
       <div class="q-py-md">
-        <OptionSelect v-if="userStore.canI('VIEW_RELOCATE_BONUS')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
+        <OptionSelect v-if="userStore.canI('VIEW_TRAINING_ALLOWANCE')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
       </div>
       <QTable
         v-model:pagination="pagination"
@@ -163,8 +163,8 @@ await getReviewList();
         </template>
         <template #body-cell-action="{ row }">
           <QTd auto-width>
-            <QBtn v-if="userStore.canI('EDIT_RELOCATE_BONUS')" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
-            <QBtn v-if="userStore.canI('EDIT_RELOCATE_BONUS')" flat round icon="o_edit" @click="editReview(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_TRAINING_ALLOWANCE')" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_TRAINING_ALLOWANCE')" flat round icon="o_edit" @click="editReview(row.id)" />
           </QTd>
         </template>
       </QTable>

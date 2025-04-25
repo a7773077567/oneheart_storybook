@@ -43,7 +43,7 @@ const cols: QTableProps['columns'] = [
     label: '金額',
     align: 'right',
     style: 'width:150px',
-    field: 'amount',
+    field: row => `$${row.amount}`,
   },
   {
     name: 'reviewDateTime',

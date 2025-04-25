@@ -146,7 +146,7 @@ await getReviewList();
     <QSeparator />
     <section>
       <div class="q-py-md">
-        <OptionSelect v-if="userStore.canI('VIEW_RELOCATE_BONUS')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
+        <OptionSelect v-if="userStore.canI('VIEW_WRITING_ALLOWANCE')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
       </div>
       <QTable
         v-model:pagination="pagination"
