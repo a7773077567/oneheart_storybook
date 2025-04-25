@@ -143,6 +143,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
             },
           },
+          {
+            path: 'relocation-bonus',
+            name: 'relocationBonus',
+            component: () => import('@/views/home/pointsNBonus/RelocationBonus.vue'),
+            meta: {
+              label: '外派獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
+            },
+          },
         ],
       },
     ],

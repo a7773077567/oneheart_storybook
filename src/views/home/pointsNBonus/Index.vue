@@ -1,10 +1,12 @@
 <script setup lang='ts'>
+import { QSeparator } from 'quasar';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const tabs = [
   { name: 'googleReview', label: 'Google 評論管理' },
   { name: 'educationPoints', label: '教育積分' },
+  { name: 'relocationBonus', label: '外派獎金' },
 ];
 const currentTab = ref(tabs[0].name);
 const route = useRoute();
@@ -36,6 +38,7 @@ watch(() => route.name, (page) => {
         @click="$router.push({ name: tab.name })"
       />
     </QTabs>
+    <QSeparator />
     <div class="points_n_bonus--page">
       <RouterView />
     </div>
