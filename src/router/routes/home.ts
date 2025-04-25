@@ -163,6 +163,16 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
             },
           },
+          {
+            path: 'training-allowance',
+            name: 'trainingAllowance',
+            component: () => import('@/views/home/pointsNBonus/TrainingAllowance.vue'),
+            meta: {
+              label: '培訓津貼',
+              requiredAuth: true,
+              permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
+            },
+          },
         ],
       },
     ],
