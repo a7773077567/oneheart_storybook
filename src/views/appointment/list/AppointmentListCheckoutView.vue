@@ -51,10 +51,12 @@ const info: CheckTableData = [
 
 const allowMultiPointPayment = computed(() => addOnList.value.length > 0);
 const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
-  const appointmentGroupType = Object.values(Types).find(type => type.identifier === userShift.type)?.pointType;
+  const availablePointGroupTypes = Object.values(Types).find(type => type.identifier === userShift.type)?.pointType;
 
+  let addOnPointType: Partial<PointTypes>[] = [];
+  // 內含加購包含儀器治療，也可使用儀器相關點數群組
   if (allowMultiPointPayment.value) {
-    const addOnPointType = addOnList.value.map((addOn) => {
+    const list = addOnList.value.map((addOn) => {
       switch (addOn.serviceType) {
         case AddOnServiceTypes['射頻']:
           return PointTypes['射頻'];
@@ -65,10 +67,10 @@ const groupOptions = appointmentStore.targetClientGroup.filter((group) => {
         default:
           return null;
       }
-    });
-    return group.type === appointmentGroupType || addOnPointType.includes(group.type);
+    }).filter(g => g !== null);
+    addOnPointType = list as Partial<PointTypes>[];
   }
-  return group.type === appointmentGroupType;
+  return availablePointGroupTypes?.includes(group.type) || addOnPointType.includes(group.type);
 }).map(item => ({
   label: item.name,
   value: item.id,

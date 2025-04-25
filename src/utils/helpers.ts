@@ -107,6 +107,7 @@ export function sortDepTypes<T extends Record<string, any>>(typesArr: T[], key: 
     ShiftType['物理治療體驗門診'],
     ShiftType['院長評估門診'],
     ShiftType['物理諮詢門診'],
+    ShiftType['家庭評估門診'],
     ShiftType['震波'],
     ShiftType['射頻'],
     ShiftType['磁波'],
