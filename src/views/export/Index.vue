@@ -3,8 +3,8 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const tabs = [
-  { name: 'appointmentExport', label: '預約單' },
-  { name: 'firstVisitExport', label: '初診客戶' },
+  // { name: 'appointmentExport', label: '預約單' },
+  // { name: 'firstVisitExport', label: '初診客戶' },
   { name: 'payrollExport', label: '薪水報表' },
 ];
 const currentTab = ref(tabs[0].name);
