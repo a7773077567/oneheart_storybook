@@ -31,6 +31,11 @@ function selectMonth({ year, month }: { year: number; month: number }) {
   form.value.yearMonth = `${year}/${month}`;
   showCalendar.value = false;
 }
+
+function handleClick(e: MouseEvent) {
+  if ((e?.target as HTMLElement)?.innerHTML?.includes('月'))
+    showCalendar.value = false;
+}
 </script>
 
 <template>
@@ -56,6 +61,7 @@ function selectMonth({ year, month }: { year: number; month: number }) {
                 :title="form.yearMonth"
                 emit-immediately
                 @navigation="selectMonth"
+                @click="handleClick"
               >
                 <div class="row items-center justify-end">
                   <QBtn v-close-popup label="Close" color="primary" flat />
