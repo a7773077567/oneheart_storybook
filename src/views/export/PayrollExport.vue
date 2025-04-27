@@ -75,6 +75,7 @@ function selectMonth({ year, month }: { year: number; month: number }) {
         emit-value
         map-options
         outlined
+        multiple
       />
     </fieldset>
     <div class="col-12 q-mt-md">
