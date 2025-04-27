@@ -23,6 +23,14 @@ async function submit() {
   });
   isDownloading.value = false;
 }
+
+const showCalendar = ref(false);
+function selectMonth({ year, month }: { year: number; month: number }) {
+  if (!year && !month)
+    return;
+  form.value.yearMonth = `${year}/${month}`;
+  showCalendar.value = false;
+}
 </script>
 
 <template>
@@ -36,11 +44,19 @@ async function submit() {
         map-options
         outlined
         date-mode
+        month-calendar
       >
         <template #append>
           <QIcon name="o_calendar_month" size="28px" class="cursor-pointer">
-            <QPopupProxy cover transition-show="scale" transition-hide="scale">
-              <QDate v-model="form.yearMonth" mask="YYYY-MM-DD" today-btn>
+            <QPopupProxy v-model="showCalendar" cover transition-show="scale" transition-hide="scale">
+              <QDate
+                v-model="form.yearMonth"
+                default-view="Years"
+                mask="YYYY/MM"
+                :title="form.yearMonth"
+                emit-immediately
+                @navigation="selectMonth"
+              >
                 <div class="row items-center justify-end">
                   <QBtn v-close-popup label="Close" color="primary" flat />
                 </div>
