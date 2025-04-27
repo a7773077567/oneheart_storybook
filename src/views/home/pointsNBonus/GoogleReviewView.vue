@@ -140,13 +140,17 @@ const lightBoxImg = ref('');
 
 <template>
   <div class="google-review">
-    <h2 class="text-headline-medium text-on-surface">Google評論管理</h2>
-    <p class="note text-body-medium text-on-surface-variant">Google 評論數為 KPI 紅綠燈分數中的評分項目</p>
+    <div class="row items-end q-py-md">
+      <div>
+        <h2 class="text-headline-medium text-on-surface">Google評論管理</h2>
+        <p class="note text-body-medium text-on-surface-variant">Google 評論數為 KPI 紅綠燈分數中的評分項目</p>
+      </div>
+      <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
+    </div>
     <QSeparator />
     <section class="google-review-content">
       <div class="google-review-content__header">
         <OptionSelect v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
-        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfReviewForm = true), (formType = 'add')" />
       </div>
       <QTable
         v-model:pagination="pagination"
