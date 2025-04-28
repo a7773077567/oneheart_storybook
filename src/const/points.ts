@@ -260,6 +260,13 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     price: 26400,
     for: [PointTypes.G動椅],
   },
+  37: {
+    name: '補償方案',
+    paidPointGained: 0,
+    giftPointGained: 0,
+    price: 0,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.營養, PointTypes.教練課, PointTypes.射頻, PointTypes.G動椅, PointTypes.磁波, PointTypes.震波],
+  },
 } as const;
 
 interface TypePlan {
