@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { type SalaryReportParams, exportSalaryReport, fetchSpaces } from '@/api';
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 const spaceOptions = ref<{ label: string; value: number }[]>([]);
 await fetchSpaces().then(res => spaceOptions.value = res.map(space => ({ label: space.name, value: space.id })));
@@ -17,6 +18,7 @@ async function submit() {
   if (ifDisabled.value)
     return;
   isDownloading.value = true;
+
   await exportSalaryReport({
     yearMonth: dayjs(form.value.yearMonth).format('YYYY/MM'),
     spaceIds: form.value.spaceIds,
