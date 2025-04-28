@@ -11,7 +11,7 @@ export async function exportSalaryReport(params: SalaryReportParams) {
   const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', '薪資報表');
+  link.setAttribute('download', '薪資報表.xlsx');
   document.body.appendChild(link);
   link.click();
   link.remove();
