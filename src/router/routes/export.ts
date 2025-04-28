@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import type { PermissionEvents } from '@/const/permission';
 
 export const exportRoutes: RouteRecordRaw[] = [{
   path: '/export',
@@ -9,6 +10,7 @@ export const exportRoutes: RouteRecordRaw[] = [{
     label: '報表管理',
     requiredAuth: true,
     icon: 'plagiarism',
+    permissions: ['VIEW_PAYROLL_EXPORT'] as PermissionEvents[],
   },
   children: [
     {
