@@ -143,6 +143,46 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['READ_EDUCATION_REVIEW'] as PermissionEvents[],
             },
           },
+          {
+            path: 'relocation-bonus',
+            name: 'relocationBonus',
+            component: () => import('@/views/home/pointsNBonus/RelocationBonus.vue'),
+            meta: {
+              label: '外派獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
+            },
+          },
+          {
+            path: 'writing-allowance',
+            name: 'writingAllowance',
+            component: () => import('@/views/home/pointsNBonus/WritingAllowance.vue'),
+            meta: {
+              label: '寫作津貼',
+              requiredAuth: true,
+              permissions: ['VIEW_RELOCATE_BONUS'] as PermissionEvents[],
+            },
+          },
+          {
+            path: 'training-allowance',
+            name: 'trainingAllowance',
+            component: () => import('@/views/home/pointsNBonus/TrainingAllowance.vue'),
+            meta: {
+              label: '培訓津貼',
+              requiredAuth: true,
+              permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
+            },
+          },
+          {
+            path: 'support-bonus',
+            name: 'supportBonus',
+            component: () => import('@/views/home/pointsNBonus/SupportBonus.vue'),
+            meta: {
+              label: '支援獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
+            },
+          },
         ],
       },
     ],

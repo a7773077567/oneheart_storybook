@@ -23,214 +23,249 @@ export const POINTS_PLAN: { [counting: number]: PointsPlan } = {
     for: [PointTypes.物理治療],
   },
   3: {
+    name: '初診$9500：5堂',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 9500,
+    for: [PointTypes.物理治療],
+  },
+  4: {
+    name: '初診$20,000：10堂送1堂',
+    paidPointGained: 10,
+    giftPointGained: 1,
+    price: 20000,
+    for: [PointTypes.物理治療],
+  },
+  5: {
     name: '$14,500：5堂',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 14500,
     for: [PointTypes.院長物理治療],
   },
-  4: {
+  6: {
     name: '$30,000：10堂送1堂',
     paidPointGained: 10,
     giftPointGained: 1,
     price: 30000,
     for: [PointTypes.院長物理治療],
   },
-  5: {
+  7: {
+    name: '初診$14,500：5堂',
+    paidPointGained: 5,
+    giftPointGained: 0,
+    price: 14500,
+    for: [PointTypes.院長物理治療],
+  },
+  8: {
+    name: '初診$30,000：10堂送1堂',
+    paidPointGained: 10,
+    giftPointGained: 1,
+    price: 30000,
+    for: [PointTypes.院長物理治療],
+  },
+  9: {
     name: '$13,500：12堂',
     paidPointGained: 12,
     giftPointGained: 0,
     price: 13500,
     for: [PointTypes.營養],
   },
-  6: {
+  10: {
     name: '$16,500：10堂送1堂',
     paidPointGained: 10,
     giftPointGained: 1,
     price: 16500,
     for: [PointTypes.教練課],
   },
-  7: {
+  11: {
     name: '$45,000：30堂送1堂',
     paidPointGained: 30,
     giftPointGained: 1,
     price: 45000,
     for: [PointTypes.教練課],
   },
-  8: {
+  12: {
     name: '開帳包：0堂',
     paidPointGained: 0,
     giftPointGained: 0,
     price: 0,
     for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.教練課, PointTypes.營養],
   },
-  9: {
+  13: {
     name: '矯正方案$18,700',
     paidPointGained: 1,
     giftPointGained: 0,
     price: 18700,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  10: {
+  14: {
     name: '軍警消醫護5堂 $7,500',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 7500,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  11: {
+  15: {
     name: '軍警消醫護10堂 $15,000',
     paidPointGained: 10,
     giftPointGained: 0,
     price: 15000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  12: {
+  16: {
     name: 'winback能量治療五堂 $9,500',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 9500,
     for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.射頻],
   },
-  13: {
+  17: {
     name: 'winback能量治療十堂送一 $20,000',
     paidPointGained: 10,
     giftPointGained: 1,
     price: 20000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.射頻],
   },
-  14: {
+  18: {
     name: '教練課5堂 $8,000',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 8000,
     for: [PointTypes.教練課],
   },
-  15: {
+  19: {
     name: '藝文初診５堂$8,850',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 8850,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  16: {
+  20: {
     name: '藝文複診５堂$9,250',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 9250,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  17: {
+  21: {
     name: '藝文初診10堂$17,200',
     paidPointGained: 10,
     giftPointGained: 0,
     price: 17200,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  18: {
+  22: {
     name: '藝文複診10堂$17,500',
     paidPointGained: 10,
     giftPointGained: 0,
     price: 17500,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  19: {
+  23: {
     name: '藝文初診20堂$33,400',
     paidPointGained: 20,
     giftPointGained: 0,
     price: 33400,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  20: {
+  24: {
     name: '藝文複診20堂$34,000',
     paidPointGained: 20,
     giftPointGained: 0,
     price: 34000,
     for: [PointTypes.物理治療, PointTypes.院長物理治療],
   },
-  21: {
+  25: {
     name: '震波徒手加價',
     paidPointGained: 1,
     giftPointGained: 0,
     price: 1,
     for: [PointTypes.震波],
   },
-  22: {
+  26: {
     name: '儲值 6000 發',
     paidPointGained: 6000,
     giftPointGained: 1000,
     price: 6000,
     for: [PointTypes.震波],
   },
-  23: {
+  27: {
     name: '儲值 10000 發',
     paidPointGained: 10000,
     giftPointGained: 2000,
     price: 10000,
     for: [PointTypes.震波],
   },
-  24: {
+  28: {
     name: '儲值 20000 發',
     paidPointGained: 20000,
     giftPointGained: 6000,
     price: 20000,
     for: [PointTypes.震波],
   },
-  25: {
+  29: {
     name: '儲值 60000 發',
     paidPointGained: 60000,
     giftPointGained: 24000,
     price: 60000,
     for: [PointTypes.震波],
   },
-  26: {
+  30: {
     name: '儲值 100000 發',
     paidPointGained: 100000,
     giftPointGained: 50000,
     price: 100000,
     for: [PointTypes.震波],
   },
-  27: {
+  31: {
     name: 'winback徒手加價',
     paidPointGained: 1,
     giftPointGained: 0,
     price: 1,
     for: [PointTypes.射頻],
   },
-  28: {
+  32: {
     name: '磁波徒手加價',
     paidPointGained: 1,
     giftPointGained: 0,
     price: 1,
     for: [PointTypes.磁波],
   },
-  29: {
+  33: {
     name: '磁波治療五堂',
     paidPointGained: 5,
     giftPointGained: 0,
     price: 9500,
     for: [PointTypes.磁波],
   },
-  30: {
+  34: {
     name: '磁波治療十堂',
     paidPointGained: 10,
     giftPointGained: 1,
     price: 20000,
     for: [PointTypes.磁波],
   },
-  31: {
+  35: {
     name: 'Ｇ動椅治療六堂',
     paidPointGained: 6,
     giftPointGained: 0,
     price: 15000,
     for: [PointTypes.G動椅],
   },
-  32: {
+  36: {
     name: 'Ｇ動椅治療十二堂',
     paidPointGained: 12,
     giftPointGained: 0,
     price: 26400,
     for: [PointTypes.G動椅],
+  },
+  37: {
+    name: '補償方案',
+    paidPointGained: 0,
+    giftPointGained: 0,
+    price: 0,
+    for: [PointTypes.物理治療, PointTypes.院長物理治療, PointTypes.營養, PointTypes.教練課, PointTypes.射頻, PointTypes.G動椅, PointTypes.磁波, PointTypes.震波],
   },
 } as const;
 

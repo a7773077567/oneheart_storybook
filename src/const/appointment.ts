@@ -13,6 +13,8 @@ export enum PaymentMethod {
   訂金 = 12,
   唯心點數 = 13,
   其他 = 14,
+  老闆折扣 = 15,
+  消防員折扣 = 16,
 }
 
 export enum PaymentState {
@@ -35,6 +37,7 @@ export enum AppointmentState {
   刪除 = 7,
 }
 
+// topup payment options: https://www.notion.so/enginelin/97b8b2abdaf8489684329c95974d54dd?pvs=4
 export const PaymentMethods = {
   cash: {
     identifier: PaymentMethod['現金'],
@@ -175,6 +178,26 @@ export const PaymentMethods = {
     forCheckout: false,
     forPointPurchasing: false,
     forGroupTicketPurchasing: false,
+  },
+  boss: {
+    identifier: PaymentMethod['老闆折扣'],
+    label: PaymentMethod['15'],
+    name: 'boss',
+    calcInReceipt: true,
+    forRefunding: false,
+    forCheckout: true,
+    forPointPurchasing: true,
+    forGroupTicketPurchasing: true,
+  },
+  firefighter: {
+    identifier: PaymentMethod['消防員折扣'],
+    label: PaymentMethod['16'],
+    name: 'firefighter',
+    calcInReceipt: true,
+    forRefunding: false,
+    forCheckout: true,
+    forPointPurchasing: true,
+    forGroupTicketPurchasing: true,
   },
 };
 

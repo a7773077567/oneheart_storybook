@@ -27,7 +27,7 @@ export function useLayoutRoute() {
           ...route,
           label: route.meta?.label as string,
           route: route.name,
-        })),
+        })).filter(route => !route.meta?.hideFromNav),
         // ...route,
       }));
   });

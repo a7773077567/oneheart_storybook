@@ -137,13 +137,17 @@ function deleteConfirm(id: number) {
 
 <template>
   <div class="education-review">
-    <h2 class="text-headline-medium">教育積分管理</h2>
-    <p class="note">教育積分為 KPI 紅綠燈分數中的評分項目</p>
+    <div class="row items-end q-py-md">
+      <div>
+        <h2 class="text-headline-medium">教育積分管理</h2>
+        <p class="text-body-medium">教育積分為 KPI 紅綠燈分數中的評分項目</p>
+      </div>
+      <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfPointForm = true), (formType = 'add')" />
+    </div>
     <QSeparator />
     <section class="education-review-content">
       <div class="education-review-content__header">
         <OptionSelect v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
-        <QBtn color="primary" label="上傳" rounded icon="add" class="q-ml-auto" @click="(stateOfPointForm = true), (formType = 'add')" />
       </div>
       <QTable
         v-model:pagination="pagination"
@@ -183,10 +187,6 @@ function deleteConfirm(id: number) {
 .education-review {
   h2 {
     margin-bottom: 12px;
-  }
-  .note {
-    @include text-style($body-medium, $on-surface-variant);
-    margin-bottom: 18px;
   }
   &-content {
     &__header {

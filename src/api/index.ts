@@ -13,3 +13,5 @@ export * from './dashboard';
 export * from './machine';
 export * from './home/googleReview';
 export * from './home/educationPoints';
+export * from './reports';
+export * from './pointsNBonus';

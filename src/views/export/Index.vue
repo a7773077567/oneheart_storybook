@@ -1,15 +1,11 @@
 <script setup lang='ts'>
-import { QSeparator } from 'quasar';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const tabs = [
-  { name: 'googleReview', label: 'Google 評論管理' },
-  { name: 'educationPoints', label: '教育積分' },
-  { name: 'relocationBonus', label: '外派獎金' },
-  { name: 'writingAllowance', label: '寫作津貼' },
-  { name: 'trainingAllowance', label: '培訓津貼' },
-  { name: 'supportBonus', label: '支援獎金' },
+  // { name: 'appointmentExport', label: '預約單' },
+  // { name: 'firstVisitExport', label: '初診客戶' },
+  { name: 'payrollExport', label: '薪水報表' },
 ];
 const currentTab = ref(tabs[0].name);
 const route = useRoute();
@@ -24,7 +20,8 @@ watch(() => route.name, (page) => {
 </script>
 
 <template>
-  <div class="points_n_bonus">
+  <div class="report_export">
+    <h3 class="q-py-md q-pl-xs text-headline-small">匯出報表</h3>
     <QTabs
       v-model="currentTab"
       align="left"
@@ -42,16 +39,16 @@ watch(() => route.name, (page) => {
       />
     </QTabs>
     <QSeparator />
-    <div class="points_n_bonus--page">
+    <div class="report_export--page">
       <RouterView />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.points_n_bonus {
+.report_export {
   &--page {
-    padding: 18px 24px;
+    padding: 24px;
   }
 }
 </style>
