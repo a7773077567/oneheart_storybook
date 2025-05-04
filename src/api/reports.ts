@@ -6,9 +6,10 @@ export interface SalaryReportParams {
   spaceIds: number[];
 }
 export async function exportSalaryReport(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report`, { params, headers: { responseType: 'blob', Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
-  const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]));
+  const blobParts: BlobPart = response as unknown as BlobPart;
+  const url = window.URL.createObjectURL(new Blob([blobParts]));
   const link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', '薪資報表.xlsx');
