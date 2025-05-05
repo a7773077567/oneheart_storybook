@@ -135,7 +135,7 @@ function removeImg(scope: UploaderScope) {
             :multiple="false"
             :max-files="1"
             accept=".jpg, .png, image/*"
-            :max-file-size="1048576"
+            :max-file-size="5242880"
             @added="handleUpload"
             @rejected="showFileErrorMsg = true"
           >
@@ -144,7 +144,7 @@ function removeImg(scope: UploaderScope) {
                 <QUploaderAddTrigger />
               </QBtn>
               <p v-if="showFileErrorMsg" style="color: red">圖片尺寸太大</p>
-              <p v-if="!field.value" style="color: rgba(69, 70, 79, 1)" class="q-mt-md">*必填。每次限傳一張，格式須為 JPG 或 PNG，檔案大小不得超過 1MB</p>
+              <p v-if="!field.value" style="color: rgba(69, 70, 79, 1)" class="q-mt-md">*必填。每次限傳一張，格式須為 JPG 或 PNG，檔案大小不得超過 5MB</p>
             </template>
             <template #list="scope">
               <OImgPreview v-if="field.value" :url="field.value" @remove="removeImg(scope)" />
