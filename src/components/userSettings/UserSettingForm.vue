@@ -58,7 +58,7 @@ const addInitialValues = computed(() => ({
   description: '',
   jobClass: null,
   PTLevel: PTLevelOptions[0].value,
-  hireDate: dayjs().format('YYYY/MM/DD'),
+  hireDate: dayjs().format('YYYY-MM-DD'),
 }));
 
 const editInitialValues = computed(() => ({
@@ -130,7 +130,10 @@ const onSubmit = handleSubmit(async (values) => {
       router.push({ name: 'resendActivationEmail' });
     }
     else {
-      const neededValues = omit(values as UpdateUser, ['avatar']);
+      let neededValues = omit(values as UpdateUser, ['avatar']);
+      if (!isTherapist(values.roleId)) {
+        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass']);
+      }
       const payload = {
         ...neededValues,
         ...(avatarUuid && { avatar: avatarUuid }),
