@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   tabs: { name: string; label: string }[];
-  modelValue: string;
+  modelValue: string; // active tab
 }>();
 
 defineEmits<{
