@@ -130,6 +130,20 @@ export const useAppointmentStore = defineStore('appointment', {
         return { ...acc, [user.id]: shiftsOfUser };
       }, {} as Record<string, any>);
     },
+
+    sportClinicHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { chiefComplaint, coachAdvice, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: {
+            chiefComplaint: { label: '主訴', value: chiefComplaint },
+            coachAdvice: { label: '教練建議', value: coachAdvice },
+          },
+        };
+      });
+    },
     medicalHistoryRecords: ({ historyRecords }) => {
       return historyRecords.map((record) => {
         const { assessmentResults, chiefComplaint, forExerciseGroup, forFrontDesk, treatmentNotes, treatmentPlan, userShiftType, date } = record;
@@ -147,6 +161,7 @@ export const useAppointmentStore = defineStore('appointment', {
         };
       });
     },
+
     magneticWaveHistoryRecords: ({ historyRecords }) => {
       return historyRecords.map((record) => {
         const { magneticWavesRecords, userShiftType, date } = record;
