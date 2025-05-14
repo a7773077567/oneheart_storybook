@@ -15,7 +15,7 @@ defineEmits<{
 
 const displayContent = computed(() => {
   return props.modelValue
-    ? props.amount.toLocaleString('en')
+    ? props.amount.toLocaleString('en', { currency: 'USD', style: 'currency' })
     : Array(props.dotNumber).fill('•').join('');
 });
 </script>
@@ -23,9 +23,8 @@ const displayContent = computed(() => {
 <template>
   <div class="display">
     <p class="display__content">
-      <span v-if="!!label">{{ label }}</span>
-      <span>{{ " $" }}</span>
-      <span class="display__amount">{{ displayContent }}</span>
+      <span v-if="!!label">{{ `${label} ` }}</span>
+      <span :class="[amount < 0 && modelValue ? 'display__amount--negative' : 'display__amount']">{{ displayContent }}</span>
     </p>
     <div
       v-if="visibilityToggle"
@@ -52,10 +51,12 @@ const displayContent = computed(() => {
     }
   }
 
-  // &__amount {
-  //   display: inline-block;
-  //   min-width: 120px;
-  // }
+  &__amount {
+    &--negative {
+      @extend .display;
+      color: $error !important;
+    }
+  }
 
   &__visibility {
     display: flex;
