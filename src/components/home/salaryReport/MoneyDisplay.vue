@@ -15,7 +15,7 @@ defineEmits<{
 
 const displayContent = computed(() => {
   return props.modelValue
-    ? props.amount.toLocaleString('en', { currency: 'USD', style: 'currency' })
+    ? props.amount.toLocaleString('en', { currency: 'USD', style: 'currency', minimumFractionDigits: 0 })
     : Array(props.dotNumber).fill('•').join('');
 });
 </script>
