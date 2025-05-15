@@ -96,3 +96,13 @@ export function getMonthDifference(year: number, month: number): number {
 
   return currentDate.diff(inputDate, 'month'); // 計算月份差異
 }
+
+export function getDate(offset: number, format?: string) {
+  const date = offset < 0
+    ? dayjs().subtract(Math.abs(offset), 'month')
+    : dayjs().add(offset, 'month');
+
+  return format
+    ? date.format(format)
+    : date.month() + 1;
+}
