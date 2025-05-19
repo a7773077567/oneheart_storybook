@@ -108,7 +108,7 @@ watch(() => props.disable, (newVal) => {
 .rows {
   display: grid;
   grid-template-columns: 180px 240px 161px 1fr;
-
+  align-items: center;
   &__row {
     padding: 22px 16px;
     @include text-style($label-large, $on-surface-variant);
