@@ -18,13 +18,21 @@ const displayContent = computed(() => {
     ? props.amount.toLocaleString('en', { currency: 'USD', style: 'currency', minimumFractionDigits: 0 })
     : Array(props.dotNumber).fill('•').join('');
 });
+
+const amountClass = computed(() => {
+  return props.amount < 0 && props.modelValue
+    ? 'display__amount--negative'
+    : props.amount === 0 && props.modelValue
+      ? 'display__amount--zero'
+      : 'display__amount';
+});
 </script>
 
 <template>
   <div class="display">
     <p class="display__content">
       <span v-if="!!label">{{ `${label} ` }}</span>
-      <span :class="[amount < 0 && modelValue ? 'display__amount--negative' : 'display__amount']">{{ displayContent }}</span>
+      <span :class="amountClass">{{ displayContent }}</span>
     </p>
     <div
       v-if="visibilityToggle"
@@ -53,8 +61,13 @@ const displayContent = computed(() => {
 
   &__amount {
     &--negative {
-      @extend .display;
+      @extend .display__amount;
       color: $error !important;
+    }
+
+    &--zero {
+      @extend .display__amount;
+      opacity: 0.38;
     }
   }
 
