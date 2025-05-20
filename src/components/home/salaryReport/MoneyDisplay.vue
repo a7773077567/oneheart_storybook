@@ -32,6 +32,7 @@ const amountClass = computed(() => {
   <div class="display">
     <p class="display__content">
       <span v-if="!!label">{{ `${label} ` }}</span>
+      <span v-if="!modelValue">$</span>
       <span :class="amountClass">{{ displayContent }}</span>
     </p>
     <div
