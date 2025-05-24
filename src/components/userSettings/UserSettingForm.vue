@@ -119,6 +119,8 @@ const onSubmit = handleSubmit(async (values) => {
   let avatarUuid = null;
 
   if (avatarPreviewFile.value) {
+    console.log('有 avatar preview file');
+
     const fileName = await uploadAvatar(targetUser.value.id, avatarPreviewFile.value);
     avatarUuid = extractUuidFromS3Url(fileName);
   }
@@ -130,10 +132,11 @@ const onSubmit = handleSubmit(async (values) => {
       router.push({ name: 'resendActivationEmail' });
     }
     else {
-      let neededValues = omit(values as UpdateUser, ['avatar']);
+      let neededValues = { ...omit(values as UpdateUser, ['avatar']) };
       if (!isTherapist(values.roleId)) {
-        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass']);
+        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass', 'avatar']);
       }
+
       const payload = {
         ...neededValues,
         ...(avatarUuid && { avatar: avatarUuid }),
