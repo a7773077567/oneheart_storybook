@@ -51,7 +51,7 @@ const avatarPreviewUrl = computed(() => {
 });
 
 const classOptions = Array(7).fill(1).map((level, idx) => ({ label: `S${level + idx}`, value: level + idx }));
-const PTLevelOptions = Object.keys(PTLevel).slice(7, 15).map(level => ({ label: level, value: PTLevel[level as keyof typeof PTLevel] }));
+const PTLevelOptions = Object.keys(PTLevel).slice(8, 16).map(level => ({ label: level, value: PTLevel[level as keyof typeof PTLevel] }));
 
 const addInitialValues = computed(() => ({
   name: '',

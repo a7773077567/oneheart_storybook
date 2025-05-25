@@ -39,6 +39,7 @@ export enum RoleType {
 }
 
 export enum PTLevel {
+  'PT0' = 0,
   'PT1' = 1,
   'PT2' = 2,
   'PT3' = 3,
