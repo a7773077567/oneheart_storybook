@@ -7,7 +7,6 @@ import { useQuasar } from 'quasar';
 import { useUserStore } from '@/stores';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import { omit } from 'radash';
-import { useRouter } from 'vue-router';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import dayjs from 'dayjs';
@@ -17,8 +16,11 @@ const props = defineProps<{
   userId?: string;
 }>();
 
+const emit = defineEmits<{
+  (e: 'submit'): void;
+}>();
+
 const $q = useQuasar();
-const router = useRouter();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
 
@@ -113,7 +115,7 @@ const createUserSchema = z.object({
     path: ['PTLevel'], // path of error
   });
 
-const { handleSubmit, resetForm, values, setFieldValue } = useForm<CreateUser>({
+const { handleSubmit, values, setFieldValue } = useForm<CreateUser>({
   initialValues: targetInitialValues.value,
   validationSchema: toTypedSchema(createUserSchema),
 });
@@ -136,7 +138,7 @@ const onSubmit = handleSubmit(async (values) => {
         neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass']);
       }
       await createUser(neededValues);
-      router.push({ name: 'resendActivationEmail' });
+      emit('submit');
     }
     else {
       let neededValues = { ...omit(values as UpdateUser, ['avatar']) };
@@ -152,12 +154,8 @@ const onSubmit = handleSubmit(async (values) => {
       $q.dialog({
         message: '更新成功',
       }).onOk(async () => {
-        await userStore.getUsers(); // temporary
-        await userStore.getUser(+props.userId!);
         await userStore.getUserInfo();
-
-        resetForm({ values: targetInitialValues.value });
-        router.push({ name: 'userList' });
+        emit('submit');
       });
     }
   }
