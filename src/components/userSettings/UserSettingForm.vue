@@ -65,6 +65,7 @@ const addInitialValues = computed(() => ({
   hireDate: dayjs().format('YYYY-MM-DD'),
   introducerUserId: null,
   ancestorUserId: null,
+  baseSalary: 0,
 }));
 
 const editInitialValues = computed(() => ({
@@ -80,6 +81,7 @@ const editInitialValues = computed(() => ({
   hireDate: targetUser.value.hireDate,
   introducerUserId: targetUser.value?.introducer?.id,
   ancestorUserId: targetUser.value?.ancestor?.id,
+  baseSalary: targetUser.value.baseSalary ?? 0,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
@@ -97,6 +99,7 @@ const createUserSchema = z.object({
   hireDate: z.string(),
   introducerUserId: z.number().nullish(),
   ancestorUserId: z.number().nullish(),
+  baseSalary: z.number(),
 }).refine((data) => {
   // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
   if (isTherapist(data.roleId)) {
@@ -190,6 +193,7 @@ watch(() => values.roleId, () => {
           <OSelect name="jobClass" label="初診等級*" :options="classOptions" error-message="" hide-bottom-space />
           <p class="note">初診等級 S1 為最低，S7 為最高。等級將影響治療師的預約自動推薦 KPI 達標率。</p>
         </template>
+        <OInput name="baseSalary" inside-label="本薪*" error-message="" type="number" />
         <OSelect name="ancestorUserId" label="師傅(選填)" :options="usersOptions" error-message="" />
         <OSelect name="introducerUserId" label="推薦人(選填)" :options="usersOptions" error-message="" />
         <OSelect multiple name="spaceIds" label="場館*" :options="spaceOptions" error-message="" />
