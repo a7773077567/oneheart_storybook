@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { PTLevel, RoleType, createUser, fetchSpaces, updateUser, uploadAvatar } from '@/api';
+import { PTLevel, RoleType, createUser, fetchSpaces, fetchUsers, updateUser, uploadAvatar } from '@/api';
 import type { CreateUser, UpdateUser } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
@@ -17,12 +17,13 @@ const props = defineProps<{
   userId?: string;
 }>();
 
-const spaces = await fetchSpaces();
-
 const $q = useQuasar();
 const router = useRouter();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
+
+// get data
+const [spaces, users] = await Promise.all([fetchSpaces(), fetchUsers({ spaceIds: [userStore.currentSpaceId!] })]);
 
 const weightForOrderOptions = [...Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx })), { label: '99', value: 99 }];
 const roleIdOptions = [
@@ -38,6 +39,7 @@ const roleIdOptions = [
   { label: '櫃檯 ', value: RoleType['櫃檯'] },
 ];
 const spaceOptions = spaces.map(space => ({ label: space.name, value: space.id }));
+const usersOptions = users.map(user => ({ label: user.name, value: user.id }));
 const avatarPreviewFile = ref<File | null>();
 const avatarPreviewUrl = computed(() => {
   if (!avatarPreviewFile.value) {
@@ -59,6 +61,7 @@ const addInitialValues = computed(() => ({
   jobClass: null,
   PTLevel: PTLevelOptions[0].value,
   hireDate: dayjs().format('YYYY-MM-DD'),
+  introducerUserId: null,
 }));
 
 const editInitialValues = computed(() => ({
@@ -72,6 +75,7 @@ const editInitialValues = computed(() => ({
   jobClass: targetUser.value.jobClass,
   PTLevel: targetUser.value.PTLevel,
   hireDate: targetUser.value.hireDate,
+  introducerUserId: targetUser.value?.introducer?.id,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
@@ -87,6 +91,7 @@ const createUserSchema = z.object({
   jobClass: z.number().nullish(),
   PTLevel: z.number().nullish(),
   hireDate: z.string(),
+  introducerUserId: z.number().nullish(),
 }).refine((data) => {
   // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
   if (isTherapist(data.roleId)) {
@@ -119,16 +124,18 @@ const onSubmit = handleSubmit(async (values) => {
   let avatarUuid = null;
 
   if (avatarPreviewFile.value) {
-    console.log('有 avatar preview file');
-
     const fileName = await uploadAvatar(targetUser.value.id, avatarPreviewFile.value);
     avatarUuid = extractUuidFromS3Url(fileName);
   }
 
   try {
     if (props.type === 'add') {
-      const payload = omit(values, ['jobClass', 'PTLevel']);
-      await createUser(payload);
+      let neededValues = values;
+      // PT等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
+      if (!isTherapist(values.roleId)) {
+        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass']);
+      }
+      await createUser(neededValues);
       router.push({ name: 'resendActivationEmail' });
     }
     else {
@@ -150,6 +157,7 @@ const onSubmit = handleSubmit(async (values) => {
         await userStore.getUserInfo();
 
         resetForm({ values: targetInitialValues.value });
+        router.push({ name: 'userList' });
       });
     }
   }
@@ -172,15 +180,16 @@ watch(() => values.roleId, () => {
     <div class="user-settings__form col-9">
       <div class="form">
         <OInput name="name" inside-label="姓名*" error-message="" />
-        <OInput type="email" name="email" inside-label="帳號*" error-message="" />
+        <OInput type="email" name="email" inside-label="帳號 Email*" error-message="" />
         <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
         <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
+        <OSelect v-if="userStore.canI('READ_PT_LEVEL') && isTherapistSelected" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
         <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
         <template v-if="isTherapistSelected">
           <OSelect name="jobClass" label="初診等級*" :options="classOptions" error-message="" hide-bottom-space />
           <p class="note">初診等級 S1 為最低，S7 為最高。等級將影響治療師的預約自動推薦 KPI 達標率。</p>
         </template>
-        <OSelect v-if="userStore.canI('READ_PT_LEVEL') && isTherapistSelected" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
+        <OSelect name="introducerUserId" label="推薦人(選填)" :options="usersOptions" error-message="" />
         <OSelect multiple name="spaceIds" label="場館*" :options="spaceOptions" error-message="" />
         <OInput type="textarea" name="description" inside-label="描述" error-message="" />
       </div>

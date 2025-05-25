@@ -15,6 +15,7 @@ export interface CreateUser extends Pick<User, 'name' | 'email' | 'weightForOrde
   jobClass?: number | null;
   PTLevel?: number | null;
   onBoardDate: string;
+  introducerUserId: number | null;
 }
 
 export interface UpdateUser extends CreateUser {
