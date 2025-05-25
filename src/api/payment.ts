@@ -40,6 +40,9 @@ export interface MedicalPaymentRecord extends BasicPaymentRecord {
   ticketGained: null;
   giftPointGained: null;
   record: Record;
+  sellers: User[];
+  seller: null;
+  chargers: User[];
 }
 
 // 堂數購買

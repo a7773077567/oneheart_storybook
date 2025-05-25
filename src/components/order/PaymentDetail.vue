@@ -24,9 +24,11 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'type', value: data.userShift?.type ? ShiftType[data.userShift.type] : '', label: '項目' },
         { key: 'userName', value: data.userShift?.user.name ?? '', label: '治療師' },
         { key: 'spaceName', value: data.spaceName ?? '', label: '場館' },
-        { key: 'addOnServices', value: addOnList?.map(service => service.serviceName).join('、') ?? ' - ', label: '加購服務' },
+        { key: 'addOnServices', value: addOnList.length > 0 ? addOnList.map(service => service.serviceName).join('、') : ' - ', label: '加購服務' },
         ...(!!data.userShift?.type && addOnList.length > 0 ? [{ key: 'addOnServiceShockWaveShots', label: '加購發數', value: `${data?.record?.addOnServiceShockWaveShots ?? 0}發` }] : []),
         ...(!!data.userShift?.type && data.userShift?.type === ShiftType['震波'] ? [{ key: 'independentShockWaveShots', label: '發數', value: `${data?.record?.independentShockWaveShots ?? 0}發` }] : []),
+        { key: 'chargers', value: data.chargers?.[0]?.name ?? '', label: '負責人(治療師)' },
+        { key: 'sellers', value: data.sellers?.map(u => u.name).join('、'), label: '銷售者' },
       ];
     }
     case TransactionTypes.團課券購買:

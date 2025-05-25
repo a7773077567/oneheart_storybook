@@ -346,6 +346,8 @@ export interface Checkout {
     groupClassTicketUsed: number | null;
     details: string;
   }[];
+  chargerId: number;
+  sellerIds: number[];
 }
 
 export interface AddOnService {

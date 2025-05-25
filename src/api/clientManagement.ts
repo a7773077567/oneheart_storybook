@@ -80,6 +80,8 @@ export interface PurchaseRecord {
   spaceName: string | null;
   type: number;
   usedPoint: number | null;
+  sellers: User[];
+  chargers: User[];
 }
 
 export interface DepInChargeTherapist {

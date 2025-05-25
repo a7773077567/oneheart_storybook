@@ -104,11 +104,23 @@ const cols: QTableProps['columns'] = [
     },
   },
   {
-    name: 'seller',
+    name: 'charger',
+    required: true,
+    label: '負責人',
+    align: 'left',
+    field: row => row.chargers.length === 0 ? '-' : row.chargers.map(({ name }: { name: string }) => name).join('、'),
+  },
+  {
+    name: 'sellers',
     required: true,
     label: '銷售者',
     align: 'left',
-    field: row => row.seller?.name ?? '-',
+    field: (row) => {
+      if (row.type === TransactionTypes['門診費用']) {
+        return row.sellers.length === 0 ? '-' : row.sellers.map(({ name }: { name: string }) => name).join('、');
+      }
+      return row.seller?.name;
+    },
   },
   {
     name: 'cancel',
