@@ -56,7 +56,7 @@ function selectAutoRecommend(ifAuto: boolean) {
 
 watch(() => values.userShiftType, (newShiftType) => {
   const shiftDetails = getType(newShiftType!)!;
-  const newTherapistOptions = appointmentStore.activeUsers.filter(item => shiftDetails.roles.includes(item.role.type));
+  const newTherapistOptions = appointmentStore.currentNonFronDeskUsers.filter(item => shiftDetails.roles.includes(item.role.type));
   // const newTherapistIds = newTherapistOptions.map(item => item.id);
   therapistOptions.value = newTherapistOptions;
   setFieldValue('userIds', []);
@@ -71,7 +71,7 @@ const onSubmit = handleSubmit(async (values) => {
   appointmentStore.appointmentCalendarInitOption = values.userIds ?? [];
   appointmentStore.availableQuery = { ...values, userIds: values.autoRecommend
     ? []
-    : appointmentStore.activeUsers.map(user => user.id) }; // refactor, 改成 api 篩選治療師，非前端篩選
+    : appointmentStore.currentNonFronDeskUsers.map(user => user.id) }; // refactor, 改成 api 篩選治療師，非前端篩選
 
   try {
     $q.loading.show();

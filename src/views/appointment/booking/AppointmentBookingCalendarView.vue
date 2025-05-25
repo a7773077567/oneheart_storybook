@@ -28,7 +28,7 @@ const queryAddOns = computed(() => appointmentStore.queryAddOns.map(addOn => Add
 const queryAppointmentType = computed(() => appointmentStore.availableQuery?.userShiftType && ShiftType[appointmentStore.availableQuery?.userShiftType]);
 const ifAutoRecommend = computed(() => appointmentStore.availableQuery?.autoRecommend);
 
-const therapistOptions = computed(() => ifAutoRecommend.value ? appointmentStore.autoRecommendTherpists : appointmentStore.activeUsers);
+const therapistOptions = computed(() => ifAutoRecommend.value ? appointmentStore.autoRecommendTherpists : appointmentStore.currentNonFronDeskUsers);
 
 onBeforeUnmount(() => {
   appointmentStore.rearrangeMode = false;

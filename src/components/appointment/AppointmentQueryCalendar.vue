@@ -118,7 +118,7 @@ function getDate() {
   <div class="booking-calendar">
     <ResourceCalendar
       v-model="selectedDate"
-      v-model:model-resources="appointmentStore.activeUsers"
+      v-model:model-resources="appointmentStore.currentNonFronDeskUsers"
       :interval-start="appointmentStore.queryCalendarStyle.start"
       :interval-count="appointmentStore.queryCalendarStyle.count"
       :init-options="appointmentStore.appointmentCalendarInitOption"

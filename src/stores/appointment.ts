@@ -94,7 +94,7 @@ export const useAppointmentStore = defineStore('appointment', {
         count,
       };
     },
-    activeUsers: (state) => {
+    currentNonFronDeskUsers: (state) => {
       const { users } = state;
 
       return users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({

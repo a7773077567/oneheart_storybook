@@ -49,7 +49,7 @@ export const useShiftStore = defineStore('shift', {
           value: item.identifier,
         }));
     },
-    activeUsers: (state) => {
+    currentNonFronDeskUsers: (state) => {
       const { users } = state;
       users.filter(({ stateOfWork, role }) => {
         return stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯'];
