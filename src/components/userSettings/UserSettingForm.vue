@@ -95,7 +95,7 @@ const createUserSchema = z.object({
   spaceIds: z.number().array(),
   avatar: z.string().nullish(),
   jobClass: z.number().nullish(),
-  PTLevel: z.number().nullish(),
+  PTLevel: z.number(),
   hireDate: z.string(),
   introducerUserId: z.number().nullish(),
   ancestorUserId: z.number().nullish(),
@@ -109,17 +109,7 @@ const createUserSchema = z.object({
 }, {
   message: '初診等級必填',
   path: ['jobClass'], // path of error
-})
-  .refine((data) => {
-  // PT等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
-    if (isTherapist(data.roleId)) {
-      return !!data.PTLevel;
-    }
-    return true;
-  }, {
-    message: '職等等級必填',
-    path: ['PTLevel'], // path of error
-  });
+});
 
 const { handleSubmit, values, setFieldValue } = useForm<CreateUser>({
   initialValues: targetInitialValues.value,
@@ -139,9 +129,8 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     if (props.type === 'add') {
       let neededValues = values;
-      // PT等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
       if (!isTherapist(values.roleId)) {
-        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass']);
+        neededValues = omit(values as UpdateUser, ['jobClass']);
       }
       await createUser(neededValues);
       emit('submit');
@@ -149,7 +138,7 @@ const onSubmit = handleSubmit(async (values) => {
     else {
       let neededValues = { ...omit(values as UpdateUser, ['avatar']) };
       if (!isTherapist(values.roleId)) {
-        neededValues = omit(values as UpdateUser, ['PTLevel', 'jobClass', 'avatar']);
+        neededValues = omit(values as UpdateUser, ['jobClass', 'avatar']);
       }
 
       const payload = {
@@ -187,7 +176,7 @@ watch(() => values.roleId, () => {
         <OInput type="email" name="email" inside-label="帳號 Email*" error-message="" />
         <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
         <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
-        <OSelect v-if="userStore.canI('READ_PT_LEVEL') && isTherapistSelected" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
+        <OSelect v-if="userStore.canI('READ_PT_LEVEL')" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
         <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
         <template v-if="isTherapistSelected">
           <OSelect name="jobClass" label="初診等級*" :options="classOptions" error-message="" hide-bottom-space />
