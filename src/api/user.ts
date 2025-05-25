@@ -49,6 +49,7 @@ export enum PTLevel {
 }
 export interface User {
   avatarUrl: string | null;
+  ancestor: User | null;
   description: string;
   email: string;
   hireDate: string;
