@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { QTableSlots } from 'quasar';
 </script>
 
 <template>
@@ -8,7 +9,7 @@
     hide-pagination
   >
     <template
-      v-for="(_, name) in $slots"
+      v-for="(_, name) in ($slots as Readonly<QTableSlots>)"
       :key="name"
       #[name]="slotData"
     >
