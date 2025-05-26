@@ -39,3 +39,4 @@ export { default as OImgPreview } from './OImgPreview.vue';
 export { default as BasicBtn } from './BasicBtn.vue';
 export { default as BasicTabs } from './BasicTabs.vue';
 export { default as MoneyDisplay } from '../home/salaryReport/MoneyDisplay.vue';
+export { default as YearMonthSelect } from './YearMonthSelect.vue';
