@@ -3,6 +3,7 @@ import type { SpaceMonthlyConfig } from '@/api/spaceManagement';
 import { BasicDialog, YearMonthSelect } from '@/components/shared';
 import { useSpaceManagementStore } from '@/stores/spaceManagement';
 import dayjs from 'dayjs';
+import type { QTableColumn } from 'quasar';
 import { computed, ref, watch } from 'vue';
 
 const spaceManagementStore = useSpaceManagementStore();
@@ -24,7 +25,7 @@ watch(
   { immediate: true },
 );
 
-const columns = [
+const columns: QTableColumn[] = [
   {
     name: 'name',
     field: 'name',
