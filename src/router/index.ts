@@ -21,7 +21,7 @@ export const routes: RouteRecordRaw[] = [
       ...clientRoutes,
       ...orderRoutes,
       ...userRoutes,
-      // ...gymRoutes,
+      ...gymRoutes,
       // ...storeRoutes,
     ],
   },

@@ -7,8 +7,8 @@ export const gymRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/gym/Gym.vue'),
     meta: {
       label: '場館管理',
-      requiredAuth: true,
-      permission: false,
+      // requiredAuth: true,
+      // permission: false,
       icon: 'o_apartment',
     },
   },
