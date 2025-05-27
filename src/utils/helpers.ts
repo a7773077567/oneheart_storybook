@@ -135,3 +135,8 @@ export function formatPriceWithComma(value: number): string {
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
 }
+
+export function removeZhuyin(input: string) {
+  // Match any Bopomofo (Zhuyin) characters in the Unicode range \u3105-\u312F
+  return input.replace(/[\u3105-\u312F]+/g, '');
+}
