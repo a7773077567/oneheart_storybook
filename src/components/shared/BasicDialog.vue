@@ -5,10 +5,13 @@ import { computed } from 'vue';
 const props = defineProps<{
   modelValue: boolean;
   title: string;
+  confirmMode?: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
+  (e: 'confirm'): void;
+  (e: 'cancel'): void;
 }>();
 
 const model = computed({
@@ -27,7 +30,11 @@ const model = computed({
         <slot />
       </div>
       <div class="dialog__actions">
-        <QBtn label="關閉" color="primary" padding="10px 24px" class="close" @click="model = false" />
+        <QBtn v-if="!confirmMode" label="關閉" color="primary" padding="10px 24px" class="btn" @click="model = false" />
+        <div v-else class="edit-btns">
+          <QBtn label="取消" color="primary" padding="10px 24px" flat @click="model = false, $emit('cancel')" />
+          <QBtn label="確定" color="primary" padding="10px 24px" class="btn" @click="$emit('confirm')" />
+        </div>
       </div>
     </div>
   </QDialog>
@@ -70,7 +77,7 @@ const model = computed({
   line-height: 32px;
 }
 
-.close {
+.btn {
   padding: 10px 24px;
   border-radius: 100px;
   :deep(.block) {
@@ -80,5 +87,11 @@ const model = computed({
     line-height: 20px;
     letter-spacing: 0.1px;
   }
+}
+
+.edit-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 </style>
