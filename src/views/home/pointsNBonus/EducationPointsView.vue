@@ -54,6 +54,13 @@ const cols: QTableProps['columns'] = [
     field: row => dayjs(row.reviewDateTime).format('HH:mm'),
   },
   {
+    name: 'attachmentUrl',
+    required: true,
+    label: '附件',
+    align: 'left',
+    field: 'attachmentUrl',
+  },
+  {
     name: 'action',
     label: '',
     align: 'right',
@@ -104,6 +111,7 @@ async function editReview(reviewId: number) {
     point: data.point,
     reviewDate: dayjs(data.reviewDateTime).format('YYYY-MM-DD'),
     reviewTime: dayjs(data.reviewDateTime).format('HH:mm'),
+    attachment: data.attachmentUrl,
   };
   formType.value = 'edit';
   stateOfPointForm.value = true;
@@ -133,6 +141,9 @@ function deleteConfirm(id: number) {
     }
   });
 }
+
+const stateOfLightbox = ref(false);
+const lightBoxImg = ref('');
 </script>
 
 <template>
@@ -158,9 +169,10 @@ function deleteConfirm(id: number) {
         :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
-        <template #body-cell-reviewScreenshotUrl="{ value }">
+        <template #body-cell-attachmentUrl="{ value }">
           <QTd>
-            <img :src="value" alt="screen shot" style="height:30px;width:60px">
+            <img v-if="value" :src="value" alt="attachment" style="height:30px;width:60px" @click="(lightBoxImg = value), (stateOfLightbox = true)">
+            <span v-else>-</span>
           </QTd>
         </template>
         <template #body-cell-action="{ row }">
@@ -181,6 +193,11 @@ function deleteConfirm(id: number) {
       @create="uploadReview"
     />
   </QDialog>
+  <VueEasyLightbox
+    :visible="stateOfLightbox"
+    :imgs="lightBoxImg"
+    @hide="stateOfLightbox = false"
+  />
 </template>
 
 <style scoped lang="scss">
