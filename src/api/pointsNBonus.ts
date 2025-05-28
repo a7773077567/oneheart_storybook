@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import type { User } from './user';
-import type { PagingMeta } from '@/types/common';
+import type { PagingMeta, S3UploadInfo } from '@/types/common';
 
 /** 外派獎金 */
 export interface RelocationBonus {
@@ -9,6 +9,7 @@ export interface RelocationBonus {
   amount: number;
   reviewDateTime: string;
   user: User;
+  attachmentUrl: string;
 }
 
 export interface NewRelocationBonus {
@@ -16,6 +17,7 @@ export interface NewRelocationBonus {
   title: string;
   amount: number;
   reviewDateTime: string;
+  attachment: string;
 }
 
 // 單一外派獎金
@@ -52,6 +54,12 @@ export async function deleteExpatAllowance(id: number) {
   await api.delete(`expatAllowances/${id}`);
 }
 
+// 取得外派獎金上傳 url
+export async function getExpatAllowanceUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`expatAllowances/${userId}/attachment/write-url`);
+  return data;
+}
+
 /** 寫作津貼 */
 export interface WritingAllowance {
   id: number;
@@ -59,6 +67,7 @@ export interface WritingAllowance {
   amount: number;
   reviewDateTime: string;
   user: User;
+  attachmentUrl: string;
 }
 
 export interface NewWritingAllowance {
@@ -66,6 +75,7 @@ export interface NewWritingAllowance {
   title: string;
   amount: number;
   reviewDateTime: string;
+  attachment: string;
 }
 // 單一寫作津貼
 export async function getWritingAllowance(id: number) {
@@ -101,6 +111,12 @@ export async function deleteWritingAllowance(id: number) {
   await api.delete(`writingAllowances/${id}`);
 }
 
+// 取得寫作津貼上傳 url
+export async function getWritingAllowanceUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`writingAllowances/${userId}/attachment/write-url`);
+  return data;
+}
+
 /** 培訓津貼 */
 export interface TrainingAllowance {
   id: number;
@@ -108,6 +124,7 @@ export interface TrainingAllowance {
   amount: number;
   reviewDateTime: string;
   user: User;
+  attachmentUrl: string;
 }
 
 export interface NewTrainingAllowance {
@@ -115,6 +132,7 @@ export interface NewTrainingAllowance {
   title: string;
   amount: number;
   reviewDateTime: string;
+  attachment: string;
 }
 // 單一培訓津貼
 export async function getTrainingAllowance(id: number) {
@@ -150,6 +168,12 @@ export async function deleteTrainingAllowance(id: number) {
   await api.delete(`trainingAllowances/${id}`);
 }
 
+// 取得培訓津貼上傳 url
+export async function getTrainingAllowanceUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`trainingAllowances/${userId}/attachment/write-url`);
+  return data;
+}
+
 /** 支援獎金 */
 export interface SupportBonus {
   id: number;
@@ -157,6 +181,7 @@ export interface SupportBonus {
   amount: number;
   reviewDateTime: string;
   user: User;
+  attachmentUrl: string;
 }
 
 export interface NewSupportBonus {
@@ -164,6 +189,7 @@ export interface NewSupportBonus {
   title: string;
   amount: number;
   reviewDateTime: string;
+  attachment: string;
 }
 // 單一支援獎金
 export async function getSupportBonus(id: number) {
@@ -197,4 +223,10 @@ export async function updateSupportBonus(id: number, payload: NewRelocationBonus
 // 刪除支援獎金
 export async function deleteSupportBonus(id: number) {
   await api.delete(`supportBonuses/${id}`);
+}
+
+// 取得支援獎金上傳 url
+export async function getSupportBonusUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`supportBonuses/${userId}/attachment/write-url`);
+  return data;
 }
