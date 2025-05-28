@@ -35,6 +35,7 @@ interface State {
   userShifts: UserShift[];
   historyRecords: HistoryRecord[];
   machineSchedules: MachineSchedule[];
+  referralUserId: null | number;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -63,6 +64,7 @@ export const useAppointmentStore = defineStore('appointment', {
     userShifts: [],
     historyRecords: [],
     machineSchedules: [],
+    referralUserId: null,
   }),
   getters: {
     userOptions(state) {
@@ -216,7 +218,7 @@ export const useAppointmentStore = defineStore('appointment', {
     },
   },
   actions: {
-    async getUsers(spaceIds: number[]) {
+    async getUsers(spaceIds?: number[]) {
       const data = await fetchUsers({ spaceIds });
       this.users = data;
     },

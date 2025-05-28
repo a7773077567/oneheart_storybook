@@ -119,11 +119,10 @@ function OpenAppointmentDialog(available: Available) {
   stateOfAppointmentDialog.value = true;
 }
 
-function afterAppointment() {
+function afterAppointment(appointment?: Available) {
   stateOfAppointmentDialog.value = false;
-  $q.dialog({
-    message: '預約成功',
-  });
+  const query = { date: appointment?.date };
+  router.push({ name: 'appointmentListCalendar', ...(appointment?.date ? { query } : {}) });
 }
 </script>
 

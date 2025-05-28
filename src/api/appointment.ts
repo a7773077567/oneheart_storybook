@@ -226,6 +226,7 @@ export interface ClientSchedule {
   userShiftAppointmentId: number;
   userShiftId: number;
   userShiftSlotId: number;
+  referalUser: User;
 }
 
 export interface ClientSchedulesModifyHistory {
@@ -292,6 +293,7 @@ export interface CreateAppointmentPayload {
   userShiftId: number;
   userShiftType: ShiftType;
   isUsingAutoRecommend: boolean;
+  referalUserId: null | number; // G動椅才需要，其他科別帶 null
 }
 
 export interface CreateAppointmentRearrangePayload {
@@ -608,6 +610,7 @@ export const availableReqSchema = z.object({
   endTime: z.string().refine(val => val.length === 5, { message: '請輸入HH:mm格式' }),
   addOnUserShiftTypes: z.array(z.nativeEnum(AddOnServiceTypes)).optional(),
   autoRecommend: z.boolean().optional(),
+  referalUserId: z.number().nullable().optional(),
 })
   .refine(({ startTime, endTime }) => {
     const start = getTimeDate(startTime);
