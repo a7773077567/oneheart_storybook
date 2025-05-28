@@ -206,6 +206,7 @@ export interface ClientSchedule {
   clientId: number;
   clientSchedulesModifyHistories: ClientSchedulesModifyHistory[];
   date: string;
+  firstScheduleState: ScheduleVisitState;
   id: number;
   isBeenRearranged: boolean;
   isEmployeePrice: boolean;

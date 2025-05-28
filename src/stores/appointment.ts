@@ -173,7 +173,7 @@ export const useAppointmentStore = defineStore('appointment', {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
-    needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
+    needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract !== true,
     needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
     targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
     queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],

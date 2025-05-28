@@ -3,8 +3,7 @@ import { computed, ref } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
-import type { ScheduleVisitState } from '@/const/appointment';
-import { PaymentState, ScheduleStateMap } from '@/const/appointment';
+import { PaymentState, ScheduleStateMap, ScheduleVisitState } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
 import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
@@ -50,7 +49,7 @@ const data = computed(() => {
     ...(isMachineOnlyShifts.value ? [{ key: 'device', label: '儀器', value: props.scheduleDetail }] : []),
     { key: 'name', label: '姓名', value: client.value.name },
     { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
-    { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
+    { key: 'isFirstClientSchedule', label: '初診', value: ScheduleVisitState[schedule.value.firstScheduleState] },
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
     { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
@@ -404,7 +403,7 @@ const isEditingReferalUser = ref(false);
     </div>
   </div>
   <QDialog v-model="isEditingFirstSchedule">
-    <FirstScheduleForm :client-name="client.name" :init-val="schedule.isFirstClientSchedule" @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange" />
+    <FirstScheduleForm :client-name="client.name" :init-val="schedule.firstScheduleState" @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange" />
   </QDialog>
   <QDialog v-model="isEditingEmployeePrice">
     <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
