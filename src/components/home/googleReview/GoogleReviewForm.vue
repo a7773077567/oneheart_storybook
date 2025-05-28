@@ -122,7 +122,7 @@ function removeImg(scope: UploaderScope) {
     <QCardSection class="q-pa-lg">
       <h2 class="google_review_form--title">{{ type === 'add' ? '上傳 Google 評論' : '編輯 Google 評論' }}</h2>
     </QCardSection>
-    <QCardSection class="q-pa-lg">
+    <QCardSection class="q-pa-lg content">
       <form>
         <OInput name="title" inside-label="項目名稱*" error-message="" />
         <OSelect name="userId" label="治療者(得分者)*" error-message="" :options="therapistOptions" />
@@ -163,6 +163,9 @@ function removeImg(scope: UploaderScope) {
 <style scoped lang="scss">
 .google_review_form {
   min-width: 480px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   &--title {
     @include text-style($headline-small, $on-surface);
   }
@@ -174,6 +177,9 @@ function removeImg(scope: UploaderScope) {
       background-color: transparent !important;
       color: transparent;
     }
+  }
+  .content {
+    overflow: auto;
   }
 }
 </style>
