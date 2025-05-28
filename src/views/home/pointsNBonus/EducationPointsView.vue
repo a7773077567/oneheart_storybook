@@ -6,6 +6,7 @@ import { type EducationPointContent, deleteEducationPoint, getAEducationPoint, g
 import EducationPointsForm from '@/components/home/educationPoints/EducationPointsForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
+import { detectFileType } from '@/utils/helpers';
 
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
@@ -59,6 +60,12 @@ const cols: QTableProps['columns'] = [
     label: '附件',
     align: 'left',
     field: 'attachmentUrl',
+    format: (val, row) => {
+      if (!val)
+        return null;
+
+      return row.fileType === 'image' ? ({ type: 'image', url: val }) : ({ type: 'pdf', url: val });
+    },
   },
   {
     name: 'action',
@@ -89,7 +96,13 @@ const onRequest: QTableProps['onRequest'] = async (props) => {
 async function getReviewList() {
   const userId = selectedTherapist.value || null;
   const { data, meta } = await getEducationPointList({ ...(userId && { userId }), page: pagination.value.page, take: pagination.value.rowsPerPage });
-  reviewList.value = data;
+  reviewList.value = await Promise.all(data.map(async (review) => {
+    if (!review.attachmentUrl)
+      return { ...review, fileType: null };
+
+    const fileType = await detectFileType(review.attachmentUrl);
+    return { ...review, fileType };
+  }));
   pagination.value.page = meta?.page ?? 1;
   pagination.value.rowsNumber = meta?.itemCount ?? 1;
 }
@@ -144,6 +157,10 @@ function deleteConfirm(id: number) {
 
 const stateOfLightbox = ref(false);
 const lightBoxImg = ref('');
+
+function checkAttachment(url: string) {
+  window.open(url, '_black');
+}
 </script>
 
 <template>
@@ -171,7 +188,8 @@ const lightBoxImg = ref('');
       >
         <template #body-cell-attachmentUrl="{ value }">
           <QTd>
-            <img v-if="value" :src="value" alt="attachment" style="height:30px;width:60px" @click="(lightBoxImg = value), (stateOfLightbox = true)">
+            <QIcon v-if="value?.type === 'pdf'" name="attach_file" size="sm" @click="checkAttachment(value.url)" />
+            <img v-else-if="value?.type === 'image'" :src="value.url" alt="attachment" style="height:30px;width:60px" @click="(lightBoxImg = value.url), (stateOfLightbox = true)">
             <span v-else>-</span>
           </QTd>
         </template>

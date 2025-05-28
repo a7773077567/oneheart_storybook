@@ -6,12 +6,12 @@ import { createEducationPoints, getEducationUploadURL, updateEducationPoint, upl
 import { computed, ref } from 'vue';
 import { RoleType } from '@/api/user';
 import dayjs from 'dayjs';
-import type { QUploader as UploaderScope } from 'quasar';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 
+type FormTypes = typeof schema & { attachment?: string | undefined };
 const props = defineProps<{
   type: T;
-  initVals?: T extends 'edit' ? Partial<FormTypes> : null;
+  initVals?: T extends 'edit' ? FormTypes : null;
   role: RoleType;
   therapistOptions: { label: string; value: number }[];
   reviewId?: T extends 'edit' ? number : undefined;
@@ -31,10 +31,8 @@ const schema = z.object({
   attachment: z.string(),
 });
 
-type FormTypes = typeof schema & { attachment?: string | undefined };
-
 const showFileErrorMsg = ref(false);
-const newUploadPhoto = ref<null | File>(null);
+const newAttachment = ref<null | File>(null);
 const initialValues = computed(() => {
   if (props.type === 'edit')
     return props.initVals;
@@ -43,10 +41,11 @@ const initialValues = computed(() => {
     reviewDate: dayjs().format('YYYY-MM-DD'),
     reviewTime: dayjs().format('HH:mm'),
     userId: props.role === RoleType['物理治療師'] ? props.therapistOptions[0].value : undefined,
+    attachment: null,
   };
 });
 
-const { handleSubmit, meta, setFieldValue } = useForm({
+const { handleSubmit, meta, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: initialValues.value,
 });
@@ -56,9 +55,9 @@ const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true;
   let fileUUID = null;
   try {
-    if (newUploadPhoto.value) {
+    if (newAttachment.value) {
       const { fileName, url, maxFileSizeInMB } = await getEducationUploadURL({ userId: values.userId });
-      await upload2awsS3(url, newUploadPhoto.value, maxFileSizeInMB);
+      await upload2awsS3(url, newAttachment.value, maxFileSizeInMB);
       fileUUID = extractUuidFromS3Url(fileName);
       if (!fileUUID)
         throw new Error('no file');
@@ -70,7 +69,7 @@ const onSubmit = handleSubmit(async (values) => {
         userId: values.userId,
         title: values.title,
         point: values.point,
-        attachment: newUploadPhoto.value ? (fileUUID as string) : extractUuidFromS3Url(values.attachment) as string,
+        attachment: newAttachment.value ? (fileUUID as string) : extractUuidFromS3Url(values.attachment) as string,
       });
     }
     else {
@@ -90,18 +89,11 @@ const onSubmit = handleSubmit(async (values) => {
   }
 });
 
-// typescript check force to define the types as readonly any[]
-function handleUpload(files: readonly any[]) {
-  const file = files[0];
+function handleUpload(file: File) {
   showFileErrorMsg.value = false;
-  newUploadPhoto.value = file;
+  newAttachment.value = file;
   const previewURL = URL.createObjectURL(file);
   setFieldValue('attachment', previewURL);
-}
-function removeImg(scope: UploaderScope) {
-  scope.removeQueuedFiles();
-  newUploadPhoto.value = null;
-  setFieldValue('attachment', '');
 }
 </script>
 
@@ -117,29 +109,16 @@ function removeImg(scope: UploaderScope) {
         <OInput name="point" inside-label="教育積分*" type="number" error-message="" />
         <OInput date-mode name="reviewDate" inside-label="上傳日期*" mask="date" :rules="['date']" error-message="" />
         <OTime name="reviewTime" now-btn label="上傳時間" error-message="" />
-        <Field v-slot="{ field }" name="attachment">
-          <QUploader
-            flat
-            style="max-width: 300px"
-            :multiple="false"
-            :max-files="1"
-            accept=".jpg, .png, image/*"
-            :max-file-size="5242880"
-            @added="handleUpload"
-            @rejected="showFileErrorMsg = true"
-          >
-            <template #header="scope">
-              <QBtn v-if="scope.canAddFiles || scope.canUpload" unelevated rounded color="blue-1" text-color="dark" icon="add" label="上傳截圖" @click="scope?.queuedFiles?.length >= 1 ? scope.removeQueuedFiles : scope.pickFiles">
-                <QUploaderAddTrigger />
-              </QBtn>
-              <p v-if="showFileErrorMsg" style="color: red">圖片尺寸太大</p>
-              <p v-if="!field.value" style="color: rgba(69, 70, 79, 1)" class="q-mt-md">*必填。每次限傳一張，格式須為 JPG 或 PNG，檔案大小不得超過 5MB</p>
-            </template>
-            <template #list="scope">
-              <OImgPreview v-if="field.value" :url="field.value" @remove="removeImg(scope)" />
-            </template>
-          </QUploader>
-        </Field>
+        <div v-if="initialValues?.attachment && values.attachment" class="preview_files">
+          <OPreview
+            label="附件資料"
+            name="attachment"
+          />
+        </div>
+        <template v-else>
+          <p style="color: rgba(69, 70, 79, 1)" class="q-mb-md">*必填。每次限傳一張，格式須為 圖片 或 PDF，檔案大小不得超過 5MB</p>
+          <OFile :model-value="newAttachment" name="attachment" label="選擇檔案" :max-file-size="5242880" accept=".jpg, .png, image/*, .pdf" @update:model-value="handleUpload" />
+        </template>
       </form>
     </QCardSection>
     <QCardSection class="q-pa-lg row justify-end">
