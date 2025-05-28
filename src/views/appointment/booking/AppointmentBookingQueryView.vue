@@ -11,6 +11,9 @@ import { getType } from '@/utils/mappers';
 import { AddOnServiceTypes, MachineTypes, PhysicalTypes, ShiftType } from '@/const/general';
 import { removeZhuyin } from '@/utils/helpers';
 import { omit } from 'radash';
+import type { QSelectSlots } from 'quasar';
+
+type Scope = Parameters<QSelectSlots['option']>[0];
 
 const $q = useQuasar();
 const router = useRouter();
@@ -162,12 +165,12 @@ function filterReferral(val: string) {
         @clear="keyword = ''"
       >
         <template #option="scope">
-          <QItem v-bind="scope.itemProps" style="max-width: 100%">
+          <QItem v-bind="(scope as Scope).itemProps" style="max-width: 100%">
             <QItemSection>
-              <QItemLabel>{{ scope.opt.label }}</QItemLabel>
+              <QItemLabel>{{ (scope as Scope).opt.label }}</QItemLabel>
             </QItemSection>
             <QItemSection>
-              <QItemLabel caption>{{ scope.opt.space }}</QItemLabel>
+              <QItemLabel caption>{{ (scope as Scope).opt.space }}</QItemLabel>
             </QItemSection>
           </QItem>
         </template>

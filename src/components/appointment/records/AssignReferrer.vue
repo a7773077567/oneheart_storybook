@@ -6,6 +6,7 @@ import { number, object } from 'zod';
 import { RoleType, type User, fetchSpaces, fetchUsers, updateReferalUser } from '@/api';
 import { useNotify } from '@/composables/notify';
 import { removeZhuyin } from '@/utils/helpers';
+import type { QSelectSlots } from 'quasar';
 
 const props = defineProps<{
   title: string;
@@ -56,12 +57,14 @@ const onSubmit = handleSubmit(async (v) => {
 function filterReferral(val: string) {
   keyword.value = removeZhuyin(val);
 }
+
+type Scope = Parameters<QSelectSlots['option']>[0];
 </script>
 
 <template>
-  <QCard class="machine_operator_form">
+  <QCard class="form">
     <QCardSection>
-      <h2 class="machine_operator_form--title">{{ title }}</h2>
+      <h2 class="form--title">{{ title }}</h2>
     </QCardSection>
     <QCardSection class="q-py-lg">
       <form @submit.prevent>
@@ -78,12 +81,12 @@ function filterReferral(val: string) {
           @clear="keyword = ''"
         >
           <template #option="scope">
-            <QItem v-bind="scope.itemProps" style="max-width: 100%">
+            <QItem v-bind="(scope as Scope).itemProps" style="max-width: 100%">
               <QItemSection>
-                <QItemLabel>{{ scope.opt.label }}</QItemLabel>
+                <QItemLabel>{{ (scope as Scope).opt.label }}</QItemLabel>
               </QItemSection>
               <QItemSection>
-                <QItemLabel caption>{{ scope.opt.space }}</QItemLabel>
+                <QItemLabel caption>{{ (scope as Scope).opt.space }}</QItemLabel>
               </QItemSection>
             </QItem>
           </template>
@@ -98,7 +101,7 @@ function filterReferral(val: string) {
 </template>
 
 <style scoped lang="scss">
-.machine_operator_form {
+.form {
   width: 336px;
   &--title {
     font-size: 24px;
