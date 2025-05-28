@@ -32,7 +32,6 @@ const schema = z.object({
   attachment: z.string(),
 });
 
-const showFileErrorMsg = ref(false);
 const newAttachment = ref<null | File>(null);
 const initialValues = computed(() => {
   if (props.type === 'edit')
@@ -91,8 +90,11 @@ const onSubmit = handleSubmit(async (values) => {
   }
 });
 
-function handleUpload(file: File) {
-  showFileErrorMsg.value = false;
+function handleUpload(file: File | null) {
+  if (!file) {
+    newAttachment.value = null;
+    return;
+  }
   newAttachment.value = file;
   const previewURL = URL.createObjectURL(file);
   setFieldValue('attachment', previewURL);
