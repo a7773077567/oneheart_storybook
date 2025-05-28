@@ -12,3 +12,10 @@ export interface PageQuery {
   take?: number;
   order?: 'ASC' | 'DESC';
 }
+
+export interface S3UploadInfo {
+  method: string;
+  url: string;
+  maxFileSizeInMB: number;
+  fileName: string;
+}
