@@ -54,7 +54,7 @@ const data = computed(() => {
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
     { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
-    { key: 'referalUser', label: '轉介治療師', value: schedule.value.referalUser ? `${schedule.value.referalUser.name}(${schedule.value.referalUser.spaces.map(s => s.name).join(',')})` : '未填寫' },
+    ...(schedule.value.userShift.type === ShiftType['G動椅'] ? ([{ key: 'referalUser', label: '轉介治療師', value: schedule.value.referalUser ? `${schedule.value.referalUser.name}(${schedule.value.referalUser.spaces.map(s => s.name).join(',')})` : '未填寫' }]) : []),
     { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
     { key: 'phone', label: '電話', value: client.value.phone },
     { key: 'address', label: '地址', value: client.value.address ?? '無' },
