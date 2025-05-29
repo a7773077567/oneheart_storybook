@@ -4,11 +4,13 @@ import { ExpansionItem, MoneyDisplay, OrganizationChart, Table } from '@/compone
 import { BasicBtn, BasicTabs } from '@/components/shared';
 import { useSalaryReportStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
+import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 const salaryStore = useSalaryReportStore();
 const userStore = useUserStore();
+const $q = useQuasar();
 
 // reset authentication to ensure whenever we enter this page, we need to re-authenticate
 salaryStore.isAuthenticated = false;
@@ -28,10 +30,14 @@ const state = reactive({
 
 watch(
   () => state.currentTab,
-  () => salaryStore.getTherapistSalaryDetail(
-    userStore.userInfo!.id,
-    state.currentTab,
-  ),
+  async () => {
+    $q.loading.show();
+    await salaryStore.getTherapistSalaryDetail(
+      userStore.userInfo!.id,
+      state.currentTab,
+    );
+    $q.loading.hide();
+  },
   { immediate: true },
 );
 
