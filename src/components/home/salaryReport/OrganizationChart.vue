@@ -54,7 +54,7 @@ onMounted(async () => {
   // because of some restrictions of apexTree, we need to remove the first child and re-render again
   // the nodeWidth is fixed so we have to reset the nodeWidth
   svgTreeEl.removeChild(svgTreeEl.firstChild!);
-  const newTree = new ApexTree(svgTreeEl, { ...options, nodeWidth: maxNodeWidth });
+  const newTree = new ApexTree(svgTreeEl, { ...options, nodeWidth: maxNodeWidth + 20 });
   newTree.render(props.data);
 
   const svgEle = document.querySelector('#apexTreeWrapper > svg')!;
