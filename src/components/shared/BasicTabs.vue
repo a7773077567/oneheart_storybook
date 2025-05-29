@@ -46,6 +46,9 @@ $border: 1px solid $outline;
     &:not(:last-child) {
       border-right: $border;
     }
+    &:hover {
+      background-color: rgba(223, 234, 252, 0.5);
+    }
 
     &--active {
       @extend .tabs__tab;
