@@ -30,4 +30,7 @@ import type { QTableSlots } from 'quasar';
 :deep(td) {
   @include text-style($body-medium, $on-surface);
 }
+:deep(td > span) {
+  @include text-style($body-medium, $on-surface);
+}
 </style>
