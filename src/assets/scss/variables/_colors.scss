@@ -41,6 +41,9 @@ $inverse-primary: rgba(183, 196, 255, 1);
 $scrim: rgba(0, 0, 0, 0.32);
 $shadow: rgba(0, 0, 0, 1);
 
+$forest: #008524;
+$warning: #E75D00;
+
 
 $colors: (
   primary: $primary,
@@ -72,7 +75,23 @@ $colors: (
   surface-container-high: $surface-container-high,
   surface-container-highest: $surface-container-highest,
   on-surface: $on-surface,
-  on-surface-variant: $on-surface-variant
+  on-surface-variant: $on-surface-variant,
+
+  on-surface-bright: #F8FBFF,
+
+  outline: rgba(118, 118, 128, 1),
+  outline-variant: rgba(219, 218, 231, 1),
+
+  inverse-surface: rgba(49, 49, 55, 1),
+  inverse-on-surface: rgba(255, 255, 255, 1),
+  inverse-primary: rgba(183, 196, 255, 1),
+
+  scrim: rgba(0, 0, 0, 0.32),
+  shadow: rgba(0, 0, 0, 1),
+
+  forest: #008524,
+
+  warning: $warning
 );
 
 @each $k, $v in $colors {
