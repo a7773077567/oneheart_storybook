@@ -53,7 +53,7 @@ const data = computed(() => {
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
     { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
-    ...(schedule.value.userShift.type === ShiftType['G動椅'] ? ([{ key: 'referalUser', label: '轉介治療師', value: schedule.value.referalUser ? `${schedule.value.referalUser.name}(${schedule.value.referalUser.spaces.map(s => s.name).join(',')})` : '未填寫' }]) : []),
+    ...(schedule.value.userShift.type === ShiftType['G動椅'] ? ([{ key: 'referalUser', label: '轉介治療師', value: schedule.value.referalUser ? `${schedule.value.referalUser.name} (${schedule.value.referalUser.spaces.map(s => s.name).join(',')})` : '未填寫' }]) : []),
     { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
     { key: 'phone', label: '電話', value: client.value.phone },
     { key: 'address', label: '地址', value: client.value.address ?? '無' },
@@ -240,9 +240,6 @@ const checkinReminder = computed(() => {
 // 預約單時間編輯判斷
 // 儀器內含預約不可編輯
 const includeMachineAddons = computed(() => schedule.value.addOnServices.some(machine => machine.isAddOn));
-
-// 轉介人
-const isEditingReferalUser = ref(false);
 </script>
 
 <template>
@@ -340,9 +337,6 @@ const isEditingReferalUser = ref(false);
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               {{ row.value }}
-            </div>
-            <div>
-              <QBtn round flat icon="edit" size="sm" @click="isEditingReferalUser = true" />
             </div>
           </div>
         </template>
@@ -480,13 +474,6 @@ const isEditingReferalUser = ref(false);
       :client-schedule-id="scheduleId"
       @save="(isEditingOperator = false), (appointmentStore.getClientSchedule(+props.scheduleId))"
       @cancel="isEditingOperator = false"
-    />
-  </QDialog>
-  <QDialog v-if="isEditingReferalUser" v-model="isEditingReferalUser" persistent>
-    <AssignReferrer
-      title="編輯轉介治療師" disable-time :init-val="schedule.referalUser?.id ?? null"
-      :client-schedule-id="scheduleId" @cancel="isEditingReferalUser = false"
-      @save="(isEditingReferalUser = false), (appointmentStore.getClientSchedule(+props.scheduleId))"
     />
   </QDialog>
 </template>
