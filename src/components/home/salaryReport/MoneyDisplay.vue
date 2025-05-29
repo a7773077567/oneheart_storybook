@@ -80,6 +80,10 @@ const amountClass = computed(() => {
     border-radius: 50%;
     background-color: $secondary-container;
     cursor: pointer;
+    transition: all 150ms ease;
+    &:hover {
+      filter: brightness(0.9);
+    }
   }
 }
 </style>
