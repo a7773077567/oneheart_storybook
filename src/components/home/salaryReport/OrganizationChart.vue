@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const options = {
-  nodeWidth: 117,
+  // nodeWidth: 117,
   nodeHeight: 60,
   childrenSpacing: 56,
   siblingSpacing: 24,
@@ -39,8 +39,23 @@ onMounted(async () => {
   // ensuring there's enough space available for proper SVG rendering.
   await nextTick();
 
-  const tree = new ApexTree(document.getElementById('svg-tree'), options);
+  const svgTreeEl = document.getElementById('svg-tree')!;
+
+  const tree = new ApexTree(svgTreeEl, options);
   tree.render(props.data);
+
+  const nodeEls = document.querySelectorAll('.node__label')!;
+  const maxNodeWidth = [...nodeEls].reduce((acc, item) => {
+    return item.clientWidth > acc
+      ? acc += item.clientWidth
+      : acc;
+  }, 0);
+
+  // because of some restrictions of apexTree, we need to remove the first child and re-render again
+  // the nodeWidth is fixed so we have to reset the nodeWidth
+  svgTreeEl.removeChild(svgTreeEl.firstChild!);
+  const newTree = new ApexTree(svgTreeEl, { ...options, nodeWidth: maxNodeWidth });
+  newTree.render(props.data);
 
   const svgEle = document.querySelector('#apexTreeWrapper > svg')!;
 
