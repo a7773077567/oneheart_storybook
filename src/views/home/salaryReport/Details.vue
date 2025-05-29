@@ -24,7 +24,7 @@ const tabs = ['當前月', '上個月', '上上個月'].map((item, idx) => {
 
 const state = reactive({
   currentTab: tabs[0].name,
-  showAmount: true,
+  showAmount: false,
   educationSharingExpand: false,
 });
 
