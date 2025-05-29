@@ -38,7 +38,17 @@ export const reportRoutes: RouteRecordRaw[] = [{
       name: 'payrollExport',
       component: () => import('@/views/report/PayrollExport.vue'),
       meta: {
-        label: '匯出報表 - 薪水報表',
+        label: '匯出報表 - 薪資報表',
+        requiredAuth: true,
+        hideFromNav: true,
+      },
+    },
+    {
+      path: 'payroll-for-hr',
+      name: 'payrollExport4HR',
+      component: () => import('@/views/report/PayrollExport4HR.vue'),
+      meta: {
+        label: '匯出報表 - 薪資報表',
         requiredAuth: true,
         hideFromNav: true,
       },

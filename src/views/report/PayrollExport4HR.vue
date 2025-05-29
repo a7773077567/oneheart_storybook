@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { type SalaryReportParams, exportSalaryReport, fetchSpaces } from '@/api';
+import { type SalaryReportParams, exportSalaryReport4HR, fetchSpaces } from '@/api';
 import dayjs from 'dayjs';
 
 const spaceOptions = ref<{ label: string; value: number }[]>([]);
@@ -18,7 +18,7 @@ async function submit() {
     return;
   isDownloading.value = true;
   try {
-    await exportSalaryReport({
+    await exportSalaryReport4HR({
       yearMonth: dayjs(form.value.yearMonth).format('YYYY/MM'),
       spaceIds: form.value.spaceIds,
     });
