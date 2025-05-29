@@ -12,7 +12,7 @@ export async function exportSalaryReport(params: SalaryReportParams) {
   const url = window.URL.createObjectURL(new Blob([blobParts]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', '薪資報表.xlsx');
+  link.setAttribute('download', `${params.yearMonth}月薪資報表.xlsx`);
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -26,7 +26,7 @@ export async function exportSalaryReport4HR(params: SalaryReportParams) {
   const url = window.URL.createObjectURL(new Blob([blobParts]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', '薪資報表 for HR.xlsx');
+  link.setAttribute('download', `${params.yearMonth}月薪資報表 for HR.xlsx`);
   document.body.appendChild(link);
   link.click();
   link.remove();
