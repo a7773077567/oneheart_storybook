@@ -81,6 +81,7 @@ watch(() => props.disable, (newVal) => {
     </slot>
 
     <template #header>
+      <slot name="tooltip" />
       <QItemSection avatar style="width: 180px;">
         <p class="label">{{ label }}</p>
       </QItemSection>
