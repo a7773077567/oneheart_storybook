@@ -168,7 +168,7 @@ function showPositionBonus(itemLabel: string) {
               <RouterLink :to="{ name: 'writingAllowance' }" class="anchor">查看寫作津貼列表</RouterLink>
             </template>
             <template v-else-if="item.label === '支援獎金'" #row-1>
-              <RouterLink :to="{}" class="anchor">查看支援獎金列表</RouterLink>
+              <RouterLink :to="{ name: 'supportBonus' }" class="anchor">查看支援獎金列表</RouterLink>
             </template>
           </ExpansionItem>
         </template>
