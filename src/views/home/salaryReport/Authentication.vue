@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { authenticateSalaryDetail } from '@/api/home/salaryReport';
+import { useDialog } from '@/composables/dialog';
 import { useSalaryReportStore } from '@/stores';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -10,14 +12,19 @@ const pwd = ref('');
 
 async function onSubmit() {
   try {
-    const res = await salaryReportStore.authenticate(pwd.value);
-    if (res === 'success') {
+    const res = await authenticateSalaryDetail(pwd.value);
+    if (res === 'Password matched') {
       salaryReportStore.isAuthenticated = true;
       router.push({ name: 'salaryReportDetails' });
     }
   }
   catch (err) {
     console.error(err);
+    useDialog({
+      title: '密碼錯誤',
+      message: '請重新輸入密碼',
+      type: 'confirm',
+    });
   }
 }
 </script>

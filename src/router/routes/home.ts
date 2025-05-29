@@ -110,7 +110,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             name: 'salaryReportAuthentication',
             component: () => import('@/views/home/salaryReport/Authentication.vue'),
             meta: {
-              requiredAuth: false,
+              requiredAuth: true,
             },
           },
           {
@@ -118,7 +118,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             name: 'salaryReportDetails',
             component: () => import('@/views/home/salaryReport/Details.vue'),
             meta: {
-              requiredAuth: false,
+              requiredAuth: true,
             },
             beforeEnter: () => {
               const salaryReportStore = useSalaryReportStore();

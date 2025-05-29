@@ -130,6 +130,8 @@ const firstTokenList = [
   'resend-activation-email',
   'clientGroups',
   'dottedSign',
+  'salaries/therapist-salary-detail',
+  'salaries/password-recheck',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
