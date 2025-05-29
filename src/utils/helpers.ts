@@ -162,3 +162,6 @@ export async function detectFileType(url: string): Promise<FileType> {
     return 'unknown';
   }
 }
+export function toCurrency(val: number) {
+  return val.toLocaleString('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+}
