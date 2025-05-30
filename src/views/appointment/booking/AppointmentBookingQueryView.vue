@@ -2,9 +2,9 @@
 import { computed, ref, watch } from 'vue';
 import { useFieldArray, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
+import { useAppointmentStore, useOptionStore, useShiftStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
-import { RoleType, type User, availableReqSchema, fetchSpaces, fetchUsers } from '@/api';
+import { RoleType, type User, availableReqSchema, fetchUsers } from '@/api';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
@@ -20,6 +20,8 @@ const router = useRouter();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 const shiftStore = useShiftStore();
+const optionStore = useOptionStore();
+
 const selectLabel = ref('治療師');
 const therapistOptions = ref<any[]>([]);
 
@@ -120,8 +122,7 @@ const keyword = ref('');
 const filterReferralList = computed(() => keyword.value ? referralList.value.filter(user => user.name.includes(keyword.value)) : referralList.value);
 async function getReferralList() {
   isFetchingReferral.value = true;
-  const spaces = await fetchSpaces();
-  const res = await fetchUsers({ spaceIds: spaces.map(s => s.id), roleTypes: [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長'], RoleType['物理治療師']] });
+  const res = await fetchUsers({ spaceIds: optionStore.spaceIds, roleTypes: [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長'], RoleType['物理治療師']] });
   referralList.value = res.map(user => ({ label: user.name, value: user.id, space: user.spaces.map(s => s.name).join(','), ...user }));
   isFetchingReferral.value = false;
 }

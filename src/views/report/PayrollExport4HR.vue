@@ -1,10 +1,11 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { type SalaryReportParams, exportSalaryReport4HR, fetchSpaces } from '@/api';
+import { type SalaryReportParams, exportSalaryReport4HR } from '@/api';
 import dayjs from 'dayjs';
+import { useOptionStore } from '@/stores';
 
-const spaceOptions = ref<{ label: string; value: number }[]>([]);
-await fetchSpaces().then(res => spaceOptions.value = res.map(space => ({ label: space.name, value: space.id })));
+const optionStore = useOptionStore();
+const spaceOptions = ref<{ label: string; value: number }[]>(optionStore.spaceList.map(space => ({ label: space.name, value: space.id })));
 
 const form = ref<SalaryReportParams>({
   yearMonth: '',
