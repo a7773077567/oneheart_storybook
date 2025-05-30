@@ -103,6 +103,7 @@ export const homeRoutes: RouteRecordRaw[] = [
         meta: {
           label: '薪資詳情',
           requiredAuth: true,
+          permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
         },
         children: [
           {
@@ -111,6 +112,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/home/salaryReport/Authentication.vue'),
             meta: {
               requiredAuth: true,
+              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
             },
           },
           {
@@ -119,6 +121,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/home/salaryReport/Details.vue'),
             meta: {
               requiredAuth: true,
+              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
             },
             beforeEnter: () => {
               const salaryReportStore = useSalaryReportStore();
