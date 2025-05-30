@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { PTLevel, RoleType, createUser, fetchSpaces, fetchUsers, updateUser, uploadAvatar } from '@/api';
+import { PTLevel, RoleType, createUser, fetchUsers, updateUser, uploadAvatar } from '@/api';
 import type { CreateUser, UpdateUser } from '@/api';
 import { useForm } from 'vee-validate';
 import { useQuasar } from 'quasar';
-import { useUserStore } from '@/stores';
+import { useOptionStore, useUserStore } from '@/stores';
 import { extractUuidFromS3Url } from '@/utils/helpers';
 import { omit } from 'radash';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -23,9 +23,10 @@ const emit = defineEmits<{
 const $q = useQuasar();
 const userStore = useUserStore();
 const targetUser = computed(() => userStore.targetUser!);
+const optionStore = useOptionStore();
 
 // get data
-const [spaces, users] = await Promise.all([fetchSpaces(), fetchUsers({ spaceIds: [userStore.currentSpaceId!] })]);
+const users = await fetchUsers({ spaceIds: optionStore.spaceIds });
 
 const weightForOrderOptions = [...Array(10).fill(1).map((item, idx) => ({ label: `${item + idx}`, value: item + idx })), { label: '99', value: 99 }];
 const roleIdOptions = [
@@ -40,7 +41,7 @@ const roleIdOptions = [
   { label: '教練 ', value: RoleType['教練'] },
   { label: '櫃檯 ', value: RoleType['櫃檯'] },
 ];
-const spaceOptions = spaces.map(space => ({ label: space.name, value: space.id }));
+const spaceOptions = optionStore.spaceList.map(space => ({ label: space.name, value: space.id }));
 const usersOptions = users.map(user => ({ label: user.name, value: user.id }));
 const avatarPreviewFile = ref<File | null>();
 const avatarPreviewUrl = computed(() => {
