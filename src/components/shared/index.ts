@@ -36,3 +36,8 @@ export { default as SwitchBtn } from './SwitchBtn.vue';
 export { default as BasicDialog } from './BasicDialog.vue';
 export { default as SimpleSelect } from './SimpleSelect.vue';
 export { default as OImgPreview } from './OImgPreview.vue';
+export { default as BasicBtn } from './BasicBtn.vue';
+export { default as BasicTabs } from './BasicTabs.vue';
+export { default as MoneyDisplay } from '../home/salaryReport/MoneyDisplay.vue';
+export { default as YearMonthSelect } from './YearMonthSelect.vue';
+export { default as BasicInput } from './BasicInput.vue';

@@ -9,6 +9,7 @@ import { AccountState, PTLevel, WorkState } from '@/api';
 const { currentRoute } = useLayoutRoute();
 const userStore = useUserStore();
 await userStore.getUsers();
+console.log('mounted');
 
 const jobTitleFilter = ref(userStore.userJobTitleOptions.map(item => item.value));
 

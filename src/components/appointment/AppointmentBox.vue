@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Client, createAppointment, createAppointmentRearrange } from '@/api';
+import { type Available, type Client, createAppointment, createAppointmentRearrange } from '@/api';
 import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
 import { getDateLabel, getTypeLabel } from '@/utils/mappers';
@@ -9,6 +9,7 @@ import { OInput, OMemberSearch } from '@/components/shared';
 import { useNotify } from '@/composables/notify';
 import { useDialog } from '@/composables/dialog';
 import { useQuasar } from 'quasar';
+import { ShiftType } from '@/const/general';
 
 interface Column<T> {
   key: keyof T | string;
@@ -23,8 +24,8 @@ interface TableData {
 }
 
 const emit = defineEmits<{
-  appointment: [];
-  close: [];
+  (e: 'appointment', appointment?: Available): void;
+  (e: 'close'): void;
 }>();
 
 const router = useRouter();
@@ -84,6 +85,7 @@ async function appointment() {
       spaceId: space.id,
       userShiftType: type,
       isUsingAutoRecommend: autoRecommand,
+      referalUserId: type === ShiftType['G動椅'] ? appointmentStore.referralUserId : null,
       ...(appointmentStore.queryAddOns.length > 0 ? { addOnUserShiftTypes: appointmentStore.queryAddOns } : {}),
     });
     await appointmentStore.getAvailable(appointmentStore.availableQuery!);
@@ -108,8 +110,8 @@ async function appointment() {
     }
     return;
   }
+  emit('appointment', appointmentStore.targetAvailable);
   appointmentStore.resetTargetAppointmentState();
-  emit('appointment');
 }
 
 const showBlacklistAlert = ref(false);

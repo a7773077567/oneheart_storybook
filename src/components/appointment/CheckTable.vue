@@ -41,7 +41,7 @@ defineProps<{
 
 .cell {
   display: grid;
-  grid-template-columns: 85px 1fr;
+  grid-template-columns: auto 1fr;
   height: 100%;
   border: 1px solid black;
   &--custom {

@@ -3,8 +3,7 @@ import { computed, ref } from 'vue';
 import { useAppointmentStore, useUserStore } from '@/stores';
 import { getDurationLabel } from '@/utils/date';
 import dayjs from 'dayjs';
-import type { ScheduleVisitState } from '@/const/appointment';
-import { PaymentState, ScheduleStateMap } from '@/const/appointment';
+import { PaymentState, ScheduleStateMap, ScheduleVisitState } from '@/const/appointment';
 import router from '@/router';
 import { useQuasar } from 'quasar';
 import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
@@ -18,6 +17,7 @@ import { AddOnServiceTypes, MachineShifts, PhysicalTypes, ShiftType } from '@/co
 import EditMachineForm from './EditMachineForm.vue';
 import type { FormContext } from 'vee-validate';
 import AssignMachineOperator from './AssignMachineOperator.vue';
+import AssignReferrer from './AssignReferrer.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -49,10 +49,11 @@ const data = computed(() => {
     ...(isMachineOnlyShifts.value ? [{ key: 'device', label: '儀器', value: props.scheduleDetail }] : []),
     { key: 'name', label: '姓名', value: client.value.name },
     { key: 'doctor', label: '治療師/教練', value: userShift.value?.user?.name ?? '' },
-    { key: 'isFirstClientSchedule', label: '初診', value: schedule.value.isFirstClientSchedule ? '初診' : '複診' },
+    { key: 'isFirstClientSchedule', label: '初診', value: ScheduleVisitState[schedule.value.firstScheduleState] },
     { key: 'isEmployeePrice', label: '員工價', value: schedule.value.isEmployeePrice },
     { key: 'autoRecommendation', label: '自動推薦', value: schedule.value.isUsingAutoRecommend },
     { key: 'lineId', label: 'LINE ID', value: client.value.lineUserId },
+    ...(schedule.value.userShift.type === ShiftType['G動椅'] ? ([{ key: 'referalUser', label: '轉介治療師', value: schedule.value.referalUser ? `${schedule.value.referalUser.name} (${schedule.value.referalUser.spaces.map(s => s.name).join(',')})` : '未填寫' }]) : []),
     { key: 'liffIntroducerName', label: '介紹人', value: client.value.liffIntroducerName ?? '未填寫' },
     { key: 'phone', label: '電話', value: client.value.phone },
     { key: 'address', label: '地址', value: client.value.address ?? '無' },
@@ -250,7 +251,12 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
           <span>會員編號</span><span>{{ scheduleDetail.clientId }}</span>
         </p>
         <div class="payment-state">
-          <QChip v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false" style="background-color: #F8C9CB;">未結帳</QChip>
+          <QChip
+            v-if="schedule.paymentState === PaymentState.未結帳" square :ripple="false"
+            style="background-color: #F8C9CB;"
+          >
+            未結帳
+          </QChip>
           <HighConversionOpportunity v-if="schedule.isHighSalesOpportunity" />
         </div>
         <ScheduleModifyHistories :data="appointmentStore.scheduleModifyHistories" />
@@ -261,10 +267,18 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
         <template #device="{ row }">
           <div class="device_info">
             <div>機台 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.name }}</div>
-            <div>時間 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineStartTime }} - {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineEndTime }}</div>
+            <div>
+              時間 {{ (row.value as ClientScheduleDetail)?.machines?.[0]?.machineStartTime }} - {{ (row.value as
+                ClientScheduleDetail)?.machines?.[0]?.machineEndTime }}
+            </div>
             <div v-if="+userShift.type === ShiftType['震波']">
               發數
-              <QBadge v-if="!(row.value as ClientScheduleDetail)?.record?.independentShockWaveShots" style="background-color: #F8C9CB; color:#C2351A" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">發數未填寫</QBadge>
+              <QBadge
+                v-if="!(row.value as ClientScheduleDetail)?.record?.independentShockWaveShots"
+                style="background-color: #F8C9CB; color:#C2351A" class="q-ml-lg q-px-sm q-py-xs text-weight-medium"
+              >
+                發數未填寫
+              </QBadge>
               <span>{{ (row.value as ClientScheduleDetail)?.record?.independentShockWaveShots }}</span>
             </div>
             <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingMachine = true" />
@@ -272,7 +286,11 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
         </template>
         <template #name="{ row }">
           <div class="name">
-            <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">{{ row.value }}</a>
+            <a
+              class="link"
+              @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })"
+            >{{ row.value
+            }}</a>
             <div v-if="scheduleDetail.isFirstClientSchedule">
               <QBadge color="grey-14" class="q-ml-lg q-px-sm q-py-xs text-weight-medium">初診</QBadge>
             </div>
@@ -281,7 +299,9 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
         <template #doctor="{ row }">
           <div class="flex items-center justify-between">
             <span v-if="row.value">{{ row.value }}</span>
-            <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-px-sm q-py-xs text-weight-medium">未指派</QBadge>
+            <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-px-sm q-py-xs text-weight-medium">
+              未指派
+            </QBadge>
             <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingOperator = true" />
           </div>
         </template>
@@ -313,18 +333,34 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
           <div v-if="row.value">{{ row.value }}</div>
           <QBadge v-else color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">LINE 未綁定</QBadge>
         </template>
+        <template #referalUser="{ row }">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              {{ row.value }}
+            </div>
+          </div>
+        </template>
         <template #liffIntroducerName="{ row }">
           <div class="liffIntroducerName">
-            <div v-if="ifNoLiffIntroducer" class="liffIntroducerName__value">客戶填寫 - &ensp;<div>{{ row.value }}</div></div>
+            <div v-if="ifNoLiffIntroducer" class="liffIntroducerName__value">
+              客戶填寫 - &ensp;<div>{{ row.value }}</div>
+            </div>
             <div class="liffIntroducerName__value">
               後台綁定
               <template v-if="!client.introducer">
                 <QBadge color="red-1" text-color="red-10" class="text-weight-bold q-mx-sm">介紹人未綁定</QBadge>
-                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })">前往綁定</a>
+                <a
+                  class="link"
+                  @click="$router.push({ name: 'clientInfo', params: { clientId: scheduleDetail.clientId } })"
+                >前往綁定</a>
               </template>
               <template v-else>
                 - &ensp;
-                <a class="link" @click="$router.push({ name: 'clientInfo', params: { clientId: client.introducer.id } })">{{ client.introducer.name }}</a>
+                <a
+                  class="link"
+                  @click="$router.push({ name: 'clientInfo', params: { clientId: client.introducer.id } })"
+                >{{
+                  client.introducer.name }}</a>
               </template>
             </div>
           </div>
@@ -333,10 +369,16 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
           <div class="time">
             <div class="time__input">
               <p v-if="!isEditingTime">{{ row.value }}</p>
-              <TimeDurationPicker v-else :model-value="duration" :options="limitTimeOptions" @cancel="isEditingTime = false" @update:model-value="updateTime" />
+              <TimeDurationPicker
+                v-else :model-value="duration" :options="limitTimeOptions"
+                @cancel="isEditingTime = false" @update:model-value="updateTime"
+              />
             </div>
             <div class="time__actions">
-              <QBtn v-if="!isEditingTime && !includeMachineAddons" rounded flat icon="edit" size="sm" :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true" />
+              <QBtn
+                v-if="!isEditingTime && !includeMachineAddons" rounded flat icon="edit" size="sm"
+                :disable="!canEditTime" outline class="time__actions-edit" @click="isEditingTime = true"
+              />
             </div>
           </div>
         </template>
@@ -346,7 +388,10 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
         </template>
         <template #note>
           <div class="note">
-            <OInput v-model="note" name="note" hide-bottom-space type="textarea" class="full-width" placeholder="請輸入預約備註" />
+            <OInput
+              v-model="note" name="note" hide-bottom-space type="textarea" class="full-width"
+              placeholder="請輸入預約備註"
+            />
             <QBtn outline label="儲存" :disable="!note" class="note__btn" @click="saveNote" />
           </div>
         </template>
@@ -362,23 +407,40 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
     </div>
     <div class="client-info__actions">
       <div class="actions">
-        <QBtn v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule" class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;" @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })" />
+        <QBtn
+          v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule"
+          class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;"
+          @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })"
+        />
 
-        <QBtn class="actions__item--rearrange" label="預約改期" :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment" outline style="width: 127px;" @click="rearrangeClientSchedule">
+        <QBtn
+          class="actions__item--rearrange" label="預約改期"
+          :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment"
+          outline style="width: 127px;" @click="rearrangeClientSchedule"
+        >
           <QTooltip v-if="includeMachineTreatment" class="bg-black" anchor="top left" self="bottom middle">
             本預約包含儀器治療，不可預約改期
           </QTooltip>
         </QBtn>
 
-        <QBtn class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule" color="red-10" style="width: 127px;" @click="cancelClientSchedule" />
+        <QBtn
+          class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule"
+          color="red-10" style="width: 127px;" @click="cancelClientSchedule"
+        />
         <div class="actions__item--space" />
         <div class="actions__item--toggler">
-          <QBtn v-if="scheduleState === '預約'" :disable="!!checkinReminder" label="報到" color="black" style="width: 127px;" @click="checkIn">
+          <QBtn
+            v-if="scheduleState === '預約'" :disable="!!checkinReminder" label="報到" color="black"
+            style="width: 127px;" @click="checkIn"
+          >
             <QTooltip v-if="!!checkinReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ checkinReminder }}
             </QTooltip>
           </QBtn>
-          <QBtn v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;" :disable="!!notFinishReminder" @click="finishService">
+          <QBtn
+            v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;"
+            :disable="!!notFinishReminder" @click="finishService"
+          >
             <QTooltip v-if="notFinishReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ notFinishReminder }}
             </QTooltip>
@@ -389,26 +451,26 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
     </div>
   </div>
   <QDialog v-model="isEditingFirstSchedule">
-    <FirstScheduleForm :client-name="client.name" :init-val="schedule.isFirstClientSchedule" @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange" />
+    <FirstScheduleForm
+      :client-name="client.name" :init-val="schedule.firstScheduleState"
+      @cancel="isEditingFirstSchedule = false" @confirm="handleFirstScheduleChange"
+    />
   </QDialog>
   <QDialog v-model="isEditingEmployeePrice">
-    <EmployeePriceForm :client-name="client.name" :init-val="schedule.isEmployeePrice" @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange" />
+    <EmployeePriceForm
+      :client-name="client.name" :init-val="schedule.isEmployeePrice"
+      @cancel="isEditingEmployeePrice = false" @confirm="handleEmployeePriceChange"
+    />
   </QDialog>
   <QDialog v-if="isMachineOnlyShifts" v-model="isEditingMachine" persistent>
     <EditMachineForm
-      title="編輯儀器治療"
-      disable-time
-      :init-val="machineInitVal"
-      :machine-type="machineInitVal!.machineType"
-      @cancel="isEditingMachine = false"
-      @submit="updateMachineInfo"
+      title="編輯儀器治療" disable-time :init-val="machineInitVal" :machine-type="machineInitVal!.machineType"
+      @cancel="isEditingMachine = false" @submit="updateMachineInfo"
     />
   </QDialog>
   <QDialog v-if="userShift.type === ShiftType['G動椅']" v-model="isEditingOperator">
     <AssignMachineOperator
-      title="指派治療師"
-      :init-val="{ userId: userShift.userId }"
-      :shift-type="userShift.type"
+      title="指派治療師" :init-val="{ userId: userShift.userId }" :shift-type="userShift.type"
       :client-schedule-id="scheduleId"
       @save="(isEditingOperator = false), (appointmentStore.getClientSchedule(+props.scheduleId))"
       @cancel="isEditingOperator = false"
@@ -421,9 +483,11 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   &__header {
     margin-bottom: 15px;
   }
+
   &__caption {
     margin-bottom: 16px;
   }
+
   &__actions {
     // display: flex;
     // justify-content: flex-end;
@@ -447,14 +511,18 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   gap: 10px;
   align-items: center;
   justify-content: space-between;
+
   &__input {
   }
+
   &__actions {
     // flex-grow: 1;
   }
+
   &__actions-edit {
     margin-left: auto;
   }
+
   &__actions-save {
     display: flex;
     gap: 10px;
@@ -465,6 +533,7 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   display: flex;
   flex-direction: column;
   gap: 15px;
+
   &__btn {
     align-self: flex-end;
   }
@@ -474,10 +543,12 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   display: flex;
   gap: 20px;
   font-size: 12px;
+
   &__item {
     display: flex;
     gap: 10px;
   }
+
   &__value {
     color: #e86969;
   }
@@ -501,6 +572,7 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   column-gap: 16px;
   row-gap: 16px;
   padding: 0 0 16px 0;
+
   &__item {
     &--checkout {
       grid-column: 1 / 5;
@@ -528,9 +600,11 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
 .liffIntroducerName {
   display: flex;
   gap: 20px;
+
   > div + div {
     margin-left: 26px;
   }
+
   &__value {
     display: flex;
     align-items: center;

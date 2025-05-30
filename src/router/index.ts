@@ -1,6 +1,6 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { useHandoverStore, useUserStore } from '@/stores';
-import { appointmentRoutes, cashDropHandoverRoutes, clientRoutes, exportRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
+import { appointmentRoutes, cashDropHandoverRoutes, clientRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, reportRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
 
 export const routes: RouteRecordRaw[] = [
   ...loginRoutes,
@@ -17,11 +17,11 @@ export const routes: RouteRecordRaw[] = [
       ...appointmentRoutes,
       ...shiftRoutes,
       ...cashDropHandoverRoutes,
-      ...exportRoutes,
+      ...reportRoutes,
       ...clientRoutes,
       ...orderRoutes,
       ...userRoutes,
-      // ...gymRoutes,
+      ...gymRoutes,
       // ...storeRoutes,
     ],
   },

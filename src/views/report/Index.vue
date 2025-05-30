@@ -5,7 +5,8 @@ import { useRoute } from 'vue-router';
 const tabs = [
   // { name: 'appointmentExport', label: '預約單' },
   // { name: 'firstVisitExport', label: '初診客戶' },
-  { name: 'payrollExport', label: '薪水報表' },
+  { name: 'payrollExport', label: '治療師薪資報表' },
+  { name: 'payrollExport4HR', label: '治療師薪資報表 For HR' },
 ];
 const currentTab = ref(tabs[0].name);
 const route = useRoute();

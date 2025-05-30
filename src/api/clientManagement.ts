@@ -38,6 +38,7 @@ export interface Client {
   phone: string;
   relationTypeName: string | null;
   firstVisitContractUrl?: string | null;
+  referalUser: User;
 }
 
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;
@@ -80,6 +81,8 @@ export interface PurchaseRecord {
   spaceName: string | null;
   type: number;
   usedPoint: number | null;
+  sellers: User[];
+  chargers: User[];
 }
 
 export interface DepInChargeTherapist {
@@ -215,4 +218,9 @@ export async function getClientPaymentDetail({ clientId, paymentId }: { clientId
 // 更新客戶是否為黑名單
 export async function updateIsBlackList(clientId: number, body: { isBlacklisted: boolean }) {
   await api.patch(`clients/${clientId}/update-isBlacklisted`, body);
+}
+
+// 更新排程轉介人
+export async function updateReferalUser({ clientScheduleId, referalUserId }: { clientScheduleId: number; referalUserId: number }) {
+  await api.patch(`clientSchedules/${clientScheduleId}/update-referal-user`, { referalUserId });
 }

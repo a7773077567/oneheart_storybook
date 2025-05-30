@@ -8,7 +8,7 @@ export const gymRoutes: RouteRecordRaw[] = [
     meta: {
       label: '場館管理',
       requiredAuth: true,
-      permission: false,
+      permissions: ['VIEW_SPACE_MANAGEMENT'],
       icon: 'o_apartment',
     },
   },

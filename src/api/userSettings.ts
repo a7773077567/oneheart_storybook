@@ -9,12 +9,14 @@ interface Space {
   type: number;
 }
 
-export interface CreateUser extends Pick<User, 'name' | 'email' | 'weightForOrder' | 'description' | 'hireDate' > {
+export interface CreateUser extends Pick<User, 'name' | 'email' | 'weightForOrder' | 'description' | 'hireDate' | 'baseSalary'> {
   roleId: RoleType;
   spaceIds: number[];
   jobClass?: number | null;
   PTLevel?: number | null;
   onBoardDate: string;
+  introducerUserId: number | null;
+  ancestorUserId: number | null;
 }
 
 export interface UpdateUser extends CreateUser {

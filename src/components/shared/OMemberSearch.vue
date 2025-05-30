@@ -5,6 +5,7 @@ import { QSelect } from 'quasar';
 import type { QSelectProps, QSelectSlots } from 'quasar';
 import type { Optional } from '@/types/utilities';
 import { type Client, fetchClients } from '@/api';
+import { removeZhuyin } from '@/utils/helpers';
 
 interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
   name?: string;
@@ -42,10 +43,6 @@ const isValidValue = computed(() => {
   return isValidTaiwanMobileNumber(customValue.value);
 });
 
-function removeZhuyin(input: string) {
-  // Match any Bopomofo (Zhuyin) characters in the Unicode range \u3105-\u312F
-  return input.replace(/[\u3105-\u312F]+/g, '');
-}
 async function filterFn(val: string) {
   const validValue = removeZhuyin(val);
   if (val && select.value) {

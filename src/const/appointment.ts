@@ -25,6 +25,7 @@ export enum PaymentState {
 export enum ScheduleVisitState {
   初診 = 1,
   複診 = 2,
+  不計入 = 3,
 }
 
 export enum AppointmentState {

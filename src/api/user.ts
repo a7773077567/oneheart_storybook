@@ -39,6 +39,7 @@ export enum RoleType {
 }
 
 export enum PTLevel {
+  'PT0' = 0,
   'PT1' = 1,
   'PT2' = 2,
   'PT3' = 3,
@@ -48,20 +49,23 @@ export enum PTLevel {
   'PT院長' = 7,
 }
 export interface User {
-  id: number;
-  name: string;
+  avatarUrl: string | null;
+  ancestor: User | null;
+  baseSalary: number;
+  description: string;
   email: string;
-  state: AccountState;
-  stateOfWork: WorkState;
+  hireDate: string;
+  id: number;
+  introducer: User | null;
+  jobClass: number;
+  name: string;
+  PTLevel: PTLevel;
   role: Role;
   spaces: Space[];
-  description: string;
-  avatarUrl: string | null;
+  state: AccountState;
+  stateOfWork: WorkState;
+  type: RoleType; // can be removed?
   weightForOrder: number;
-  type: RoleType;
-  jobClass: number;
-  PTLevel: PTLevel;
-  hireDate: string;
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;

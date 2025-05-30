@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import type { User } from '../user';
-import type { PageQuery, PagingMeta } from '@/types/common';
+import type { PageQuery, PagingMeta, S3UploadInfo } from '@/types/common';
 
 export interface EducationPointContent {
   id: number;
@@ -8,6 +8,7 @@ export interface EducationPointContent {
   reviewDateTime: string;
   user: User;
   point: number;
+  attachmentUrl: string;
 }
 
 export interface EducationPoint {
@@ -15,6 +16,7 @@ export interface EducationPoint {
   title: string;
   reviewDateTime: string;
   point: number;
+  attachment: string;
 }
 
 export async function getEducationPointList(params: { userId?: number } & PageQuery) {
@@ -38,5 +40,11 @@ export async function updateEducationPoint({ id }: { id: number }, payload: Educ
 
 export async function deleteEducationPoint({ id }: { id: number }) {
   const { data } = await api.delete(`educationPoints/${id}`);
+  return data;
+}
+
+// 取得教育積分上傳 url
+export async function getEducationUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`educationPoints/${userId}/attachment/write-url`);
   return data;
 }

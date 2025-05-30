@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { RoleType, type User, fetchUser, fetchUserInfo, fetchUsers } from '@/api/user';
+import { AccountState, RoleType, type User, WorkState, fetchUser, fetchUserInfo, fetchUsers } from '@/api';
 import { type PermissionEvents, RolePermissions } from '@/const/permission';
 
 interface State {
@@ -64,6 +64,11 @@ export const useUserStore = defineStore('user', {
       return (role: RoleType, action: PermissionEvents): boolean => {
         return !!RolePermissions[role][action];
       };
+    },
+    activeUsers(state) {
+      if (state.users?.length === 0)
+        return [];
+      return state.users.filter(user => user.stateOfWork === WorkState['在職'] && user.state === AccountState['開通']).map(user => ({ label: user.name, value: user.id }));
     },
   },
   actions: {

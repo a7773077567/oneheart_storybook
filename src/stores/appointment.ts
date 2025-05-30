@@ -35,6 +35,7 @@ interface State {
   userShifts: UserShift[];
   historyRecords: HistoryRecord[];
   machineSchedules: MachineSchedule[];
+  referralUserId: null | number;
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -63,6 +64,7 @@ export const useAppointmentStore = defineStore('appointment', {
     userShifts: [],
     historyRecords: [],
     machineSchedules: [],
+    referralUserId: null,
   }),
   getters: {
     userOptions(state) {
@@ -94,7 +96,7 @@ export const useAppointmentStore = defineStore('appointment', {
         count,
       };
     },
-    activeUsers: (state) => {
+    currentNonFronDeskUsers: (state) => {
       const { users } = state;
 
       return users.filter(({ stateOfWork, role }) => stateOfWork !== WorkState['離職'] && role.type !== RoleType['櫃檯']).map(member => ({
@@ -208,7 +210,7 @@ export const useAppointmentStore = defineStore('appointment', {
       const userStore = useUserStore();
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
-    needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract === false,
+    needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract !== true,
     needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
     targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
     queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],
@@ -253,7 +255,7 @@ export const useAppointmentStore = defineStore('appointment', {
     },
   },
   actions: {
-    async getUsers(spaceIds: number[]) {
+    async getUsers(spaceIds?: number[]) {
       const data = await fetchUsers({ spaceIds });
       this.users = data;
     },

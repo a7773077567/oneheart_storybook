@@ -4,7 +4,7 @@ import { ScheduleVisitState } from '@/const/appointment';
 
 const props = defineProps<{
   clientName: string;
-  initVal: boolean;
+  initVal: ScheduleVisitState;
 }>();
 
 defineEmits<{
@@ -12,7 +12,7 @@ defineEmits<{
   (e: 'confirm', state: ScheduleVisitState): void;
 }>();
 
-const state = ref(props.initVal ? ScheduleVisitState['初診'] : ScheduleVisitState['複診']);
+const state = ref(props.initVal);
 </script>
 
 <template>
@@ -33,6 +33,12 @@ const state = ref(props.initVal ? ScheduleVisitState['初診'] : ScheduleVisitSt
           <QItemSection>複診</QItemSection>
           <QItemSection>
             <QRadio v-model="state" left-label :val="ScheduleVisitState['複診']" />
+          </QItemSection>
+        </QItem>
+        <QItem>
+          <QItemSection>不計入</QItemSection>
+          <QItemSection>
+            <QRadio v-model="state" left-label :val="ScheduleVisitState['不計入']" />
           </QItemSection>
         </QItem>
       </QList>

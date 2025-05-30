@@ -6,12 +6,27 @@ export interface SalaryReportParams {
   spaceIds: number[];
 }
 export async function exportSalaryReport(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report`, { params, headers: { responseType: 'blob', Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
-  const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]));
+  const blobParts: BlobPart = response as unknown as BlobPart;
+  const url = window.URL.createObjectURL(new Blob([blobParts]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', '薪資報表.xlsx');
+  link.setAttribute('download', `${params.yearMonth}月薪資報表.xlsx`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}
+
+export async function exportSalaryReport4HR(params: SalaryReportParams) {
+  const response = await api.get(`reports/salary-report-for-hr`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+
+  const blobParts: BlobPart = response as unknown as BlobPart;
+  const url = window.URL.createObjectURL(new Blob([blobParts]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${params.yearMonth}月薪資報表 for HR.xlsx`);
   document.body.appendChild(link);
   link.click();
   link.remove();

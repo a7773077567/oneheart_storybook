@@ -34,7 +34,7 @@ watchEffect(async () => {
     await Promise.all([
       appointmentStore.getClientSchedulesInProgress(selectedDate.value),
       appointmentStore.getMachineScheduleInprogress({ date: selectedDate.value, machineIds: selectedMachines.value }),
-      appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.activeUsers.map(item => item.id) }),
+      appointmentStore.getShifts({ startDate: selectedDate.value, endDate: selectedDate.value, userIds: appointmentStore.currentNonFronDeskUsers.map(item => item.id) }),
     ]);
   }
   catch (err) {
@@ -134,7 +134,7 @@ function getMachineAppointment(scope: any) {
     <section class="appointment_calendar">
       <ResourceCalendar
         :model-value="selectedDate"
-        :model-resources="appointmentStore.activeUsers"
+        :model-resources="appointmentStore.currentNonFronDeskUsers"
         :interval-start="16"
         :interval-count="30"
         :interval-minutes="30"

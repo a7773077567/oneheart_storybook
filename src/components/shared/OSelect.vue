@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-import type { QSelectProps } from 'quasar';
+import type { QSelectProps, QSelectSlots } from 'quasar';
 import type { Optional } from '@/types/utilities';
 
 interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
@@ -23,7 +23,11 @@ const { value, errorMessage } = useField<string>(() => props.name, props.customR
     emit-value
     map-options
     outlined
-  />
+  >
+    <template v-for="(_, slotname) in ($slots as Readonly<QSelectSlots>)" #[slotname]="scope">
+      <slot :name="slotname" v-bind="{ ...scope ?? {} }" />
+    </template>
+  </QSelect>
 </template>
 
 <style lang="scss" scoped>

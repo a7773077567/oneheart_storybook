@@ -14,8 +14,6 @@ const crumbList = ref<Crumb[]>();
 watch(currentRoute, getCrumbs, { immediate: true });
 
 function getCrumbs() {
-  console.log(currentMatched.value);
-
   const crumbs = currentMatched.value.map<Crumb>(route => ({
     name: route.name,
     label: route.meta.customLabel ? currentMeta.value.label as string : route.meta.label as string,
@@ -26,12 +24,16 @@ function getCrumbs() {
 
 <template>
   <QBreadcrumbs separator=">">
-    <QBreadcrumbsEl
+    <template
       v-for="({ name, label }, idx) in crumbList"
       :key="idx"
-      :label="label"
-      :to="{ name }"
-    />
+    >
+      <QBreadcrumbsEl
+        v-if="!!label"
+        :label="label"
+        :to="{ name }"
+      />
+    </template>
   </QBreadcrumbs>
 </template>
 

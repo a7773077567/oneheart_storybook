@@ -6,6 +6,7 @@ import { type EducationPointContent, deleteEducationPoint, getAEducationPoint, g
 import EducationPointsForm from '@/components/home/educationPoints/EducationPointsForm.vue';
 import { useTrafficLight, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
+import { detectFileType } from '@/utils/helpers';
 
 const userStore = useUserStore();
 const trafficLightStore = useTrafficLight();
@@ -54,6 +55,19 @@ const cols: QTableProps['columns'] = [
     field: row => dayjs(row.reviewDateTime).format('HH:mm'),
   },
   {
+    name: 'attachmentUrl',
+    required: true,
+    label: '附件',
+    align: 'left',
+    field: 'attachmentUrl',
+    format: (val, row) => {
+      if (!val)
+        return null;
+
+      return row.fileType === 'image' ? ({ type: 'image', url: val }) : ({ type: 'pdf', url: val });
+    },
+  },
+  {
     name: 'action',
     label: '',
     align: 'right',
@@ -82,7 +96,13 @@ const onRequest: QTableProps['onRequest'] = async (props) => {
 async function getReviewList() {
   const userId = selectedTherapist.value || null;
   const { data, meta } = await getEducationPointList({ ...(userId && { userId }), page: pagination.value.page, take: pagination.value.rowsPerPage });
-  reviewList.value = data;
+  reviewList.value = await Promise.all(data.map(async (review) => {
+    if (!review.attachmentUrl)
+      return { ...review, fileType: null };
+
+    const fileType = await detectFileType(review.attachmentUrl);
+    return { ...review, fileType };
+  }));
   pagination.value.page = meta?.page ?? 1;
   pagination.value.rowsNumber = meta?.itemCount ?? 1;
 }
@@ -104,6 +124,7 @@ async function editReview(reviewId: number) {
     point: data.point,
     reviewDate: dayjs(data.reviewDateTime).format('YYYY-MM-DD'),
     reviewTime: dayjs(data.reviewDateTime).format('HH:mm'),
+    attachment: data.attachmentUrl,
   };
   formType.value = 'edit';
   stateOfPointForm.value = true;
@@ -133,6 +154,13 @@ function deleteConfirm(id: number) {
     }
   });
 }
+
+const stateOfLightbox = ref(false);
+const lightBoxImg = ref('');
+
+function checkAttachment(url: string) {
+  window.open(url, '_black');
+}
 </script>
 
 <template>
@@ -158,9 +186,11 @@ function deleteConfirm(id: number) {
         :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
-        <template #body-cell-reviewScreenshotUrl="{ value }">
+        <template #body-cell-attachmentUrl="{ value }">
           <QTd>
-            <img :src="value" alt="screen shot" style="height:30px;width:60px">
+            <QIcon v-if="value?.type === 'pdf'" name="attach_file" size="sm" @click="checkAttachment(value.url)" />
+            <img v-else-if="value?.type === 'image'" :src="value.url" alt="attachment" style="height:30px;width:60px" @click="(lightBoxImg = value.url), (stateOfLightbox = true)">
+            <span v-else>-</span>
           </QTd>
         </template>
         <template #body-cell-action="{ row }">
@@ -181,6 +211,11 @@ function deleteConfirm(id: number) {
       @create="uploadReview"
     />
   </QDialog>
+  <VueEasyLightbox
+    :visible="stateOfLightbox"
+    :imgs="lightBoxImg"
+    @hide="stateOfLightbox = false"
+  />
 </template>
 
 <style scoped lang="scss">

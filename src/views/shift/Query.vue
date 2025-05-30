@@ -49,7 +49,7 @@ function getUserShifts() {
     </div>
     <Calendar
       v-model="currentDate"
-      :model-resources="shiftStore.activeUsers"
+      :model-resources="shiftStore.currentNonFronDeskUsers"
       simple-mode
       view="day"
       :max-days="days"

@@ -28,7 +28,7 @@ const queryAddOns = computed(() => appointmentStore.queryAddOns.map(addOn => Add
 const queryAppointmentType = computed(() => appointmentStore.availableQuery?.userShiftType && ShiftType[appointmentStore.availableQuery?.userShiftType]);
 const ifAutoRecommend = computed(() => appointmentStore.availableQuery?.autoRecommend);
 
-const therapistOptions = computed(() => ifAutoRecommend.value ? appointmentStore.autoRecommendTherpists : appointmentStore.activeUsers);
+const therapistOptions = computed(() => ifAutoRecommend.value ? appointmentStore.autoRecommendTherpists : appointmentStore.currentNonFronDeskUsers);
 
 onBeforeUnmount(() => {
   appointmentStore.rearrangeMode = false;
@@ -117,11 +117,10 @@ function OpenAppointmentDialog(available: Available) {
   stateOfAppointmentDialog.value = true;
 }
 
-function afterAppointment() {
+function afterAppointment(appointment?: Available) {
   stateOfAppointmentDialog.value = false;
-  $q.dialog({
-    message: '預約成功',
-  });
+  const query = { date: appointment?.date };
+  router.push({ name: 'appointmentListCalendar', ...(appointment?.date ? { query } : {}) });
 }
 
 function getTimesArray(start: number, count: number, interval: number) {

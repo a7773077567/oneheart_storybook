@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import type { PermissionEvents } from '@/const/permission';
+import { useSalaryReportStore } from '@/stores';
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -95,7 +96,45 @@ export const homeRoutes: RouteRecordRaw[] = [
         ],
       },
       {
-        path: 'personal-appointments',
+        path: 'salary-report',
+        name: 'salary-report',
+        component: () => import('@/views/home/salaryReport/Index.vue'),
+        redirect: { name: 'salaryReportDetails' },
+        meta: {
+          label: '薪資詳情',
+          requiredAuth: true,
+          permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+        },
+        children: [
+          {
+            path: 'authentication',
+            name: 'salaryReportAuthentication',
+            component: () => import('@/views/home/salaryReport/Authentication.vue'),
+            meta: {
+              requiredAuth: true,
+              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+            },
+          },
+          {
+            path: 'details',
+            name: 'salaryReportDetails',
+            component: () => import('@/views/home/salaryReport/Details.vue'),
+            meta: {
+              requiredAuth: true,
+              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+            },
+            beforeEnter: () => {
+              const salaryReportStore = useSalaryReportStore();
+              if (salaryReportStore.isAuthenticated) {
+                return;
+              }
+              return { name: 'salaryReportAuthentication' };
+            },
+          },
+        ],
+      },
+      {
+        path: '',
         name: 'personalAppointments',
         component: () => import('@/views/home/PersonalAppointmentsView.vue'),
         meta: {

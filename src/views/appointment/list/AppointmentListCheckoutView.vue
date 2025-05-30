@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAppointmentStore } from '@/stores';
+import { useAppointmentStore, useUserStore } from '@/stores';
 import { CheckTable, CheckoutAction, PaymentComposition, PriceTags, Receipt } from '@/components/appointment';
 import { AddOnServiceTypes, PointTypes, ShiftType, Types } from '@/const/general';
 import { PaymentMethod, PaymentMethods } from '@/const/appointment';
 import { computed, ref, watch } from 'vue';
 import { calcReceiptAmount } from '@/utils/helpers';
-import { checkout } from '@/api/appointment';
+import { checkout } from '@/api';
 import router from '@/router';
 import { useQuasar } from 'quasar';
 import { useDialog } from '@/composables/dialog';
@@ -19,15 +19,20 @@ type Payments = InstanceType<typeof PaymentComposition>['$props']['modelValue'];
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
-await appointmentStore.getClientSchedule(+props.scheduleId);
-if (!appointmentStore.isSameSpaceClinicSchedule) {
-  const { onOk, onCancel } = await useDialog({
-    title: '系統提示',
-    message: '此預約單並非此場館，無法進行此操作',
-    type: 'confirm',
-  });
-  onOk(() => router.push({ name: 'appointmentListCalendar' }));
-  onCancel(() => router.push({ name: 'appointmentListCalendar' }));
+const userStore = useUserStore();
+await getCheckoutInfo();
+
+async function getCheckoutInfo() {
+  await Promise.allSettled([appointmentStore.getClientSchedule(+props.scheduleId), userStore.getUsers()]);
+  if (!appointmentStore.isSameSpaceClinicSchedule) {
+    const { onOk, onCancel } = await useDialog({
+      title: '系統提示',
+      message: '此預約單並非此場館，無法進行此操作',
+      type: 'confirm',
+    });
+    onOk(() => router.push({ name: 'appointmentListCalendar' }));
+    onCancel(() => router.push({ name: 'appointmentListCalendar' }));
+  }
 }
 
 const { id: scheduleId, date: scheduleDate, client, userShift, addOnServices, isUsingAutoRecommend, isEmployeePrice, isFirstClientSchedule, record } = (appointmentStore.targetClientSchedule!);
@@ -102,12 +107,15 @@ const methodOptions = computed(() => {
     : options.filter(option => option.value !== PaymentMethod['團課卷']);
 });
 
+const sellerIds = ref([]);
 async function onCheckout() {
   $q.loading.show({ delay: 0 });
   try {
     await checkout(scheduleId, {
       amount: totalAmount.value,
       multiChannelPay: payments.value,
+      sellerIds: sellerIds.value,
+      chargerId: userShift.user.id,
     });
     $q.notify({ message: '已結帳', timeout: 2000, position: 'top', color: 'positive' });
   }
@@ -152,6 +160,11 @@ watch(payments, (chosenPayments) => {
 
     <PriceTags :list="priceTags" />
 
+    <fieldset>
+      <legend class="text-title-medium q-mb-md">負責人與銷售者</legend>
+      <QInput label="負責人" disable outlined filled class="q-mb-md" dense :model-value="userShift?.user.name" color="teal" />
+      <QSelect v-model="sellerIds" multiple label="銷售者(選填、可複選)" :options="userStore.activeUsers" error-message="" outlined dense emit-value map-options />
+    </fieldset>
     <CheckoutAction v-model="totalAmount" @checkout="isReceiptDialogOpen = true" />
     <PaymentComposition v-model="payments" :method-options="methodOptions" :group-options="groupOptions" :multi-point="allowMultiPointPayment" />
   </div>

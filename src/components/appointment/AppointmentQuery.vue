@@ -25,7 +25,7 @@ const { handleSubmit } = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
   appointmentStore.appointmentCalendarInitOption = values.userIds!;
-  appointmentStore.availableQuery = { ...values, userIds: appointmentStore.activeUsers.map(user => user.id) };
+  appointmentStore.availableQuery = { ...values, userIds: appointmentStore.currentNonFronDeskUsers.map(user => user.id) };
   await appointmentStore.getAvailable(appointmentStore.availableQuery);
   appointmentStore.querySent = true;
 });
@@ -41,7 +41,7 @@ const onSubmit = handleSubmit(async (values) => {
       <OSelect name="userShiftType" label="選擇項目" :options="typeOptions" />
     </InputBox>
     <InputBox label="選擇治療師">
-      <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.activeUsers" multiple />
+      <OSelect name="userIds" label="選擇治療師" :options="appointmentStore.currentNonFronDeskUsers" multiple />
     </InputBox>
     <InputBox label="選擇日期" class="gutter">
       <DatePicker name="date" />

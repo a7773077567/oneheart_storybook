@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
 import type { PermissionEvents } from '@/const/permission';
 
-export const exportRoutes: RouteRecordRaw[] = [{
-  path: '/export',
-  name: 'export',
-  component: () => import('@/views/export/Index.vue'),
+export const reportRoutes: RouteRecordRaw[] = [{
+  path: '/report',
+  name: 'report',
+  component: () => import('@/views/report/Index.vue'),
   redirect: { name: 'payrollExport' },
   meta: {
     label: '報表管理',
@@ -16,7 +16,7 @@ export const exportRoutes: RouteRecordRaw[] = [{
     {
       path: 'appointment',
       name: 'appointmentExport',
-      component: () => import('@/views/export/AppointmentExport.vue'),
+      component: () => import('@/views/report/AppointmentExport.vue'),
       meta: {
         label: '匯出報表 - 預約單',
         requiredAuth: true,
@@ -26,7 +26,7 @@ export const exportRoutes: RouteRecordRaw[] = [{
     {
       path: 'first-visit-patient',
       name: 'firstVisitExport',
-      component: () => import('@/views/export/FirstVisitExport.vue'),
+      component: () => import('@/views/report/FirstVisitExport.vue'),
       meta: {
         label: '匯出報表 - 初診客戶',
         requiredAuth: true,
@@ -36,9 +36,19 @@ export const exportRoutes: RouteRecordRaw[] = [{
     {
       path: 'payroll',
       name: 'payrollExport',
-      component: () => import('@/views/export/PayrollExport.vue'),
+      component: () => import('@/views/report/PayrollExport.vue'),
       meta: {
-        label: '匯出報表 - 薪水報表',
+        label: '匯出報表 - 薪資報表',
+        requiredAuth: true,
+        hideFromNav: true,
+      },
+    },
+    {
+      path: 'payroll-for-hr',
+      name: 'payrollExport4HR',
+      component: () => import('@/views/report/PayrollExport4HR.vue'),
+      meta: {
+        label: '匯出報表 - 薪資報表',
         requiredAuth: true,
         hideFromNav: true,
       },

@@ -135,3 +135,33 @@ export function formatPriceWithComma(value: number): string {
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
 }
+
+export function removeZhuyin(input: string) {
+  // Match any Bopomofo (Zhuyin) characters in the Unicode range \u3105-\u312F
+  return input.replace(/[\u3105-\u312F]+/g, '');
+}
+
+/**
+ * 判斷遠端檔案的類型（透過 Content-Type header）
+ * @param url 檔案的 S3 / GCS 簽名網址
+ * @returns 'image' | 'pdf' | 'unknown'
+ */
+export type FileType = 'image' | 'pdf' | 'unknown';
+export async function detectFileType(url: string): Promise<FileType> {
+  try {
+    const res = await fetch(url, { method: 'GET' });
+    const contentType = res.headers.get('Content-Type') || '';
+    if (contentType.startsWith('image/'))
+      return 'image';
+    if (contentType === 'application/pdf')
+      return 'pdf';
+    return 'unknown';
+  }
+  catch (error) {
+    console.error('Failed to fetch file type:', error);
+    return 'unknown';
+  }
+}
+export function toCurrency(val: number) {
+  return val.toLocaleString('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+}
