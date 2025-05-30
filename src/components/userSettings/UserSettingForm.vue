@@ -137,15 +137,18 @@ const onSubmit = handleSubmit(async (values) => {
     }
     else {
       let neededValues = { ...omit(values as UpdateUser, ['avatar']) };
+      
       if (!isTherapist(values.roleId)) {
         neededValues = omit(values as UpdateUser, ['jobClass', 'avatar']);
       }
-
+      
       const payload = {
         ...neededValues,
         ...(avatarUuid && { avatar: avatarUuid }),
       };
+      
       await updateUser(targetUser.value.id, payload);
+      
       $q.dialog({
         message: '更新成功',
       }).onOk(async () => {

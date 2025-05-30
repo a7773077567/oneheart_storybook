@@ -12,9 +12,10 @@ import {
 } from '@/api';
 import { useForm } from 'vee-validate';
 import { pick } from 'radash';
-import { HistoryChiefComplaints } from '@/components/appointment';
+import { HistoryChiefComplaints, MedicalHistoryClipboard } from '@/components/appointment';
 import { useQuasar } from 'quasar';
 import { ScheduleStateMap } from '@/const/appointment';
+import { useNotify } from '@/composables/notify';
 
 const props = defineProps<{
   scheduleId: number;
@@ -28,7 +29,7 @@ const recordId = computed(
 const appointmentStore = useAppointmentStore();
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
 const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
-await appointmentStore.getHistoryChiefComplaints(recordId.value);
+// await appointmentStore.getHistoryChiefComplaints(recordId.value);
 
 const date = computed(() =>
   dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'),
@@ -44,7 +45,7 @@ const initialValues = computed<{
   [key in keyof SportConsultation]: SportConsultation[key];
 }>(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'coachAdvice']));
 
-const { handleSubmit, meta, setFieldValue } = useForm({
+const { handleSubmit, meta, setValues } = useForm({
   initialValues: initialValues.value,
 });
 
@@ -54,11 +55,14 @@ const onSubmit = handleSubmit(async (val) => {
 
   await appointmentStore.getClientSchedule(props.scheduleId);
 });
-
-function pasteHistory(history: HistoryChiefComplaint) {
-  setFieldValue('chiefComplaint', history.chiefComplaint);
-  stateOfHistoryDialog.value = false;
+async function openHistoryDialog() {
+  await appointmentStore.getHistoryRecords(recordId.value);
+  stateOfHistoryDialog.value = true;
 }
+// function pasteHistory(history: HistoryChiefComplaint) {
+//   setFieldValue('chiefComplaint', history.chiefComplaint);
+//   stateOfHistoryDialog.value = false;
+// }
 
 async function finishRecord() {
   try {
@@ -69,6 +73,11 @@ async function finishRecord() {
   catch (err) {
     console.log(err);
   }
+}
+function selectRecord(record: Record<string, any>) {
+  setValues(record);
+  stateOfHistoryDialog.value = false;
+  useNotify('病例套用成功');
 }
 </script>
 
@@ -81,13 +90,7 @@ async function finishRecord() {
       <div v-for="(item, idx) in data" :key="idx" class="input">
         <div class="input__label">
           <span>{{ item.label }}</span>
-          <QIcon
-            v-if="item.showCopyBtn"
-            name="o_folder"
-            size="20px"
-            class="cursor-pointer q-pa-xs"
-            @click="stateOfHistoryDialog = true"
-          />
+          <QBtn v-if="item.showCopyBtn" icon="o_folder" label="歷史病例" size="12px" class="cursor-pointer q-pa-xs" flat style="color: #137AB3;" @click="openHistoryDialog" />
         </div>
         <OInput
           :name="item.name"
@@ -103,10 +106,7 @@ async function finishRecord() {
     </div>
   </div>
   <QDialog v-model="stateOfHistoryDialog">
-    <HistoryChiefComplaints
-      :data="appointmentStore.historyChiefComplaints"
-      @choose="pasteHistory"
-    />
+    <MedicalHistoryClipboard :data="appointmentStore.sportClinicHistoryRecords" @select="selectRecord" />
   </QDialog>
 </template>
 

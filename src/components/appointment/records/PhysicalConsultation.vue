@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { HistoryChiefComplaints } from '@/components/appointment';
+import { HistoryChiefComplaints, MedicalHistoryClipboard } from '@/components/appointment';
 import { type ClientScheduleDetail, type HistoryChiefComplaint, type PhysicalConsultation, appointmentFinishRecord, updateClientSchedule } from '@/api/appointment';
 import { computed, ref } from 'vue';
 import { useAppointmentStore } from '@/stores';
@@ -8,6 +8,7 @@ import { pick } from 'radash';
 import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 import { ScheduleStateMap } from '@/const/appointment';
+import { useNotify } from '@/composables/notify';
 
 interface DataItem {
   title: string;
@@ -28,12 +29,11 @@ const appointmentStore = useAppointmentStore();
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
 const scheduleState = computed(() => ScheduleStateMap.get(schedule.value.state)!.label);
 const recordId = computed(() => props.scheduleDetail.medicalAndTrainingRecordId);
-await appointmentStore.getHistoryChiefComplaints(recordId.value);
 const stateOfHistoryDialog = ref(false);
 const date = computed(() => dayjs(props.scheduleDetail.date).format('YYYY/MM/DD'));
 
 const initialValues = computed(() => pick(props.scheduleDetail.record, ['chiefComplaint', 'pastHistory', 'occupationType', 'exerciseHabits', 'others', 'clinicalObservation', 'palpation', 'movementAssessment', 'problemSummary', 'treatmentNotes', 'forExerciseGroup']));
-const { handleSubmit, setFieldValue, resetForm } = useForm({ initialValues: initialValues.value });
+const { handleSubmit, setValues, resetForm } = useForm({ initialValues: initialValues.value });
 const onSubmit = handleSubmit(async (formValue) => {
   await updateClientSchedule(recordId.value, formValue);
   $q.notify({ message: '已存檔', timeout: 2000 });
@@ -66,9 +66,15 @@ const data: DataItem[] = [
 
 ];
 
-function pasteHistory(history: HistoryChiefComplaint) {
-  setFieldValue('chiefComplaint', history.chiefComplaint);
+async function openHistoryDialog() {
+  await appointmentStore.getHistoryRecords(recordId.value);
+  stateOfHistoryDialog.value = true;
+}
+
+function selectRecord(record: Record<string, any>) {
+  setValues(record);
   stateOfHistoryDialog.value = false;
+  useNotify('病例套用成功');
 }
 
 async function finishRecord() {
@@ -97,7 +103,7 @@ async function finishRecord() {
           <div v-for="(item, itemIdx) in items" :key="itemIdx" class="input">
             <div class="input__label">
               <span>{{ item.label }}</span>
-              <QIcon v-if="item.showCopyBtn" name="o_folder" size="20px" class="cursor-pointer q-pa-xs" @click="stateOfHistoryDialog = true" />
+              <QBtn v-if="item.showCopyBtn" icon="o_folder" label="歷史病例" size="12px" class="cursor-pointer q-pa-xs" flat style="color: #137AB3;" @click="openHistoryDialog" />
             </div>
             <OInput :name="item.name" type="textarea" class="input__item" hide-bottom-space />
           </div>
@@ -109,7 +115,7 @@ async function finishRecord() {
       <QBtn v-if="scheduleState === '完成服務'" label="病例完成" color="primary" style="width: 127px;" @click="finishRecord" />
     </div>
     <QDialog v-model="stateOfHistoryDialog">
-      <HistoryChiefComplaints :data="appointmentStore.historyChiefComplaints" @choose="pasteHistory" />
+      <MedicalHistoryClipboard :data="appointmentStore.physicalConsultationHistoryRecords" @select="selectRecord" />
     </QDialog>
   </div>
 </template>

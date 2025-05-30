@@ -132,6 +132,20 @@ export const useAppointmentStore = defineStore('appointment', {
         return { ...acc, [user.id]: shiftsOfUser };
       }, {} as Record<string, any>);
     },
+
+    sportClinicHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { chiefComplaint, coachAdvice, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: {
+            chiefComplaint: { label: '主訴', value: chiefComplaint },
+            coachAdvice: { label: '教練建議', value: coachAdvice },
+          },
+        };
+      });
+    },
     medicalHistoryRecords: ({ historyRecords }) => {
       return historyRecords.map((record) => {
         const { assessmentResults, chiefComplaint, forExerciseGroup, forFrontDesk, treatmentNotes, treatmentPlan, userShiftType, date } = record;
@@ -149,6 +163,29 @@ export const useAppointmentStore = defineStore('appointment', {
         };
       });
     },
+    physicalConsultationHistoryRecords: ({ historyRecords }) => {
+      return historyRecords.map((record) => {
+        const { chiefComplaint, pastHistory, occupationType, exerciseHabits, others, clinicalObservation, palpation, movementAssessment, problemSummary, treatmentNotes, forExerciseGroup, userShiftType, date } = record;
+        return {
+          userShiftType,
+          date,
+          record: {
+            chiefComplaint: { label: '主訴', value: chiefComplaint },
+            pastHistory: { label: '病史', value: pastHistory },
+            occupationType: { label: '職業類型/生活型態', value: occupationType },
+            exerciseHabits: { label: '運動習慣', value: exerciseHabits },
+            others: { label: '其他', value: others },
+            clinicalObservation: { label: '臨床觀察', value: clinicalObservation },
+            palpation: { label: '觸診', value: palpation },
+            movementAssessment: { label: '動作測試', value: movementAssessment },
+            problemSummary: { label: '問題摘要', value: problemSummary },
+            treatmentNotes: { label: '治療備註', value: treatmentNotes },
+            forExerciseGroup: { label: '給運動組的建議', value: forExerciseGroup },
+          },
+        };
+      });
+    },
+
     magneticWaveHistoryRecords: ({ historyRecords }) => {
       return historyRecords.map((record) => {
         const { magneticWavesRecords, userShiftType, date } = record;
