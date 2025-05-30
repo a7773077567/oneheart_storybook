@@ -129,7 +129,7 @@ function showPositionBonus(itemLabel: string) {
                 />
               </div>
             </template>
-            <template v-else-if="item.label === '職務獎金' && RoleType[userStore.role] === '系統管理者'" #body>
+            <template v-else-if="item.label === '職務獎金' && RoleType[userStore.role] === '院長'" #body>
               <div class="table-wrapper">
                 <div class="caption--position">
                   <QIcon name="o_info" size="20px" />
