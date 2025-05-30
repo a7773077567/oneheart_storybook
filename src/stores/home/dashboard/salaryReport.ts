@@ -374,7 +374,7 @@ export const useSalaryReportStore = defineStore('salaryReport', {
           {
             performanceTarget: '條件',
             totalExecutionGoal: `avg. ${condition.totalExecutionGoal} hr`,
-            revenueTarget: `avg. ${condition.totalExecutionGoal} K`,
+            revenueTarget: `avg. ${condition.revenueTarget} K`,
             complaintRefundRate: `${condition.complaintRefundRate}%`,
             greenLightRate: `${condition.greenLightRate}%`,
           },
