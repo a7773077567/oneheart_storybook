@@ -140,7 +140,7 @@ async function createGroup(value: CreateGroupField) {
       </fieldset>
       <fieldset class="col-8">
         <OSelect
-          label="銷售者"
+          label="負責人"
           class="field--val"
           name="sellerName"
           :options="sellerOptions"
