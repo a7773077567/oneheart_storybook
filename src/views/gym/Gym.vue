@@ -114,7 +114,7 @@ async function onConfirm() {
     <BasicDialog
       v-if="editDialogOpened"
       v-model="editDialogOpened"
-      title="8 月場館設定"
+      :title="`${yearMonth.month + 1} 月場館設定`"
       confirm-mode
       @confirm="onConfirm"
     >
