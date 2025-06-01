@@ -17,7 +17,7 @@ const therapistNumber = ref(0);
 const customerComplaintsAndRefundRate = ref(0);
 const targetSpaceId = ref<null | number>(0);
 
-const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month).padStart(2, '0')}`);
+const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month + 1).padStart(2, '0')}`);
 
 watch(
   yearMonthQuery,
