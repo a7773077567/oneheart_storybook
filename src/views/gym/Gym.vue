@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SpaceMonthlyConfig } from '@/api/spaceManagement';
 import { BasicDialog, YearMonthSelect } from '@/components/shared';
+import { useNotify } from '@/composables/notify';
 import { useSpaceManagementStore } from '@/stores/spaceManagement';
 import dayjs from 'dayjs';
 import type { QTableColumn } from 'quasar';
@@ -64,17 +65,17 @@ function openEditDialog(row: SpaceMonthlyConfig) {
 }
 
 async function onConfirm() {
-  ;
-
   await spaceManagementStore.updateSpaceMonthlyConfig(
     targetSpaceId.value!,
     {
       year: yearMonth.value.year,
-      month: yearMonth.value.month,
+      month: yearMonth.value.month + 1,
       therapistNumber: +therapistNumber.value,
       customerComplaintsAndRefundRate: +customerComplaintsAndRefundRate.value,
     },
   );
+
+  useNotify('更新成功');
 
   await spaceManagementStore.getSpaceMonthlyConfigList(yearMonthQuery.value);
 
