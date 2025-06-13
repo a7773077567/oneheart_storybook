@@ -4,14 +4,14 @@ import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
 import { type EducationPointContent, deleteEducationPoint, getAEducationPoint, getEducationPointList } from '@/api';
 import EducationPointsForm from '@/components/home/educationPoints/EducationPointsForm.vue';
-import { useTrafficLight, useUserStore } from '@/stores';
+import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { detectFileType } from '@/utils/helpers';
 
 const userStore = useUserStore();
-const trafficLightStore = useTrafficLight();
+const bonusStore = useBonusStore();
 
-const selectedTherapist = ref(trafficLightStore.therapistFilterOptions?.[0]?.value);
+const selectedTherapist = ref(bonusStore.therapistFilterOptions?.[0]?.value);
 const reviewList = ref<EducationPointContent[]>([]);
 
 const cols: QTableProps['columns'] = [
@@ -82,8 +82,8 @@ const pagination = ref({
 });
 
 // before mounted
-await trafficLightStore.getAvailableTherapistList();
-selectedTherapist.value = trafficLightStore.therapistFilterOptions?.[0]?.value;
+await bonusStore.getAvailableTherapistList();
+selectedTherapist.value = bonusStore.therapistFilterOptions?.[0]?.value;
 await getReviewList();
 
 const onRequest: QTableProps['onRequest'] = async (props) => {
@@ -175,7 +175,7 @@ function checkAttachment(url: string) {
     <QSeparator />
     <section class="education-review-content">
       <div class="education-review-content__header">
-        <OptionSelect v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
+        <OptionSelect v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
       </div>
       <QTable
         v-model:pagination="pagination"
@@ -206,7 +206,7 @@ function checkAttachment(url: string) {
     <EducationPointsForm
       :type="formType" :init-vals="reviewInfo" :role="role"
       :review-id="targetReview"
-      :therapist-options="trafficLightStore.scorerOptions"
+      :therapist-options="bonusStore.scorerOptions"
       @close="stateOfPointForm = false"
       @create="uploadReview"
     />

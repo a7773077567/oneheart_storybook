@@ -4,13 +4,13 @@ import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
 import { type ReviewListContent, RoleType, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
-import { useTrafficLight, useUserStore } from '@/stores';
+import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 
 const userStore = useUserStore();
-const trafficLightStore = useTrafficLight();
+const bonusStore = useBonusStore();
 
-const selectedTherapist = ref(trafficLightStore.therapistFilterOptions?.[0]?.value);
+const selectedTherapist = ref(bonusStore.therapistFilterOptions?.[0]?.value);
 const reviewList = ref<ReviewListContent[]>([]);
 
 const cols: QTableProps['columns'] = [
@@ -68,8 +68,8 @@ const pagination = ref({
 });
 
 // before mounted
-await trafficLightStore.getAvailableTherapistList();
-selectedTherapist.value = trafficLightStore.therapistFilterOptions?.[0]?.value;
+await bonusStore.getAvailableTherapistList();
+selectedTherapist.value = bonusStore.therapistFilterOptions?.[0]?.value;
 await getReviewList();
 
 const onRequest: QTableProps['onRequest'] = async (props) => {
@@ -150,7 +150,7 @@ const lightBoxImg = ref('');
     <QSeparator />
     <section class="google-review-content">
       <div class="google-review-content__header">
-        <OptionSelect v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" v-model="selectedTherapist" :options="trafficLightStore.therapistFilterOptions" @update:model-value="getReviewList" />
+        <OptionSelect v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" v-model="selectedTherapist" :options="bonusStore.therapistFilterOptions" @update:model-value="getReviewList" />
       </div>
       <QTable
         v-model:pagination="pagination"
@@ -179,7 +179,7 @@ const lightBoxImg = ref('');
     <ReviewForm
       :type="formType" :init-vals="reviewInfo" :role="role"
       :review-id="targetReview"
-      :therapist-options="trafficLightStore.scorerOptions"
+      :therapist-options="bonusStore.scorerOptions"
       @close="stateOfReviewForm = false"
       @create="uploadReview"
     />
