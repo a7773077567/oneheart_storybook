@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { createPointGroup } from '@/api';
-import type { Client, CreateGroupField } from '@/api';
+import { type Client, type CreateGroupField, getDepInChargeTherapist } from '@/api';
 import { usePointsStore, useUserStore } from '@/stores';
 import { POINTS_PLAN, plansByType, pointUnit } from '@/const/points';
 import { PointTypes } from '@/const/general';
@@ -26,24 +26,35 @@ const pointsTopupSchema = z.object({
   clientId: z.number(),
   clientPhone: z.string(),
   groupName: z.string(),
-  sellerId: z.number().nullable().optional(),
-  sellerName: z.string().nullable().optional(),
   clientGroupId: z.number(),
   plan: z.number(),
   pointType: z.nativeEnum(PointTypes),
   paidPointGained: z.preprocess(a => Number(a), z.number().nonnegative()),
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
+  sellers: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+  })).default([]),
+  chargers: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+  })).default([]),
 });
 
 const initialValues = computed(() => pointsStore.topupDetail);
 
 const { handleSubmit, values, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(pointsTopupSchema),
+  initialValues: initialValues.value,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  pointsStore.topupDetail = { ...values, sellerId: values.sellerId ?? null, planName: values.plan ? POINTS_PLAN[values.plan].name : '', contractDottedsignTaskId: null };
+  pointsStore.topupDetail = {
+    ...values,
+    planName: values.plan ? POINTS_PLAN[values.plan].name : '',
+    contractDottedsignTaskId: null,
+  };
 
   emit('goNext');
 });
@@ -61,7 +72,7 @@ const planOptions = computed(() => {
 
   return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
-const sellerOptions = computed(() => userStore.users.filter(getOpenAccount).map(p => ({ label: p.name, value: p.id })));
+const sellerOptions = computed(() => userStore.users.filter(getOpenAccount).map(p => ({ name: p.name, id: p.id })));
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
@@ -81,12 +92,23 @@ function selectClient(selectList: Client[]) {
 }
 
 const remainingPoints = ref(0);
-function getPointGroup(group: { name: string; id: number; type: PointTypes; points: number }) {
+async function getPointGroup(group: { name: string; id: number; type: PointTypes; points: number }) {
   remainingPoints.value = group.points;
   setFieldValue('clientGroupId', group.id ?? '');
   setFieldValue('groupName', group.name ?? '');
   setFieldValue('pointType', group.type);
   setFieldValue('plan', undefined);
+  // refactor: 堂數、金額重置？
+
+  if (values.clientId) {
+    setDefaultChargers(values.clientId, group.type);
+  }
+}
+
+async function setDefaultChargers(clientId: number, type: PointTypes) {
+  // 負責人會自動代群組的所有人員的對應科別負責人
+  const chargers = await getDepInChargeTherapist(clientId, { clientGroupType: type });
+  setFieldValue('chargers', chargers.filter(charger => !!charger.inChargeUserId).map(charger => ({ id: charger.inChargeUserId, name: charger.inChargeUserName })));
 }
 
 function setDefaultVal(selectedId: number) {
@@ -95,11 +117,6 @@ function setDefaultVal(selectedId: number) {
   setFieldValue('paidPointGained', selectedPlan?.paidPointGained);
   setFieldValue('giftPointGained', selectedPlan?.giftPointGained);
   setFieldValue('amount', selectedPlan?.price);
-}
-
-function choseSeller(selectedSeller: { label: string; value: number }) {
-  setFieldValue('sellerId', selectedSeller.value);
-  setFieldValue('sellerName', selectedSeller.label);
 }
 
 // 新增群組
@@ -128,7 +145,10 @@ async function createGroup(value: CreateGroupField) {
 
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
       <fieldset class="col-11 col-md-8">
-        <OInput inside-label="客戶*" readonly class="field--val" name="clientName" hide-bottom-space :virtual-scroll-item-size="50" />
+        <OInput
+          inside-label="客戶*" readonly class="field--val" name="clientName" hide-bottom-space
+          :virtual-scroll-item-size="50"
+        />
         <div class="q-ml-md">
           <QBadge color="black" class="q-px-sm text-body1">
             會員編號：
@@ -139,31 +159,17 @@ async function createGroup(value: CreateGroupField) {
         </div>
       </fieldset>
       <fieldset class="col-8">
-        <OSelect
-          label="負責人"
-          class="field--val"
-          name="sellerName"
-          :options="sellerOptions"
-          hide-bottom-space
-          :virtual-scroll-item-size="50"
-          :emit-value="false"
-          error-message=""
-          @update:model-value="choseSeller"
-        />
-      </fieldset>
-      <fieldset class="col-8">
         <div class="full-width row items-start">
           <div class="col-8">
             <OSelect
-              label="堂數群組*"
-              :disable="!values.clientId"
-              class="field--val" name="groupName" :options="pointsStore.pointGroupOptions" hide-bottom-space
-              :virtual-scroll-item-size="50"
-              error-message=""
+              label="堂數群組*" :disable="!values.clientId" class="field--val" name="groupName"
+              :options="pointsStore.pointGroupOptions" hide-bottom-space :virtual-scroll-item-size="50" error-message=""
               @update:model-value="getPointGroup"
             />
             <p class="q-mt-md q-ml-sm">
-              剩餘{{ pointUnit[(values.pointType ?? PointTypes.物理治療)] }}數： {{ remainingPoints }} {{ pointUnit[(values.pointType ?? PointTypes.物理治療)] }}
+              剩餘{{ pointUnit[(values.pointType ?? PointTypes.物理治療)] ?? '堂' }}數： {{ remainingPoints }} {{
+                pointUnit[(values.pointType
+                  ?? PointTypes.物理治療)] ?? '堂' }}
             </p>
           </div>
           <QBtn class="col-auto q-ml-md" outline label="新增群組" :disable="!values.clientId" @click="showAddForm = true" />
@@ -171,32 +177,49 @@ async function createGroup(value: CreateGroupField) {
       </fieldset>
       <fieldset class="col-8">
         <OSelect
-          label="方案*"
-          class="field--val" name="plan" :options="planOptions" hide-bottom-space :virtual-scroll-item-size="50"
-          error-message="" @update:model-value="setDefaultVal"
+          label="方案*" class="field--val" name="plan" :options="planOptions" hide-bottom-space
+          :virtual-scroll-item-size="50" error-message="" @update:model-value="setDefaultVal"
         />
       </fieldset>
       <div class="col-12 row q-col-gutter-md items-center">
         <fieldset class="col-6 col-md-3">
           <OInput
-            :inside-label="`${pointUnit[values.pointType ?? PointTypes.物理治療]}數*`"
-            type="number" class="field--val" name="paidPointGained" hide-bottom-space placeholder="數量"
-            error-message=""
+            :inside-label="`${pointUnit[values.pointType ?? PointTypes.物理治療] ?? '堂'}數*`" type="number" class="field--val"
+            name="paidPointGained" hide-bottom-space placeholder="數量" error-message=""
           />
         </fieldset>
         <fieldset class="col-6 col-md-3">
-          <OInput :inside-label="`贈送${pointUnit[values.pointType ?? PointTypes.物理治療]}數*`" type="number" class="field--val" name="giftPointGained" hide-bottom-space placeholder="數量" error-message="" />
+          <OInput
+            :inside-label="`贈送${pointUnit[values.pointType ?? PointTypes.物理治療] ?? '堂'}數*`" type="number"
+            class="field--val" name="giftPointGained" hide-bottom-space placeholder="數量" error-message=""
+          />
         </fieldset>
         <fieldset class="col-12 col-md-2">
           <QInput
-            label="總數"
-            type="number" :model-value="totalPoints" class="field--val" hide-bottom-space placeholder="數量" disable
-            readonly
+            label="總數" type="number" :model-value="totalPoints" class="field--val" hide-bottom-space
+            placeholder="數量" disable readonly
           />
         </fieldset>
       </div>
       <fieldset class="col-8">
-        <OInput inside-label="金額*" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
+        <OInput
+          inside-label="金額*" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$"
+          error-message=""
+        />
+      </fieldset>
+      <fieldset class="col-8">
+        <OSelect
+          multiple label="負責人(選填、可複選)" class="field--val" name="chargers" :options="sellerOptions"
+          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="name"
+          option-value="id"
+        />
+      </fieldset>
+      <fieldset class="col-8">
+        <OSelect
+          multiple label="銷售者(選填、可複選)" class="field--val" name="sellers" :options="sellerOptions"
+          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="name"
+          option-value="id"
+        />
       </fieldset>
     </form>
     <div class="q-my-lg flex">

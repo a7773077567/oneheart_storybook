@@ -1,6 +1,6 @@
 import { api } from '@/utils/api';
 import type { User } from './user';
-import type { ShiftType } from '@/const/general';
+import type { PointTypes, ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
 import type { ContractTypes } from './contract';
 import type { PaymentDetail } from './payment';
@@ -88,6 +88,7 @@ export interface PurchaseRecord {
 export interface DepInChargeTherapist {
   userShiftType: ShiftType;
   inChargeUserName: string;
+  inChargeUserId: number;
 }
 export interface MedicalHistoryParams {
   userShiftTypes: number[];
@@ -172,8 +173,8 @@ export async function updateIntroducer(clientId: number, body: { introducerClien
 }
 
 // 取得客戶各科別負責人
-export async function getDepInChargeTherapist(clientId: number) {
-  const { data } = await api.get<DepInChargeTherapist[]>(`clients/${clientId}/inChargeUsers`);
+export async function getDepInChargeTherapist(clientId: number, query: { clientGroupType?: PointTypes } = {}) {
+  const { data } = await api.get<DepInChargeTherapist[]>(`clients/${clientId}/inChargeUsers`, { params: query });
   return data;
 }
 export async function getMedicalHistory(clientId: number, params: MedicalHistoryParams) {
