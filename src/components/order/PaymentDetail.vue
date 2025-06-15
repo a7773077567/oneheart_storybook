@@ -53,12 +53,13 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
         { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
+        { key: 'chargers', value: data.chargers?.length > 0 ? data.chargers?.map(charger => charger.name).join('、') : '-', label: '負責人', span: true },
+        { key: 'sellers', value: data.sellers?.length > 0 ? data.sellers?.map(u => u.name).join('、') : '-', label: '銷售者', span: true },
         { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
         { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
         { key: 'paidPointGained', value: `${data.paidPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `${pointUnit[data.pointPaymentClientGroupType]}數` },
         { key: 'giftPointGained', value: `${data.giftPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `贈送${pointUnit[data.pointPaymentClientGroupType]}數` },
-        { key: 'chargers', value: data.chargers?.length > 0 ? data.chargers?.map(charger => charger.name).join('、') : '-', label: '負責人', span: true },
-        { key: 'sellers', value: data.sellers?.length > 0 ? data.sellers?.map(u => u.name).join('、') : '-', label: '銷售者', span: true },
+        { key: 'amount', value: `$${data.amount}`, label: '金額' },
       ];
     case TransactionTypes.堂數退款:
     default:
@@ -66,10 +67,12 @@ const purchaseDetail = computed<CheckTableData>(() => {
         { key: 'date', value: data.date, span: true, custom: true },
         { key: 'name', value: data.clientName, label: '姓名' },
         { key: 'pointType', value: PointTypes[data.pointPaymentClientGroupType], label: '類別' },
+        { key: 'chargers', value: data.chargers?.length > 0 ? data.chargers?.map(charger => charger.name).join('、') : '-', label: '負責人', span: true },
+        { key: 'sellers', value: data.sellers?.length > 0 ? data.sellers?.map(u => u.name).join('、') : '-', label: '銷售者', span: true },
         { key: 'groupName', value: data.pointPaymentClientGroupName, label: '群組' },
-        { key: 'plan', value: data.pointPaymentPlan, label: '方案' },
-        { key: 'paidPointGained', value: `${data.paidPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `${pointUnit[data.pointPaymentClientGroupType]}數` },
-        { key: 'giftPointGained', value: `${data.giftPointGained} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `贈${pointUnit[data.pointPaymentClientGroupType]}` },
+        { key: 'plan', value: data.pointPaymentPlan, label: '退款方案' },
+        { key: 'paidPointGained', value: `${(+data.paidPointGained + +data.giftPointGained).toFixed(2)} ${pointUnit[data.pointPaymentClientGroupType]}`, label: `退款${pointUnit[data.pointPaymentClientGroupType]}數` },
+        { key: 'amount', value: `-$${data.amount}`, label: '退款金額' },
       ];
   }
 });

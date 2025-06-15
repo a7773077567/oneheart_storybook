@@ -11,6 +11,7 @@ interface Props extends /* @vue-ignore */ Optional<QInputProps, 'modelValue'> {
   disable?: boolean;
   type?: QInputProps['type'];
   insideLabel?: string;
+  prefix?: string;
 }
 const props = defineProps<Props>();
 
@@ -34,6 +35,7 @@ const { value, errorMessage } = useField<string>(() => props.name || '', props.c
       :disable="disable"
       :type="type"
       :label="insideLabel"
+      :prefix="prefix"
       v-bind="$attrs"
     >
       <template #append>

@@ -1,6 +1,7 @@
 import { api } from '@/utils/api';
 import type { PaymentTypes, PointTypes } from '@/const/general';
 import type { Client } from './clientManagement';
+import type { User } from './user';
 
 export interface PointsGroup {
   id: number;
@@ -76,8 +77,32 @@ export async function gainPoint(param: GainPoint) {
   await api.post('clientGroups/gainPoint', param);
 }
 
-export type RefundPoint = Pick<GainPoint, 'clientId' | 'clientGroupId' | 'amount' | 'multiChannelPay'>;
 // 退還堂數
+export type RefundPoint = Pick<GainPoint, 'clientId' | 'clientGroupId' | 'amount' | 'multiChannelPay'>;
 export async function refundPoint(param: RefundPoint) {
   await api.post('clientGroups/refundPoint', param);
+}
+
+// 取得客戶群組可退款點數付款列表
+export interface RefundablePayment {
+  amount: number;
+  chargers: User[];
+  clientGroupId: number;
+  clientGroupName: string;
+  createdAt: string;
+  id: number;
+  plan: string;
+  sellers: User[];
+  useAblePoints: number;
+  usedPoints: number;
+}
+export async function getAvaiRefundablePlans(clientGroupId: number) {
+  const { data } = await api.get<RefundablePayment[]>(`clientGroups/${clientGroupId}/available-refunded-pointPayments`);
+  return data;
+}
+
+// 針對特定點數付款記錄進行退點
+export type RefundPointPlan = RefundPoint & { pointPaymentId: number };
+export async function refundByPointPlan(params: RefundPointPlan) {
+  await api.post('clientGroups/refundSpecificPointPayment', params);
 }

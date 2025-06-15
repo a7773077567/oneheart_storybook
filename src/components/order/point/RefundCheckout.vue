@@ -7,7 +7,7 @@ import { useQuasar } from 'quasar';
 import { PaymentMethods } from '@/const/appointment';
 import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
 import { useRouter } from 'vue-router';
-import { refundPoint } from '@/api';
+import { refundByPointPlan } from '@/api';
 import { useUserStore } from '@/stores';
 import { calcReceiptAmount } from '@/utils/helpers';
 import { useDialog } from '@/composables/dialog';
@@ -33,20 +33,24 @@ const payments = ref<Payments>([]);
 const methodOptions = Object.values(PaymentMethods).filter(payment => payment.forRefunding).map(({ label, identifier }) => ({ label, value: identifier }));
 
 const refundDetail = computed<CheckTableData>(() => {
-  const { client, pointGroup } = props.modelValue;
+  const { client, pointGroup, pointPayment } = props.modelValue;
   return [
     { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
     { key: 'name', value: client?.name ?? '', label: '姓名' },
     { key: 'phone', value: client?.phone ?? '', label: '電話' },
+    { key: 'sellers', value: pointPayment?.sellers && pointPayment.sellers.length > 0 ? pointPayment?.sellers?.map(seller => seller.name).join(',') : '-', span: true, label: '負責人' },
+    { key: 'chargersName', value: pointPayment?.chargers && pointPayment.chargers?.length > 0 ? pointPayment?.chargers?.map(charger => charger.name).join(',') : '-', span: true, label: '銷售者' },
     { key: 'pointType', value: pointGroup?.type ? PointTypes[pointGroup.type] : '', label: '類別' },
     { key: 'groupName', value: pointGroup?.name ?? '', label: '群組' },
-    { key: 'classCounts', value: `${pointGroup?.points ?? 0} ${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}`, label: '堂數' },
+    { key: 'plan', value: pointPayment?.plan ?? '', label: '退款方案' },
+    { key: 'groupName', value: `$${props.modelValue.amount ?? 0}`, label: '退款金額' },
+    { key: 'classCounts', value: `${pointPayment?.useAblePoints ?? 0} ${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}`, label: '退款堂數' },
   ];
 });
 
 // receipt
 const receiptData = computed(() => {
-  const { client, pointGroup } = props.modelValue;
+  const { client, pointGroup, pointPayment } = props.modelValue;
   return [
     { name: 'name', label: '姓名', value: client?.name ?? '' },
     { name: 'gender', label: '性別', value: client?.gender ?? '' },
@@ -54,7 +58,7 @@ const receiptData = computed(() => {
     { name: 'birthDate', label: '出生年月日', value: client?.birthDate ?? '' },
     { name: 'group', label: '群組', value: pointGroup?.name ?? '' },
     { name: 'amount', label: '金額', value: `$${calcReceiptAmount(payments.value)}` },
-    { name: 'pointGained', label: `退款${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}數`, value: `${pointGroup?.points ?? 0}${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}` },
+    { name: 'pointGained', label: `退款${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}數`, value: `${pointPayment?.useAblePoints ?? 0}${pointUnit[pointGroup?.type ?? PointTypes['物理治療']]}` },
   ];
 });
 
@@ -62,7 +66,7 @@ const $q = useQuasar();
 const router = useRouter();
 const isRefunding = ref(false);
 async function onCheckout() {
-  const { clientId, clientGroupId, amount } = props.modelValue;
+  const { clientId, clientGroupId, amount, pointPaymentId } = props.modelValue;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
     return { payMethod, amount, authorisationCode, receiptNumber, details };
   });
@@ -76,11 +80,12 @@ async function onCheckout() {
   }
   isRefunding.value = true;
   try {
-    await refundPoint({
+    await refundByPointPlan({
       clientId,
       clientGroupId,
       amount,
       multiChannelPay,
+      pointPaymentId,
     });
 
     const { onOk, onCancel } = await useDialog({
@@ -122,12 +127,12 @@ async function onCheckout() {
       </template>
     </CheckTable>
     <div class="refund_point_amount">
-      退款總額 &nbsp;<span class="refund_point_amount--val">{{ modelValue.amount }} 元</span>
+      退款總額 &nbsp;<span class="refund_point_amount--val">${{ modelValue.amount }} 元</span>
     </div>
     <PaymentComposition v-model="payments" :method-options="methodOptions" />
 
     <div class="q-my-lg">
-      <QBtn outline size="md" label="取消" class="q-px-lg q-mr-md" @click="$emit('cancel')" />
+      <QBtn outline size="md" label="返回上一步" class="q-px-lg q-mr-md" @click="$emit('goBack')" />
       <QBtn color="red" size="md" label="確認退款結帳" class="q-px-lg" @click="isCheckoutOpen = true" />
     </div>
   </div>
