@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { useOptionStore } from '@/stores';
 
 const optionStore = useOptionStore();
-const spaceOptions = ref<{ label: string; value: number }[]>(optionStore.spaceList.map(space => ({ label: space.name, value: space.id })));
+const spaceOptions = computed<{ label: string; value: number }[]>(() => optionStore.spaceList.map(space => ({ label: space.name, value: space.id })));
 
 const form = ref<SalaryReportParams>({
   yearMonth: '',
