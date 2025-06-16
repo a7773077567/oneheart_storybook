@@ -14,14 +14,14 @@ const { value } = useField<string | null>(() => props.name || '', undefined, {
 
 // to refactor
 const previewValue = computed(() => {
-  return props.value !== undefined ? props.value : value;
+  return props.value !== undefined ? props.value : value.value;
 });
 
 function previewFile() {
   if (!previewValue.value || typeof previewValue.value !== 'string')
     return;
 
-  window.open(previewValue.value);
+  window.open(previewValue.value, '_blank');
 }
 </script>
 
