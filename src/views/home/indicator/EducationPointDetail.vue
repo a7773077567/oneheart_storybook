@@ -204,10 +204,10 @@ async function fetchAllData() {
             </div>
             <div class="col-12 col-md-4">
               <p class="text-body-medium q-mb-sm text-right">前三個月 {{ previous3Scores.join('+') }} = {{ previous3ScoresTotal }} 積分 =</p>
-              <p class="text-title_medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
+              <p class="text-title-medium text-right">目前得分 {{ overview.currentPoint }} 分</p>
             </div>
             <div class="col-12 col-md-4">
-              <p class="text-body-medium q-mb-sm text-right">前三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
+              <p class="text-body-medium q-mb-sm text-right">近三個月 {{ recent3Scores.join('+') }} = {{ recent3ScoresTotal }} 積分 =</p>
               <p class="text-title-medium text-right">預測得分 {{ overview.predictionPoint }} 分</p>
             </div>
           </div>
