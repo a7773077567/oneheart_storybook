@@ -66,6 +66,7 @@ export interface User {
   stateOfWork: WorkState;
   type: RoleType; // can be removed?
   weightForOrder: number;
+  isPartTime?: boolean; // 目前開 boolean，若之後有增加正職、兼職以外選項，會改為 string
 };
 export type BasicLoginReq = z.infer<typeof basicLoginSchema>;
 export type ForgotReq = z.infer<typeof emailSchema>;

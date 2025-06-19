@@ -17,6 +17,7 @@ export interface CreateUser extends Pick<User, 'name' | 'email' | 'weightForOrde
   onBoardDate: string;
   introducerUserId: number | null;
   ancestorUserId: number | null;
+  isPartTime?: boolean;
 }
 
 export interface UpdateUser extends CreateUser {
