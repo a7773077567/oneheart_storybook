@@ -76,7 +76,8 @@ function getBookings(scope: any) {
       bookings: item,
       left: scope.timeStartPosX(scheduleStartTime) + 10,
       width: durationWidth - 20 > cardMinWidth ? durationWidth : cardMinWidth,
-      top: 10,
+      top: 4,
+      bottom: 4,
       count: item.length,
       isAllCheckout,
     };
@@ -118,8 +119,8 @@ function getMachineAppointment(scope: any) {
       bookings: item,
       left: scope.timeStartPosX(scheduleStartTime) + 10,
       width: durationWidth - 20 > cardMinWidth ? durationWidth : cardMinWidth,
-      top: 10,
-      bottom: 10,
+      top: 4,
+      bottom: 4,
       count: item.length,
       isAllCheckout,
       showMachineCard: item[0].userShift.type !== ShiftType['G動椅'], // 除G動椅預約單外其他都顯示灰色儀器卡片

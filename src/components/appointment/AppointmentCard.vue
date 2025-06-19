@@ -15,11 +15,8 @@ const isCheckedOut = computed(() => props.data.paymentState === PaymentState['�
 const beforeCheckIn = computed(() => props.data.state === AppointmentState['預約']);
 
 const router = useRouter();
-const paymentInfo = computed(() => SchedulePaymentMap.get(props.data.paymentState)!);
 const stateInfo = computed(() => ScheduleStateMap.get(props.data.state)!);
-const cardBgc = computed(() => paymentInfo.value.cardStyle.bgc);
-const stateLabel = computed(() => stateInfo.value.label);
-const stateColor = computed(() => stateInfo.value.cardStyle?.color);
+
 const isGroupClass = computed(() => props.data.userShift.type === 11);
 const type = computed(() => Object.values(Types).find(type => props.data.userShift.type === type.identifier));
 const typeLabel = computed(() => isGroupClass.value ? props.data.userShift.name : type.value?.label);
@@ -51,30 +48,36 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
 </script>
 
 <template>
-  <div class="booking-card" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
-    <div class="booking-card__client">
-      <div class="booking-card__client--val q-pr-sm">客戶：{{ data.client.name }}</div>
-      <p class="booking-card__client--val">科別：{{ typeLabel }}</p>
-      <p v-if="data.userShift.type === ShiftType['G動椅']" class="booking-card__client--val">治療師：{{ data.userShift.user.name || '未指派' }}</p>
-    </div>
-
+  <QCard flat class="booking-card bg-secondary-container" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
+    <QCardSection class="q-pa-none q-mb-xs text-on-surface">
+      <p class="text-label-medium-prominent q-mb-xs">{{ `${data.scheduleStartTime} - ${data.scheduleEndTime}` }}</p>
+      <p>
+        <span class="text-label-large-perminent q-mr-sm">{{ data.client.name }}</span> <span class="text-label-medium-prominent">{{ typeLabel }}</span>
+      </p>
+    </QCardSection>
+    <QCardSection v-if="data.userShift.type === ShiftType['G動椅']" class="q-pa-none q-mb-xs">
+      <p class="">治療師：{{ data.userShift.user.name || '未指派' }}</p>
+    </QCardSection>
     <QCardSection v-if="addOns?.length > 0" class="q-pa-none q-mb-xs">
-      <div class="row items-center">
-        <span class="text-label-medium q-mr-xs">加購：</span>
-        <AddOnIcon v-for="addOn in addOns" :key="addOn.type" :machine-type="addOn.type" class="q-mr-xs" />
+      <div class="row items-center q-gutter-x-xs">
+        <span class="text-label-medium">加購：</span>
+        <AddOnIcon v-for="addOn in addOns" :key="addOn.type" :machine-type="addOn.type" />
       </div>
     </QCardSection>
-    <div class="flex q-gutter-xs">
-      <template v-for="(offer, idx) in specialOffers" :key="idx">
-        <QBadge v-if="!!offer.value" color="green-3" text-color="green-8" class="text-weight-bold">{{ offer.label }}</QBadge>
-      </template>
-      <HighConversionOpportunity v-if="data.isHighSalesOpportunity" mini-mode />
-    </div>
-
-    <p class="booking-card__state">{{ stateLabel }}</p>
-
-    <QBtn :label="isCheckedOut ? '＄已結帳' : '＄結帳' " :disable="isCheckedOut || beforeCheckIn" rounded color="white" text-color="black" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
+    <QCardSection class="q-pa-none">
+      <div class="flex q-gutter-x-xs">
+        <QBadge class="text-label-small" v-bind="+props.data.state < 3 ? { color: 'error-16', textColor: 'error' } : { color: 'secondary-16', textColor: 'on-surface-variant' }">{{ stateInfo.label }}</QBadge>
+        <HighConversionOpportunity v-if="data.isHighSalesOpportunity" mini-mode />
+        <template v-for="(offer, idx) in specialOffers" :key="idx">
+          <QBadge v-if="!!offer.value" class="text-weight-bold bg-forest-16 text-forest">{{ offer.label }}</QBadge>
+        </template>
+      </div>
+    </QCardSection>
+    <QCardActions align="right" class="q-pb-none">
+      <div v-if="isCheckedOut" class="text-label-large text-outline">＄已結帳</div>
+      <QBtn v-else label="＄結帳" :disable="isCheckedOut || beforeCheckIn" rounded color="primary" text-color="white" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
+    </QCardActions>
 
     <QTooltip :id="`tooltip-${data.id}`" :key="data.id" class="bg-black text-white booking-card__note q-pa-md" anchor="center right" self="bottom middle" max-width="264px" max-height="160px">
       <div v-for="(item, idx) in tooltipInfo" :key="idx" class="tooltip_info">
@@ -82,7 +85,7 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
         <div class="value">{{ item.value }}</div>
       </div>
     </QTooltip>
-  </div>
+  </QCard>
 </template>
 
 <style lang="scss" scoped>
@@ -92,16 +95,16 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
 }
 
 .booking-card {
-  // max-width: 105px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 10px;
+  padding: 8px;
   font-size: 12px;
-  background-color: v-bind('cardBgc');
   border-radius: 10px;
   cursor: pointer;
   position: relative;
+  border-radius: 8px;
+  justify-content: center;
   &__client {
     @include overflow;
     &--val {
@@ -113,26 +116,14 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
   &__type {
     @include overflow;
   }
-  &__state {
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 700;
-    color: v-bind('stateColor');
-    background-color: #515050;
-  }
   &__badge {
     position: absolute;
     top: 0;
     right: 0;
-    display: block;
-    content: '';
-    background: #515050;
-    color: white;
-    border-radius: 0 0 0 50%;
+    background-color: $tertiary;
+    border-radius: 0 8px;
     padding: 2px 4px;
-    font-weight: 600;
+    @include text-style($label-medium, $on-primary);
   }
 }
 
