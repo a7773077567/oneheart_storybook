@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { AppointmentState, PaymentState, SchedulePaymentMap, ScheduleStateMap } from '@/const/appointment';
 import { ShiftType, Types } from '@/const/general';
+import AddOnIcon from './AddOnIcon.vue';
 
 interface Props {
   data: ClientSchedule;
@@ -45,6 +46,8 @@ const tooltipInfo = computed(() => [
     : []),
   ...(props.data.userShift.type === ShiftType['G動椅'] ? [{ label: '治療師', value: props.data.userShift.user?.id ? props.data.userShift.user?.name : '未指派' }] : []),
 ]);
+
+const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
 </script>
 
 <template>
@@ -56,7 +59,12 @@ const tooltipInfo = computed(() => [
     </div>
 
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
-
+    <QCardSection v-if="addOns?.length > 0" class="q-pa-none q-mb-xs">
+      <div class="row items-center">
+        <span class="text-label-medium q-mr-xs">加購：</span>
+        <AddOnIcon v-for="addOn in addOns" :key="addOn.type" :machine-type="addOn.type" class="q-mr-xs" />
+      </div>
+    </QCardSection>
     <div class="flex q-gutter-xs">
       <template v-for="(offer, idx) in specialOffers" :key="idx">
         <QBadge v-if="!!offer.value" color="green-3" text-color="green-8" class="text-weight-bold">{{ offer.label }}</QBadge>
