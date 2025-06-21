@@ -47,9 +47,9 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
 </script>
 
 <template>
-  <QCard flat class="booking-card bg-secondary-container column" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
+  <QCard flat class="booking-card column" :class="data.paymentState === PaymentState['已結帳'] ? ' bg-secondary-container' : ' bg-tertiary-container'">
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
-    <QCardSection class="q-pa-none col-auto" style="flex: 1 1 20px; overflow: hidden">
+    <QCardSection class="q-pa-none col-auto" style="flex: 1 1 20px; overflow: hidden; max-height: fit-content;">
       <QCardSection class="q-pa-none q-mb-xs text-on-surface">
         <p class="text-label-medium-prominent q-mb-xs">{{ `${data.scheduleStartTime} - ${data.scheduleEndTime}` }}</p>
         <p>
@@ -75,7 +75,7 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
         </template>
       </div>
     </QCardSection>
-    <QCardActions align="right" class="q-py-none col" style="flex: 0 1 auto">
+    <QCardActions align="right" class="q-py-none col booking-card__action">
       <div v-if="isCheckedOut" class="text-label-large text-outline">＄已結帳</div>
       <QBtn v-else label="＄結帳" :disable="isCheckedOut || beforeCheckIn" rounded color="primary" text-color="white" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
     </QCardActions>
@@ -105,7 +105,7 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
   cursor: pointer;
   position: relative;
   border-radius: 8px;
-  justify-content: center;
+  justify-content: start;
   overflow: hidden;
   &__client {
     @include overflow;
@@ -126,6 +126,10 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
     border-radius: 0 8px;
     padding: 2px 4px;
     @include text-style($label-medium, $on-primary);
+  }
+  &__action {
+    flex: 0 1 auto;
+    margin-top: auto;
   }
 }
 
