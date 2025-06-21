@@ -7,6 +7,7 @@ const tabs = [
   // { name: 'firstVisitExport', label: '初診客戶' },
   { name: 'payrollExport', label: '治療師薪資報表' },
   { name: 'coachPayrollExport', label: '教練薪資報表' },
+  { name: 'counterPayrollExport', label: '櫃檯薪資報表' },
   { name: 'payrollExport4HR', label: '治療師薪資報表 For HR' },
 ];
 const currentTab = ref(tabs[0].name);

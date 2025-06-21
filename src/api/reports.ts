@@ -53,3 +53,18 @@ export async function exportSalaryReport4Coach(params: SalaryReportParams) {
   link.remove();
   window.URL.revokeObjectURL(url);
 }
+
+// 櫃檯薪資報表
+export async function exportSalaryReport4Counter(params: SalaryReportParams) {
+  const response = await api.get(`reports/salary-report-for-counter`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+
+  const blobParts: BlobPart = response as unknown as BlobPart;
+  const url = window.URL.createObjectURL(new Blob([blobParts]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${params.yearMonth}月櫃檯薪資報表.xlsx`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}
