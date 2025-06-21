@@ -48,24 +48,26 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
 </script>
 
 <template>
-  <QCard flat class="booking-card bg-secondary-container" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
+  <QCard flat class="booking-card bg-secondary-container column" :class="{ 'booking-card--first': data.isFirstClientSchedule }">
     <div v-if="data.isFirstClientSchedule" class="booking-card__badge">初</div>
-    <QCardSection class="q-pa-none q-mb-xs text-on-surface">
-      <p class="text-label-medium-prominent q-mb-xs">{{ `${data.scheduleStartTime} - ${data.scheduleEndTime}` }}</p>
-      <p>
-        <span class="text-label-large-perminent q-mr-sm">{{ data.client.name }}</span> <span class="text-label-medium-prominent">{{ typeLabel }}</span>
-      </p>
+    <QCardSection class="q-pa-none col-auto" style="flex: 1 1 20px; overflow: hidden">
+      <QCardSection class="q-pa-none q-mb-xs text-on-surface">
+        <p class="text-label-medium-prominent q-mb-xs">{{ `${data.scheduleStartTime} - ${data.scheduleEndTime}` }}</p>
+        <p>
+          <span class="text-label-large-perminent q-mr-sm">{{ data.client.name }}</span> <span class="text-label-medium-prominent">{{ typeLabel }}</span>
+        </p>
+      </QCardSection>
+      <QCardSection v-if="data.userShift.type === ShiftType['G動椅']" class="q-pa-none q-mb-xs">
+        <p class="">治療師：{{ data.userShift.user.name || '未指派' }}</p>
+      </QCardSection>
     </QCardSection>
-    <QCardSection v-if="data.userShift.type === ShiftType['G動椅']" class="q-pa-none q-mb-xs">
-      <p class="">治療師：{{ data.userShift.user.name || '未指派' }}</p>
-    </QCardSection>
-    <QCardSection v-if="addOns?.length > 0" class="q-pa-none q-mb-xs">
+    <QCardSection v-if="addOns?.length > 0" class="q-pa-none q-mb-xs col" style="flex: 0 1 auto">
       <div class="row items-center q-gutter-x-xs">
         <span class="text-label-medium">加購：</span>
         <AddOnIcon v-for="addOn in addOns" :key="addOn.type" :machine-type="addOn.type" />
       </div>
     </QCardSection>
-    <QCardSection class="q-pa-none">
+    <QCardSection class="q-pa-none col" style="flex: 0 1 auto">
       <div class="flex q-gutter-x-xs">
         <QBadge class="text-label-small" v-bind="+props.data.state < 3 ? { color: 'error-16', textColor: 'error' } : { color: 'secondary-16', textColor: 'on-surface-variant' }">{{ stateInfo.label }}</QBadge>
         <HighConversionOpportunity v-if="data.isHighSalesOpportunity" mini-mode />
@@ -74,7 +76,7 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
         </template>
       </div>
     </QCardSection>
-    <QCardActions align="right" class="q-pb-none">
+    <QCardActions align="right" class="q-py-none col" style="flex: 0 1 auto">
       <div v-if="isCheckedOut" class="text-label-large text-outline">＄已結帳</div>
       <QBtn v-else label="＄結帳" :disable="isCheckedOut || beforeCheckIn" rounded color="primary" text-color="white" unelevated dense size="12px" padding="3px 12px" @click.stop="() => router.push({ name: 'appointmentListCheckout', params: { scheduleId: data.id } })" />
     </QCardActions>
@@ -105,6 +107,7 @@ const addOns = computed(() => props.data.addOnServices.filter(a => a.isAddOn));
   position: relative;
   border-radius: 8px;
   justify-content: center;
+  overflow: hidden;
   &__client {
     @include overflow;
     &--val {
