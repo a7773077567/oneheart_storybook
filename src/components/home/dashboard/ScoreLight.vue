@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const lightSignals = computed(() => {
   return props.rules.map(range => ({ ...range, isWithin:
-    range.min === 0 ? props.score < (range.max ?? 0) : (range.max === null ? props.score > range.min : props.score > range.min && props.score < range.max) }));
+    range.min === 0 ? props.score < (range.max ?? 0) : (range.max === null ? props.score >= range.min : props.score > range.min && props.score < range.max) }));
 });
 </script>
 
