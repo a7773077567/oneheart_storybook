@@ -68,7 +68,8 @@ export interface PointsPaymentRecord extends BasicPaymentRecord {
   pointUsed: null;
   type: TransactionTypes.堂數交易 | TransactionTypes.堂數退款;
   ticketGained: null;
-  seller: Pick<User, 'id' | 'name'>;
+  sellers: User[];
+  chargers: User[];
 }
 
 // 團課券購買

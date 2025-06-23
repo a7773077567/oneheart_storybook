@@ -154,7 +154,7 @@ function getCalendarStyle() {
   font-weight: 500;
 }
 :deep(.q-calendar-resource__resource--interval) {
-  min-height: 135px !important;
+  min-height: 144px !important;
 }
 
 // :deep(.q-calendar-resource__resource--row:last-child) {

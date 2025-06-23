@@ -3,12 +3,12 @@ import { ref } from 'vue';
 import { OSteps } from '@/components/shared';
 import RefundForm from '@/components/order/point/RefundForm.vue';
 import RefundCheckout from '@/components/order/point/RefundCheckout.vue';
-import type { Client, PointsGroup, RefundPoint } from '@/api';
+import type { Client, PointsGroup, RefundPointPlan, RefundablePayment } from '@/api';
 
 const steps = [{ label: '填寫退款內容', key: 'form' }, { label: '選擇退款方式', key: 'checkout' }];
 const currentStep = ref(steps[0]);
 
-export type RefundDetail = RefundPoint & { client: Partial<Client> | null; pointGroup: Partial<PointsGroup> | null };
+export type RefundDetail = RefundPointPlan & { client: Partial<Client> | null; pointGroup: Partial<PointsGroup> | null; pointPayment: Partial<RefundablePayment> };
 const refundValues = ref<RefundDetail>({} as RefundDetail);
 
 function cancelTopup() {

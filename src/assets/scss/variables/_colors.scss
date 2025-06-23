@@ -8,6 +8,7 @@ $secondary: rgba(58, 78, 107, 1);
 $on-secondary: rgba(255, 255, 255, 1);
 $secondary-container: rgba(223, 234, 252, 1);
 $on-secondary-container: rgba(26, 24, 51, 1);
+$secondary-16: rgba(58, 78, 107, 0.16);
 
 $tertiary: rgba(223, 84, 88, 1);
 $on-tertiary: rgba(255, 255, 255, 1);
@@ -18,6 +19,7 @@ $error: rgba(194, 53, 26, 1);
 $on-error: rgba(255, 255, 255, 1);
 $error-container: rgba(252, 231, 229, 1);
 $on-error-container: rgba(65, 0, 2, 1);
+$error-16: rgba(179, 38, 30, 0.16);
 
 $surface-dim: rgba(217, 218, 224, 1);
 $surface: rgba(240, 246, 255, 1);
@@ -42,6 +44,7 @@ $scrim: rgba(0, 0, 0, 0.32);
 $shadow: rgba(0, 0, 0, 1);
 
 $forest: #008524;
+$forest-16: rgba(34, 149, 11, 0.16);
 $warning: #E75D00;
 
 
@@ -55,6 +58,7 @@ $colors: (
   on-secondary: $on-secondary,
   secondary-container: $secondary-container,
   on-secondary-container: $on-secondary-container,
+  secondary-16: $secondary-16,
 
   tertiary: $tertiary,
   on-tertiary: $on-tertiary,
@@ -62,6 +66,7 @@ $colors: (
   on-tertiary-container: $on-tertiary-container,
 
   error: $error,
+  error-16: $error-16,
   on-error: $on-error,
   error-container: $error-container,
   on-error-container: $on-error-container,
@@ -89,7 +94,8 @@ $colors: (
   scrim: rgba(0, 0, 0, 0.32),
   shadow: rgba(0, 0, 0, 1),
 
-  forest: #008524,
+  forest: $forest,
+  forest-16: $forest-16,
 
   warning: $warning
 );

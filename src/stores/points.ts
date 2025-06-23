@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
-import { type Client, type PointsGroup, RoleType, fetchUsers, getClientPointGroup } from '@/api';
+import { type Client, type PointsGroup, type RefundablePayment, RoleType, fetchUsers, getAvaiRefundablePlans, getClientPointGroup } from '@/api';
 import { PointTypes } from '@/const/general';
-import { useUserStore } from './user';
 
 interface State {
   topupDetail: PointsPurchase;
   targetClientPointGroup: PointsGroup[];
   targetClient: Partial<Client> | null;
   sellerOptions: any[];
+  refundableList: RefundablePayment[];
 }
 
 export interface PointsPurchase {
@@ -23,8 +23,8 @@ export interface PointsPurchase {
   giftPointGained: number;
   amount: number;
   contractDottedsignTaskId: string | null;
-  sellerId: number | null;
-  sellerName?: string | null;
+  sellers: { id: number; name: string }[];
+  chargers: { id: number; name: string }[];
 }
 
 const initialTopup = {
@@ -34,14 +34,14 @@ const initialTopup = {
   clientGroupId: Number.NaN,
   pointType: Number.NaN,
   groupName: '',
-  plan: 8,
+  plan: 1,
   planName: '',
   paidPointGained: 0,
   giftPointGained: 0,
   amount: 0,
   contractDottedsignTaskId: null,
-  sellerId: null,
-  sellerName: null,
+  sellers: [],
+  chargers: [],
 };
 export const usePointsStore = defineStore('points', {
   state: (): State => {
@@ -50,6 +50,7 @@ export const usePointsStore = defineStore('points', {
       targetClientPointGroup: [],
       targetClient: null,
       sellerOptions: [],
+      refundableList: [],
     };
   },
   getters: {
@@ -74,6 +75,9 @@ export const usePointsStore = defineStore('points', {
         RoleType['副院長'],
       ] });
       this.sellerOptions = data.map(p => ({ label: p.name, value: p.id }));
+    },
+    async getAvaiRefundablePlans(clientGroupId: number) {
+      this.refundableList = await getAvaiRefundablePlans(clientGroupId);
     },
   },
 });

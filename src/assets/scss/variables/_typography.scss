@@ -102,6 +102,14 @@ $label-medium: (
   line-height: 16px,
   letter-spacing: 0.5px
 );
+$label-medium-prominent: (
+  font-family: $base-font,
+  font-size: 12px,
+  font-style: normal,
+  font-weight: 700,
+  line-height: 16px,
+  letter-spacing: 0.5px
+);
 
 $label-small: (
   font-family: $base-font,
@@ -162,6 +170,7 @@ $texts: (
   "label-large": $label-large,
   "label-large-perminent": $label-large-perminent,
   "label-medium": $label-medium,
+  "label-medium-prominent": $label-medium-prominent,
   "label-small": $label-small,
   "body-large": $body-large,
   "body-medium": $body-medium,

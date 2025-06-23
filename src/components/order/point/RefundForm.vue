@@ -1,13 +1,14 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
 import { OInput } from '@/components/shared';
-import { useForm } from 'vee-validate';
+import { Field, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { usePointsStore } from '@/stores';
 import { PointTypes } from '@/const/general';
-import type { Client, PointsGroup } from '@/api';
+import type { Client, PointsGroup, RefundPointPlan } from '@/api';
 import type { RefundDetail } from '@/views/order/point/RefundPoint.vue';
+import RefundPlanSelect from './RefundPlanSelect.vue';
 
 const props = defineProps<{
   modelValue: Partial<RefundDetail>;
@@ -37,6 +38,20 @@ const pointRefundSchema = z.object({
     points: z.number().nonnegative().gt(0, '退堂數量需大於0'),
   }).nullable(),
   amount: z.number(),
+  pointPayment: z.object({
+    id: z.number(),
+    plan: z.string(),
+    useAblePoints: z.number(),
+    amount: z.number(),
+    sellers: z.array(z.object({
+      id: z.number(),
+      name: z.string(),
+    })).default([]),
+    chargers: z.array(z.object({
+      id: z.number(),
+      name: z.string(),
+    })).default([]),
+  }),
 });
 
 const initialValues = computed(() => ({
@@ -51,10 +66,9 @@ const { handleSubmit, resetForm, values, setFieldValue, meta, errors } = useForm
   validationSchema: toTypedSchema(pointRefundSchema),
   initialValues: initialValues.value,
 });
-const classCounts = computed(() => values.pointGroup?.points);
 
 const onSubmit = handleSubmit(async (values) => {
-  emit('update:modelValue', values);
+  emit('update:modelValue', { ...values, pointPaymentId: values.pointPayment.id } as Partial<RefundDetail>);
   emit('goNext');
 });
 
@@ -68,19 +82,25 @@ function getClientGroup() {
   }
 }
 
-function setRefundClassAmount(pointGroup: PointsGroup) {
+function selectPointGroup(pointGroup: PointsGroup) {
   setFieldValue('clientGroupId', pointGroup.id);
+  setFieldValue('pointPayment', undefined);
+  pointsStore.getAvaiRefundablePlans(pointGroup.id);
 }
 
 function selectClient({ name, phone, identityNumber, birthDate, gender }: Partial<Client>) {
   setFieldValue('client', { name, phone, identityNumber, birthDate, gender });
+}
+
+function setAmount(option: RefundPointPlan) {
+  setFieldValue('amount', option?.amount ?? 0);
 }
 </script>
 
 <template>
   <div class="points_topup">
     <form class="row q-col-gutter-md points_topup_form" @submit.prevent>
-      <fieldset class="col-12">
+      <fieldset class="col-12 col-sm-9 col-md-7">
         <OMemberSearch
           label="客戶"
           name="clientId"
@@ -92,22 +112,28 @@ function selectClient({ name, phone, identityNumber, birthDate, gender }: Partia
         />
       </fieldset>
 
-      <fieldset class="col-12">
+      <fieldset class="col-12 col-sm-9 col-md-7">
         <OSelect
           label="堂數群組"
           class="field--val" name="pointGroup" :options="pointsStore.pointGroupOptions" hide-bottom-space
           :virtual-scroll-item-size="50" :disable="!values.clientId" :error-message="errors.pointGroup"
-          @update:model-value="setRefundClassAmount"
+          @update:model-value="selectPointGroup"
         />
       </fieldset>
 
-      <fieldset class="col-12">
+      <!-- <fieldset class="col-12 col-sm-9 col-md-7">
         <span class="field--key">退回堂數</span>
         <div class="text-weight-medium"> {{ typeof classCounts === 'number' ? `${classCounts ?? 0} 堂` : '-' }} </div>
+      </fieldset> -->
+
+      <fieldset class="col-12 col-sm-9 col-md-7">
+        <Field v-slot="{ handleChange, field }" name="pointPayment" @update:model-value="setAmount">
+          <RefundPlanSelect :model-value="field.value" :list="pointsStore.refundableList" :point-type="values.pointGroup?.type" @update:model-value="handleChange" />
+        </Field>
       </fieldset>
 
-      <fieldset class="col-12">
-        <OInput inside-label="退款金額" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" />
+      <fieldset class="col-12 col-sm-9 col-md-7">
+        <OInput inside-label="退款金額" type="number" class="field--val" name="amount" hide-bottom-space placeholder="$" error-message="" prefix="$" />
       </fieldset>
     </form>
     <div class="q-my-lg flex">

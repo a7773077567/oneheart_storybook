@@ -41,6 +41,7 @@ const roleIdOptions = [
   { label: '教練 ', value: RoleType['教練'] },
   { label: '櫃檯 ', value: RoleType['櫃檯'] },
 ];
+const employmentTypeOptions = [{ label: '正職', value: false }, { label: '兼職', value: true }];
 const spaceOptions = optionStore.spaceList.map(space => ({ label: space.name, value: space.id }));
 const usersOptions = users.map(user => ({ label: user.name, value: user.id }));
 const avatarPreviewFile = ref<File | null>();
@@ -67,6 +68,7 @@ const addInitialValues = computed(() => ({
   introducerUserId: null,
   ancestorUserId: null,
   baseSalary: 0,
+  isPartTime: false,
 }));
 
 const editInitialValues = computed(() => ({
@@ -83,6 +85,7 @@ const editInitialValues = computed(() => ({
   introducerUserId: targetUser.value?.introducer?.id,
   ancestorUserId: targetUser.value?.ancestor?.id,
   baseSalary: targetUser.value.baseSalary ?? 0,
+  isPartTime: !!targetUser.value.isPartTime,
 }));
 const targetInitialValues = computed(() => props.type === 'add' ? addInitialValues.value : editInitialValues.value);
 
@@ -101,6 +104,7 @@ const createUserSchema = z.object({
   introducerUserId: z.number().nullish(),
   ancestorUserId: z.number().nullish(),
   baseSalary: z.number(),
+  isPartTime: z.boolean().nullish(),
 }).refine((data) => {
   // 初診等級只有在帳號職位是「治療師、院長、副院長」時會出現（必填）
   if (isTherapist(data.roleId)) {
@@ -138,18 +142,18 @@ const onSubmit = handleSubmit(async (values) => {
     }
     else {
       let neededValues = { ...omit(values as UpdateUser, ['avatar']) };
-      
+
       if (!isTherapist(values.roleId)) {
         neededValues = omit(values as UpdateUser, ['jobClass', 'avatar']);
       }
-      
+
       const payload = {
         ...neededValues,
         ...(avatarUuid && { avatar: avatarUuid }),
       };
-      
+
       await updateUser(targetUser.value.id, payload);
-      
+
       $q.dialog({
         message: '更新成功',
       }).onOk(async () => {
@@ -180,6 +184,7 @@ watch(() => values.roleId, () => {
         <OInput type="email" name="email" inside-label="帳號 Email*" error-message="" />
         <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
         <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
+        <OSelect name="isPartTime" label="聘僱類型*" :options="employmentTypeOptions" error-message="" />
         <OSelect v-if="userStore.canI('READ_PT_LEVEL')" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
         <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
         <template v-if="isTherapistSelected">

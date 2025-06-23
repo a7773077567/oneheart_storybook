@@ -44,11 +44,31 @@ export const reportRoutes: RouteRecordRaw[] = [{
       },
     },
     {
+      path: 'coach-payroll',
+      name: 'coachPayrollExport',
+      component: () => import('@/views/report/CoachPayrollExport.vue'),
+      meta: {
+        label: '匯出報表 - 教練薪資報表',
+        requiredAuth: true,
+        hideFromNav: true,
+      },
+    },
+    {
+      path: 'counter-payroll',
+      name: 'counterPayrollExport',
+      component: () => import('@/views/report/CounterPayrollExport.vue'),
+      meta: {
+        label: '匯出報表 - 櫃檯薪資報表',
+        requiredAuth: true,
+        hideFromNav: true,
+      },
+    },
+    {
       path: 'payroll-for-hr',
       name: 'payrollExport4HR',
       component: () => import('@/views/report/PayrollExport4HR.vue'),
       meta: {
-        label: '匯出報表 - 薪資報表',
+        label: '匯出報表 - 薪資報表 for HR',
         requiredAuth: true,
         hideFromNav: true,
       },

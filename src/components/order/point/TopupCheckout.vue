@@ -29,7 +29,8 @@ const purchaseDetail = computed<CheckTableData>(() => [
   { key: 'date', value: dayjs().format('YYYY-MM-DD'), span: true, custom: true },
   { key: 'name', value: pointsStore.topupDetail?.clientName ?? '', label: '姓名' },
   { key: 'phone', value: pointsStore.topupDetail?.clientPhone ?? '', label: '電話' },
-  { key: 'sellerName', value: pointsStore.topupDetail.sellerName ?? '-', span: true, label: '負責人' },
+  { key: 'sellers', value: pointsStore.topupDetail.sellers?.length > 0 ? pointsStore.topupDetail.sellers.map(seller => seller.name).join(',') : '-', span: true, label: '負責人' },
+  { key: 'chargersName', value: pointsStore.topupDetail.chargers?.length > 0 ? pointsStore.topupDetail.chargers.map(charger => charger.name).join(',') : '-', span: true, label: '銷售者' },
   { key: 'pointType', value: pointsStore.topupDetail.pointType && PointTypes[pointsStore.topupDetail.pointType], label: '類別' },
   { key: 'groupName', value: pointsStore.topupDetail?.groupName ?? '', label: '群組' },
   { key: 'plan', value: pointsStore.topupDetail?.plan ? POINTS_PLAN[pointsStore.topupDetail.plan].name : '', label: '方案' },
@@ -58,7 +59,7 @@ const receiptData = computed(() => {
 
 const isProceeding = ref(false);
 async function onCheckout() {
-  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount, sellerId,
+  const { clientId, clientGroupId, planName, paidPointGained, giftPointGained, amount, sellers, chargers,
     //  contractDottedsignTaskId #394 暫時移除簽約步驟
   } = pointsStore.topupDetail;
   const multiChannelPay = payments.value.map(({ payMethod, amount, authorisationCode, receiptNumber, details }) => {
@@ -88,7 +89,8 @@ async function onCheckout() {
       giftPointGained,
       amount,
       multiChannelPay,
-      sellerId,
+      sellerIds: sellers?.map(seller => seller.id),
+      chargerIds: chargers?.map(charger => charger.id),
       // contractDottedsignTaskId: `${contractDottedsignTaskId}`,
     });
 

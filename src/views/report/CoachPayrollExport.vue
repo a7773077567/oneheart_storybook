@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { type SalaryReportParams, exportSalaryReport4HR } from '@/api';
+import { type SalaryReportParams, exportSalaryReport4Coach } from '@/api';
 import dayjs from 'dayjs';
 import { useOptionStore } from '@/stores';
 
@@ -19,7 +19,7 @@ async function submit() {
     return;
   isDownloading.value = true;
   try {
-    await exportSalaryReport4HR({
+    await exportSalaryReport4Coach({
       yearMonth: dayjs(form.value.yearMonth).format('YYYY/MM'),
       spaceIds: form.value.spaceIds,
     });
