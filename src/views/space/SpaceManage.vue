@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { SpaceMonthlyConfig } from '@/api/spaceManagement';
+import { type SpaceMonthlyConfig, type UpdateSpaceMonthlyConfig, type User, fetchUsers } from '@/api';
 import { BasicDialog, YearMonthSelect } from '@/components/shared';
+import BasicSelect from '@/components/shared/BasicSelect.vue';
 import { useNotify } from '@/composables/notify';
+import { RoleType } from '@/const/user';
 import { useSpaceManagementStore } from '@/stores/spaceManagement';
 import dayjs from 'dayjs';
 import type { QTableColumn } from 'quasar';
@@ -14,9 +16,14 @@ const yearMonth = ref({
   month: dayjs().month(),
 });
 const editDialogOpened = ref(false);
-const therapistNumber = ref(0);
-const customerComplaintsAndRefundRate = ref(0);
-const targetSpaceId = ref<null | number>(0);
+
+const form = ref<Omit<UpdateSpaceMonthlyConfig, 'year' | 'month'>>({
+  therapistNumber: 0,
+  customerComplaintsAndRefundRate: 0,
+  frontDeskFullTimeUserIds: [],
+  frontDeskPartTimeStaffUserIds: [],
+});
+const targetSpace = ref<null | { name: string; id: number }>(null);
 
 const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month + 1).padStart(2, '0')}`);
 
@@ -49,6 +56,22 @@ const columns: QTableColumn[] = [
     style: 'width: 148px',
   },
   {
+    name: 'frontDeskFullTimeUsers',
+    field: 'frontDeskFullTimeUsers',
+    label: '櫃檯正職人員',
+    align: 'left',
+    style: 'width: 152px; max-width: 152px; white-space: break-spaces',
+    format: (val: User[]) => val.map(user => user.name).join(','),
+  },
+  {
+    name: 'frontDeskPartTimeStaffUsers',
+    field: 'frontDeskPartTimeStaffUsers',
+    label: '櫃檯兼職人員',
+    align: 'left',
+    style: 'width: 152px; max-width: 152px; white-space: break-spaces',
+    format: (val: User[]) => val.map(user => user.name).join(','),
+  },
+  {
     name: 'edit',
     field: 'edit',
     label: '',
@@ -56,22 +79,34 @@ const columns: QTableColumn[] = [
   },
 ];
 
-function openEditDialog(row: SpaceMonthlyConfig) {
-  therapistNumber.value = row.therapistNumber;
-  customerComplaintsAndRefundRate.value = row.customerComplaintsAndRefundRate;
-  targetSpaceId.value = row.id;
+async function openEditDialog(row: SpaceMonthlyConfig) {
+  const { therapistNumber, customerComplaintsAndRefundRate, frontDeskFullTimeUserIds, frontDeskPartTimeStaffUserIds } = row;
 
+  form.value = {
+    therapistNumber,
+    customerComplaintsAndRefundRate,
+    frontDeskFullTimeUserIds,
+    frontDeskPartTimeStaffUserIds,
+  };
+  targetSpace.value = { name: row.name, id: row.id };
   editDialogOpened.value = true;
+
+  getSpaceFrontDeskUsers(row.id);
 }
 
 async function onConfirm() {
+  if (!targetSpace.value?.id)
+    return useNotify('no space id');
+
   await spaceManagementStore.updateSpaceMonthlyConfig(
-    targetSpaceId.value!,
+    targetSpace.value.id,
     {
       year: yearMonth.value.year,
       month: yearMonth.value.month + 1,
-      therapistNumber: +therapistNumber.value,
-      customerComplaintsAndRefundRate: +customerComplaintsAndRefundRate.value,
+      therapistNumber: +form.value.therapistNumber,
+      customerComplaintsAndRefundRate: +form.value.customerComplaintsAndRefundRate,
+      frontDeskFullTimeUserIds: form.value.frontDeskFullTimeUserIds,
+      frontDeskPartTimeStaffUserIds: form.value.frontDeskPartTimeStaffUserIds,
     },
   );
 
@@ -80,6 +115,12 @@ async function onConfirm() {
   await spaceManagementStore.getSpaceMonthlyConfigList(yearMonthQuery.value);
 
   editDialogOpened.value = false;
+}
+
+const frontDeskUsers = ref<{ label: string; value: number }[]>([]);
+async function getSpaceFrontDeskUsers(spaceId: number) {
+  const list = await fetchUsers({ spaceIds: [spaceId], roleTypes: [RoleType['櫃檯']] });
+  frontDeskUsers.value = list.map(user => ({ label: user.name, value: user.id }));
 }
 </script>
 
@@ -115,24 +156,30 @@ async function onConfirm() {
     <BasicDialog
       v-if="editDialogOpened"
       v-model="editDialogOpened"
-      :title="`${yearMonth.month + 1} 月場館設定`"
+      title="場館設定"
       confirm-mode
       @confirm="onConfirm"
     >
-      <div class="inputs">
+      <div class="q-mb-md">
+        <h3 class="text-title-small q-mb-2">{{ targetSpace?.name }}</h3>
+        <h3 class="text-title-small">{{ yearMonth.year }}年 {{ yearMonth.month }}月</h3>
+      </div>
+      <form class="inputs" @submit.prevent>
         <BasicInput
-          v-model="therapistNumber"
+          v-model="form.therapistNumber"
           label="場館治療師人數*"
           type="number"
           hide-bottom-space
         />
         <BasicInput
-          v-model="customerComplaintsAndRefundRate"
+          v-model="form.customerComplaintsAndRefundRate"
           label="客訴與退款率*"
           type="number"
           hide-bottom-space
         />
-      </div>
+        <BasicSelect v-model="form.frontDeskFullTimeUserIds" multiple emit-value map-options :options="frontDeskUsers" label="櫃檯正職人員" hide-bottom-space />
+        <BasicSelect v-model="form.frontDeskPartTimeStaffUserIds" multiple emit-value map-options :options="frontDeskUsers" label="櫃檯兼職人員" hide-bottom-space />
+      </form>
     </BasicDialog>
   </div>
 </template>
@@ -157,7 +204,7 @@ async function onConfirm() {
 .inputs {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
 }
 
 :deep(th) {
