@@ -132,6 +132,7 @@ const firstTokenList = [
   'dottedSign',
   'salaries/therapist-salary-detail',
   'salaries/password-recheck',
+  'coachQuarterlyBonus',
 ];
 
 function checkClientFirstToken(url: string, method: string) {

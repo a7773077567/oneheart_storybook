@@ -22,7 +22,8 @@ export type PermissionEvents =
   | 'EDIT_SUPPORT_BONUS'
   | 'VIEW_PAYROLL_EXPORT'
   | 'VIEW_THERAPIST_SALARY_REPORT'
-  | 'VIEW_SPACE_MANAGEMENT';
+  | 'VIEW_SPACE_MANAGEMENT'
+  | 'VIEW_BONUS_ISSUE';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -49,6 +50,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_PAYROLL_EXPORT: true,
     VIEW_THERAPIST_SALARY_REPORT: true,
     VIEW_SPACE_MANAGEMENT: true,
+    VIEW_BONUS_ISSUE: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,

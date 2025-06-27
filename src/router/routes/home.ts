@@ -224,6 +224,29 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'bonus-issue',
+        name: 'bonusIssue',
+        component: () => import('@/views/bonus/BonusOverview.vue'),
+        redirect: { name: 'coachQuarterBonus' },
+        meta: {
+          label: '獎金發放',
+          requiredAuth: true,
+          permissions: ['VIEW_BONUS_ISSUE'],
+        },
+        children: [
+          {
+            path: 'coach-quarter-bonus',
+            name: 'coachQuarterBonus',
+            component: () => import('@/views/bonus/CoachQuarterBonus.vue'),
+            meta: {
+              label: '教練季獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_BONUS_ISSUE'],
+            },
+          },
+        ],
+      },
     ],
   },
 ];
