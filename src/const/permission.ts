@@ -21,9 +21,10 @@ export type PermissionEvents =
   | 'VIEW_SUPPORT_BONUS'
   | 'EDIT_SUPPORT_BONUS'
   | 'VIEW_PAYROLL_EXPORT'
-  | 'VIEW_THERAPIST_SALARY_REPORT'
   | 'VIEW_SPACE_MANAGEMENT'
-  | 'VIEW_BONUS_ISSUE';
+  | 'VIEW_BONUS_ISSUE'
+  | 'VIEW_SALARY_REPORT'
+  | 'EDIT_SALARY_REPORT';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -48,9 +49,10 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: true,
     EDIT_SUPPORT_BONUS: true,
     VIEW_PAYROLL_EXPORT: true,
-    VIEW_THERAPIST_SALARY_REPORT: true,
     VIEW_SPACE_MANAGEMENT: true,
     VIEW_BONUS_ISSUE: true,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,
@@ -73,7 +75,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: true,
     EDIT_SUPPORT_BONUS: true,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: true,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['副院長']]: {
     READ_HANDOVER: true,
@@ -96,7 +99,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: true,
     EDIT_SUPPORT_BONUS: true,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: true,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,
@@ -119,7 +123,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: false,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: false,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['副店長']]: {
     READ_HANDOVER: true,
@@ -142,7 +147,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: false,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: false,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['櫃檯']]: {
     READ_HANDOVER: true,
@@ -165,7 +171,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: false,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: false,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['教練組長']]: {
     READ_HANDOVER: false,
@@ -188,7 +195,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: false,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: false,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['教練']]: {
     READ_HANDOVER: false,
@@ -211,7 +219,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: false,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: false,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['物理治療師']]: {
     READ_HANDOVER: false,
@@ -234,7 +243,8 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: true,
     EDIT_SUPPORT_BONUS: false,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: true,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
   [RoleType['物理治療師組長']]: {
     READ_HANDOVER: false,
@@ -257,6 +267,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_SUPPORT_BONUS: true,
     EDIT_SUPPORT_BONUS: true,
     VIEW_PAYROLL_EXPORT: false,
-    VIEW_THERAPIST_SALARY_REPORT: true,
+    VIEW_SALARY_REPORT: true,
+    EDIT_SALARY_REPORT: false,
   },
 };
