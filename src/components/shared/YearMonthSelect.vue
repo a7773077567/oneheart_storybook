@@ -6,13 +6,14 @@ import { computed, reactive, watch } from 'vue';
 
 const props = defineProps<{
   modelValue: { year: number; month: number };
+  monthOptions?: { label: string; value: number }[];
 }>();
 
 const emit = defineEmits<{
   (e: 'update:modelValue', val: { year: number; month: number }): void;
 }>();
 
-const monthOptions = Array.from({ length: 12 }, (_, idx) => ({ label: `${idx + 1} 月`, value: idx }));
+const monthOptions = computed(() => props.monthOptions || Array.from({ length: 12 }, (_, idx) => ({ label: `${idx + 1} 月`, value: idx })));
 const yearOptions = getYearOptions(props.modelValue.year);
 
 const state = reactive({
@@ -63,7 +64,7 @@ function resetState() {
 </script>
 
 <template>
-  <div :class="[state.menuOpened ? 'input--active' : 'input']">
+  <div v-bind="$attrs" :class="[state.menuOpened ? 'input--active' : 'input']">
     <div :class="[state.menuOpened ? 'input__label--active' : 'input__label']">月份</div>
     <div :class="[state.menuOpened ? 'input__text--active' : 'input__text']">{{ inputText }}</div>
     <div class="input__calendar">
