@@ -27,12 +27,13 @@ defineEmits<{
 $border: 1px solid $outline;
 
 .tabs {
+  width: fit-content;
   display: flex;
   border-radius: 8px;
   border: $border;
   overflow: hidden;
   &__tab {
-    width: 141px;
+    width: 107px;
     padding: 10px 0;
     display: flex;
     gap: 8px;
