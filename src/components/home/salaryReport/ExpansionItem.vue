@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{
   label: string;
   amount: number;
   showAmount: boolean;
-  details: (string | string[])[][];
+  details: any[][];
   disable?: boolean;
 }>(), {
   modelValue: false,
@@ -109,7 +109,7 @@ watch(() => props.disable, (newVal) => {
 .rows {
   display: grid;
   grid-template-columns: 180px 240px 161px 1fr;
-  align-items: center;
+  align-items: stretch;
   &__row {
     padding: 22px 16px;
     @include text-style($label-large, $on-surface-variant);
@@ -127,6 +127,7 @@ watch(() => props.disable, (newVal) => {
   &__item {
     display: flex;
     flex-direction: column;
+    white-space: pre-wrap;
     @include text-style($label-large, $on-surface-variant);
 
     &--nested {
