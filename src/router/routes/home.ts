@@ -149,7 +149,10 @@ export const homeRoutes: RouteRecordRaw[] = [
               requiredAuth: true,
               permissions: ['VIEW_SALARY_REPORT'],
             },
-            beforeEnter: [checkSalaryAuth, redirectSalaryReport],
+            beforeEnter: [
+              checkSalaryAuth,
+              redirectSalaryReport,
+            ],
             children: [
               {
                 path: 'therapist',

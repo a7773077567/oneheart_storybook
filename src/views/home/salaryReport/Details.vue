@@ -12,7 +12,6 @@ salaryStore.isAuthenticated = false;
 <template>
   <div class="details">
     <div v-if="userStore.canI('EDIT_SALARY_REPORT')" class="details__header">
-      <QSelect class="q-mb-lg" />
       <div class="row q-gutter-lg">
         <RouterLink :to="{ name: 'salaryReportTherapist' }">salaryReportTherapist</RouterLink>
         <RouterLink :to="{ name: 'salaryReportCoach' }">salaryReportCoach</RouterLink>
