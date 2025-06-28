@@ -3,7 +3,7 @@ import { RoleType } from '@/api';
 import { ExpansionItem, MoneyDisplay, OrganizationChart, Table } from '@/components/home/salaryReport';
 import { BasicBtn, BasicTabs } from '@/components/shared';
 import { useSalaryReportStore, useUserStore } from '@/stores';
-import dayjs from 'dayjs';
+import { getMonthTabs } from '@/utils/salaryReport';
 import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -12,15 +12,10 @@ const salaryStore = useSalaryReportStore();
 const userStore = useUserStore();
 const $q = useQuasar();
 
-const tabs = ['當前月', '上個月', '上上個月'].map((item, idx) => {
-  return {
-    name: `${getDate(0 - idx, 'YYYY/MM')}`,
-    label: `${getDate(0 - idx)} 月 (${item})`,
-  };
-});
+const monthTabs = getMonthTabs();
 
 const state = reactive({
-  currentTab: tabs[0].name,
+  currentTab: monthTabs[0].name,
   showAmount: false,
   educationSharingExpand: false,
 });
@@ -53,16 +48,6 @@ const expansionItems = computed(() => {
   ];
 });
 
-function getDate(offset: number, format?: string) {
-  const date = offset < 0
-    ? dayjs().subtract(Math.abs(offset), 'month')
-    : dayjs().add(offset, 'month');
-
-  return format
-    ? date.format(format)
-    : date.month() + 1;
-}
-
 function showPositionBonus(itemLabel: string) {
   return itemLabel !== '職務獎金' || [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長']].includes(userStore.role);
 }
@@ -73,7 +58,7 @@ function showPositionBonus(itemLabel: string) {
     <div class="details__header">
       <BasicTabs
         v-model="state.currentTab"
-        :tabs="tabs"
+        :tabs="monthTabs"
       />
       <MoneyDisplay
         v-model="state.showAmount"
