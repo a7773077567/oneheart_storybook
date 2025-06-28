@@ -39,14 +39,16 @@ watch(
 );
 
 const expansionItems = computed(() => {
-  return [
-    coachSalaryStore.baseSalary,
-    coachSalaryStore.performanceBonus,
-    coachSalaryStore.spaceRental,
-    coachSalaryStore.performanceChampion,
-    coachSalaryStore.executionChampion,
-    coachSalaryStore.quarterlyBonus,
-  ];
+  return userStore.userInfo?.isPartTime
+    ? [coachSalaryStore.partTimeSalary]
+    : [
+        coachSalaryStore.baseSalary,
+        coachSalaryStore.performanceBonus,
+        coachSalaryStore.spaceRental,
+        coachSalaryStore.performanceChampion,
+        coachSalaryStore.executionChampion,
+        coachSalaryStore.quarterlyBonus,
+      ];
 });
 </script>
 

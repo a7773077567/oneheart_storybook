@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import type { CoachSalaryDetail } from '@/types/home/salaryReport/coach';
 import { fetchCoachSalaryDetail } from '@/api/home/salaryReport/coach';
 import { toCurrency } from '@/utils/helpers';
+import { useUserStore } from '@/stores/user';
 
 interface State {
   coachSalaryDetail: CoachSalaryDetail | null;
@@ -159,6 +160,24 @@ export const useSalaryReportCoachStore = defineStore('salaryReportCoach', {
               [infos],
               ...details,
             ],
+      };
+    },
+    partTimeSalary: (state) => {
+      if (!state.coachSalaryDetail) {
+        return {
+          label: '兼職人員薪資',
+          amount: 0,
+          details: [],
+        };
+      }
+      const { amount, basic, hours } = state.coachSalaryDetail.performanceBonus;
+
+      return {
+        label: '兼職人員薪資',
+        amount,
+        details: [
+          ['總執行時數 * 業績獎金單位金額', toCurrency(amount), `總執行數 = ${hours} hr`, `業績獎金單位金額 = ${basic.unitPrice}`],
+        ],
       };
     },
   },
