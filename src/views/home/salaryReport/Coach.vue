@@ -6,8 +6,11 @@ import { useSalaryReportCoachStore } from '@/stores/home/salaryReport/coach';
 import { getMonthTabs } from '@/utils/salaryReport';
 import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const $q = useQuasar();
+const route = useRoute();
+const userId = computed(() => route.query.employeeId as string);
 const coachSalaryStore = useSalaryReportCoachStore();
 const userStore = useUserStore();
 const monthTabs = getMonthTabs();
@@ -18,12 +21,12 @@ const state = reactive({
 });
 
 watch(
-  () => state.currentTab,
+  [() => state.currentTab, () => userId.value],
   async () => {
     $q.loading.show();
     try {
       await coachSalaryStore.getCoachSalaryDetail(
-        userStore.userInfo!.id,
+        +userId.value,
         state.currentTab,
       );
     }

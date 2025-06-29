@@ -25,7 +25,7 @@ const redirectSalaryReport: NavigationGuardWithThis<undefined> = (to, from) => {
   // avoid infinite loop
   if (fromAuthentication && to.name === 'salaryReportDetails') {
     const targetRouteName = RoleInfo[userStore.role].salaryRoute;
-    return { name: targetRouteName };
+    return { name: targetRouteName, query: { employeeId: userStore.userInfo!.id } };
   }
 };
 
@@ -150,7 +150,7 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['VIEW_SALARY_REPORT'],
             },
             beforeEnter: [
-              // checkSalaryAuth,
+              checkSalaryAuth,
               redirectSalaryReport,
             ],
             children: [

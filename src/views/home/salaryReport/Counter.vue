@@ -6,11 +6,12 @@ import { useSalaryReportCounterStore } from '@/stores/home/salaryReport/counter'
 import { getMonthTabs } from '@/utils/salaryReport';
 import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 
 const $q = useQuasar();
+const route = useRoute();
+const userId = computed(() => route.query.employeeId as string);
 const counterSalaryStore = useSalaryReportCounterStore();
-const userStore = useUserStore();
 const monthTabs = getMonthTabs();
 
 const state = reactive({
@@ -20,12 +21,12 @@ const state = reactive({
 });
 
 watch(
-  () => state.currentTab,
+  [() => state.currentTab, () => userId.value],
   async () => {
     $q.loading.show();
     try {
       await counterSalaryStore.getCounterSalaryDetail(
-        userStore.userInfo!.id,
+        +userId.value,
         state.currentTab,
       );
     }
