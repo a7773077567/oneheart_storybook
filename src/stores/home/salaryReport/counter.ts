@@ -1,5 +1,6 @@
 import { type CounterSalaryDetail, fetchCounterSalaryDetail } from '@/api/home/salaryReport/counter';
 import { toCurrency } from '@/utils/helpers';
+import Therapist from '@/views/home/salaryReport/Therapist.vue';
 import { defineStore } from 'pinia';
 
 interface State {
@@ -153,6 +154,10 @@ export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
                 };
               })],
             ],
+            caption: {
+              therapistCount: bonusItem.therapistCount,
+              averagePrice: toCurrency(bonusItem.averagePrice),
+            },
           },
         };
       });

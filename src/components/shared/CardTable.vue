@@ -10,7 +10,6 @@ const props = defineProps<{
     isUsed?: boolean;
   } | string)[][];
   showDataTitle?: boolean;
-  caption?: string[];
   fieldWidth?: string;
   valueWidth?: string;
   valueAlign?: string;
@@ -27,7 +26,7 @@ const gridItems = computed(() => {
           ],
           style: {
             'justify-content': (eleIdx !== 0 && props.valueAlign) ? props.valueAlign : 'flex-start',
-            'border-bottom': (!props.caption && idx === props.data.length - 1) ? 'none' : undefined,
+            'border-bottom': idx === props.data.length - 1 ? 'none' : undefined,
           },
         };
       }
@@ -40,7 +39,7 @@ const gridItems = computed(() => {
           'background-color': ele.isPassed ? '#C8EEBF' : ele.isUsed ? '#1A7AB3' : '#fff',
           'color': ele.isUsed ? '#fff' : '#1A1B21',
           'justify-content': (eleIdx !== 0 && props.valueAlign) ? props.valueAlign : 'flex-start',
-          'border-bottom': (!props.caption && idx === props.data.length - 1) ? 'none' : undefined,
+          'border-bottom': idx === props.data.length - 1 ? 'none' : undefined,
         },
         isPassed: ele.isPassed,
         isUsed: ele.isUsed,
@@ -81,13 +80,8 @@ const gridStyle = computed(() => {
         </div>
       </div>
     </div>
-    <div v-if="caption" class="card__caption">
-      <div class="caption">
-        <div class="caption__title">說明事項：</div>
-        <ul>
-          <li />
-        </ul>
-      </div>
+    <div v-if="$slots.caption" class="card__caption">
+      <slot name="caption" />
     </div>
   </div>
 </template>
@@ -138,12 +132,6 @@ $background: #f7f7f8;
     }
   }
   &__title {
-  }
-}
-
-.caption {
-  &__title {
-    @include text-style($body-medium, $on-surface-variant);
   }
 }
 </style>

@@ -182,6 +182,17 @@ async function revokeSalary() {
                     </template>
                   </div>
                 </template>
+
+                <template #caption>
+                  <div class="caption">
+                    <div class="caption__title">說明事項：</div>
+                    <ul class="caption__list">
+                      <li>{{ `註1：本季執行數標準（含射頻）= 治療師人數 ${row.value[0].bonusData[state.currentSpaceTab].commissionRate.caption.therapistCount}人 * 執行數單人標準。` }}</li>
+                      <li>{{ `註2：本季銷售額標準（含儲值）= 本季應達成的銷售額 = 季執行數標準 * 均價 ${row.value[0].bonusData[state.currentSpaceTab].commissionRate.caption.averagePrice}。` }}</li>
+                      <li>實際執行情況請見 <span class="anchor">本季執行明細</span> 、 <span>本季銷售明細。</span></li>
+                    </ul>
+                  </div>
+                </template>
               </CardTable>
             </div>
           </div>
@@ -258,6 +269,28 @@ async function revokeSalary() {
         color: #fff;
       }
     }
+  }
+}
+
+.caption {
+  &__title {
+    @include text-style($body-medium, $on-surface-variant);
+  }
+
+  &__list {
+    list-style-type: disc;
+    list-style-position: inside;
+    padding-left: 8px;
+  }
+  li {
+    @include text-style($body-medium, $on-surface-variant);
+  }
+
+  span {
+    @include text-style($body-medium, $on-surface-variant);
+    font-weight: 700;
+    color: $primary;
+    cursor: pointer;
   }
 }
 </style>
