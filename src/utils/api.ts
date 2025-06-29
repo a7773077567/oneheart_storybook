@@ -135,6 +135,10 @@ const firstTokenList = [
   'salaries/counter-salary-detail',
   'coachQuarterlyBonus',
   'salaries/password-recheck',
+  'salaries/confirm-counter-salary',
+  'salaries/confirm-coach-salary',
+  'salaries/confirm-therapist-salary',
+  'salaries/revoke-salary-confirmation',
 ];
 
 function checkClientFirstToken(url: string, method: string) {

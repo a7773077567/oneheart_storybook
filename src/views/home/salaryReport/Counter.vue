@@ -5,21 +5,21 @@ import { confirmCounterSalary } from '@/api/home/salaryReport/counter';
 import { ConfirmChip, ExpansionItem, InfoHelp, Layout } from '@/components/home/salaryReport';
 import { BasicBtn, BasicTabs, CardTable, MoneyDisplay } from '@/components/shared';
 import { useDialog } from '@/composables/dialog';
+import { useLoad } from '@/composables/load';
 import { useUserStore } from '@/stores';
 import { useSalaryReportCounterStore } from '@/stores/home/salaryReport/counter';
 import { toCurrency } from '@/utils/helpers';
 import { getMonthTabs } from '@/utils/salaryReport';
 import dayjs from 'dayjs';
-import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
-const $q = useQuasar();
 const route = useRoute();
 const userId = computed(() => route.query.employeeId as string);
 const counterSalaryStore = useSalaryReportCounterStore();
 const userStore = useUserStore();
 const monthTabs = getMonthTabs();
+const { load } = useLoad();
 
 const state = reactive({
   currentTab: monthTabs[0].name,
@@ -30,19 +30,12 @@ const state = reactive({
 watch(
   [() => state.currentTab, () => userId.value],
   async () => {
-    $q.loading.show();
-    try {
+    load(async () => {
       await counterSalaryStore.getCounterSalaryDetail(
         +userId.value,
         state.currentTab,
       );
-    }
-    catch (err) {
-      console.error(err);
-    }
-    finally {
-      $q.loading.hide();
-    }
+    });
   },
   { immediate: true },
 );
@@ -58,26 +51,26 @@ const expansionItems = computed(() => {
 async function confirmSalary() {
   const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(counterSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
   onOk(async () => {
-    $q.loading.show();
-    // await confirmCounterSalary({ yearMonth: state.currentTab });
-    await counterSalaryStore.getCounterSalaryDetail(
-      +userId.value,
-      state.currentTab,
-    );
-    $q.loading.hide();
+    load(async () => {
+      await confirmCounterSalary({ yearMonth: state.currentTab });
+      await counterSalaryStore.getCounterSalaryDetail(
+        +userId.value,
+        state.currentTab,
+      );
+    });
   });
 }
 
 async function revokeSalary() {
   const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
   onOk(async () => {
-    $q.loading.show();
-    // await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
-    await counterSalaryStore.getCounterSalaryDetail(
-      +userId.value,
-      state.currentTab,
-    );
-    $q.loading.hide();
+    load(async () => {
+      await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+      await counterSalaryStore.getCounterSalaryDetail(
+        +userId.value,
+        state.currentTab,
+      );
+    });
   });
 }
 </script>
