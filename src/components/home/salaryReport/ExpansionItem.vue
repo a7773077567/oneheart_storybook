@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { MoneyDisplay } from '@/components/home/salaryReport';
-import { name } from 'node_modules/@azure/msal-browser/dist/packageMetadata';
 import { QExpansionItem } from 'quasar';
 import { computed, ref, watch } from 'vue';
 
