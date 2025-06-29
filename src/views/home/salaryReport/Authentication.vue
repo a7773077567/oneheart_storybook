@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { authenticateSalaryDetail } from '@/api/home/salaryReport';
+import { authenticateSalaryDetail } from '@/api/home/salaryReport/therapist';
 import { useDialog } from '@/composables/dialog';
-import { useSalaryReportStore } from '@/stores';
+import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const salaryReportStore = useSalaryReportStore();
+const salaryReportStore = useSalaryReportTherapistStore();
 const isPwd = ref(true);
 const pwd = ref('');
 
@@ -52,7 +52,6 @@ async function onSubmit() {
     <div class="authentication__btn">
       <BasicBtn
         label="確定密碼"
-        color="primary"
         padding="10px 24px"
         @click="onSubmit"
       />

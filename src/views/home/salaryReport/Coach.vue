@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { ExpansionItem, InfoHelp } from '@/components/home/salaryReport';
-import { BasicTabs, MoneyDisplay } from '@/components/shared';
+import { RoleType } from '@/api';
+import { revokeSalaryConfirmation } from '@/api/home/salaryReport/admin';
+import { confirmCoachSalary } from '@/api/home/salaryReport/coach';
+import { ConfirmChip, ExpansionItem, InfoHelp, Layout } from '@/components/home/salaryReport';
+import { BasicBtn, BasicTabs, MoneyDisplay } from '@/components/shared';
+import { useDialog } from '@/composables/dialog';
 import { useUserStore } from '@/stores';
 import { useSalaryReportCoachStore } from '@/stores/home/salaryReport/coach';
+import { toCurrency } from '@/utils/helpers';
 import { getMonthTabs } from '@/utils/salaryReport';
+import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -52,11 +58,37 @@ const expansionItems = computed(() => {
         coachSalaryStore.quarterlyBonus,
       ];
 });
+
+async function confirmSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(coachSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+  onOk(async () => {
+    $q.loading.show();
+    // await confirmCoachSalary({ yearMonth: state.currentTab });
+    await coachSalaryStore.getCoachSalaryDetail(
+      +userId.value,
+      state.currentTab,
+    );
+    $q.loading.hide();
+  });
+}
+
+async function revokeSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
+  onOk(async () => {
+    $q.loading.show();
+    // await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+    await coachSalaryStore.getCoachSalaryDetail(
+      +userId.value,
+      state.currentTab,
+    );
+    $q.loading.hide();
+  });
+}
 </script>
 
 <template>
-  <div class="details">
-    <div class="details__header">
+  <Layout>
+    <template #header>
       <BasicTabs
         v-model="state.currentTab"
         :tabs="monthTabs"
@@ -68,8 +100,11 @@ const expansionItems = computed(() => {
         label="薪資"
         visibility-toggle
       />
-    </div>
-    <div class="details__body">
+      <ConfirmChip />
+      <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary" />
+      <BasicBtn v-else label="確認薪資" style="justify-self: end;" @click="confirmSalary" />
+    </template>
+    <template #body>
       <ExpansionItem
         v-for="(item, idx) in expansionItems"
         :key="idx"
@@ -99,25 +134,10 @@ const expansionItems = computed(() => {
           <InfoHelp :infos="row.value" />
         </template>
       </ExpansionItem>
-    </div>
-  </div>
+    </template>
+  </Layout>
 </template>
 
 <style lang="scss" scoped>
-.details {
-  padding: 24px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  overflow: scroll;
-  &__header {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    gap: 24px;
-  }
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
+
 </style>

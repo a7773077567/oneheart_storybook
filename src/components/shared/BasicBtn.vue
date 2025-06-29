@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import type { QBtnProps } from 'quasar';
 
+const props = withDefaults(
+  defineProps<QBtnProps>(),
+  {
+    color: 'primary',
+  },
+);
 </script>
 
 <template>
-  <QBtn color="primary" padding="10px 24px" class="btn" />
+  <QBtn v-bind="props" padding="10px 24px" class="btn" />
 </template>
 
 <style lang="scss" scoped>

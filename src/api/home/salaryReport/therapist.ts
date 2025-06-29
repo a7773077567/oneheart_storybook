@@ -113,3 +113,8 @@ export async function fetchTherapistSalaryDetail(userId: number, yearMonth: stri
   const { data } = await api.get<TherapistSalaryDetail>(`salaries/therapist-salary-detail`, { params: { userId, yearMonth } });
   return data;
 }
+
+export async function confirmTherapistSalary(payload: { yearMonth: string }) {
+  const { data } = await api.post(`salaries/confirm-therapist-salary`, payload);
+  return data;
+}

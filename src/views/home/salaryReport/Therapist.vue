@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { RoleType } from '@/api';
-import { ExpansionItem, MoneyDisplay, OrganizationChart, Table } from '@/components/home/salaryReport';
+import { revokeSalaryConfirmation } from '@/api/home/salaryReport/admin';
+import { confirmTherapistSalary } from '@/api/home/salaryReport/therapist';
+import { ConfirmChip, ExpansionItem, Layout, MoneyDisplay, OrganizationChart, Table } from '@/components/home/salaryReport';
 import { BasicBtn, BasicTabs } from '@/components/shared';
-import { useSalaryReportStore, useUserStore } from '@/stores';
+import { useDialog } from '@/composables/dialog';
+import { useUserStore } from '@/stores';
+import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
+import { toCurrency } from '@/utils/helpers';
 import { getMonthTabs } from '@/utils/salaryReport';
+import dayjs from 'dayjs';
 import { useQuasar } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
@@ -11,7 +17,7 @@ import { RouterLink, useRoute } from 'vue-router';
 const $q = useQuasar();
 const route = useRoute();
 const userId = computed(() => route.query.employeeId as string);
-const salaryStore = useSalaryReportStore();
+const therapistSalaryStore = useSalaryReportTherapistStore();
 const userStore = useUserStore();
 
 const monthTabs = getMonthTabs();
@@ -26,7 +32,7 @@ watch(
   [() => state.currentTab, () => userId.value],
   async () => {
     $q.loading.show();
-    await salaryStore.getTherapistSalaryDetail(
+    await therapistSalaryStore.getTherapistSalaryDetail(
       +userId.value,
       state.currentTab,
     );
@@ -37,27 +43,53 @@ watch(
 
 const expansionItems = computed(() => {
   return [
-    { ...salaryStore.executionAmount },
-    salaryStore.shockWaveSharing,
-    salaryStore.magneticWaveSharing,
-    salaryStore.gChairSharing,
-    salaryStore.SecondmentBonus,
-    salaryStore.educationSharing,
-    salaryStore.recommendationBonus,
-    salaryStore.writingBonus,
-    salaryStore.positionBonus,
-    salaryStore.assistanceBonus,
+    { ...therapistSalaryStore.executionAmount },
+    therapistSalaryStore.shockWaveSharing,
+    therapistSalaryStore.magneticWaveSharing,
+    therapistSalaryStore.gChairSharing,
+    therapistSalaryStore.SecondmentBonus,
+    therapistSalaryStore.educationSharing,
+    therapistSalaryStore.recommendationBonus,
+    therapistSalaryStore.writingBonus,
+    therapistSalaryStore.positionBonus,
+    therapistSalaryStore.assistanceBonus,
   ];
 });
 
 function showPositionBonus(itemLabel: string) {
   return itemLabel !== '職務獎金' || [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長']].includes(userStore.role);
 }
+
+async function confirmSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(therapistSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+  onOk(async () => {
+    $q.loading.show();
+    // await confirmTherapistSalary({ yearMonth: state.currentTab });
+    await therapistSalaryStore.getTherapistSalaryDetail(
+      +userId.value,
+      state.currentTab,
+    );
+    $q.loading.hide();
+  });
+}
+
+async function revokeSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
+  onOk(async () => {
+    $q.loading.show();
+    // await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+    await therapistSalaryStore.getTherapistSalaryDetail(
+      +userId.value,
+      state.currentTab,
+    );
+    $q.loading.hide();
+  });
+}
 </script>
 
 <template>
-  <div class="details">
-    <div class="details__header">
+  <Layout>
+    <template #header>
       <BasicTabs
         v-model="state.currentTab"
         :tabs="monthTabs"
@@ -65,13 +97,15 @@ function showPositionBonus(itemLabel: string) {
       <MoneyDisplay
         v-model="state.showAmount"
         :dot-number="5"
-        :amount="salaryStore.totalAmount"
+        :amount="therapistSalaryStore.totalAmount"
         label="薪資"
         visibility-toggle
       />
-      <!-- <BasicBtn label="確認薪資" style="justify-self: end;" /> -->
-    </div>
-    <div class="details__body">
+      <ConfirmChip />
+      <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary" />
+      <BasicBtn v-else label="確認薪資" style="justify-self: end;" @click="confirmSalary" />
+    </template>
+    <template #body>
       <QList>
         <template
           v-for="(item, idx) in expansionItems"
@@ -97,19 +131,19 @@ function showPositionBonus(itemLabel: string) {
             <template v-if="item.label === '教育分潤'" #body>
               <div v-if="state.educationSharingExpand" class="table-wrapper">
                 <Table
-                  :columns="salaryStore.educationSharingTable.columns"
-                  :rows="salaryStore.educationSharingTable.rows"
+                  :columns="therapistSalaryStore.educationSharingTable.columns"
+                  :rows="therapistSalaryStore.educationSharingTable.rows"
                 />
                 <OrganizationChart
-                  :data="salaryStore.educationSharingRelationship"
+                  :data="therapistSalaryStore.educationSharingRelationship"
                 />
               </div>
             </template>
             <template v-else-if="item.label === '推薦獎金'" #body>
               <div class="table-wrapper">
                 <Table
-                  :columns="salaryStore.recommendationBonusTable.columns"
-                  :rows="salaryStore.recommendationBonusTable.rows"
+                  :columns="therapistSalaryStore.recommendationBonusTable.columns"
+                  :rows="therapistSalaryStore.recommendationBonusTable.rows"
                 />
               </div>
             </template>
@@ -120,8 +154,8 @@ function showPositionBonus(itemLabel: string) {
                   <span>$10,000 或 營收 1% 擇優發放。</span>
                 </div>
                 <Table
-                  :columns="salaryStore.positionBonusTable.columns"
-                  :rows="salaryStore.positionBonusTable.rows"
+                  :columns="therapistSalaryStore.positionBonusTable.columns"
+                  :rows="therapistSalaryStore.positionBonusTable.rows"
                 >
                   <template
                     #body-cell="props"
@@ -163,31 +197,11 @@ function showPositionBonus(itemLabel: string) {
           </ExpansionItem>
         </template>
       </QList>
-    </div>
-    <div class="details__actions">
-      <!-- <BasicBtn label="確認薪資" /> -->
-    </div>
-  </div>
+    </template>
+  </Layout>
 </template>
 
 <style lang="scss" scoped>
-.details {
-  padding: 24px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  overflow: scroll;
-  &__header {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    gap: 24px;
-  }
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-
 .amount-caption {
   display: flex;
   align-items: center;

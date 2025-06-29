@@ -1,5 +1,5 @@
 import { RoleType } from '@/api';
-import { type TherapistSalaryDetail, fetchTherapistSalaryDetail } from '@/api/home/salaryReport';
+import { type TherapistSalaryDetail, fetchTherapistSalaryDetail } from '@/api/home/salaryReport/therapist';
 import { EducationApprenticeLevel, EducationMentorLevel, PositionBonusType, RecommendationBonusType } from '@/const/saplaryReport';
 import { useUserStore } from '@/stores/user';
 import { transformRelationshipsToTree } from '@/utils/apextree';
@@ -11,7 +11,7 @@ interface State {
   therapistSalaryDetail: TherapistSalaryDetail | null;
 }
 
-export const useSalaryReportStore = defineStore('salaryReport', {
+export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist', {
   state: (): State => ({
     isAuthenticated: false,
     therapistSalaryDetail: null,

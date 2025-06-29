@@ -44,3 +44,8 @@ export async function fetchCounterSalaryDetail(userId: number, yearMonth: string
   const { data } = await api.get<CounterSalaryDetail>(`salaries/counter-salary-detail`, { params: { userId, yearMonth } });
   return data;
 }
+
+export async function confirmCounterSalary(payload: { yearMonth: string }) {
+  const { data } = await api.post(`salaries/confirm-counter-salary`, payload);
+  return data;
+}

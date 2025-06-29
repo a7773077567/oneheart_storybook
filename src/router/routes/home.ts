@@ -1,11 +1,12 @@
 import type { NavigationGuardWithThis, RouteRecordRaw } from 'vue-router';
 import type { PermissionEvents } from '@/const/permission';
-import { useSalaryReportStore, useUserStore } from '@/stores';
+import { useUserStore } from '@/stores';
 import { RoleInfo } from '@/const/general';
 import { RoleType } from '@/api';
+import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
 
 const checkSalaryAuth: NavigationGuardWithThis<undefined> = () => {
-  const salaryReportStore = useSalaryReportStore();
+  const salaryReportStore = useSalaryReportTherapistStore();
 
   if (!salaryReportStore.isAuthenticated) {
     return { name: 'salaryReportAuthentication' };

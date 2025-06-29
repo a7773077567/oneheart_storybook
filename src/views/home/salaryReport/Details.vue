@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { RoleType } from '@/api';
+import { revokeSalaryConfirmation } from '@/api/home/salaryReport/admin';
 import { OptionSelect } from '@/components/shared';
+import { useDialog } from '@/composables/dialog';
 import { RoleInfo } from '@/const/general';
-import { useSalaryReportStore, useUserStore } from '@/stores';
+import { useUserStore } from '@/stores';
+import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
+import { useQuasar } from 'quasar';
 import { ref, watch } from 'vue';
-import { RouterLink, RouterView, useRouter } from 'vue-router';
+import { RouterView, useRouter } from 'vue-router';
 
 const userStore = useUserStore();
-const salaryStore = useSalaryReportStore();
+const salaryStore = useSalaryReportTherapistStore();
 const router = useRouter();
 
 await userStore.getUsers();
@@ -45,5 +49,4 @@ if (RoleType[userStore.role] === '系統管理者') {
 </template>
 
 <style lang="scss" scoped>
-
 </style>

@@ -29,6 +29,7 @@ $surface-container-low: rgba(239, 244, 251, 1);
 $surface-container: rgba(237, 240, 244, 1);
 $surface-container-high: rgba(231, 234, 239, 1);
 $surface-container-highest: rgba(216, 224, 237, 1);
+$surface-variant: #E1E5EC;
 $on-surface: rgba(26, 27, 33, 1);
 $on-surface-variant: rgba(69, 70, 79, 1);
 $on-surface-bright: #F8FBFF;
@@ -80,6 +81,7 @@ $colors: (
   surface-container: $surface-container,
   surface-container-high: $surface-container-high,
   surface-container-highest: $surface-container-highest,
+  surface-variant: $surface-variant,
   on-surface: $on-surface,
   on-surface-variant: $on-surface-variant,
 
