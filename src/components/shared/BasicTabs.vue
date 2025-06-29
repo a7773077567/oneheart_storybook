@@ -1,12 +1,17 @@
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue';
+
+const props = defineProps<{
   tabs: { name: string; label: string }[];
-  modelValue: string; // active tab
+  modelValue: string | number | null; // active tab
+  tabWidth?: number;
 }>();
 
 defineEmits<{
   (e: 'update:modelValue', val: string): void;
 }>();
+
+const tabWidth = computed(() => props.tabWidth ? `${props.tabWidth}px` : '104px');
 </script>
 
 <template>
@@ -33,7 +38,7 @@ $border: 1px solid $outline;
   border: $border;
   overflow: hidden;
   &__tab {
-    width: 107px;
+    width: v-bind('tabWidth');
     padding: 10px 0;
     display: flex;
     gap: 8px;

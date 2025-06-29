@@ -150,7 +150,7 @@ export const homeRoutes: RouteRecordRaw[] = [
               permissions: ['VIEW_SALARY_REPORT'],
             },
             beforeEnter: [
-              checkSalaryAuth,
+              // checkSalaryAuth,
               redirectSalaryReport,
             ],
             children: [

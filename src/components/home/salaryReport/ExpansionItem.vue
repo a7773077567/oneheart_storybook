@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { MoneyDisplay } from '@/components/home/salaryReport';
+import { name } from 'node_modules/@azure/msal-browser/dist/packageMetadata';
 import { QExpansionItem } from 'quasar';
 import { computed, ref, watch } from 'vue';
 
@@ -108,7 +109,7 @@ watch(() => props.disable, (newVal) => {
 
 .rows {
   display: grid;
-  grid-template-columns: 180px 240px 161px 1fr;
+  grid-template-columns: 180px 240px minmax(161px, auto) 1fr;
   align-items: stretch;
   &__row {
     padding: 22px 16px;
@@ -159,5 +160,9 @@ watch(() => props.disable, (newVal) => {
 
 :deep(.q-item) {
   padding: 16px;
+}
+
+:slotted(span) {
+  @include text-style($label-large, $on-surface-variant);
 }
 </style>

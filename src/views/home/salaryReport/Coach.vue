@@ -15,7 +15,6 @@ const monthTabs = getMonthTabs();
 const state = reactive({
   currentTab: monthTabs[0].name,
   showAmount: false,
-  educationSharingExpand: false,
 });
 
 watch(

@@ -132,6 +132,7 @@ const firstTokenList = [
   'dottedSign',
   'salaries/therapist-salary-detail',
   'salaries/coach-salary-detail',
+  'salaries/counter-salary-detail',
   'coachQuarterlyBonus',
   'salaries/password-recheck',
 ];
