@@ -95,6 +95,10 @@ export function showDecimal(val: number, places: number = 2) {
   return val.toFixed(places);
 }
 
+export function removeFloatingNumber(val: number, places: number = 2) {
+  return Number.isInteger(val) ? val : +(val.toFixed(places));
+}
+
 export function calcPercentage(divisor: number, dividend: number) {
   return dividend === 0 ? '0%' : `${Math.round((divisor / dividend) * 100)}%`;
 }
