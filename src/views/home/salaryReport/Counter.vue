@@ -118,7 +118,7 @@ async function revokeSalary() {
         <template v-if="item.label === '儲值抽成'" #row-0="{ row }">
           <div class="row q-gutter-sm items-center">
             <InfoHelp :infos="row.value[0]" />
-            <RouterLink :to="{ name: '' }" class="anchor">查詢交易紀錄</RouterLink>
+            <RouterLink :to="{ name: 'transactionRecords' }" class="anchor">查詢交易紀錄</RouterLink>
           </div>
         </template>
 
