@@ -17,7 +17,7 @@ import { RouterLink, useRoute } from 'vue-router';
 const route = useRoute();
 const userId = computed(() => route.query.employeeId as string);
 const counterSalaryStore = useSalaryReportCounterStore();
-const userStore = useUserStore();
+// const userStore = useUserStore();
 const monthTabs = getMonthTabs();
 const { load } = useLoad();
 
@@ -48,31 +48,31 @@ const expansionItems = computed(() => {
   ];
 });
 
-async function confirmSalary() {
-  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(counterSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
-  onOk(async () => {
-    load(async () => {
-      await confirmCounterSalary({ yearMonth: state.currentTab });
-      await counterSalaryStore.getCounterSalaryDetail(
-        +userId.value,
-        state.currentTab,
-      );
-    });
-  });
-}
+// async function confirmSalary() {
+//   const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(counterSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+//   onOk(async () => {
+//     load(async () => {
+//       await confirmCounterSalary({ yearMonth: state.currentTab });
+//       await counterSalaryStore.getCounterSalaryDetail(
+//         +userId.value,
+//         state.currentTab,
+//       );
+//     });
+//   });
+// }
 
-async function revokeSalary() {
-  const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
-  onOk(async () => {
-    load(async () => {
-      await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
-      await counterSalaryStore.getCounterSalaryDetail(
-        +userId.value,
-        state.currentTab,
-      );
-    });
-  });
-}
+// async function revokeSalary() {
+//   const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
+//   onOk(async () => {
+//     load(async () => {
+//       await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+//       await counterSalaryStore.getCounterSalaryDetail(
+//         +userId.value,
+//         state.currentTab,
+//       );
+//     });
+//   });
+// }
 </script>
 
 <template>
@@ -90,9 +90,9 @@ async function revokeSalary() {
         visibility-toggle
       />
 
-      <ConfirmChip />
-      <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary" />
-      <BasicBtn v-else label="確認薪資" style="justify-self: end;" @click="confirmSalary" />
+      <!-- <ConfirmChip /> -->
+      <!-- <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary" />
+      <BasicBtn v-else label="確認薪資" style="justify-self: end;" @click="confirmSalary" /> -->
     </template>
 
     <template #body>
@@ -282,7 +282,7 @@ async function revokeSalary() {
   span {
     @include text-style($body-medium, $on-surface-variant);
     font-weight: 700;
-    color: $primary;
+    // color: $primary;
     cursor: pointer;
   }
 }
