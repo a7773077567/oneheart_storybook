@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
 import type { SignalRange } from '@/api/dashboard';
-import { removeFloatingNumber } from '@/utils/helpers';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   label: string;
@@ -16,7 +16,7 @@ const lightSignals = computed(() => {
   return props.rules.map(range => ({ ...range, isWithin:
     range.min === 0 ? props.score < (range.max ?? 0) : (range.max === null ? props.score >= range.min : props.score > range.min && props.score < range.max) }));
 });
-const formattedScore = computed(() => removeFloatingNumber(props.score, 2));
+const formattedScore = computed(() => showDecimal(props.score, 2));
 </script>
 
 <template>
