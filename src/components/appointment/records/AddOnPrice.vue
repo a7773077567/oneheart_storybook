@@ -4,7 +4,7 @@ import { addOnService, deleteAddOnService, getContractShareLink, updateAddOnServ
 import type { ClientScheduleDetail, UpdateMachinePayload } from '@/api';
 import { Loading, QBadge, QItemLabel, useQuasar } from 'quasar';
 import { useAppointmentStore } from '@/stores';
-import { AddOnServiceTypes, type MachineTypes } from '@/const/general';
+import { AddOnServiceTypes, MachineTypes } from '@/const/general';
 import type { FormContext } from 'vee-validate';
 import EditMachineForm from './EditMachineForm.vue';
 import { MachineContractMapping } from '@/const/contracts';
@@ -17,21 +17,33 @@ const props = defineProps<{
 }>();
 
 const appointmentStore = useAppointmentStore();
-const addOnList = computed(
-  () => props.scheduleDetail.addOnServices.map(service => ({
-    ...service,
-    label: service.serviceName,
-    value: service.serviceType,
-    isAdded: service.isAddOn,
-  })),
+const addOnServices = [
+  { label: '震波儀器治療', machineType: MachineTypes['震波儀器治療'], serviceType: AddOnServiceTypes['震波'] },
+  { label: '磁波儀器治療', machineType: MachineTypes['磁波儀器治療'], serviceType: AddOnServiceTypes['射頻'] },
+  { label: '射頻儀器治療', machineType: MachineTypes['射頻儀器治療'], serviceType: AddOnServiceTypes['磁波'] },
+];
+
+const availableList = computed(
+  () => addOnServices
+    .map((service) => {
+      const addedService = appointmentStore.targetAppointmentAddOns.find(a => a.type === service.machineType);
+
+      return ({
+        ...service,
+        ...addedService,
+        isAdded: !!addedService,
+      });
+    }).sort((a, b) => Number(a.isAdded) - Number(b.isAdded)),
 );
+
 // 發數要從 record 拿，不存在加購項目中
 const shockWaveShots = computed(() => props.scheduleDetail.record?.addOnServiceShockWaveShots ?? 0);
 const isCheckedOut = computed(() => props.scheduleDetail.paymentState === PaymentState['已結帳']);
 const isServiceFinished = computed(() => props.scheduleDetail.state === AppointmentState['完成服務'] || props.scheduleDetail.state === AppointmentState['病例完成']);
+const appointmentClientId = computed(() => props.scheduleDetail.clientId);
 
 const $q = useQuasar();
-async function addItem(item: typeof addOnList.value[number]) {
+async function addItem(item: typeof availableList.value[number]) {
   try {
     await addOnService({ clientScheduleId: props.scheduleId, serviceType: item.serviceType });
     $q.notify({ message: '加價服務添加成功', timeout: 200, position: 'top' });
@@ -43,7 +55,7 @@ async function addItem(item: typeof addOnList.value[number]) {
   }
 }
 
-async function rmItem(item: typeof addOnList.value[number]) {
+async function rmItem(item: typeof availableList.value[number]) {
   await deleteAddOnService({ clientScheduleId: props.scheduleId, serviceType: item.serviceType });
   $q.notify({ message: '加價服務移除成功', timeout: 200, position: 'top' });
   appointmentStore.getClientSchedule(props.scheduleId);
@@ -82,13 +94,13 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
 
 // 儀器合約
 const showError = ref(false);
-async function handleSign({ serviceType, type }: { serviceType: AddOnServiceTypes; type: MachineTypes }) {
-  const contract = MachineContractMapping[type];
+async function handleSign({ serviceType, machineType }: { serviceType: AddOnServiceTypes; machineType: MachineTypes }) {
+  const contract = MachineContractMapping[machineType];
 
   Loading.show({ message: '等待合約完成...' });
   const payload = JSON.stringify(({
     contractType: contract.contractType,
-    clientId: appointmentStore.targetClientSchedule?.clientId,
+    clientId: appointmentClientId.value,
     scheduleId: props.scheduleId,
     serviceType,
     isAddOn: true,
@@ -99,6 +111,7 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
       redirectUrl: `${window.location.origin}/sign-success`,
       payloadJSONString: payload,
       type: contract.contractType,
+      clientId: appointmentClientId.value,
     });
 
     Loading.hide();
@@ -115,14 +128,14 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
 <template>
   <div class="add_on">
     <QList separator class="add_on_list">
-      <QItem v-for="addOn in addOnList" :key="addOn.value">
+      <QItem v-for="addOn in availableList" :key="addOn.serviceType">
         <QItemSection>
           <QItemLabel>
             {{ addOn.label }}
           </QItemLabel>
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
-          <QItemLabel v-if="!!addOn.contractTaskId">已簽約</QItemLabel>
+          <QItemLabel v-if="!!addOn.contractStatus">已簽約</QItemLabel>
           <QBtn v-else label="簽約" rounded color="primary" style="width: fit-content" @click="handleSign(addOn)" />
         </QItemSection>
         <QItemSection v-if="addOn.isAdded">
@@ -152,11 +165,11 @@ async function handleSign({ serviceType, type }: { serviceType: AddOnServiceType
               :disable="isCheckedOut || isServiceFinished"
               @click="(isEditingMachine = true), (serviceInitVal = {
                 machineId: addOn.machineId!,
-                startTime: addOn.startTime,
-                endTime: addOn.endTime,
+                startTime: addOn.startTime!,
+                endTime: addOn.endTime!,
                 scheduleStartTime: scheduleDetail.scheduleStartTime,
                 scheduleEndTime: scheduleDetail.scheduleEndTime,
-                machineType: addOn.type,
+                machineType: addOn.machineType,
                 serviceType: addOn.serviceType,
                 ...(addOn.serviceType === AddOnServiceTypes['震波'] ? { shockWaveShots } : {}),
               }

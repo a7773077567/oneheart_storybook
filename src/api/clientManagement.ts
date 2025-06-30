@@ -2,7 +2,7 @@ import { api } from '@/utils/api';
 import type { User } from './user';
 import type { PointTypes, ShiftType } from '@/const/general';
 import type { PagingMeta } from '@/types/common';
-import type { ContractTypes } from './contract';
+import type { ContractStatus, ContractTypes } from './contract';
 import type { PaymentDetail } from './payment';
 import type { IdentityType } from '@/const/client';
 
@@ -39,6 +39,7 @@ export interface Client {
   relationTypeName: string | null;
   firstVisitContractUrl?: string | null;
   referalUser: User;
+  clientMachineContractsStatus: ContractStatus[];
 }
 
 export type ClientSettings = Pick<Client, 'name' | 'phone' | 'gender' | 'identityNumber' | 'birthDate' | 'address' | 'note' | 'howToKnowUs'>;

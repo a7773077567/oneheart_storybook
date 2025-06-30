@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { MachineShifts, MachineTypes, ShiftType, TabMap, Types } from '@/const/general';
-import { MachineContractMapping } from '@/const/contracts';
+import { MachineShifts, MachineTypes, TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
 import { ContractTypes, getContractShareLink } from '@/api';
-import { Dialog, Loading, QBadge } from 'quasar';
+import { Loading, QBadge } from 'quasar';
 import { GenericDialog } from '@/components/shared';
 import { useRoute } from 'vue-router';
 
@@ -62,6 +61,9 @@ function getRecordModules() {
 const showError = ref(false);
 const successRedirectUrl = `${window.location.origin}/sign-success`;
 async function handleSign(contractType: ContractTypes) {
+  if (!appointmentStore.targetClientSchedule?.clientId) {
+    return console.warn('no client id');
+  }
   Loading.show({ message: '等待合約完成...' });
   const payload = JSON.stringify(({
     contractType,
@@ -74,6 +76,7 @@ async function handleSign(contractType: ContractTypes) {
       redirectUrl: successRedirectUrl,
       payloadJSONString: payload,
       type: contractType,
+      clientId: appointmentStore.targetClientSchedule!.clientId,
     });
 
     Loading.hide();
@@ -87,19 +90,12 @@ async function handleSign(contractType: ContractTypes) {
 }
 
 const isMachineOnlyTreatment = computed(() => !!userShiftType.value && MachineShifts.includes(userShiftType.value));
-const machineContract = computed(() => {
-  if (!isMachineOnlyTreatment.value && !!appointmentStore.targetClientSchedule?.machines?.[0]?.type)
-    return null;
-
-  const machineType = appointmentStore.targetClientSchedule?.machines?.[0]?.type as MachineTypes;
-  return MachineContractMapping[machineType];
-});
 
 function handleMachineSign() {
-  if (!userShiftType.value || !isMachineOnlyTreatment.value || !machineContract.value)
+  if (!userShiftType.value || !isMachineOnlyTreatment.value || !appointmentStore.appointmentContract?.contractType)
     return;
 
-  handleSign(machineContract.value.contractType);
+  handleSign(appointmentStore.appointmentContract.contractType);
 }
 
 const addOnCounts = computed(() => appointmentStore.targetAppointmentAddOns?.length ?? 0);
@@ -125,10 +121,11 @@ const addOnCounts = computed(() => appointmentStore.targetAppointmentAddOns?.len
               <p>需簽署「就診須知合約」才能進行後續治療服務</p>
               <QBtn label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleSign(ContractTypes['物理治療初診就診須知'])" />
             </div>
-            <div v-if="isMachineOnlyTreatment && appointmentStore.needToSignMachineContract" class="first_contract_banner">
+            <!-- 獨立儀器門診才需出現合約簽署提示 -->
+            <div v-if="isMachineOnlyTreatment && !appointmentStore.appointmentContract?.hasSigned" class="first_contract_banner">
               <QBtn disable icon="warning" round unelevated color="orange-3" text-color="red-8" class="q-mr-sm" style="cursor: default;" />
-              <p>需簽署「{{ machineContract?.name }}」才能進行後續治療服務</p>
-              <QBtn v-if="!!machineContract && !!userShiftType" label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleMachineSign" />
+              <p>需簽署「{{ appointmentStore.appointmentContract?.name }}」才能進行後續治療服務</p>
+              <QBtn v-if="!!appointmentStore.appointmentContract?.contractType" label="簽約" unelevated rounded color="primary" class="q-ml-auto" @click="handleMachineSign" />
             </div>
             <component :is="recordModules[tab.name]" :schedule-id="+scheduleId" :schedule-detail="appointmentStore.targetClientSchedule" />
           </div>

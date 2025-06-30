@@ -149,6 +149,7 @@ function checkClientFirstToken(url: string, method: string) {
     'refundPoint',
     'update-firstVisitContract',
     'refundSpecificPointPayment',
+    'client-machine-contract',
   ];
   const inExclusion = clientExclusionList.some(item => url.includes(item));
   const isMemos = url.includes('memos');
