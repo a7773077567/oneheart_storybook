@@ -74,7 +74,7 @@ watch(() => [targetSpaceId.value, yearMonthQuery.value], () => {
 <template>
   <div class="coach-quarter-bonus">
     <h3 class="text-headline-medium q-mb-md">教練季獎金</h3>
-    <p class="text-body-medium q-mb-lg">季獎金發放時間為「1、4、7、10」月，可於 <span>薪資詳情</span> 查看。</p>
+    <p class="text-body-medium q-mb-lg">季獎金發放時間為「1、4、7、10」月，可於 <a class="text-primary text-weight-bold link" @click="$router.push({ name: 'salary-report' })">薪資詳情</a> 查看。</p>
     <QSeparator />
     <section class="coach-list">
       <div class="q-my-md coach-list__filters">
@@ -156,6 +156,11 @@ watch(() => [targetSpaceId.value, yearMonthQuery.value], () => {
     &__separator:last-child {
       display: none;
     }
+  }
+
+  .link {
+    cursor: pointer;
+    text-decoration: underline;
   }
 }
 </style>
