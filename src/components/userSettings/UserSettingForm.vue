@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'submit'): void;
+  (e: 'cancel'): void;
 }>();
 
 const $q = useQuasar();
@@ -179,7 +180,7 @@ watch(() => values.roleId, () => {
 <template>
   <div class="user-settings row q-col-gutter-md">
     <div class="user-settings__form col-9">
-      <div class="form">
+      <form class="form" @submit.prevent>
         <OInput name="name" inside-label="姓名*" error-message="" />
         <OInput type="email" name="email" inside-label="帳號 Email*" error-message="" />
         <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
@@ -196,19 +197,20 @@ watch(() => values.roleId, () => {
         <OSelect name="introducerUserId" label="推薦人(選填)" :options="usersOptions" error-message="" />
         <OSelect multiple name="spaceIds" label="場館*" :options="spaceOptions" error-message="" />
         <OInput type="textarea" name="description" inside-label="描述" error-message="" />
-      </div>
+      </form>
       <div class="user-settings__actions">
-        <QBtn label="儲存" outline style="width: 126px;" @click="onSubmit" />
+        <QBtn v-if="type === 'edit'" label="取消" outline rounded color="primary" class="q-px-lg" @click="$emit('cancel')" />
+        <QBtn :label="type === 'edit' ? '儲存' : '新增'" unelevated rounded color="primary" class="q-px-lg" @click="onSubmit" />
       </div>
     </div>
-    <div v-if="type === 'edit'" class="avatar col-3">
+    <div v-if="type === 'edit'" class="user-settings__avatar col-3">
       <QAvatar size="120px">
         <img :src="avatarPreviewUrl">
       </QAvatar>
       <div class="avatar__btn">
         <div class="uploader">
           <QFile v-model="avatarPreviewFile" class="uploader__file" />
-          <QBtn :label="targetUser.avatarUrl ? '更換照片' : '上傳照片'" outline class="uploader__btn" />
+          <QBtn :label="targetUser.avatarUrl ? '更換照片' : '上傳照片'" outline rounded color="primary" />
         </div>
       </div>
     </div>
@@ -217,59 +219,51 @@ watch(() => values.roleId, () => {
 
 <style lang="scss" scoped>
 .user-settings {
-  padding: 20px 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: start;
   width: 100%;
+
+  @media (min-width: $sm) {
+    flex-direction: row;
+    gap: 48px;
+  }
+
   &__form {
-    // width: 100%;
-    // max-width: 556px;
     display: flex;
     flex-direction: column;
     gap: 45px;
+    order: 1;
+    width: 100%;
+    @media (min-width: $sm) {
+      order: 0;
+      width: 70%;
+      max-width: 640px;
+    }
   }
   &__actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 16px;
   }
-}
-
-.state {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  padding: 10px;
-  &::after {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #e86969;
-  }
-  &--active {
-    @extend .state;
-    &::after {
-      background-color: #91d0c1;
-    }
-  }
-}
-
-.avatar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  &__btn {
-    translate: 0 -12px;
+  &__avatar {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    order: 0;
+    width: 100%;
+    @media (min-width: $sm) {
+      order: 1;
+      width: fit-content;
+    }
+    .avatar__btn {
+      margin-top: 24px;
+    }
   }
 }
 
 .uploader {
   position: relative;
-
   &__file {
     position: absolute;
     opacity: 0;
@@ -277,14 +271,6 @@ watch(() => values.roleId, () => {
     height: 100%;
     z-index: 100;
   }
-  &__btn {
-    border-radius: 8px;
-    background-color: white !important;
-  }
-}
-
-.suspend {
-  color: #e86969;
 }
 
 .note {
