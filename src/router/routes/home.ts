@@ -1,6 +1,34 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { NavigationGuardWithThis, RouteRecordRaw } from 'vue-router';
 import type { PermissionEvents } from '@/const/permission';
-import { useSalaryReportStore } from '@/stores';
+import { useUserStore } from '@/stores';
+import { RoleInfo } from '@/const/general';
+import { RoleType } from '@/api';
+import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
+
+const checkSalaryAuth: NavigationGuardWithThis<undefined> = () => {
+  const salaryReportStore = useSalaryReportTherapistStore();
+
+  if (!salaryReportStore.isAuthenticated) {
+    return { name: 'salaryReportAuthentication' };
+  }
+};
+
+const redirectSalaryReport: NavigationGuardWithThis<undefined> = (to, from) => {
+  const userStore = useUserStore();
+
+  const fromAuthentication = from.name === 'salaryReportAuthentication';
+  const isAdmin = RoleType[userStore.role] === '系統管理者';
+
+  if (fromAuthentication && isAdmin) {
+    return;
+  }
+
+  // avoid infinite loop
+  if (fromAuthentication && to.name === 'salaryReportDetails') {
+    const targetRouteName = RoleInfo[userStore.role].salaryRoute;
+    return { name: targetRouteName, query: { employeeId: userStore.userInfo!.id } };
+  }
+};
 
 export const homeRoutes: RouteRecordRaw[] = [
   {
@@ -98,12 +126,11 @@ export const homeRoutes: RouteRecordRaw[] = [
       {
         path: 'salary-report',
         name: 'salary-report',
-        component: () => import('@/views/home/salaryReport/Index.vue'),
         redirect: { name: 'salaryReportDetails' },
         meta: {
           label: '薪資詳情',
           requiredAuth: true,
-          permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+          permissions: ['VIEW_SALARY_REPORT'],
         },
         children: [
           {
@@ -112,7 +139,7 @@ export const homeRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/home/salaryReport/Authentication.vue'),
             meta: {
               requiredAuth: true,
-              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+              permissions: ['VIEW_SALARY_REPORT'],
             },
           },
           {
@@ -121,15 +148,41 @@ export const homeRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/home/salaryReport/Details.vue'),
             meta: {
               requiredAuth: true,
-              permissions: ['VIEW_THERAPIST_SALARY_REPORT'],
+              permissions: ['VIEW_SALARY_REPORT'],
             },
-            beforeEnter: () => {
-              const salaryReportStore = useSalaryReportStore();
-              if (salaryReportStore.isAuthenticated) {
-                return;
-              }
-              return { name: 'salaryReportAuthentication' };
-            },
+            beforeEnter: [
+              checkSalaryAuth,
+              redirectSalaryReport,
+            ],
+            children: [
+              {
+                path: 'therapist',
+                name: 'salaryReportTherapist',
+                component: () => import('@/views/home/salaryReport/Therapist.vue'),
+                meta: {
+                  requiredAuth: true,
+                  permissions: ['VIEW_SALARY_REPORT'],
+                },
+              },
+              {
+                path: 'coach',
+                name: 'salaryReportCoach',
+                component: () => import('@/views/home/salaryReport/Coach.vue'),
+                meta: {
+                  requiredAuth: true,
+                  permissions: ['VIEW_SALARY_REPORT'],
+                },
+              },
+              {
+                path: 'counter',
+                name: 'salaryReportCounter',
+                component: () => import('@/views/home/salaryReport/Counter.vue'),
+                meta: {
+                  requiredAuth: true,
+                  permissions: ['VIEW_SALARY_REPORT'],
+                },
+              },
+            ],
           },
         ],
       },
@@ -220,6 +273,29 @@ export const homeRoutes: RouteRecordRaw[] = [
               label: '支援獎金',
               requiredAuth: true,
               permissions: ['VIEW_TRAINING_ALLOWANCE'] as PermissionEvents[],
+            },
+          },
+        ],
+      },
+      {
+        path: 'bonus-issue',
+        name: 'bonusIssue',
+        component: () => import('@/views/bonus/BonusOverview.vue'),
+        redirect: { name: 'coachQuarterBonus' },
+        meta: {
+          label: '獎金發放',
+          requiredAuth: true,
+          permissions: ['VIEW_BONUS_ISSUE'],
+        },
+        children: [
+          {
+            path: 'coach-quarter-bonus',
+            name: 'coachQuarterBonus',
+            component: () => import('@/views/bonus/CoachQuarterBonus.vue'),
+            meta: {
+              label: '教練季獎金',
+              requiredAuth: true,
+              permissions: ['VIEW_BONUS_ISSUE'],
             },
           },
         ],

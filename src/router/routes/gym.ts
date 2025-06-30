@@ -2,9 +2,9 @@ import type { RouteRecordRaw } from 'vue-router';
 
 export const gymRoutes: RouteRecordRaw[] = [
   {
-    path: '/gym',
-    name: 'gym',
-    component: () => import('@/views/gym/Gym.vue'),
+    path: '/space-manage',
+    name: 'spaceManage',
+    component: () => import('@/views/space/SpaceManage.vue'),
     meta: {
       label: '場館管理',
       requiredAuth: true,

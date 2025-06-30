@@ -92,7 +92,12 @@ export function calcReceiptAmount(payments: Pick<Payment, 'payMethod' | 'amount'
 }
 
 export function showDecimal(val: number, places: number = 2) {
-  return val.toFixed(places);
+  const factor = 10 ** places;
+  return (Math.round(val * factor) / factor).toFixed(places);
+}
+
+export function removeFloatingNumber(val: number, places: number = 2) {
+  return Number.isInteger(val) ? val : +(val.toFixed(places));
 }
 
 export function calcPercentage(divisor: number, dividend: number) {

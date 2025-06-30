@@ -15,3 +15,5 @@ export * from './home/googleReview';
 export * from './home/educationPoints';
 export * from './reports';
 export * from './pointsNBonus';
+export * from './spaceManagement';
+export * from './bonus';

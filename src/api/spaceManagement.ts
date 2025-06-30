@@ -1,4 +1,5 @@
 import { api } from '@/utils/api';
+import type { User } from './user';
 
 export interface SpaceMonthlyConfig {
   id: number;
@@ -8,6 +9,10 @@ export interface SpaceMonthlyConfig {
   month: number;
   therapistNumber: number;
   customerComplaintsAndRefundRate: number;
+  frontDeskFullTimeUserIds: number[];
+  frontDeskPartTimeStaffUserIds: number[];
+  frontDeskFullTimeUsers: User[];
+  frontDeskPartTimeStaffUsers: User[];
 }
 
 export interface UpdateSpaceMonthlyConfig {
@@ -15,6 +20,8 @@ export interface UpdateSpaceMonthlyConfig {
   month: number;
   therapistNumber: number;
   customerComplaintsAndRefundRate: number;
+  frontDeskFullTimeUserIds: number[];
+  frontDeskPartTimeStaffUserIds: number[];
 }
 
 export async function fetchSpaceMonthlyConfigList(yearMonth: string) {

@@ -9,12 +9,23 @@ export enum ContractTypes {
   SIS超磁場治療儀療程前注意事項 = 5,
   射頻儀器治療同意書 = 6,
   G動椅儀器治療同意書 = 7,
+  '聚焦式震波療程同意書(新版)' = 8,
+  'SIS超磁場治療儀療程前注意事項(新版)' = 9,
+  '射頻儀器治療同意書(新版)' = 10,
+  'G動椅儀器治療同意書(新版)' = 11,
 }
+const MachineContracts = ContractTypes['聚焦式震波療程同意書(新版)'] | ContractTypes['SIS超磁場治療儀療程前注意事項(新版)'] | ContractTypes['射頻儀器治療同意書(新版)'] | ContractTypes['G動椅儀器治療同意書(新版)'];
 
 export interface ContractParam {
   redirectUrl: string;
   payloadJSONString: string;
   type: ContractTypes;
+  clientId?: number; // 當 ShareLink 類型為 8,9,10,11 ，客戶 ID 為必填欄位
+}
+
+export interface ContractStatus {
+  hasSignedNewContract: boolean;
+  newContractType: ContractTypes;
 }
 
 // 下載合約
@@ -48,4 +59,9 @@ export async function updateAddOnServiceContract({ clientScheduleId, contractTas
     contractStatus: 'success',
   });
   return data;
+}
+
+// 客戶簽署儀器合約
+export async function signMachineContract(payload: { clientScheduleId: number; dottedsignTaskId: string; clientId: number;contractType: typeof MachineContracts }) {
+  await api.post(`/clients/client-machine-contract`, payload);
 }

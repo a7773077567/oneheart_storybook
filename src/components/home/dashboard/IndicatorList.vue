@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
 import type { TrafficLightStatistic } from '@/api';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   overview: TrafficLightStatistic;
@@ -58,9 +59,9 @@ const list = computed(() => [
           {{ item.label }}
         </QItemSection>
         <QItemSection class="score">
-          {{ item?.current ?? 0 }}
+          {{ showDecimal(item?.current ?? 0, 2) }}
         </QItemSection>
-        <QItemSection class="score">{{ item?.predict ?? 0 }}</QItemSection>
+        <QItemSection class="score">{{ showDecimal(item?.predict ?? 0, 2) }}</QItemSection>
       </QItem>
     </QList>
   </div>

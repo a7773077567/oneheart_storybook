@@ -415,3 +415,60 @@ export enum AddOnServiceTypes {
   射頻 = 15,
   磁波 = 16,
 }
+
+export const RoleInfo: { [K in `${RoleType}`]: {
+  identifier: RoleType;
+  label: keyof typeof RoleType;
+  salaryRoute: string;
+} } = {
+  [RoleType.系統管理者]: {
+    identifier: RoleType['系統管理者'],
+    label: '系統管理者',
+    salaryRoute: 'salaryReportDetails',
+  },
+  [RoleType.院長]: {
+    identifier: RoleType['院長'],
+    label: '院長',
+    salaryRoute: 'salaryReportTherapist',
+  },
+  [RoleType.副院長]: {
+    identifier: RoleType['副院長'],
+    label: '副院長',
+    salaryRoute: 'salaryReportTherapist',
+  },
+  [RoleType.物理治療師組長]: {
+    identifier: RoleType['物理治療師組長'],
+    label: '物理治療師組長',
+    salaryRoute: 'salaryReportTherapist',
+  },
+  [RoleType.物理治療師]: {
+    identifier: RoleType['物理治療師'],
+    label: '物理治療師',
+    salaryRoute: 'salaryReportTherapist',
+  },
+  [RoleType.店長]: {
+    identifier: RoleType['店長'],
+    label: '店長',
+    salaryRoute: 'salaryReportCoach',
+  },
+  [RoleType.副店長]: {
+    identifier: RoleType['副店長'],
+    label: '副店長',
+    salaryRoute: 'salaryReportCoach',
+  },
+  [RoleType.教練組長]: {
+    identifier: RoleType['教練組長'],
+    label: '教練組長',
+    salaryRoute: 'salaryReportCoach',
+  },
+  [RoleType.教練]: {
+    identifier: RoleType['教練'],
+    label: '教練',
+    salaryRoute: 'salaryReportCoach',
+  },
+  [RoleType.櫃檯]: {
+    identifier: RoleType['櫃檯'],
+    label: '櫃檯',
+    salaryRoute: 'salaryReportCounter',
+  },
+} as const;

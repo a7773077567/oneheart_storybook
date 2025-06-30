@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   label: string;
@@ -56,11 +57,11 @@ const barColor = computed(() => color.value.bar);
 
     <QCardSection horizontal class="items-center justify-between q-mb-md">
       <div class="text-body-large text-on-surface">目前得分 <span class="text-body-medium text-on-surface text-on-surface-variant">（前三個月）</span></div>
-      <div class="text-title-medium text-on-surface">{{ current }} 分</div>
+      <div class="text-title-medium text-on-surface">{{ showDecimal(current) }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between q-mb-sm">
       <div class="text-body-large text-on-surface">預測得分 <span class="text-body-medium text-on-surface text-on-surface-variant">（近三個月）</span></div>
-      <div class="text-title-medium text-on-surface" :style="{ color: color.text }">{{ predict }} 分</div>
+      <div class="text-title-medium text-on-surface" :style="{ color: color.text }">{{ showDecimal(predict) }} 分</div>
     </QCardSection>
     <QCardSection horizontal class="items-center justify-between">
       <progress id="progress_bar" :max="total" :value="predict === total ? 100 : predict" />

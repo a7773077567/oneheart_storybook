@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, watch } from 'vue';
-import { ContractTypes, updateAddOnServiceContract, updateClientFirstVisitContract, updateIndependentMachineContract } from '@/api';
+import { ContractTypes, signMachineContract, updateAddOnServiceContract, updateClientFirstVisitContract, updateIndependentMachineContract } from '@/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +41,17 @@ watch(contractDetail, (contract) => {
       return updateIndependentMachineContract({
         clientScheduleId: +contract.scheduleId,
         dottedsignTaskId: contract.taskId,
+      });
+    }
+    case ContractTypes['聚焦式震波療程同意書(新版)']:
+    case ContractTypes['SIS超磁場治療儀療程前注意事項(新版)']:
+    case ContractTypes['G動椅儀器治療同意書(新版)']:
+    case ContractTypes['射頻儀器治療同意書(新版)']:{
+      return signMachineContract({
+        clientScheduleId: +contract.scheduleId,
+        dottedsignTaskId: contract.taskId,
+        clientId: +contract.clientId,
+        contractType: contractDetail.value.contractType,
       });
     }
     default:

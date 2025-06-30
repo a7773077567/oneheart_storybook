@@ -45,7 +45,7 @@ function onOkClick() {
         <div v-if="type === 'success'" class="text-center q-py-md">
           <span class="material-icons" style="color: #1D9E30; font-size: 64px">check_circle</span>
         </div>
-        <p>{{ message }}</p>
+        <p style="white-space: pre-wrap;">{{ message }}</p>
       </QCardSection>
 
       <hr>

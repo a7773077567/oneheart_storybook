@@ -131,7 +131,14 @@ const firstTokenList = [
   'clientGroups',
   'dottedSign',
   'salaries/therapist-salary-detail',
+  'salaries/coach-salary-detail',
+  'salaries/counter-salary-detail',
+  'coachQuarterlyBonus',
   'salaries/password-recheck',
+  'salaries/confirm-counter-salary',
+  'salaries/confirm-coach-salary',
+  'salaries/confirm-therapist-salary',
+  'salaries/revoke-salary-confirmation',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
@@ -142,6 +149,7 @@ function checkClientFirstToken(url: string, method: string) {
     'refundPoint',
     'update-firstVisitContract',
     'refundSpecificPointPayment',
+    'client-machine-contract',
   ];
   const inExclusion = clientExclusionList.some(item => url.includes(item));
   const isMemos = url.includes('memos');

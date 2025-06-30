@@ -17,7 +17,6 @@ import { AddOnServiceTypes, MachineShifts, PhysicalTypes, ShiftType } from '@/co
 import EditMachineForm from './EditMachineForm.vue';
 import type { FormContext } from 'vee-validate';
 import AssignMachineOperator from './AssignMachineOperator.vue';
-import AssignReferrer from './AssignReferrer.vue';
 
 const props = defineProps<{
   scheduleId: number;
@@ -212,16 +211,17 @@ async function updateMachineInfo({ value, setFieldError }: { value: UpdateMachin
 }
 
 const isEditingOperator = ref(false);
+const needToSignMachineContract = computed(() => (appointmentStore.appointmentContract?.hasSigned === false) || appointmentStore.targetAppointmentAddOns.some(addon => !addon.contractStatus));
 
-// 以下情況 disable 完成服務：尚未簽署初診同意書、尚未簽署儀器使用同意書、尚未填寫震波發數
+// 以下情況 disable 完成服務：尚未簽署初診同意書、尚未簽署儀器使用同意書、尚未填寫震波發數(分別判斷獨立震波門診 or 震波加購)
 const notFinishReminder = computed(() => {
   switch (true) {
     case appointmentStore.needToSignFirstVisit:
       return '尚未簽署同意書，不可完成服務。';
-    case appointmentStore.needToSignMachineContract:
+    case needToSignMachineContract.value:
       return '尚未簽署儀器使用同意書，不可完成服務。';
     case userShift.value.type === ShiftType['震波'] && !props.scheduleDetail.record.independentShockWaveShots:
-    case appointmentStore.targetAppointmentAddOns.includes(AddOnServiceTypes['震波']) && !props.scheduleDetail.record.addOnServiceShockWaveShots:
+    case appointmentStore.targetAppointmentAddOns.map(addon => addon.serviceType).includes(AddOnServiceTypes['震波']) && !props.scheduleDetail.record.addOnServiceShockWaveShots:
       return '尚未填寫震波發數，不可完成服務';
     default:
       return false;

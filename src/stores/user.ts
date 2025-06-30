@@ -70,6 +70,11 @@ export const useUserStore = defineStore('user', {
         return [];
       return state.users.filter(user => user.stateOfWork === WorkState['在職'] && user.state === AccountState['開通']).map(user => ({ label: user.name, value: user.id }));
     },
+    activeSalaryUsers(state) {
+      if (state.users?.length === 0)
+        return [];
+      return state.users.filter(user => user.stateOfWork === WorkState['在職'] && user.state === AccountState['開通'] && user.role.type !== RoleType['系統管理者']).map(user => ({ label: user.name, value: user.id }));
+    },
   },
   actions: {
     async getUserInfo() {

@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { computed } from 'vue';
 import type { SignalRange } from '@/api/dashboard';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   label: string;
@@ -15,6 +16,7 @@ const lightSignals = computed(() => {
   return props.rules.map(range => ({ ...range, isWithin:
     range.min === 0 ? props.score < (range.max ?? 0) : (range.max === null ? props.score >= range.min : props.score > range.min && props.score < range.max) }));
 });
+const formattedScore = computed(() => showDecimal(props.score, 2));
 </script>
 
 <template>
@@ -23,7 +25,7 @@ const lightSignals = computed(() => {
       {{ caption }}
     </div>
     <div class="signal__content">
-      <span class="text-title-medium text-on-surface-variant">{{ label }} {{ noData ? '-' : score }} 分</span>
+      <span class="text-title-medium text-on-surface-variant">{{ label }} {{ noData ? '-' : formattedScore }} 分</span>
       <div class="light-container">
         <div v-for="signal in lightSignals" :key="signal.light" class="light" :class="[signal.light, { isChecked: !noData && signal.isWithin }]">
           <QIcon v-if="!noData && signal.isWithin" name="check" size="18px" color="white" />

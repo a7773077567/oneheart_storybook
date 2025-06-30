@@ -1,5 +1,5 @@
 import { RoleType } from '@/api';
-import { type TherapistSalaryDetail, fetchTherapistSalaryDetail } from '@/api/home/salaryReport';
+import { type TherapistSalaryDetail, fetchTherapistSalaryDetail } from '@/api/home/salaryReport/therapist';
 import { EducationApprenticeLevel, EducationMentorLevel, PositionBonusType, RecommendationBonusType } from '@/const/saplaryReport';
 import { useUserStore } from '@/stores/user';
 import { transformRelationshipsToTree } from '@/utils/apextree';
@@ -11,7 +11,7 @@ interface State {
   therapistSalaryDetail: TherapistSalaryDetail | null;
 }
 
-export const useSalaryReportStore = defineStore('salaryReport', {
+export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist', {
   state: (): State => ({
     isAuthenticated: false,
     therapistSalaryDetail: null,
@@ -408,137 +408,6 @@ export const useSalaryReportStore = defineStore('salaryReport', {
 
     async getTherapistSalaryDetail(userId: number, yearMonth: string) {
       this.therapistSalaryDetail = await fetchTherapistSalaryDetail(userId, yearMonth);
-      // this.therapistSalaryDetail = {
-      //   id: 7,
-      //   totalAmount: yearMonth === '2025/05'
-      //     ? 150000
-      //     : yearMonth === '2025/04'
-      //       ? 14000
-      //       : 13000,
-      //   executionAmount: {
-      //     amount: 65550,
-      //     baseSalary: 0,
-      //     totalExecutions: {
-      //       amount: 65550,
-      //       totalHours: 69,
-      //       unitPrice: 950,
-      //       PTLevel: 7,
-      //       executions: [
-      //         {
-      //           label: '物理治療時數 55.5',
-      //           weight: 1,
-      //         },
-      //         {
-      //           label: '院長物理治療時數 10.5',
-      //           weight: 1,
-      //         },
-      //         {
-      //           label: '射頻儀器治療時數 3',
-      //           weight: 3,
-      //         },
-      //       ],
-      //     },
-      //   },
-      //   shockWaveSharing: {
-      //     amount: 14220,
-      //     shots: 79000,
-      //     unitPrice: 0.18,
-      //   },
-      //   magneticWaveSharing: {
-      //     amount: 5500,
-      //     hours: 11,
-      //     unitPrice: 500,
-      //   },
-      //   gChairSharing: {
-      //     amount: 0,
-      //     unitPrice: 150,
-      //     hours: {
-      //       total: 0,
-      //       therapy: 0,
-      //       referral: 0,
-      //     },
-      //   },
-      //   secondmentBonus: {
-      //     amount: 0,
-      //   },
-      //   educationSharing: {
-      //     amount: 4730,
-      //     relationships: [
-      //       {
-      //         id: 6,
-      //         level: 1,
-      //         name: '林君儀 Nana.Lin',
-      //         unitPrice: 40,
-      //         hours: 118.25,
-      //         amount: 4730,
-      //         parentId: 7,
-      //       },
-      //       {
-      //         id: 6,
-      //         level: 1,
-      //         name: '林君儀 Nana.Lin',
-      //         unitPrice: 40,
-      //         hours: 118.25,
-      //         amount: 4730,
-      //         parentId: 7,
-      //       },
-      //       {
-      //         id: 23,
-      //         level: 1,
-      //         name: '曾惠琳 HuiLin.Tseng',
-      //         unitPrice: 40,
-      //         hours: 0,
-      //         amount: 0,
-      //         parentId: 7,
-      //       },
-      //       {
-      //         id: 24,
-      //         level: 2,
-      //         name: '張鼎詮 TingChuan.Chang',
-      //         unitPrice: 20,
-      //         hours: 82,
-      //         amount: 1640,
-      //         parentId: 6,
-      //       },
-      //       {
-      //         id: 40,
-      //         level: 2,
-      //         name: '莊詠祥 YungHsiang.Chuang',
-      //         unitPrice: 20,
-      //         hours: 88.5,
-      //         amount: 1770,
-      //         parentId: 23,
-      //       },
-      //     ],
-      //   },
-      //   recommendationBonus: {
-      //     amount: 0,
-      //     recommendations: [],
-      //   },
-      //   writingBonus: {
-      //     amount: 0,
-      //   },
-      //   positionBonus: {
-      //     amount: 47828,
-      //     performanceTarget: {
-      //       condition: {
-      //         totalExecutionGoal: 80,
-      //         revenueTarget: 150,
-      //         complaintRefundRate: 1,
-      //         greenLightRate: 50,
-      //       },
-      //       status: {
-      //         totalExecutionGoal: false,
-      //         revenueTarget: true,
-      //         complaintRefundRate: true,
-      //         greenLightRate: false,
-      //       },
-      //     },
-      //   },
-      //   assistanceBonus: {
-      //     amount: 0,
-      //   },
-      // };
     },
 
   },

@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { SignalRange, TrafficLightStatistic } from '@/api';
 import ScoreLight from './ScoreLight.vue';
+import { showDecimal } from '@/utils/helpers';
 
 const props = defineProps<{
   userId: number;
@@ -83,9 +84,9 @@ const list = computed(() => [
               {{ item.label }}
             </QItemSection>
             <QItemSection class="score">
-              {{ item?.current ?? 0 }}
+              {{ showDecimal(item?.current ?? 0) }}
             </QItemSection>
-            <QItemSection class="score">{{ item?.predict ?? 0 }}</QItemSection>
+            <QItemSection class="score">{{ showDecimal(item?.predict ?? 0) }}</QItemSection>
           </QItem>
         </QList>
       </div>

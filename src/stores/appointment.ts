@@ -8,7 +8,10 @@ import type { UserShift, UserShiftsGet } from '@/api/shift';
 import { getTimeDate } from '@/utils/date';
 import { ScheduleState } from '@/const/appointment';
 import { useUserStore } from './user';
-import { type AddOnServiceTypes, MachineShifts, ShiftType } from '@/const/general';
+import { MachineShifts } from '@/const/general';
+import type { AddOnServiceTypes, MachineTypes, ShiftType } from '@/const/general';
+import dayjs from 'dayjs';
+import { MachineContractMapping } from '@/const/contracts';
 
 interface State {
   users: User[];
@@ -38,34 +41,37 @@ interface State {
   referralUserId: null | number;
 }
 
+const newContractImplementDate = '2025-06-30';
 export const useAppointmentStore = defineStore('appointment', {
-  state: (): State => ({
-    users: [],
-    querySent: false,
-    availableQuery: null,
-    clientPhone: '',
-    clients: [],
-    targetClient: null,
-    targetUserShift: null,
-    available: [],
-    targetAvailable: null,
-    clientSchedulesNotStarted: [],
-    clientSchedulesNotStartedQuery: null,
-    targetClientScheduleNotStarted: null,
-    rearrangeQuery: null,
-    rearrangeMode: false,
-    clientSchedulesHistories: [],
-    clientSchedulesHistoriesQuery: null,
-    clientSchedulesInProgress: [],
-    targetClientSchedule: null,
-    historyChiefComplaints: [],
-    targetClientGroup: [],
-    appointmentCalendarInitOption: [],
-    userShifts: [],
-    historyRecords: [],
-    machineSchedules: [],
-    referralUserId: null,
-  }),
+  state: (): State => {
+    return ({
+      users: [],
+      querySent: false,
+      availableQuery: null,
+      clientPhone: '',
+      clients: [],
+      targetClient: null,
+      targetUserShift: null,
+      available: [],
+      targetAvailable: null,
+      clientSchedulesNotStarted: [],
+      clientSchedulesNotStartedQuery: null,
+      targetClientScheduleNotStarted: null,
+      rearrangeQuery: null,
+      rearrangeMode: false,
+      clientSchedulesHistories: [],
+      clientSchedulesHistoriesQuery: null,
+      clientSchedulesInProgress: [],
+      targetClientSchedule: null,
+      historyChiefComplaints: [],
+      targetClientGroup: [],
+      appointmentCalendarInitOption: [],
+      userShifts: [],
+      historyRecords: [],
+      machineSchedules: [],
+      referralUserId: null,
+    });
+  },
   getters: {
     userOptions(state) {
       const { users } = state;
@@ -211,8 +217,15 @@ export const useAppointmentStore = defineStore('appointment', {
       return state.targetClientSchedule?.userShift.spaceId === userStore.currentSpace?.id;
     },
     needToSignFirstVisit: state => state.targetClientSchedule?.isSignedFirstVisitContract !== true,
-    needToSignMachineContract: state => state.targetClientSchedule?.isSignedIndependentMachineContract === false || state.targetClientSchedule?.addOnServices.some(service => service.isAddOn && !service.contractTaskId),
-    targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map(service => service.serviceType) ?? [],
+    targetAppointmentAddOns: state => state.targetClientSchedule?.addOnServices.filter(service => !!service.isAddOn)?.map((addon) => {
+      const newContractState = state.targetClientSchedule?.client?.clientMachineContractsStatus?.find(({ newContractType }) => newContractType === MachineContractMapping[addon.type].contractType);
+      const useOldContract = dayjs(state.targetClientSchedule!.date).isBefore(newContractImplementDate);
+
+      return ({
+        ...addon,
+        contractStatus: (!!newContractState?.hasSignedNewContract) || (useOldContract ? !!addon.contractStatus : false),
+      });
+    }) ?? [],
     queryAddOns: state => state.availableQuery?.addOnUserShiftTypes ?? [],
     machineOnlyAppointment: (state) => {
       if (state.machineSchedules.length === 0)
@@ -252,6 +265,24 @@ export const useAppointmentStore = defineStore('appointment', {
         .map(user => (
           { ...user as User }
         ));
+    },
+    // 目前僅有儀器相關預約需簽約
+    appointmentContract(state) {
+      const isIndependentMachineAppointment = !!state.targetClientSchedule?.userShift?.type && MachineShifts.includes(state.targetClientSchedule.userShift.type);
+
+      if (!state.targetClientSchedule || !isIndependentMachineAppointment)
+        return null;
+
+      const machineType = state.targetClientSchedule.machines?.[0]?.type as MachineTypes;
+      const contractSigningState = state.targetClientSchedule.client.clientMachineContractsStatus.find(({ newContractType }) => newContractType === MachineContractMapping[machineType].contractType);
+
+      // 若還沒簽新約，7/1 以前的預約單簽約狀態從舊資料撈
+      const useOldContract = dayjs(state.targetClientSchedule!.date).isBefore(newContractImplementDate);
+      return {
+        name: MachineContractMapping[machineType].name,
+        hasSigned: (!!contractSigningState?.hasSignedNewContract) || (useOldContract ? state.targetClientSchedule.isSignedIndependentMachineContract : false),
+        contractType: contractSigningState?.newContractType,
+      };
     },
   },
   actions: {
