@@ -13,6 +13,7 @@ export interface TherapistSalaryDetail {
   writingBonus: WritingBonus;
   positionBonus: PositionBonus;
   assistanceBonus: AssistanceBonus;
+  isConfirmed: boolean;
 }
 
 export interface ExecutionAmount {

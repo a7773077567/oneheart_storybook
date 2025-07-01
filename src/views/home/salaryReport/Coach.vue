@@ -26,6 +26,8 @@ const state = reactive({
   showAmount: false,
 });
 
+const isSalaryConfirmed = computed(() => coachSalaryStore.coachSalaryDetail?.isConfirmed);
+
 watch(
   [() => state.currentTab, () => userId.value],
   async () => {
@@ -52,31 +54,31 @@ const expansionItems = computed(() => {
       ];
 });
 
-// async function confirmSalary() {
-//   const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(coachSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
-//   onOk(async () => {
-//     load(async () => {
-//       await confirmCoachSalary({ yearMonth: state.currentTab });
-//       await coachSalaryStore.getCoachSalaryDetail(
-//         +userId.value,
-//         state.currentTab,
-//       );
-//     });
-//   });
-// }
+async function confirmSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(coachSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+  onOk(async () => {
+    load(async () => {
+      await confirmCoachSalary({ yearMonth: state.currentTab });
+      await coachSalaryStore.getCoachSalaryDetail(
+        +userId.value,
+        state.currentTab,
+      );
+    });
+  });
+}
 
-// async function revokeSalary() {
-//   const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
-//   onOk(async () => {
-//     load(async () => {
-//       await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
-//       await coachSalaryStore.getCoachSalaryDetail(
-//         +userId.value,
-//         state.currentTab,
-//       );
-//     });
-//   });
-// }
+async function revokeSalary() {
+  const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
+  onOk(async () => {
+    load(async () => {
+      await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+      await coachSalaryStore.getCoachSalaryDetail(
+        +userId.value,
+        state.currentTab,
+      );
+    });
+  });
+}
 </script>
 
 <template>
@@ -93,9 +95,13 @@ const expansionItems = computed(() => {
         label="薪資"
         visibility-toggle
       />
-      <!-- <ConfirmChip />
-      <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary" />
-      <BasicBtn v-else label="確認薪資" style="justify-self: end;" @click="confirmSalary" /> -->
+      <ConfirmChip :done="isSalaryConfirmed" />
+      <BasicBtn v-if="RoleType[userStore.role] === '系統管理者'" :disable="!isSalaryConfirmed" icon="o_redo" label="倒回確認" style="justify-self: end;" @click="revokeSalary">
+        <QTooltip v-if="!isSalaryConfirmed" anchor="top left" :offset="[30, 36]" class="bg-black text-white">薪資已倒回，待人員重新確認</QTooltip>
+      </BasicBtn>
+      <BasicBtn v-else label="確認薪資" :disable="isSalaryConfirmed" style="justify-self: end;" @click="confirmSalary">
+        <QTooltip v-if="isSalaryConfirmed" anchor="top left" :offset="[30, 36]" class="bg-black text-white">薪資已確認，若需倒回確認請聯繫系統管理員</QTooltip>
+      </BasicBtn>
     </template>
     <template #body>
       <ExpansionItem

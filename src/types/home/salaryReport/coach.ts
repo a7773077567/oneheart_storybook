@@ -39,4 +39,5 @@ export interface CoachSalaryDetail {
     teamBonus: number;
     rankBonus: number;
   }[];
+  isConfirmed: boolean;
 }

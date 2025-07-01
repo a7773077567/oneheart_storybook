@@ -7,6 +7,7 @@ export interface CounterSalaryDetail {
   profitShareAmount: ProfitShareAmount;
   extraBonusAmount: number;
   counterQuarterlyBonus: CounterQuarterlyBonus[];
+  isConfirmed: boolean;
 }
 
 interface CounterQuarterlyBonus {
