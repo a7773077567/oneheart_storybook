@@ -70,7 +70,7 @@ async function handleSign(contractType: ContractTypes) {
     clientId: appointmentStore.targetClientSchedule?.clientId,
     scheduleId: props.scheduleId,
   }));
-  const needClientId = newMachineContracts.includes(contractType);
+  const needClientId = newMachineContracts.includes(contractType as (typeof newMachineContracts)[number]);
   try {
     const { shareLink } = await getContractShareLink({
       redirectUrl: successRedirectUrl,

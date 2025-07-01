@@ -19,7 +19,7 @@ export const newMachineContracts = [
   ContractTypes['SIS超磁場治療儀療程前注意事項(新版)'],
   ContractTypes['射頻儀器治療同意書(新版)'],
   ContractTypes['G動椅儀器治療同意書(新版)'],
-];
+] as const;
 
 export interface ContractParam {
   redirectUrl: string;

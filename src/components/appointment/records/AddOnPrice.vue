@@ -19,15 +19,14 @@ const props = defineProps<{
 const appointmentStore = useAppointmentStore();
 const addOnServices = [
   { label: '震波儀器治療', machineType: MachineTypes['震波儀器治療'], serviceType: AddOnServiceTypes['震波'] },
-  { label: '磁波儀器治療', machineType: MachineTypes['磁波儀器治療'], serviceType: AddOnServiceTypes['射頻'] },
-  { label: '射頻儀器治療', machineType: MachineTypes['射頻儀器治療'], serviceType: AddOnServiceTypes['磁波'] },
+  { label: '磁波儀器治療', machineType: MachineTypes['磁波儀器治療'], serviceType: AddOnServiceTypes['磁波'] },
+  { label: '射頻儀器治療', machineType: MachineTypes['射頻儀器治療'], serviceType: AddOnServiceTypes['射頻'] },
 ];
 
 const availableList = computed(
   () => addOnServices
     .map((service) => {
       const addedService = appointmentStore.targetAppointmentAddOns.find(a => a.type === service.machineType);
-
       return ({
         ...service,
         ...addedService,
