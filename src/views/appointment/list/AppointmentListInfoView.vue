@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { MachineShifts, MachineTypes, TabMap, Types } from '@/const/general';
 import { useAppointmentStore } from '@/stores';
-import { ContractTypes, getContractShareLink } from '@/api';
+import { ContractTypes, getContractShareLink, newMachineContracts } from '@/api';
 import { Loading, QBadge } from 'quasar';
 import { GenericDialog } from '@/components/shared';
 import { useRoute } from 'vue-router';
@@ -70,13 +70,13 @@ async function handleSign(contractType: ContractTypes) {
     clientId: appointmentStore.targetClientSchedule?.clientId,
     scheduleId: props.scheduleId,
   }));
-
+  const needClientId = newMachineContracts.includes(contractType);
   try {
     const { shareLink } = await getContractShareLink({
       redirectUrl: successRedirectUrl,
       payloadJSONString: payload,
       type: contractType,
-      clientId: appointmentStore.targetClientSchedule!.clientId,
+      ...(needClientId ? { clientId: appointmentStore.targetClientSchedule!.clientId } : {}),
     });
 
     Loading.hide();

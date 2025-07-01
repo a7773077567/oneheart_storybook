@@ -14,7 +14,12 @@ export enum ContractTypes {
   '射頻儀器治療同意書(新版)' = 10,
   'G動椅儀器治療同意書(新版)' = 11,
 }
-const MachineContracts = ContractTypes['聚焦式震波療程同意書(新版)'] | ContractTypes['SIS超磁場治療儀療程前注意事項(新版)'] | ContractTypes['射頻儀器治療同意書(新版)'] | ContractTypes['G動椅儀器治療同意書(新版)'];
+export const newMachineContracts = [
+  ContractTypes['聚焦式震波療程同意書(新版)'],
+  ContractTypes['SIS超磁場治療儀療程前注意事項(新版)'],
+  ContractTypes['射頻儀器治療同意書(新版)'],
+  ContractTypes['G動椅儀器治療同意書(新版)'],
+];
 
 export interface ContractParam {
   redirectUrl: string;
@@ -61,7 +66,7 @@ export async function updateAddOnServiceContract({ clientScheduleId, contractTas
   return data;
 }
 
-// 客戶簽署儀器合約
-export async function signMachineContract(payload: { clientScheduleId: number; dottedsignTaskId: string; clientId: number;contractType: typeof MachineContracts }) {
+// 客戶簽署儀器合約(新約)
+export async function signMachineContract(payload: { clientScheduleId: number; dottedsignTaskId: string; clientId: number;contractType: typeof newMachineContracts[number] }) {
   await api.post(`/clients/client-machine-contract`, payload);
 }
