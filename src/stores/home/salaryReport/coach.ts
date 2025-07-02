@@ -85,11 +85,11 @@ export const useSalaryReportCoachStore = defineStore('salaryReportCoach', {
 
       return {
         label: '場租',
-        amount: -amount,
+        amount,
         details: amount === 0
           ? [infos]
           : [
-              [`場租時數 * ${unitPrice}`, toCurrency(-amount), `場租時數 = ${hours} hr`, `場租價格 = ${toCurrency(unitPrice)}/hr`],
+              [`場租時數 * ${unitPrice}`, toCurrency(amount), `場租時數 = ${hours} hr`, `場租價格 = ${toCurrency(unitPrice)}/hr`],
             ],
       };
     },
