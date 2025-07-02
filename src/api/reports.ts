@@ -6,7 +6,7 @@ export interface SalaryReportParams {
   spaceIds: number[];
 }
 export async function exportSalaryReport(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report`, { params, timeout: 0, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
   const blobParts: BlobPart = response as unknown as BlobPart;
   const url = window.URL.createObjectURL(new Blob([blobParts]));
@@ -20,7 +20,7 @@ export async function exportSalaryReport(params: SalaryReportParams) {
 }
 
 export async function exportSalaryReport4HR(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report-for-hr`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report-for-hr`, { params, timeout: 0, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
   const blobParts: BlobPart = response as unknown as BlobPart;
   const url = window.URL.createObjectURL(new Blob([blobParts]));
@@ -41,7 +41,7 @@ export async function exporReportTest() {
 
 // 教練薪資報表
 export async function exportSalaryReport4Coach(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report-for-coach`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report-for-coach`, { params, timeout: 0, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
   const blobParts: BlobPart = response as unknown as BlobPart;
   const url = window.URL.createObjectURL(new Blob([blobParts]));
@@ -56,7 +56,7 @@ export async function exportSalaryReport4Coach(params: SalaryReportParams) {
 
 // 櫃檯薪資報表
 export async function exportSalaryReport4Counter(params: SalaryReportParams) {
-  const response = await api.get(`reports/salary-report-for-counter`, { params, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+  const response = await api.get(`reports/salary-report-for-counter`, { params, timeout: 0, responseType: 'blob', headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
 
   const blobParts: BlobPart = response as unknown as BlobPart;
   const url = window.URL.createObjectURL(new Blob([blobParts]));
