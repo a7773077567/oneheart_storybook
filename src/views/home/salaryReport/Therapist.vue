@@ -15,7 +15,6 @@ import { computed, reactive, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
 const route = useRoute();
-const userId = computed(() => route.query.employeeId as string);
 const therapistSalaryStore = useSalaryReportTherapistStore();
 const userStore = useUserStore();
 const { load } = useLoad();
@@ -27,8 +26,13 @@ const state = reactive({
   showAmount: false,
   educationSharingExpand: false,
 });
-
+const userId = computed(() => route.query.employeeId as string);
+const userRole = computed(() => userStore.users.find(user => user.id === +userId.value)!.role.type);
 const isSalaryConfirmed = computed(() => therapistSalaryStore.therapistSalaryDetail?.isConfirmed);
+
+watch(() => route.query.employeeId, () => {
+  therapistSalaryStore.targetUserRole = userRole.value;
+}, { immediate: true });
 
 watch(
   [() => state.currentTab, () => userId.value],
@@ -59,7 +63,7 @@ const expansionItems = computed(() => {
 });
 
 function showPositionBonus(itemLabel: string) {
-  return itemLabel !== '職務獎金' || [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長']].includes(userStore.role);
+  return itemLabel !== '職務獎金' || [RoleType['院長'], RoleType['副院長'], RoleType['物理治療師組長']].includes(userRole.value);
 }
 
 async function confirmSalary() {
@@ -153,7 +157,7 @@ async function revokeSalary() {
                 />
               </div>
             </template>
-            <template v-else-if="item.label === '職務獎金' && RoleType[userStore.role] === '院長'" #body>
+            <template v-else-if="item.label === '職務獎金' && RoleType[userRole] === '院長'" #body>
               <div class="table-wrapper">
                 <div class="caption--position">
                   <QIcon name="o_info" size="20px" />
@@ -163,23 +167,15 @@ async function revokeSalary() {
                   :columns="therapistSalaryStore.positionBonusTable.columns"
                   :rows="therapistSalaryStore.positionBonusTable.rows"
                 >
-                  <template
-                    #body-cell="props"
-                  >
+                  <template #body-cell="props">
                     <QTd :props="props">
                       <template v-if="props.row.performanceTarget === '狀態'">
-                        <template v-if="props.value === '狀態'">
-                          狀態
-                        </template>
+                        <template v-if="props.value === '狀態'">狀態</template>
                         <template v-else>
-                          <span
-                            :class="[props.value ? 'text-forest' : 'text-warning']"
-                          >{{ props.value ? '達成' : '未達成' }}</span>
+                          <span :class="[props.value ? 'text-forest' : 'text-warning']">{{ props.value ? '達成' : '未達成' }}</span>
                         </template>
                       </template>
-                      <template v-else>
-                        {{ props.value }}
-                      </template>
+                      <template v-else>{{ props.value }}</template>
                     </QTd>
                   </template>
                 </Table>

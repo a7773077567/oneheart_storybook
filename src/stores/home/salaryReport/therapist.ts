@@ -9,12 +9,14 @@ import { defineStore } from 'pinia';
 interface State {
   isAuthenticated: boolean;
   therapistSalaryDetail: TherapistSalaryDetail | null;
+  targetUserRole: number | null;
 }
 
 export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist', {
   state: (): State => ({
     isAuthenticated: false,
     therapistSalaryDetail: null,
+    targetUserRole: null,
   }),
   getters: {
     totalAmount: (state) => {
@@ -299,11 +301,11 @@ export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist'
       const userStore = useUserStore();
       const { positionBonus } = state.therapistSalaryDetail;
 
-      if ([RoleType['副院長'], RoleType['物理治療師組長']].includes(userStore.role)) {
+      if ([RoleType['副院長'], RoleType['物理治療師組長']].includes(state.targetUserRole!)) {
         return {
           label: '職務獎金',
           amount: positionBonus.amount,
-          details: [['職務獎金', toCurrency(positionBonus.amount), `${RoleType[userStore.role]}職務獎金 = ${PositionBonusType[RoleType[userStore.role] as keyof typeof PositionBonusType]}`]],
+          details: [['職務獎金', toCurrency(positionBonus.amount), `${RoleType[userStore.role]}職務獎金 = ${positionBonus.amount}`]],
         };
       }
 
@@ -322,16 +324,16 @@ export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist'
         };
       }
 
-      const { positionBonus } = state.therapistSalaryDetail;
+      const { performanceTarget } = state.therapistSalaryDetail.positionBonus;
 
-      if (!positionBonus) {
+      if (!performanceTarget) {
         return {
           columns: [],
           rows: [],
         };
       }
 
-      const { condition } = positionBonus.performanceTarget;
+      const { condition } = performanceTarget;
       return {
         columns: [
           {
@@ -379,7 +381,7 @@ export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist'
             greenLightRate: `${condition.greenLightRate}%`,
           },
           {
-            ...positionBonus.performanceTarget.status,
+            ...performanceTarget.status,
             performanceTarget: '狀態',
           },
         ],
