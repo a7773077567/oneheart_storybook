@@ -19,7 +19,7 @@ await userStore.getUsers();
 // reset authentication to ensure whenever we enter this page, we need to re-authenticate
 salaryStore.isAuthenticated = false;
 
-const currentEmployee = ref(userStore.activeSalaryUsers[0].value);
+const currentEmployee = ref(userStore.activeSalaryUsers[5].value);
 
 if (RoleType[userStore.role] === '系統管理者') {
   watch(currentEmployee, (newVal) => {

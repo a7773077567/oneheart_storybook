@@ -1,15 +1,25 @@
-import { type CounterSalaryDetail, fetchCounterSalaryDetail } from '@/api/home/salaryReport/counter';
-import { toCurrency } from '@/utils/helpers';
-import Therapist from '@/views/home/salaryReport/Therapist.vue';
+import { type CounterSalaryDetail, type DetailParams, type ExecutionClientSchedule, type PaginationMeta, type RevenuePayment, fetchCounterSalaryDetail, fetchExecutionClientScheduleList, fetchRevenuePaymentList } from '@/api/home/salaryReport/counter';
+import type { PointTypes } from '@/const/general';
+import { PaymentTypes, ShiftType, TransactionTypes } from '@/const/general';
+import { pointUnit } from '@/const/points';
+import { showDecimal, toCurrency } from '@/utils/helpers';
 import { defineStore } from 'pinia';
 
 interface State {
   counterSalaryDetail: CounterSalaryDetail | null;
+  executionClientSchedules: ExecutionClientSchedule[];
+  executionClientScheduleMeta: PaginationMeta | null;
+  revenuePaymentList: RevenuePayment[];
+  revenuePaymentMeta: PaginationMeta | null;
 }
 
 export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
   state: (): State => ({
     counterSalaryDetail: null,
+    executionClientSchedules: [],
+    executionClientScheduleMeta: null,
+    revenuePaymentList: [],
+    revenuePaymentMeta: null,
   }),
   getters: {
     totalAmount: (state) => {
@@ -171,10 +181,90 @@ export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
         ],
       };
     },
+    executionClientScheduleRows(state) {
+      if (!state.executionClientSchedules) {
+        return [];
+      }
+      return state.executionClientSchedules.map((item) => {
+        const { date, scheduleStartTime, scheduleEndTime, client, addOnServices, userShiftId, executionCount } = item;
+        return {
+          userShiftId,
+          date,
+          time: `${scheduleStartTime}-${scheduleEndTime}`,
+          name: client.name,
+          type: ShiftType[item.userShift.type],
+          addOns: addOnServices.length ? addOnServices.map(item => item.serviceName).join(', ') : '-',
+          count: executionCount,
+        };
+      });
+    },
+    revenuePaymentRows(state) {
+      if (!state.executionClientSchedules) {
+        return [];
+      }
+      return state.revenuePaymentList.map((item) => {
+        const { date, clientId, clientName, type, clientSchedulePaymentMultiChannelPay: Medical, groupClassTicketPaymentMultiChannelPay: voucher, pointPaymentMultiChannelPay: point, amount: total, ticketGained, paidPointGained, giftPointGained, pointPaymentClientGroupType, chargers: allChargers } = item;
+        const payMethod = (() => {
+          switch (type) {
+            case TransactionTypes.門診費用:
+              return Medical.length > 1 ? '複合式結帳' : PaymentTypes[Medical[0].payMethod];
+            case TransactionTypes.團課券購買:
+            case TransactionTypes.團課券退款:
+              return voucher.length > 1 ? '複合式結帳' : PaymentTypes[voucher[0].payMethod];
+            case TransactionTypes.堂數交易:
+            case TransactionTypes.堂數退款:
+              return point.length > 1 ? '複合式結帳' : PaymentTypes[point[0].payMethod];
+            default:
+              return '';
+          }
+        })();
+        const amount = (() => {
+          switch (type) {
+            case TransactionTypes.門診費用:
+              return `$${total}`;
+            case TransactionTypes.團課券購買:
+              return `${ticketGained} 張 / $${total}`;
+            case TransactionTypes.團課券退款:
+              return `${ticketGained} 張 / $ -${total}`;
+            case TransactionTypes.堂數交易:
+              return `${showDecimal(+paidPointGained + +giftPointGained)} ${pointUnit[pointPaymentClientGroupType as PointTypes]}/ $${total}`;
+            case TransactionTypes.堂數退款:
+              return `${showDecimal(+paidPointGained + +giftPointGained)} ${pointUnit[pointPaymentClientGroupType as PointTypes]}/ $ -${total}`;
+            default:
+              return 0;
+          }
+        })();
+
+        const chargers = allChargers.length === 0 ? '-' : allChargers.map(({ name }: { name: string }) => name).join('、');
+        return {
+          date,
+          clientId,
+          type: TransactionTypes[type],
+          clientName,
+          payMethod,
+          amount,
+          chargers,
+        };
+      });
+    },
   },
   actions: {
     async getCounterSalaryDetail(userId: number, yearMonth: string) {
       this.counterSalaryDetail = await fetchCounterSalaryDetail(userId, yearMonth);
     },
+
+    async getExecutionClientScheduleList(params: DetailParams) {
+      const { data, meta } = await fetchExecutionClientScheduleList(params);
+      this.executionClientSchedules = data;
+      this.executionClientScheduleMeta = meta;
+      return { data, meta };
+    },
+    async getRevenuePaymentList(params: DetailParams) {
+      const { data, meta } = await fetchRevenuePaymentList(params);
+      this.revenuePaymentList = data;
+      this.revenuePaymentMeta = meta;
+      return { data, meta };
+    },
+
   },
 });

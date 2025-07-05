@@ -139,6 +139,8 @@ const firstTokenList = [
   'salaries/confirm-coach-salary',
   'salaries/confirm-therapist-salary',
   'salaries/revoke-salary-confirmation',
+  'salaries/counter-quarterly-execution-count-clientSchedule-list',
+  'salaries/counter-quarterly-revenue-payment-list',
 ];
 
 function checkClientFirstToken(url: string, method: string) {
