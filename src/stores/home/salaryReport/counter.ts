@@ -139,7 +139,7 @@ export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
               },
               {
                 label: '本季適用抽成比例(取較低者):',
-                value: `${bonusItem.finalPercentage.toFixed(2)}%`,
+                value: `${bonusItem.finalPercentage * 100}%`,
                 isUsed: bonusItem.finalPercentage !== 0,
               },
             ],
