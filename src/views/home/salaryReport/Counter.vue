@@ -68,7 +68,7 @@ const executionColumns: QTableColumn[] = [
   { name: 'time', field: 'time', label: '時間', align: 'left' },
   { name: 'name', field: 'name', label: '客戶姓名', align: 'left' },
   { name: 'type', field: 'type', label: '項目', align: 'left' },
-  { name: 'addOns', field: 'addOns', label: '加購服務', align: 'left', style: 'width: 232px' },
+  { name: 'addOns', field: 'addOns', label: '加購服務', align: 'left' },
   { name: 'count', field: 'count', label: '執行數', align: 'left' },
   { name: 'btn', field: 'btn', label: '', align: 'left', style: 'width: 48px' },
 ];
@@ -78,9 +78,9 @@ const revenueColumns: QTableColumn[] = [
   { name: 'clientId', field: 'clientId', label: '客戶編號', align: 'left' },
   { name: 'type', field: 'type', label: '項目', align: 'left' },
   { name: 'clientName', field: 'clientName', label: '客戶姓名', align: 'left' },
-  { name: 'payMethod', field: 'payMethod', label: '付款方式', align: 'left', style: 'width: 232px' },
+  { name: 'payMethod', field: 'payMethod', label: '付款方式', align: 'left' },
   { name: 'amount', field: 'amount', label: '堂數/金額', align: 'left' },
-  { name: 'chargers', field: 'chargers', label: '負責人', align: 'left', style: 'width: 48px' },
+  { name: 'chargers', field: 'chargers', label: '負責人', align: 'left' },
 ];
 
 async function confirmSalary() {
