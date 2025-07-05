@@ -187,13 +187,17 @@ export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
       }
       return state.executionClientSchedules.map((item) => {
         const { date, scheduleStartTime, scheduleEndTime, client, addOnServices, userShiftId, executionCount } = item;
+
         return {
           userShiftId,
           date,
           time: `${scheduleStartTime}-${scheduleEndTime}`,
           name: client.name,
           type: ShiftType[item.userShift.type],
-          addOns: addOnServices.length ? addOnServices.map(item => item.serviceName).join(', ') : '-',
+          addOns: (() => {
+            const addOns = addOnServices.filter(item => item.isAddOn);
+            return addOns.length ? addOns.map(item => item.serviceName).join(', ') : '-';
+          })(),
           count: executionCount,
         };
       });
