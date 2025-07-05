@@ -68,12 +68,7 @@ export const usePointsStore = defineStore('points', {
       this.topupDetail = initialTopup;
     },
     async getSellerOption() {
-      const data = await fetchUsers({ roleTypes: [
-        RoleType['物理治療師'],
-        RoleType['物理治療師組長'],
-        RoleType['院長'],
-        RoleType['副院長'],
-      ] });
+      const data = await fetchUsers({});
       this.sellerOptions = data.map(p => ({ label: p.name, value: p.id }));
     },
     async getAvaiRefundablePlans(clientGroupId: number) {
