@@ -127,14 +127,14 @@ export const useSalaryReportCounterStore = defineStore('salaryReportCounter', {
                 label: '本季執行數：',
                 value: executionPassedIdx === null
                   ? `${bonusItem.quarterlyExecutionCount} (未達標)`
-                  : `${bonusItem.quarterlyExecutionCount}(達 ${(bonusItem.commissionRatios[executionPassedIdx] * 100).toFixed(2)}% 標準)}`,
+                  : `${bonusItem.quarterlyExecutionCount}(達 ${(bonusItem.commissionRatios[executionPassedIdx] * 100).toFixed(2)}% 標準)`,
                 isPassed: executionPassedIdx !== null,
               },
               {
                 label: '本季銷售額：',
                 value: salesPassedIdx === null
                   ? `${toCurrency(bonusItem.quarterlyRevenueAmount)} (未達標)`
-                  : `${toCurrency(bonusItem.quarterlyRevenueAmount)}(達 ${(bonusItem.commissionRatios[salesPassedIdx] * 100).toFixed(2)}% 標準)}`,
+                  : `${toCurrency(bonusItem.quarterlyRevenueAmount)}(達 ${(bonusItem.commissionRatios[salesPassedIdx] * 100).toFixed(2)}% 標準)`,
                 isPassed: salesPassedIdx !== null,
               },
               {
