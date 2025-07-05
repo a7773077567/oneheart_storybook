@@ -6,12 +6,11 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { createPointGroup } from '@/api';
 import { type Client, type CreateGroupField, getDepInChargeTherapist } from '@/api';
-import { usePointsStore, useUserStore } from '@/stores';
+import { usePointsStore } from '@/stores';
 import { POINTS_PLAN, plansByType, pointUnit } from '@/const/points';
 import { PointTypes } from '@/const/general';
 import PointsGroupForm from '@/components/client/pointsGroup/PointsGroupForm.vue';
 import { useQuasar } from 'quasar';
-import { getOpenAccount } from '@/utils/helpers';
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
@@ -19,7 +18,6 @@ const emit = defineEmits<{
 }>();
 
 const pointsStore = usePointsStore();
-const userStore = useUserStore();
 
 const pointsTopupSchema = z.object({
   clientName: z.string(),
@@ -33,12 +31,12 @@ const pointsTopupSchema = z.object({
   giftPointGained: z.preprocess(a => Number(a), z.number().nonnegative().optional().default(0)),
   amount: z.preprocess(a => Number(a), z.number().nonnegative()),
   sellers: z.array(z.object({
-    id: z.number(),
-    name: z.string(),
+    label: z.string(),
+    value: z.number(),
   })).default([]),
   chargers: z.array(z.object({
-    id: z.number(),
-    name: z.string(),
+    label: z.string(),
+    value: z.number(),
   })).default([]),
 });
 
@@ -72,7 +70,6 @@ const planOptions = computed(() => {
 
   return targetType?.plans.map(planId => ({ label: POINTS_PLAN[planId].name, value: planId }));
 });
-const sellerOptions = computed(() => userStore.users.filter(getOpenAccount).map(p => ({ name: p.name, id: p.id })));
 
 function selectClient(selectList: Client[]) {
   const client = selectList[0];
@@ -108,7 +105,7 @@ async function getPointGroup(group: { name: string; id: number; type: PointTypes
 async function setDefaultChargers(clientId: number, type: PointTypes) {
   // 負責人會自動代群組的所有人員的對應科別負責人
   const chargers = await getDepInChargeTherapist(clientId, { clientGroupType: type });
-  setFieldValue('chargers', chargers.filter(charger => !!charger.inChargeUserId).map(charger => ({ id: charger.inChargeUserId, name: charger.inChargeUserName })));
+  setFieldValue('chargers', chargers.filter(charger => !!charger.inChargeUserId).map(charger => ({ value: charger.inChargeUserId, label: charger.inChargeUserName })));
 }
 
 function setDefaultVal(selectedId: number) {
@@ -209,16 +206,16 @@ async function createGroup(value: CreateGroupField) {
       </fieldset>
       <fieldset class="col-8">
         <OSelect
-          multiple label="負責人(選填、可複選)" class="field--val" name="chargers" :options="sellerOptions"
-          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="name"
-          option-value="id"
+          multiple label="負責人(選填、可複選)" class="field--val" name="chargers" :options="pointsStore.sellerOptions"
+          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="label"
+          option-value="value"
         />
       </fieldset>
       <fieldset class="col-8">
         <OSelect
-          multiple label="銷售者(選填、可複選)" class="field--val" name="sellers" :options="sellerOptions"
-          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="name"
-          option-value="id"
+          multiple label="銷售者(選填、可複選)" class="field--val" name="sellers" :options="pointsStore.sellerOptions"
+          hide-bottom-space :virtual-scroll-item-size="50" :emit-value="false" error-message="" option-label="label"
+          option-value="value"
         />
       </fieldset>
     </form>

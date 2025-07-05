@@ -4,7 +4,7 @@ import TopupForm from '@/components/order/point/TopupForm.vue';
 import TopupCheckout from '@/components/order/point/TopupCheckout.vue';
 
 // import TopupSign from '@/components/order/point/TopupSign.vue';
-import { usePointsStore, useUserStore } from '@/stores';
+import { usePointsStore } from '@/stores';
 import { OSteps } from '@/components/shared';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -43,8 +43,7 @@ function checkContractStatus() {
 }
 
 // get seller data
-const userStore = useUserStore();
-userStore.getUsers();
+pointsStore.getSellerOption();
 </script>
 
 <template>

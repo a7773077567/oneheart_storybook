@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { QBtn } from 'quasar';
 import type { QBtnProps, QBtnSlots } from 'quasar';
+import { type Slot, type Slots, useSlots } from 'vue';
 
 const props = withDefaults(
   defineProps<QBtnProps>(),
@@ -7,12 +9,20 @@ const props = withDefaults(
     color: 'primary',
   },
 );
+
+defineSlots<AllSlots>();
+
+type AllSlots = {
+  [K in keyof QBtnSlots]?: Slot | undefined
+} ;
+
+const slots = useSlots() as AllSlots;
 </script>
 
 <template>
   <QBtn v-bind="props" padding="10px 24px" class="btn">
     <template
-      v-for="(_, name) in $slots as {}"
+      v-for="(_, name) in slots "
       :key="name"
       #[name]
     >

@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { RoleType } from '@/api';
-import { revokeSalaryConfirmation } from '@/api/home/salaryReport/admin';
 import { OptionSelect } from '@/components/shared';
-import { useDialog } from '@/composables/dialog';
 import { RoleInfo } from '@/const/general';
 import { useUserStore } from '@/stores';
 import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
-import { useQuasar } from 'quasar';
 import { ref, watch } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 

@@ -2,15 +2,15 @@
 import { RoleType } from '@/api';
 import { revokeSalaryConfirmation } from '@/api/home/salaryReport/admin';
 import { confirmCounterSalary } from '@/api/home/salaryReport/counter';
-import { ConfirmChip, ExpansionItem, InfoHelp, Layout } from '@/components/home/salaryReport';
-import { BasicBtn, BasicTabs, CardTable, MoneyDisplay } from '@/components/shared';
+import { ConfirmChip, DetailTable, ExpansionItem, InfoHelp, Layout } from '@/components/home/salaryReport';
+import { BasicBtn, BasicDialog, BasicTabs, CardTable, MoneyDisplay } from '@/components/shared';
 import { useDialog } from '@/composables/dialog';
 import { useLoad } from '@/composables/load';
 import { useUserStore } from '@/stores';
 import { useSalaryReportCounterStore } from '@/stores/home/salaryReport/counter';
-import { toCurrency } from '@/utils/helpers';
 import { getMonthTabs } from '@/utils/salaryReport';
 import dayjs from 'dayjs';
+import type { QTableColumn } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
@@ -22,20 +22,33 @@ const monthTabs = getMonthTabs();
 const { load } = useLoad();
 
 const state = reactive({
-  currentTab: monthTabs[0].name,
-  showAmount: false,
+  currentMonth: monthTabs[0].name,
+  showAmount: true,
   currentSpaceTab: 0,
+  isExecutionsDetailDialogOpen: false,
+  isSalesDetailDialogOpen: false,
 });
 
 const isSalaryConfirmed = computed(() => counterSalaryStore.counterSalaryDetail?.isConfirmed);
+const currentSpaceId = computed(() => counterSalaryStore.counterSalaryDetail?.counterQuarterlyBonus[state.currentSpaceTab]?.space.id);
+const currentSpaceName = computed(() => counterSalaryStore.counterSalaryDetail?.counterQuarterlyBonus[state.currentSpaceTab]?.space.name);
+const lastSeasonString = computed(() => {
+  const date = dayjs(state.currentMonth);
+  const lastSeasonMonths = Array.from({ length: 3 }, (_, i) => date.subtract(i + 1, 'month'));
+  const lastSeasonStartMonth = lastSeasonMonths[2].format('M');
+  const lastSeasonEndMonth = lastSeasonMonths[0].format('M');
+  const year = lastSeasonMonths[0].year();
+
+  return `${year} 年 ${lastSeasonStartMonth}-${lastSeasonEndMonth} 月`;
+});
 
 watch(
-  [() => state.currentTab, () => userId.value],
+  [() => state.currentMonth, () => userId.value],
   async () => {
     load(async () => {
       await counterSalaryStore.getCounterSalaryDetail(
         +userId.value,
-        state.currentTab,
+        state.currentMonth,
       );
     });
   },
@@ -50,14 +63,42 @@ const expansionItems = computed(() => {
   ];
 });
 
+const executionColumns: QTableColumn[] = [
+  { name: 'date', field: 'date', label: '日期', align: 'left' },
+  { name: 'time', field: 'time', label: '時間', align: 'left' },
+  { name: 'name', field: 'name', label: '客戶姓名', align: 'left' },
+  { name: 'type', field: 'type', label: '項目', align: 'left' },
+  { name: 'addOns', field: 'addOns', label: '加購服務', align: 'left' },
+  { name: 'count', field: 'count', label: '執行數', align: 'left' },
+  { name: 'btn', field: 'btn', label: '', align: 'left', style: 'width: 48px' },
+];
+
+const revenueColumns: QTableColumn[] = [
+  { name: 'date', field: 'date', label: '日期', align: 'left' },
+  { name: 'clientId', field: 'clientId', label: '客戶編號', align: 'left' },
+  { name: 'type', field: 'type', label: '項目', align: 'left' },
+  { name: 'clientName', field: 'clientName', label: '客戶姓名', align: 'left' },
+  { name: 'payMethod', field: 'payMethod', label: '付款方式', align: 'left' },
+  { name: 'amount', field: 'amount', label: '堂數/金額', align: 'left' },
+  { name: 'chargers', field: 'chargers', label: '負責人', align: 'left' },
+];
+
 async function confirmSalary() {
-  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(counterSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+  const { onOk } = await useDialog({
+    type: 'confirm',
+    title: '薪資確認',
+    subtitle: `謝謝您於本月份的辛勞與付出！`,
+    message: `本月份薪資已按雙方契約及相關規章計算完成，詳如頁面所載，請您確認金額無誤。
+您點擊「確定」後，該薪資金額即視為已確認無誤，並將依此金額發放，後續不得再提出異議。
+同時，本頁面亦依法作為您的薪資明細（薪資單），請您自行留存備查。
+如對金額有任何疑問，請於確認前與公司聯繫。`,
+  });
   onOk(async () => {
     load(async () => {
-      await confirmCounterSalary({ yearMonth: state.currentTab });
+      await confirmCounterSalary({ yearMonth: state.currentMonth });
       await counterSalaryStore.getCounterSalaryDetail(
         +userId.value,
-        state.currentTab,
+        state.currentMonth,
       );
     });
   });
@@ -67,10 +108,10 @@ async function revokeSalary() {
   const { onOk } = await useDialog({ type: 'confirm', title: '倒回確認', message: '倒回確認後，該人員需重新確認。' });
   onOk(async () => {
     load(async () => {
-      await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentTab });
+      await revokeSalaryConfirmation({ userId: +userId.value, yearMonth: state.currentMonth });
       await counterSalaryStore.getCounterSalaryDetail(
         +userId.value,
-        state.currentTab,
+        state.currentMonth,
       );
     });
   });
@@ -81,7 +122,7 @@ async function revokeSalary() {
   <Layout>
     <template #header>
       <BasicTabs
-        v-model="state.currentTab"
+        v-model="state.currentMonth"
         :tabs="monthTabs"
       />
       <MoneyDisplay
@@ -105,6 +146,7 @@ async function revokeSalary() {
       <ExpansionItem
         v-for="(item, idx) in expansionItems"
         :key="idx"
+        :model-value="true"
         :label="item.label"
         :amount="item.amount"
         :show-amount="state.showAmount"
@@ -188,7 +230,7 @@ async function revokeSalary() {
                     <ul class="caption__list">
                       <li>{{ `註1：本季執行數標準（含射頻）= 治療師人數 ${row.value[0].bonusData[state.currentSpaceTab].commissionRate.caption.therapistCount}人 * 執行數單人標準。` }}</li>
                       <li>{{ `註2：本季銷售額標準（含儲值）= 本季應達成的銷售額 = 季執行數標準 * 均價 ${row.value[0].bonusData[state.currentSpaceTab].commissionRate.caption.averagePrice}。` }}</li>
-                      <li>實際執行情況請見 <span class="anchor">本季執行明細</span> 、 <span>本季銷售明細。</span></li>
+                      <li>實際執行情況請見 <span class="anchor" @click="state.isExecutionsDetailDialogOpen = true">本季執行明細</span> 、 <span @click="state.isSalesDetailDialogOpen = true">本季銷售明細。</span></li>
                     </ul>
                   </div>
                 </template>
@@ -197,6 +239,38 @@ async function revokeSalary() {
           </div>
         </template>
       </ExpansionItem>
+      <BasicDialog
+        v-if="state.isExecutionsDetailDialogOpen"
+        v-model="state.isExecutionsDetailDialogOpen"
+        title="本季執行明細（含射頻）"
+      >
+        <DetailTable
+          :title="currentSpaceName"
+          :sub-title="lastSeasonString"
+          :request-func="counterSalaryStore.getExecutionClientScheduleList"
+          :columns="executionColumns"
+          :rows="counterSalaryStore.executionClientScheduleRows"
+          :year-month="state.currentMonth"
+          :user-id="+userId"
+          :space-id="currentSpaceId"
+        />
+      </BasicDialog>
+      <BasicDialog
+        v-if="state.isSalesDetailDialogOpen"
+        v-model="state.isSalesDetailDialogOpen"
+        title="本季銷售明細（含儲值）"
+      >
+        <DetailTable
+          :title="currentSpaceName"
+          :sub-title="lastSeasonString"
+          :request-func="counterSalaryStore.getRevenuePaymentList"
+          :columns="revenueColumns"
+          :rows="counterSalaryStore.revenuePaymentRows"
+          :year-month="state.currentMonth"
+          :user-id="+userId"
+          :space-id="currentSpaceId"
+        />
+      </BasicDialog>
     </template>
   </Layout>
 </template>
@@ -288,7 +362,7 @@ async function revokeSalary() {
   span {
     @include text-style($body-medium, $on-surface-variant);
     font-weight: 700;
-    // color: $primary;
+    color: $primary;
     cursor: pointer;
   }
 }

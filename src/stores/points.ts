@@ -23,8 +23,8 @@ export interface PointsPurchase {
   giftPointGained: number;
   amount: number;
   contractDottedsignTaskId: string | null;
-  sellers: { id: number; name: string }[];
-  chargers: { id: number; name: string }[];
+  sellers: { value: number; label: string }[];
+  chargers: { value: number; label: string }[];
 }
 
 const initialTopup = {
