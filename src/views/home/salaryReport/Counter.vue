@@ -22,7 +22,7 @@ const monthTabs = getMonthTabs();
 const { load } = useLoad();
 
 const state = reactive({
-  currentMonth: monthTabs[3].name,
+  currentMonth: monthTabs[0].name,
   showAmount: true,
   currentSpaceTab: 0,
   isExecutionsDetailDialogOpen: false,
