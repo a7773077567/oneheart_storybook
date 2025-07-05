@@ -3,6 +3,7 @@ import { useDialogPluginComponent } from 'quasar';
 
 interface DialogProps {
   title: string;
+  subtitle?: string;
   message: string;
   okLabel?: string;
   cancelLabel?: string;
@@ -33,7 +34,7 @@ function onOkClick() {
 
 <template>
   <QDialog ref="dialogRef" :model-value="true" @update:model-value="$emit('update:modelValue', $event)">
-    <QCard style="min-width: 400px;">
+    <!-- <QCard style="min-width: 400px;">
       <QCardSection class="row items-center q-pb-none">
         <h3 class="text-h6 q-mx-auto">
           {{ title }}
@@ -54,6 +55,59 @@ function onOkClick() {
         <QBtn v-if="!hideCancel" :label="cancelLabel" @click="onDialogHide" />
         <QBtn :label="okLabel" color="black" @click="onOkClick" />
       </QCardActions>
-    </QCard>
+    </QCard> -->
+    <div class="dialog">
+      <div class="dialog__body">
+        <div class="dialog__title">{{ title }}</div>
+        <div class="dialog__message">
+          <div v-if="subtitle" class="message--title">{{ `${subtitle}\n\n` }}</div>
+          <div class="message">{{ message }}</div>
+        </div>
+      </div>
+      <div class="dialog__actions">
+        <QBtn v-if="!hideCancel" flat padding="10px 12px" :label="cancelLabel" color="primary" @click="onDialogHide" />
+        <QBtn :label="okLabel" flat padding="10px 12px" color="primary" @click="onOkClick" />
+      </div>
+    </div>
   </QDialog>
 </template>
+
+<style scoped lang="scss">
+.dialog {
+  background-color: #fff;
+  min-width: 400px;
+  border-radius: 28px;
+  &__body {
+    padding: 24px 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  &__title {
+    @include text-style($headline-small, $on-surface);
+    font-size: 20px;
+  }
+  &__message {
+    white-space: pre-wrap;
+  }
+  &__actions {
+    padding: 24px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  :deep(.q-btn .block) {
+    @include text-style($label-large, $primary);
+  }
+}
+
+.message {
+  @include text-style($body-medium, $on-surface-variant);
+  &--title {
+    @extend .message;
+    font-weight: 700;
+  }
+}
+</style>
