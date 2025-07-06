@@ -302,7 +302,7 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
             <QBadge v-else style="background-color: #F8C9CB; color:#C2351A" class="q-px-sm q-py-xs text-weight-medium">
               未指派
             </QBadge>
-            <QBtn class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingOperator = true" />
+            <QBtn v-if="userShift.type === ShiftType['G動椅']" class="q-ml-auto" round flat icon="edit" size="sm" @click="isEditingOperator = true" />
           </div>
         </template>
         <template #isFirstClientSchedule="{ row }">
