@@ -64,7 +64,7 @@ const addInitialValues = computed(() => ({
   spaceIds: [spaceOptions[0].value],
   description: '',
   jobClass: null,
-  PTLevel: PTLevelOptions[0].value,
+  PTLevel: null,
   hireDate: dayjs().format('YYYY-MM-DD'),
   introducerUserId: null,
   ancestorUserId: null,
@@ -100,7 +100,7 @@ const createUserSchema = z.object({
   spaceIds: z.number().array(),
   avatar: z.string().nullish(),
   jobClass: z.number().nullish(),
-  PTLevel: z.number(),
+  PTLevel: z.number().nullish(),
   hireDate: z.string(),
   introducerUserId: z.number().nullish(),
   ancestorUserId: z.number().nullish(),
@@ -186,7 +186,7 @@ watch(() => values.roleId, () => {
         <OInput date-mode name="hireDate" inside-label="到職期間*" error-message="" />
         <OSelect name="roleId" label="職稱*" :options="roleIdOptions" error-message="" />
         <OSelect name="isPartTime" label="聘僱類型*" :options="employmentTypeOptions" error-message="" />
-        <OSelect v-if="userStore.canI('READ_PT_LEVEL')" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階*" :options="PTLevelOptions" error-message="" />
+        <OSelect v-if="userStore.canI('READ_PT_LEVEL')" :disable="!userStore.canI('EDIT_PT_LEVEL')" name="PTLevel" label="職階" :options="PTLevelOptions" error-message="" />
         <OSelect name="weightForOrder" label="權重*" :options="weightForOrderOptions" error-message="" />
         <template v-if="isTherapistSelected">
           <OSelect name="jobClass" label="初診等級*" :options="classOptions" error-message="" hide-bottom-space />
