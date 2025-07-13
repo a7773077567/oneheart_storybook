@@ -16,7 +16,6 @@ const targetSpaceId = ref<null | number>(userStore.userInfo?.spaces?.[0]?.id ?? 
 const spaceOptions = computed(() => (userStore.userInfo?.spaces ?? []).map(space => ({ ...space, label: space.name, value: space.id })));
 
 // year month
-const monthOptions = [1, 4, 7, 10].map(m => ({ label: `${m} 月`, value: m - 1 }));
 const yearMonth = ref({
   year: dayjs().year(),
   month: getClosestQuarterMonth(dayjs().month() + 1) - 1,
@@ -79,7 +78,7 @@ watch(() => [targetSpaceId.value, yearMonthQuery.value], () => {
     <section class="coach-list">
       <div class="q-my-md coach-list__filters">
         <OptionSelect v-model="targetSpaceId" :options="spaceOptions" style="width: 228px" />
-        <YearMonthSelect v-model="yearMonth" style="width: 240px" :month-options="monthOptions" />
+        <YearMonthSelect v-model="yearMonth" style="width: 240px" />
       </div>
       <ul class="q-py-md">
         <template v-for="(coach, idx) in list" :key="coach.coachUserId">
