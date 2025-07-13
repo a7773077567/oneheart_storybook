@@ -76,7 +76,7 @@ function selectClient(selectList: Client[]) {
 
   pointsStore.targetClient = client;
   if (values.clientGroupId) {
-    resetForm({ values: { ...initialValues.value, clientId: client.id, clientName: client.name, clientPhone: client.phone } });
+    resetForm({ values: { clientId: client.id, clientName: client.name, clientPhone: client.phone } });
   }
   else {
     setFieldValue('clientId', client.id);
@@ -105,7 +105,11 @@ async function getPointGroup(group: { name: string; id: number; type: PointTypes
 async function setDefaultChargers(clientId: number, type: PointTypes) {
   // 負責人會自動代群組的所有人員的對應科別負責人
   const chargers = await getDepInChargeTherapist(clientId, { clientGroupType: type });
-  setFieldValue('chargers', chargers.filter(charger => !!charger.inChargeUserId).map(charger => ({ value: charger.inChargeUserId, label: charger.inChargeUserName })));
+  const responsiblePerson = chargers.filter(charger => !!charger.inChargeUserId).map(charger => ({ value: charger.inChargeUserId, label: charger.inChargeUserName }));
+  // filter 離職人員
+  const activePerson = responsiblePerson.filter(p => pointsStore.sellerOptions.find(o => o.value === p.value));
+
+  setFieldValue('chargers', activePerson);
 }
 
 function setDefaultVal(selectedId: number) {

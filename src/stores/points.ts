@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type Client, type PointsGroup, type RefundablePayment, RoleType, fetchUsers, getAvaiRefundablePlans, getClientPointGroup } from '@/api';
+import { type Client, type PointsGroup, type RefundablePayment, RoleType, WorkState, fetchUsers, getAvaiRefundablePlans, getClientPointGroup } from '@/api';
 import { PointTypes } from '@/const/general';
 
 interface State {
@@ -69,7 +69,7 @@ export const usePointsStore = defineStore('points', {
     },
     async getSellerOption() {
       const data = await fetchUsers({});
-      this.sellerOptions = data.map(p => ({ label: p.name, value: p.id }));
+      this.sellerOptions = data.filter(p => p.stateOfWork !== WorkState['離職']).map(p => ({ label: p.name, value: p.id }));
     },
     async getAvaiRefundablePlans(clientGroupId: number) {
       this.refundableList = await getAvaiRefundablePlans(clientGroupId);
