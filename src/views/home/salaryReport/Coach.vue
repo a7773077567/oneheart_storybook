@@ -55,7 +55,15 @@ const expansionItems = computed(() => {
 });
 
 async function confirmSalary() {
-  const { onOk } = await useDialog({ type: 'confirm', title: '薪資確認', message: `您的 ${dayjs(state.currentTab).format('M')} 月薪資為 ${toCurrency(coachSalaryStore.totalAmount)}。\n\n請確認您的薪資正確，點擊確認後將鎖定該薪資內容。` });
+  const { onOk } = await useDialog({
+    type: 'confirm',
+    title: '薪資確認',
+    subtitle: `謝謝您於本月份的辛勞與付出！`,
+    message: `本月份薪資已按雙方契約及相關規章計算完成，詳如頁面所載，請您確認金額無誤。
+您點擊「確定」後，該薪資金額即視為已確認無誤，並將依此金額發放，後續不得再提出異議。
+同時，本頁面亦依法作為您的薪資明細（薪資單），請您自行留存備查。
+如對金額有任何疑問，請於確認前與公司聯繫。`,
+  });
   onOk(async () => {
     load(async () => {
       await confirmCoachSalary({ yearMonth: state.currentTab });
