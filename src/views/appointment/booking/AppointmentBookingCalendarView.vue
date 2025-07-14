@@ -117,10 +117,14 @@ function OpenAppointmentDialog(available: Available) {
   stateOfAppointmentDialog.value = true;
 }
 
-function afterAppointment(appointment?: Available) {
+// disable for now
+// function afterAppointment(appointment?: Available) {
+//   stateOfAppointmentDialog.value = false;
+//   const query = { date: appointment?.date };
+//   router.push({ name: 'appointmentListCalendar', ...(appointment?.date ? { query } : {}) });
+// }
+function afterAppointment() {
   stateOfAppointmentDialog.value = false;
-  const query = { date: appointment?.date };
-  router.push({ name: 'appointmentListCalendar', ...(appointment?.date ? { query } : {}) });
 }
 
 function getTimesArray(start: number, count: number, interval: number) {
