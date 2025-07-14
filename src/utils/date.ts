@@ -107,3 +107,13 @@ export function getDate(offset: number, format?: string) {
     ? date.format(format)
     : date.month() + 1;
 }
+
+export function isTimeDurationOverlap(duration1: Duration, duration2: Duration) {
+  if (getTimeDate(duration1.endTime).isSameOrBefore(getTimeDate(duration2.startTime))) {
+    return false;
+  }
+  if (getTimeDate(duration2.endTime).isSameOrBefore(getTimeDate(duration1.startTime))) {
+    return false;
+  }
+  return true;
+}

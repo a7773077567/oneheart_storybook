@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useAppointmentStore, useUserStore } from '@/stores';
-import { getDurationLabel } from '@/utils/date';
+import { useAppointmentStore, useShiftStore, useUserStore } from '@/stores';
+import { getDurationLabel, getTimeDate, isTimeDurationOverlap } from '@/utils/date';
 import dayjs from 'dayjs';
 import { PaymentState, ScheduleStateMap, ScheduleVisitState } from '@/const/appointment';
 import router from '@/router';
@@ -17,17 +17,22 @@ import { AddOnServiceTypes, MachineShifts, PhysicalTypes, ShiftType } from '@/co
 import EditMachineForm from './EditMachineForm.vue';
 import type { FormContext } from 'vee-validate';
 import AssignMachineOperator from './AssignMachineOperator.vue';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{
   scheduleId: number;
   scheduleDetail: ClientScheduleDetail;
 }>();
 
+dayjs.extend(isSameOrBefore);
+
 type Duration = InstanceType<typeof TimeDurationPicker>['$props']['modelValue'];
 
 const $q = useQuasar();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
+const shiftStore = useShiftStore();
 
 const isEditingTime = ref(false);
 const schedule = computed(() => appointmentStore.targetClientSchedule!);
@@ -129,8 +134,23 @@ async function saveNote() {
   $q.notify({ message: '已存檔！', timeout: 2000, position: 'center' });
 }
 
-async function updateTime({ start, end }: Duration) {
+async function onUpdateTime({ start, end }: Duration) {
   try {
+    await shiftStore.getUserShift(schedule.value.id);
+    const { notAvailableTimes } = shiftStore.targetUserShift!;
+
+    const isTimeOverlap = notAvailableTimes.some(item => isTimeDurationOverlap({ startTime: start, endTime: end }, item));
+    if (isTimeOverlap) {
+      const { onOk } = await useDialog({ type: 'confirm', title: '此時段為不可預約時間', message: '您選擇的時段在排班設定為「不可預約時間」，是否仍要儲存編輯？' });
+      onOk(updateTime);
+      return;
+    }
+    updateTime();
+  }
+  catch (err) {
+    console.log(err);
+  }
+  async function updateTime() {
     await adjustScheduleTime(+props.scheduleId, {
       startTime: start,
       endTime: end,
@@ -138,9 +158,6 @@ async function updateTime({ start, end }: Duration) {
     await appointmentStore.getClientSchedule(+props.scheduleId);
     $q.notify({ message: '時間已調整', timeout: 2000, position: 'top' });
     isEditingTime.value = false;
-  }
-  catch (err) {
-    console.log(err);
   }
 }
 
@@ -371,7 +388,7 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
               <p v-if="!isEditingTime">{{ row.value }}</p>
               <TimeDurationPicker
                 v-else :model-value="duration" :options="limitTimeOptions"
-                @cancel="isEditingTime = false" @update:model-value="updateTime"
+                @cancel="isEditingTime = false" @update:model-value="onUpdateTime"
               />
             </div>
             <div class="time__actions">
