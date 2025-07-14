@@ -7,7 +7,7 @@ import { useField } from 'vee-validate';
 interface MultiRange { from: string; to: string };
 
 interface Props {
-  modelValue?: string;
+  modelValue?: string | MultiRange;
   name?: string;
   range?: boolean;
   options?: string[] | ((date: any) => boolean);
