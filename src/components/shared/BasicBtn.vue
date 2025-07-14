@@ -36,7 +36,7 @@ const slots = useSlots() as AllSlots;
   padding: 10px 24px;
   border-radius: 100px;
   :deep(.block) {
-    color: #fff;
+    // color: #fff;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;

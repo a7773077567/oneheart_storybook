@@ -126,3 +126,8 @@ export async function getSinglePayment(paymentId: number) {
 export async function deletePayment(paymentId: number) {
   await api.delete(`payments/${paymentId}`);
 }
+
+// 更新交易記錄的負責人和銷售者
+export async function updateChargetNSeller({ paymentId, sellerIds, chargerIds }: { paymentId: number; sellerIds: number[]; chargerIds: number[] }) {
+  await api.patch(`payments/${paymentId}/update-charger-and-seller`, { sellerIds, chargerIds });
+}

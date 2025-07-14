@@ -81,8 +81,9 @@ export const useUserStore = defineStore('user', {
       const userInfo = await fetchUserInfo();
       this.userInfo = userInfo;
     },
-    async getUsers() {
-      const data = await fetchUsers({ spaceIds: [this.currentSpaceId!] });
+    async getUsers(query: { spaceIds?: number[]; roleTypes?: RoleType[] } = {}) {
+      const spaceIds = query?.spaceIds ?? [this.currentSpaceId!];
+      const data = await fetchUsers({ ...query ?? {}, spaceIds });
       this.users = data;
     },
     async getUser(userId: number) {

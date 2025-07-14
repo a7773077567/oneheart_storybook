@@ -13,8 +13,10 @@ import { Receipt } from '@/components/appointment';
 import { calcReceiptAmount, showDecimal } from '@/utils/helpers';
 import PaymentDetail from '@/components/order/PaymentDetail.vue';
 import CancelOrder from '@/components/order/CancelOrder.vue';
+import EditPayment from '@/components/order/EditPayment.vue';
 import { Space } from '@/const/space';
 import { pointUnit } from '@/const/points';
+import { useUserStore } from '@/stores';
 
 type ReceiptData = InstanceType<typeof Receipt>['$props']['rows'];
 
@@ -108,18 +110,17 @@ const cols: QTableProps['columns'] = [
     required: true,
     label: '負責人',
     align: 'left',
-    field: row => row.chargers.length === 0 ? '-' : row.chargers.map(({ name }: { name: string }) => name).join('、'),
+    style: 'min-width: 152px; white-space: pre-wrap',
+    field: row => row?.chargers.length === 0 ? '-' : row.chargers.map(({ name }: { name: string }) => name).join('、'),
   },
   {
     name: 'sellers',
     required: true,
     label: '銷售者',
     align: 'left',
+    style: 'min-width: 152px; white-space: pre-wrap',
     field: (row) => {
-      if (row.type === TransactionTypes['門診費用']) {
-        return row.sellers.length === 0 ? '-' : row.sellers.map(({ name }: { name: string }) => name).join('、');
-      }
-      return row.seller?.name;
+      return row?.sellers.length === 0 ? '-' : row.sellers.map(({ name }: { name: string }) => name).join('、');
     },
   },
   {
@@ -143,6 +144,13 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     field: row => row,
   },
+  {
+    name: 'edit',
+    required: true,
+    label: '',
+    align: 'left',
+    field: (row: typeof rows.value[number]) => row.type === TransactionTypes['堂數交易'],
+  },
 ];
 
 const rows = ref<(MedicalPaymentRecord | PointsPaymentRecord | VoucherPaymentRecord)[]>([]);
@@ -150,51 +158,29 @@ const paging = ref<QPagination['$props']>({
   max: 1,
   modelValue: 1,
 });
-
-const schema = z.object({
-  date: z.object({ from: z.string(), to: z.string() }),
-  nameOrPhone: z.string().nullable().optional(),
+const query = ref({
+  client: '',
+  date: { from: dayjs().startOf('month').format('YYYY-MM-DD'), to: dayjs().endOf('month').format('YYYY-MM-DD') },
 });
-
-const { handleSubmit, values } = useForm({
-  validationSchema: toTypedSchema(schema),
-  initialValues: {
-    date: {
-      from: dayjs().startOf('month').format('YYYY-MM-DD'),
-      to: dayjs().endOf('month').format('YYYY-MM-DD'),
-    },
-  },
-});
-
-const onSubmit = handleSubmit((values) => {
-  getRecordList({
-    page: 1, // 重新從第一頁搜尋
-    date: values.date,
-    nameOrPhone: values.nameOrPhone ?? '',
+async function getRecordList(_query: typeof query.value & { page?: number }) {
+  const { data, meta } = await getPayments({
+    page: _query?.page ?? 1,
+    startDate: _query.date.from,
+    endDate: _query.date.to,
+    ...(_query.client ? { nameOrPhone: _query.client } : {}),
   });
-});
-
-type Query = z.infer<typeof schema> & { page: number };
-async function getRecordList(query: Query) {
-  const _query = {
-    page: query.page ?? 1,
-    startDate: query.date.from,
-    endDate: query.date.to,
-    ...(query.nameOrPhone ? { nameOrPhone: query.nameOrPhone } : {}),
-  };
-  const { data, meta } = await getPayments(_query);
   rows.value = data;
 
   paging.value = { max: meta!.pageCount, modelValue: meta!.page };
 }
 
 watch(() => paging.value.modelValue, async (page) => {
-  getRecordList({ page, date: values.date as Query['date'], ...(values.nameOrPhone && { nameOrPhone: values.nameOrPhone }) });
+  getRecordList({ page, ...query.value });
 });
 
 getRecordList({
   page: 1,
-  date: { from: dayjs().startOf('month').format('YYYY-MM-DD'), to: dayjs().endOf('month').format('YYYY-MM-DD') },
+  ...query.value,
 });
 
 // receipt
@@ -210,7 +196,7 @@ async function checkReceipt(paymentId: number) {
   let extraFields: InstanceType<typeof Receipt>['$props']['rows'] = [];
 
   switch (type) {
-    case TransactionTypes.門診費用:{
+    case TransactionTypes.門診費用: {
       const addOnList = data.addOnServices.filter(addOn => addOn.isAddOn);
       amount = calcReceiptAmount(clientSchedulePaymentMultiChannelPay);
       extraFields = [
@@ -267,49 +253,60 @@ async function checkPaymentDetail(val: any) {
 }
 
 const showCancelConfirm = ref(false);
-const cancelDetail = ref();
+const paymentDetail = ref();
 
 function openCancelConfirm(data: (typeof rows.value)[number]) {
   const { amount, clientId, clientName, date, id } = data;
-  cancelDetail.value = { amount, clientId, clientName, date, id };
+  paymentDetail.value = { amount, clientId, clientName, date, id };
   showCancelConfirm.value = true;
 }
 
 async function cancelTransaction() {
-  if (!cancelDetail.value.id)
+  if (!paymentDetail.value.id)
     return;
 
-  await deletePayment(cancelDetail.value.id);
+  await deletePayment(paymentDetail.value.id);
   await getRecordList({
     page: paging.value.modelValue, // 重新從第一頁搜尋
-    date: values.date as Query['date'],
-    nameOrPhone: values.nameOrPhone ?? '',
+    ...query.value,
   });
   showCancelConfirm.value = false;
 }
+
+const showEdit = ref(false);
+function editPayment(payment: PointsPaymentRecord) {
+  paymentDetail.value = payment;
+  showEdit.value = true;
+}
+const userStore = useUserStore();
+userStore.getUsers({});
 </script>
 
 <template>
   <div class="transaction_records_page q-py-sm">
     <div class="row q-col-gutter-md items-center" style="max-width: 860px">
       <InputBox label="" class="col-xs-12 col-sm-5">
-        <OInput name="nameOrPhone" rounded dense hide-bottom-space placeholder="請輸入客戶名稱或電話" clearable />
+        <OInput v-model="query.client" name="nameOrPhone" rounded dense hide-bottom-space placeholder="請輸入客戶名稱或電話" clearable />
       </InputBox>
       <InputBox label="" class="col-xs-12 col-sm-5">
-        <DatePicker name="date" range />
+        <DatePicker v-model="query.date" name="date" range />
       </InputBox>
       <div class="col-2">
-        <QBtn outline label="搜尋" @click="onSubmit" />
+        <QBtn
+          outline label="搜尋" @click="getRecordList({
+            page: 1, // 重新從第一頁搜尋
+            ...query,
+          })"
+        />
       </div>
     </div>
     <div class="flex justify-end q-py-md">
-      <QPagination
-        v-model="paging.modelValue"
-        :max="paging.max"
-        input
-      />
+      <QPagination v-model="paging.modelValue" :max="paging.max" input />
     </div>
-    <QTable :columns="cols" :rows="rows" row-key="id" hide-pagination class="no-shadow" :rows-per-page-options="[0]" bordered>
+    <QTable
+      :columns="cols" :rows="rows" row-key="id" hide-pagination class="no-shadow" :rows-per-page-options="[0]"
+      bordered
+    >
       <template #body-cell-cancel="{ value, row }">
         <QTd class="text-center">
           <template v-if="row.type === TransactionTypes['門診費用']">
@@ -330,15 +327,32 @@ async function cancelTransaction() {
           <span v-else>-</span>
         </QTd>
       </template>
+      <template #body-cell-edit="{ value, row }">
+        <QTd>
+          <QBtn v-if="!!value" flat round icon="o_edit" @click="editPayment(row)" />
+          <span v-else />
+        </QTd>
+      </template>
     </QTable>
     <QDialog v-model="isReceiptDialogOpen">
-      <Receipt :rows="receiptData" :space-name="space" :space-id="Space[space as keyof typeof Space]" hide-checkout payment-method="現金" />
+      <Receipt
+        :rows="receiptData" :space-name="space" :space-id="Space[space as keyof typeof Space]" hide-checkout
+        payment-method="現金"
+      />
     </QDialog>
     <QDialog v-model="showDetail">
       <PaymentDetail :detail="targetPaymentDetails" />
     </QDialog>
     <QDialog v-model="showCancelConfirm">
-      <CancelOrder :data="cancelDetail" @cancel="showCancelConfirm = false" @confirm="cancelTransaction" />
+      <CancelOrder :data="paymentDetail" @cancel="showCancelConfirm = false" @confirm="cancelTransaction" />
+    </QDialog>
+    <QDialog v-model="showEdit">
+      <EditPayment
+        :data="paymentDetail" @cancel="showEdit = false" @confirm="(getRecordList({
+          ...query,
+          page: paging.modelValue ?? 1,
+        })), (showEdit = false)"
+      />
     </QDialog>
   </div>
 </template>
