@@ -136,7 +136,7 @@ async function saveNote() {
 
 async function onUpdateTime({ start, end }: Duration) {
   try {
-    await shiftStore.getUserShift(schedule.value.id);
+    await shiftStore.getUserShift(schedule.value.userShift.id);
     const { notAvailableTimes } = shiftStore.targetUserShift!;
 
     const isTimeOverlap = notAvailableTimes.some(item => isTimeDurationOverlap({ startTime: start, endTime: end }, item));
