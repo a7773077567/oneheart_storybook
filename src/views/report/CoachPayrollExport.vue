@@ -1,14 +1,14 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { type SalaryReportParams, exportSalaryReport4Coach } from '@/api';
+import { exportSalaryReport4Coach } from '@/api';
 import dayjs from 'dayjs';
 import { useOptionStore } from '@/stores';
 
 const optionStore = useOptionStore();
 const spaceOptions = computed<{ label: string; value: number }[]>(() => optionStore.spaceList.map(space => ({ label: space.name, value: space.id })));
 
-const form = ref<SalaryReportParams>({
-  yearMonth: '',
+const form = ref<{ yearMonth: { year: number; month: number }[]; spaceIds: number[] }>({
+  yearMonth: [],
   spaceIds: [],
 });
 
@@ -19,10 +19,10 @@ async function submit() {
     return;
   isDownloading.value = true;
   try {
-    await exportSalaryReport4Coach({
-      yearMonth: dayjs(form.value.yearMonth).format('YYYY/MM'),
+    await Promise.allSettled(form.value.yearMonth.map(({ year, month }) => exportSalaryReport4Coach({
+      yearMonth: `${year}/${String(month).padStart(2, '0')}`,
       spaceIds: form.value.spaceIds,
-    });
+    })));
   }
   catch (error) {
     console.log(error);
@@ -32,58 +32,15 @@ async function submit() {
   }
 }
 
-const showCalendar = ref(false);
-function selectMonth({ year, month }: { year: number; month: number }) {
-  if (!year && !month)
-    return;
-  form.value.yearMonth = `${year}/${month}`;
-  showCalendar.value = false;
-}
-
-function handleClick(e: MouseEvent) {
-  if ((e?.target as HTMLElement)?.innerHTML?.includes('月'))
-    showCalendar.value = false;
-}
-
-const errorRange = computed(() => dayjs(form.value.yearMonth).isSameOrAfter(undefined, 'month'));
-const disableSubmit = computed(() => !!errorRange.value || !form.value.yearMonth || form.value.spaceIds.length === 0);
+const errorRange = computed(() => form.value.yearMonth.some(selection => dayjs(selection).isSameOrAfter(undefined, 'month')));
+const disableSubmit = computed(() => !!errorRange.value || form.value.yearMonth.length === 0 || form.value.spaceIds.length === 0);
 </script>
 
 <template>
   <div class="row q-col-gutter-md">
     <fieldset class="col-9">
       <p class="q-mb-sm text-body-small"> *僅可選擇已結束的月份匯出薪資資料。當月及未來月份無法匯出</p>
-      <QInput
-        v-model="form.yearMonth"
-        label="選擇日期"
-        dense
-        emit-value
-        map-options
-        outlined
-        date-mode
-        month-calendar
-        :error="!!errorRange"
-      >
-        <template #append>
-          <QIcon name="o_calendar_month" size="28px" class="cursor-pointer">
-            <QPopupProxy v-model="showCalendar" cover transition-show="scale" transition-hide="scale">
-              <QDate
-                v-model="form.yearMonth"
-                default-view="Years"
-                mask="YYYY/MM"
-                :title="form.yearMonth"
-                emit-immediately
-                @navigation="selectMonth"
-                @click="handleClick"
-              >
-                <div class="row items-center justify-end">
-                  <QBtn v-close-popup label="Close" color="primary" flat />
-                </div>
-              </QDate>
-            </QPopupProxy>
-          </QIcon>
-        </template>
-      </QInput>
+      <YearMonthSelect v-model="form.yearMonth" />
     </fieldset>
     <fieldset class="col-9">
       <QSelect
@@ -102,3 +59,12 @@ const disableSubmit = computed(() => !!errorRange.value || !form.value.yearMonth
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+:deep(.input) {
+  border: 1px solid rgba(0, 0, 0, 0.24) !important;
+  .input__text {
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+</style>
