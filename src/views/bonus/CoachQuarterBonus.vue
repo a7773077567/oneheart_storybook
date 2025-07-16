@@ -18,15 +18,10 @@ const spaceOptions = computed(() => (userStore.userInfo?.spaces ?? []).map(space
 // year month
 const yearMonth = ref({
   year: dayjs().year(),
-  month: getClosestQuarterMonth(dayjs().month() + 1) - 1,
+  month: dayjs().month() + 1,
 });
-function getClosestQuarterMonth(currentMonth: number): number {
-  const quarterMonths = [1, 4, 7, 10];
-  return quarterMonths.reduce((prev, curr) =>
-    Math.abs(curr - currentMonth) < Math.abs(prev - currentMonth) ? curr : prev,
-  );
-}
-const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month + 1).padStart(2, '0')}`);
+
+const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month).padStart(2, '0')}`);
 
 const schema = object({
   coachQuarterlyBonuses: array(object({

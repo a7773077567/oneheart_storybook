@@ -13,7 +13,7 @@ const spaceManagementStore = useSpaceManagementStore();
 
 const yearMonth = ref({
   year: dayjs().year(),
-  month: dayjs().month(),
+  month: dayjs().month() + 1,
 });
 const editDialogOpened = ref(false);
 
@@ -25,7 +25,7 @@ const form = ref<Omit<UpdateSpaceMonthlyConfig, 'year' | 'month'>>({
 });
 const targetSpace = ref<null | { name: string; id: number }>(null);
 
-const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month + 1).padStart(2, '0')}`);
+const yearMonthQuery = computed(() => `${yearMonth.value.year}/${String(yearMonth.value.month).padStart(2, '0')}`);
 
 watch(
   yearMonthQuery,

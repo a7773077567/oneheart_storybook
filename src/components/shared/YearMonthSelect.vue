@@ -25,7 +25,7 @@ const state = reactive({
   currentViewYear: dayjs().year(),
   tempSelections: [] as Selection[],
   tempSelectedYear: dayjs().year(),
-  tempSelectedMonth: dayjs().month(),
+  tempSelectedMonth: dayjs().month() + 1,
 });
 
 const inputText = computed(() => {
@@ -38,7 +38,7 @@ const inputText = computed(() => {
       .join('、');
   }
   const selection = props.modelValue as Selection;
-  return `${selection.year ?? dayjs().year()}年${(selection.month ?? dayjs().month()) + 1}月`;
+  return `${selection.year ?? dayjs().year()}年${(selection.month ?? dayjs().month())}月`;
 });
 
 const currentYearText = computed(() => `${state.currentViewYear} 年`);
@@ -47,7 +47,7 @@ const currentMonthText = computed(() => {
   if (isMultiSelectMode.value) {
     return '選擇月份';
   }
-  return `${state.tempSelectedMonth + 1} 月`;
+  return `${state.tempSelectedMonth} 月`;
 });
 
 watch(() => state.menuOpened, (isOpen) => {
