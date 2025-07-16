@@ -2,17 +2,18 @@
 import { computed, ref } from 'vue';
 import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { type EducationPointContent, deleteEducationPoint, getAEducationPoint, getEducationPointList } from '@/api';
+import { type EducationPointContent, ReviewState, deleteEducationPoint, getAEducationPoint, getEducationPointList } from '@/api';
 import EducationPointsForm from '@/components/home/educationPoints/EducationPointsForm.vue';
 import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
-import { detectFileType } from '@/utils/helpers';
+import { type FileType, detectFileType } from '@/utils/helpers';
+import ReviewChip from '@/components/home/review/ReviewChip.vue';
 
 const userStore = useUserStore();
 const bonusStore = useBonusStore();
 
 const selectedTherapist = ref(bonusStore.therapistFilterOptions?.[0]?.value);
-const reviewList = ref<EducationPointContent[]>([]);
+const reviewList = ref<(EducationPointContent & { fileType: null | FileType })[]>([]);
 
 const cols: QTableProps['columns'] = [
   {
@@ -22,6 +23,14 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     style: 'width:150px',
     field: row => row.user.name,
+  },
+  {
+    name: 'status',
+    required: true,
+    label: '審核狀態',
+    align: 'left',
+    style: 'width:150px',
+    field: 'status',
   },
   {
     name: 'title',
@@ -99,6 +108,11 @@ async function getReviewList() {
   reviewList.value = await Promise.all(data.map(async (review) => {
     if (!review.attachmentUrl)
       return { ...review, fileType: null };
+
+    // if alreay get fileType, skip fetch again
+    const _file = reviewList.value.find(file => file.id === review.id);
+    if (!!_file && !!_file.fileType)
+      return _file;
 
     const fileType = await detectFileType(review.attachmentUrl);
     return { ...review, fileType };
@@ -186,6 +200,11 @@ function checkAttachment(url: string) {
         :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
+        <template #body-cell-status="{ value }">
+          <QTd>
+            <ReviewChip :state="value" />
+          </QTd>
+        </template>
         <template #body-cell-attachmentUrl="{ value }">
           <QTd>
             <QIcon v-if="value?.type === 'pdf'" name="attach_file" size="sm" @click="checkAttachment(value.url)" />
@@ -195,8 +214,8 @@ function checkAttachment(url: string) {
         </template>
         <template #body-cell-action="{ row }">
           <QTd auto-width>
-            <QBtn v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
-            <QBtn v-if="userStore.canI('EDIT_EDUCATION_REVIEW')" flat round icon="o_edit" @click="editReview(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_EDUCATION_REVIEW') && (row.status === ReviewState['待審核'] || userStore.canI('EDIT_REVIEW'))" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_EDUCATION_REVIEW') && (row.status === ReviewState['待審核'] || userStore.canI('EDIT_REVIEW'))" flat round icon="o_edit" @click="editReview(row.id)" />
           </QTd>
         </template>
       </QTable>

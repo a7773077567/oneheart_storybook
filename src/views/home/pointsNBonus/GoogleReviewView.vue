@@ -2,10 +2,11 @@
 import { computed, ref } from 'vue';
 import { QSeparator, useQuasar } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { type ReviewListContent, RoleType, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
+import { type ReviewListContent, ReviewState, deleteGoogleReview, getAGoogleReview, getGoogleReviewList } from '@/api';
 import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
+import ReviewChip from '@/components/home/review/ReviewChip.vue';
 
 const userStore = useUserStore();
 const bonusStore = useBonusStore();
@@ -21,6 +22,14 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     style: 'width:150px',
     field: row => row.user.name,
+  },
+  {
+    name: 'status',
+    required: true,
+    label: '審核狀態',
+    align: 'left',
+    style: 'width:150px',
+    field: 'status',
   },
   {
     name: 'title',
@@ -161,6 +170,11 @@ const lightBoxImg = ref('');
         :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
       >
+        <template #body-cell-status="{ value }">
+          <QTd>
+            <ReviewChip :state="value" />
+          </QTd>
+        </template>
         <template #body-cell-reviewScreenshotUrl="{ value }">
           <QTd>
             <img :src="value" alt="screen shot" style="height: 30px; max-width:60px" @click="(lightBoxImg = value), (stateOfLightbox = true)">
@@ -168,8 +182,8 @@ const lightBoxImg = ref('');
         </template>
         <template #body-cell-action="{ row }">
           <QTd auto-width>
-            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
-            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW')" flat round icon="o_edit" @click="editReview(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW') && (row.status === ReviewState['待審核'] || userStore.canI('EDIT_REVIEW'))" flat round icon="o_delete" class="q-mr-sm" @click="deleteConfirm(row.id)" />
+            <QBtn v-if="userStore.canI('EDIT_GOOGLE_REVIEW') && (row.status === ReviewState['待審核'] || userStore.canI('EDIT_REVIEW'))" flat round icon="o_edit" @click="editReview(row.id)" />
           </QTd>
         </template>
       </QTable>

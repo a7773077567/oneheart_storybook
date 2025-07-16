@@ -1,17 +1,24 @@
 import { api } from '@/utils/api';
 import type { User } from './user';
 import type { PagingMeta, S3UploadInfo } from '@/types/common';
+import type { ReviewState } from './review';
 
-/** 外派獎金 */
-export interface RelocationBonus {
-  id: number;
-  title: string;
-  amount: number;
-  reviewDateTime: string;
-  user: User;
-  attachmentUrl: string;
+interface ReviewResult {
+  approvedAt: null | string;
+  approvedBy: null | string;
+  approver: null | User;
+  status: ReviewState;
 }
 
+/** 外派獎金 */
+export interface RelocationBonus extends ReviewResult {
+  amount: number;
+  attachmentUrl: string;
+  id: number;
+  reviewDateTime: string;
+  title: string;
+  user: User;
+};
 export interface NewRelocationBonus {
   userId: number;
   title: string;
@@ -61,7 +68,7 @@ export async function getExpatAllowanceUploadURL({ userId }: { userId: number })
 }
 
 /** 寫作津貼 */
-export interface WritingAllowance {
+export interface WritingAllowance extends ReviewResult {
   id: number;
   title: string;
   amount: number;
@@ -118,7 +125,7 @@ export async function getWritingAllowanceUploadURL({ userId }: { userId: number 
 }
 
 /** 培訓津貼 */
-export interface TrainingAllowance {
+export interface TrainingAllowance extends ReviewResult {
   id: number;
   title: string;
   amount: number;
@@ -175,7 +182,7 @@ export async function getTrainingAllowanceUploadURL({ userId }: { userId: number
 }
 
 /** 支援獎金 */
-export interface SupportBonus {
+export interface SupportBonus extends ReviewResult {
   id: number;
   title: string;
   amount: number;

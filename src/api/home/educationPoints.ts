@@ -1,14 +1,19 @@
 import { api } from '@/utils/api';
 import type { User } from '../user';
 import type { PageQuery, PagingMeta, S3UploadInfo } from '@/types/common';
+import type { ReviewState } from '../review';
 
 export interface EducationPointContent {
-  id: number;
-  title: string;
-  reviewDateTime: string;
-  user: User;
-  point: number;
+  approvedAt: null | string;
+  approvedBy: null | string;
+  approver: null | User;
   attachmentUrl: string;
+  id: number;
+  point: number;
+  reviewDateTime: string;
+  status: ReviewState;
+  title: string;
+  user: User;
 }
 
 export interface EducationPoint {

@@ -24,7 +24,8 @@ export type PermissionEvents =
   | 'VIEW_SPACE_MANAGEMENT'
   | 'VIEW_BONUS_ISSUE'
   | 'VIEW_SALARY_REPORT'
-  | 'EDIT_SALARY_REPORT';
+  | 'EDIT_SALARY_REPORT'
+  | 'EDIT_REVIEW';
 type CanDo = Partial<{ readonly [key in PermissionEvents]: boolean }>;
 
 export const RolePermissions: { [role in RoleType]: CanDo } = {
@@ -53,6 +54,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_BONUS_ISSUE: true,
     VIEW_SALARY_REPORT: true,
     EDIT_SALARY_REPORT: true,
+    EDIT_REVIEW: true,
   },
   [RoleType['院長']]: {
     READ_HANDOVER: true,
@@ -77,6 +79,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_PAYROLL_EXPORT: false,
     VIEW_SALARY_REPORT: true,
     EDIT_SALARY_REPORT: false,
+    EDIT_REVIEW: true,
   },
   [RoleType['副院長']]: {
     READ_HANDOVER: true,
@@ -101,6 +104,7 @@ export const RolePermissions: { [role in RoleType]: CanDo } = {
     VIEW_PAYROLL_EXPORT: false,
     VIEW_SALARY_REPORT: true,
     EDIT_SALARY_REPORT: false,
+    EDIT_REVIEW: true,
   },
   [RoleType['店長']]: {
     READ_HANDOVER: true,

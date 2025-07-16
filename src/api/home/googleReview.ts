@@ -1,14 +1,19 @@
 import { api } from '@/utils/api';
 import type { User } from '../user';
 import type { PageQuery, PagingMeta, S3UploadInfo } from '@/types/common';
+import type { ReviewState } from '../review';
 
 // Adjust the import path as necessary
 
 export interface ReviewListContent {
+  approvedAt: null | string;
+  approvedBy: null | string;
+  approver: null | User;
   id: number;
-  title: string;
   reviewScreenshotUrl: string;
   reviewDateTime: string;
+  status: ReviewState;
+  title: string;
   user: User;
 }
 

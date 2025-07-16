@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores';
 import { RoleInfo } from '@/const/general';
 import { RoleType } from '@/api';
 import { useSalaryReportTherapistStore } from '@/stores/home/salaryReport/therapist';
+import { reviewRoutes } from './review';
 
 const checkSalaryAuth: NavigationGuardWithThis<undefined> = () => {
   const salaryReportStore = useSalaryReportTherapistStore();
@@ -300,6 +301,7 @@ export const homeRoutes: RouteRecordRaw[] = [
           },
         ],
       },
+      ...reviewRoutes,
     ],
   },
 ];

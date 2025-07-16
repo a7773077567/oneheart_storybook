@@ -39,7 +39,7 @@ const selectStyle = computed(() => {
     emit-value
     map-options
     borderless
-    :label="model.length ? undefined : label"
+    :label="model?.length ? undefined : label"
     :options="options"
     :style="selectStyle"
     :popup-content-style="popupStyle"
