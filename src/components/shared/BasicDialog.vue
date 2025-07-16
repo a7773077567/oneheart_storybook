@@ -2,11 +2,19 @@
 import type { QDialogProps } from 'quasar';
 import { computed } from 'vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean;
   title: string;
   confirmMode?: boolean;
-}>();
+  confirmLabel?: string;
+  cancelLabel?: string;
+  maxWidth?: string;
+}>(), {
+  confirmMode: false,
+  confirmLabel: '確定',
+  cancelLabel: '取消',
+  maxWidth: '800px',
+});
 
 const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
@@ -22,7 +30,7 @@ const model = computed({
 
 <template>
   <QDialog v-model="model" persistent>
-    <div class="dialog">
+    <div class="dialog" :style="{ maxWidth }">
       <div class="dialog__header">
         <div class="title">{{ title }}</div>
       </div>
@@ -32,8 +40,8 @@ const model = computed({
       <div class="dialog__actions">
         <QBtn v-if="!confirmMode" label="關閉" color="primary" padding="10px 24px" class="btn" @click="model = false" />
         <div v-else class="edit-btns">
-          <QBtn label="取消" color="primary" padding="10px 24px" flat @click="model = false, $emit('cancel')" />
-          <QBtn label="確定" color="primary" padding="10px 24px" class="btn" @click="$emit('confirm')" />
+          <QBtn :label="cancelLabel" color="primary" padding="10px 24px" flat @click="model = false, $emit('cancel')" />
+          <QBtn :label="confirmLabel" color="primary" padding="10px 24px" class="btn" @click="$emit('confirm')" />
         </div>
       </div>
     </div>
@@ -50,7 +58,6 @@ const model = computed({
 .dialog {
   background-color: #fff;
   width: 100%;
-  max-width: 800px;
   max-height: 85vh;
   border-radius: 28px;
   &__header {
