@@ -4,62 +4,127 @@ import dayjs from 'dayjs';
 import { QMenu } from 'quasar';
 import { computed, reactive, watch } from 'vue';
 
+interface Selection { year: number; month: number }
 const props = defineProps<{
-  modelValue: { year: number; month: number };
+  modelValue: Selection | Selection[];
   monthOptions?: { label: string; value: number }[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', val: { year: number; month: number }): void;
+  (e: 'update:modelValue', val: Selection | Selection[]): void;
 }>();
 
-const monthOptions = computed(() => props.monthOptions || Array.from({ length: 12 }, (_, idx) => ({ label: `${idx + 1} 月`, value: idx })));
-const yearOptions = getYearOptions(props.modelValue.year);
+const isMultiSelectMode = computed(() => Array.isArray(props.modelValue));
+
+const monthOptions = computed(() => props.monthOptions || Array.from({ length: 12 }, (_, idx) => ({ label: `${idx + 1} 月`, value: idx + 1 })));
+const yearOptions = getYearOptions(dayjs().year());
 
 const state = reactive({
-  monthOpened: true,
-  selectedMonth: props.modelValue.month,
-  yearOpened: false,
-  selectedYear: props.modelValue.year,
   menuOpened: false,
+  view: 'month' as 'month' | 'year',
+  currentViewYear: dayjs().year(),
+  tempSelections: [] as Selection[],
+  tempSelectedYear: dayjs().year(),
+  tempSelectedMonth: dayjs().month(),
 });
 
-const inputText = computed(() => `${state.selectedYear}年${dayjs().month(state.selectedMonth).format('M')}月`);
-
-watch(() => state.monthOpened, (newVal) => {
-  if (newVal) {
-    state.yearOpened = false;
+const inputText = computed(() => {
+  if (isMultiSelectMode.value) {
+    const selections = props.modelValue as Selection[];
+    if (!selections || selections.length === 0)
+      return '選擇月份';
+    return selections
+      .map(sel => `${sel.year}年${sel.month}月`)
+      .join('、');
   }
+  const selection = props.modelValue as Selection;
+  return `${selection.year ?? dayjs().year()}年${(selection.month ?? dayjs().month()) + 1}月`;
 });
 
-watch(() => state.yearOpened, (newVal) => {
-  if (newVal) {
-    state.monthOpened = false;
+const currentYearText = computed(() => `${state.currentViewYear} 年`);
+
+const currentMonthText = computed(() => {
+  if (isMultiSelectMode.value) {
+    return '選擇月份';
+  }
+  return `${state.tempSelectedMonth + 1} 月`;
+});
+
+watch(() => state.menuOpened, (isOpen) => {
+  if (isOpen) {
+    if (isMultiSelectMode.value) {
+      state.tempSelections = JSON.parse(JSON.stringify(props.modelValue as Selection[]));
+      const selections = props.modelValue as Selection[];
+      state.currentViewYear = selections.length > 0 ? selections[selections.length - 1].year : dayjs().year();
+    }
+    else {
+      const selection = props.modelValue as Selection;
+      state.tempSelectedYear = selection.year ?? dayjs().year();
+      state.tempSelectedMonth = selection.month ?? dayjs().month() + 1;
+      state.currentViewYear = selection.year ?? dayjs().year();
+    }
+    state.view = 'month';
   }
 });
 
 function getYearOptions(currentYear: number) {
   const pastYears = 20;
-
   return Array.from({ length: pastYears }, (_, idx) => currentYear - idx)
     .map(year => ({ label: `${year} 年`, value: year }));
 }
 
+function isYearSelected(year: number): boolean {
+  if (isMultiSelectMode.value) {
+    return state.tempSelections.some(sel => sel.year === year);
+  }
+  return state.tempSelectedYear === year;
+}
+
+function isMonthSelected(month: number): boolean {
+  if (isMultiSelectMode.value) {
+    return state.tempSelections.some(sel => sel.year === state.currentViewYear && sel.month === month);
+  }
+  return state.currentViewYear === state.tempSelectedYear && state.tempSelectedMonth === month;
+}
+
+function handleMonthClick(month: number) {
+  if (isMultiSelectMode.value) {
+    const selection: Selection = { year: state.currentViewYear, month };
+    const index = state.tempSelections.findIndex(s => s.year === selection.year && s.month === selection.month);
+    if (index > -1) {
+      state.tempSelections.splice(index, 1);
+    }
+    else {
+      state.tempSelections.push(selection);
+    }
+  }
+  else {
+    state.tempSelectedYear = state.currentViewYear;
+    state.tempSelectedMonth = month;
+  }
+}
+
+function handleYearClick(year: number) {
+  state.currentViewYear = year;
+  if (!isMultiSelectMode.value) {
+    state.tempSelectedYear = year;
+  }
+  state.view = 'month';
+}
+
 function onConfirm() {
-  emit('update:modelValue', { year: state.selectedYear, month: state.selectedMonth });
-  resetState();
+  if (isMultiSelectMode.value) {
+    const sortedSelections = [...state.tempSelections].sort((a, b) => a.year - b.year || a.month - b.month);
+    emit('update:modelValue', sortedSelections);
+  }
+  else {
+    emit('update:modelValue', { year: state.tempSelectedYear, month: state.tempSelectedMonth });
+  }
+  state.menuOpened = false;
 }
 
 function onCancel() {
-  state.selectedMonth = props.modelValue.month;
-  state.selectedYear = props.modelValue.year;
-  resetState();
-}
-
-function resetState() {
-  state.monthOpened = true;
   state.menuOpened = false;
-  state.yearOpened = false;
 }
 </script>
 
@@ -77,55 +142,55 @@ function resetState() {
       <div class="menu__header">
         <div
           class="menu__select"
-          @click="state.monthOpened = !state.monthOpened"
+          @click="state.view = 'month'"
         >
-          <span>{{ `${state.selectedMonth + 1} 月` }}</span>
+          <span>{{ currentMonthText }}</span>
           <QIcon
             name="arrow_drop_down"
             size="18px"
-            :style="state.monthOpened ? 'transform: rotate(180deg);' : ''"
+            :style="state.view === 'month' ? 'transform: rotate(180deg);' : ''"
           />
         </div>
         <div
           class="menu__select"
-          @click="state.yearOpened = !state.yearOpened"
+          @click="state.view = 'year'"
         >
-          <span>{{ `${state.selectedYear} 年` }}</span>
+          <span>{{ currentYearText }}</span>
           <QIcon
             name="arrow_drop_down"
             size="18px"
-            :style="state.yearOpened ? 'transform: rotate(180deg);' : ''"
+            :style="state.view === 'year' ? 'transform: rotate(180deg);' : ''"
           />
         </div>
       </div>
 
       <ul class="menu__list">
-        <template v-if="state.monthOpened">
+        <template v-if="state.view === 'month'">
           <li
             v-for="(item, idx) in monthOptions"
             :key="idx"
-            :class="[item.value === state.selectedMonth ? 'menu__list-item--active' : 'menu__list-item']"
-            @click="state.selectedMonth = item.value"
+            :class="[isMonthSelected(item.value) ? 'menu__list-item--active' : 'menu__list-item']"
+            @click="handleMonthClick(item.value)"
           >
             <div class="menu__list-check">
               <QIcon
-                v-show="item.value === state.selectedMonth" name="o_check"
+                v-show="isMonthSelected(item.value)" name="o_check"
                 size="24px"
               />
             </div>
             <span>{{ item.label }}</span>
           </li>
         </template>
-        <template v-if="state.yearOpened">
+        <template v-if="state.view === 'year'">
           <li
             v-for="(item, idx) in yearOptions"
             :key="idx"
-            :class="[item.value === state.selectedYear ? 'menu__list-item--active' : 'menu__list-item']"
-            @click="state.selectedYear = item.value"
+            :class="[isYearSelected(item.value) ? 'menu__list-item--active' : 'menu__list-item']"
+            @click="handleYearClick(item.value)"
           >
             <div class="menu__list-check">
               <QIcon
-                v-show="item.value === state.selectedYear" name="o_check"
+                v-show="isYearSelected(item.value)" name="o_check"
                 size="24px"
               />
             </div>
