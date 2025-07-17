@@ -76,7 +76,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'other-allowance',
         name: 'otherAllowance',
-        component: () => import('@/views/home/pointsNbonus/otherAllowance.vue'),
+        component: () => import('@/views/home/pointsNbonus/OtherAllowance.vue'),
         meta: {
           label: '其他津貼',
           requiredAuth: true,

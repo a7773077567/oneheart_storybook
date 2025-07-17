@@ -189,7 +189,7 @@ getReviewList();
         class="no-shadow"
         :rows-per-page-options="[1, 10, 20, 50]"
         @request="onRequest"
-        @row-click="(_: undefined, row: Review) => targetReview = ({ id: row.id, type: row.type })"
+        @row-click="(_:Event, row: Review) => targetReview = ({ id: row.id, type: row.type })"
       >
         <template #body-cell-status="{ value }">
           <QTd>
