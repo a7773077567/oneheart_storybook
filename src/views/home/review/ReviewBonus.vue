@@ -21,6 +21,7 @@ const reviewTypes: { [key in ReviewTypes]: string } = {
   EducationPoints: '教育積分',
   GoogleReviews: 'Google 評論',
   SupportBonuses: '支援獎金',
+  OtherBonuses: '其他津貼',
 };
 const cols: QTableProps['columns'] = [
   {

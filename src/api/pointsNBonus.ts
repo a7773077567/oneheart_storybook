@@ -237,3 +237,60 @@ export async function getSupportBonusUploadURL({ userId }: { userId: number }) {
   const { data } = await api.get<S3UploadInfo>(`supportBonuses/${userId}/attachment/write-url`);
   return data;
 }
+
+/** 其他津貼 */
+export interface OtherAllowance extends ReviewResult {
+  amount: number;
+  attachmentUrl: string;
+  id: number;
+  reviewDateTime: string;
+  title: string;
+  user: User;
+};
+export interface NewOtherAllowance {
+  userId: number;
+  title: string;
+  amount: number;
+  reviewDateTime: string;
+  attachment: string;
+}
+
+// 單一其他津貼
+export async function getOtherAllowance(id: number) {
+  const { data } = await api.get<OtherAllowance>(`otherBonuses/${id}`);
+  return data;
+};
+
+// 其他津貼列表
+interface BonusQuery {
+  order?: 'ASC' | 'DESC';
+  page?: number;
+  take?: number;
+  userId?: number;
+}
+export async function getOtherAllowanceList(params: BonusQuery) {
+  const { data, meta } = await api.get<OtherAllowance[], PagingMeta>(`otherBonuses`, { params });
+  return { data, meta };
+};
+
+// 建立其他津貼
+export async function createOtherAllowance(payload: NewOtherAllowance) {
+  await api.post('otherBonuses', payload);
+}
+
+// 更新其他津貼
+export async function updateOtherAllowance(id: number, payload: NewOtherAllowance) {
+  const { data } = await api.patch(`otherBonuses/${id}`, payload);
+  return data;
+}
+
+// 刪除其他津貼
+export async function deleteOtherAllowance(id: number) {
+  await api.delete(`otherBonuses/${id}`);
+}
+
+// 取得其他津貼上傳 url
+export async function getOtherAllowanceUploadURL({ userId }: { userId: number }) {
+  const { data } = await api.get<S3UploadInfo>(`otherBonuses/${userId}/attachment/write-url`);
+  return data;
+}

@@ -10,6 +10,7 @@ const tabs = [
   { name: 'writingAllowance', label: '寫作津貼' },
   { name: 'trainingAllowance', label: '培訓津貼' },
   { name: 'supportBonus', label: '支援獎金' },
+  { name: 'otherAllowance', label: '其他津貼' },
 ];
 const currentTab = ref(tabs[0].name);
 const route = useRoute();

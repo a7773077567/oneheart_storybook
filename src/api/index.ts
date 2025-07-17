@@ -14,7 +14,7 @@ export * from './machine';
 export * from './home/googleReview';
 export * from './home/educationPoints';
 export * from './reports';
-export * from './pointsNBonus';
+export * from './pointsNbonus';
 export * from './spaceManagement';
 export * from './bonus';
 export * from './review';

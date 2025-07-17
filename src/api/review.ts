@@ -20,7 +20,8 @@ export type ReviewTypes =
   | 'ExpatAllowances'
   | 'EducationPoints'
   | 'GoogleReviews'
-  | 'SupportBonuses';
+  | 'SupportBonuses'
+  | 'OtherBonuses';
 
 export enum ReviewState {
   待審核 = 1,
