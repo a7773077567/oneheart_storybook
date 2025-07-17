@@ -17,4 +17,4 @@ export * from './reports';
 export * from './spaceManagement';
 export * from './bonus';
 export * from './review';
-export * from './pointsNbonus';
+export * from './pointsNbonues';
