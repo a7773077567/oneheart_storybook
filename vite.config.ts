@@ -30,6 +30,7 @@ export default defineConfig({
       scss: {
         additionalData: `@use "@/assets/scss/variables" as *;
         @use "@/assets/scss/mixins" as *;`,
+        api: 'modern',
       },
     },
   },
