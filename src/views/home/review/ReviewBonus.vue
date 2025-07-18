@@ -177,7 +177,7 @@ getReviewList();
 <template>
   <div class="review">
     <h2 class="text-headline-medium text-on-surface">積分與獎金審核</h2>
-    <div class="q-py-md">
+    <div class="q-py-md review-filter">
       <OptionSelect v-model="selectedTherapist" :options="therapistList" @update:model-value="getReviewList" />
     </div>
     <section class="review-content">
@@ -227,3 +227,21 @@ getReviewList();
     @hide="stateOfLightbox = false"
   />
 </template>
+
+<style scoped lang="scss">
+.review {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  h2,
+  &_filter {
+    flex: 0 0 auto;
+  }
+  &-content {
+    flex: 1;
+    overflow: auto;
+  }
+}
+</style>
