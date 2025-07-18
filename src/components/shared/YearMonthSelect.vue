@@ -137,7 +137,7 @@ function onCancel() {
     </div>
   </div>
 
-  <QMenu v-model="state.menuOpened" target=".input" fit :offset="[0, 1]">
+  <QMenu v-model="state.menuOpened" persistent target=".input" fit :offset="[0, 1]">
     <div id="year-month-select-menu" class="menu">
       <div class="menu__header">
         <div
