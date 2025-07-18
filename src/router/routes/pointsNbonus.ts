@@ -5,7 +5,7 @@ export const pointNbonus: RouteRecordRaw[] = [
   {
     path: 'points-bonus-manage',
     name: 'pointsNbonus',
-    component: () => import('@/views/home/pointsNbonus/Index.vue'),
+    component: () => import('@/views/home/pointsNbonues/Index.vue'),
     redirect: { name: 'googleReview' },
     meta: {
       label: '積分與獎金管理',
@@ -16,7 +16,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'google-review',
         name: 'googleReview',
-        component: () => import('@/views/home/pointsNbonus/GoogleReviewView.vue'),
+        component: () => import('@/views/home/pointsNbonues/GoogleReviewView.vue'),
         meta: {
           label: 'Google評論管裡',
           requiredAuth: true,
@@ -26,7 +26,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'education-points',
         name: 'educationPoints',
-        component: () => import('@/views/home/pointsNbonus/EducationPointsView.vue'),
+        component: () => import('@/views/home/pointsNbonues/EducationPointsView.vue'),
         meta: {
           label: '教育積分管理',
           requiredAuth: true,
@@ -36,7 +36,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'relocation-bonus',
         name: 'relocationBonus',
-        component: () => import('@/views/home/pointsNbonus/RelocationBonus.vue'),
+        component: () => import('@/views/home/pointsNbonues/RelocationBonus.vue'),
         meta: {
           label: '外派獎金',
           requiredAuth: true,
@@ -46,7 +46,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'writing-allowance',
         name: 'writingAllowance',
-        component: () => import('@/views/home/pointsNbonus/WritingAllowance.vue'),
+        component: () => import('@/views/home/pointsNbonues/WritingAllowance.vue'),
         meta: {
           label: '寫作津貼',
           requiredAuth: true,
@@ -56,7 +56,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'training-allowance',
         name: 'trainingAllowance',
-        component: () => import('@/views/home/pointsNbonus/TrainingAllowance.vue'),
+        component: () => import('@/views/home/pointsNbonues/TrainingAllowance.vue'),
         meta: {
           label: '培訓津貼',
           requiredAuth: true,
@@ -66,7 +66,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'support-bonus',
         name: 'supportBonus',
-        component: () => import('@/views/home/pointsNbonus/SupportBonus.vue'),
+        component: () => import('@/views/home/pointsNbonues/SupportBonus.vue'),
         meta: {
           label: '支援獎金',
           requiredAuth: true,
@@ -76,7 +76,7 @@ export const pointNbonus: RouteRecordRaw[] = [
       {
         path: 'other-allowance',
         name: 'otherAllowance',
-        component: () => import('@/views/home/pointsNbonus/OtherAllowance.vue'),
+        component: () => import('@/views/home/pointsNbonues/OtherAllowance.vue'),
         meta: {
           label: '其他津貼',
           requiredAuth: true,
