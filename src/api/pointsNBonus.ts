@@ -238,7 +238,7 @@ export async function getSupportBonusUploadURL({ userId }: { userId: number }) {
   return data;
 }
 
-/** 其他津貼(其他獎金) */
+/** 其他津貼 (其他獎金) */
 export interface OtherAllowance extends ReviewResult {
   amount: number;
   attachmentUrl: string;
