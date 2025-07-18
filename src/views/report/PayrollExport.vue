@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue';
-import { type SalaryReportParams, exportSalaryReport, fetchSpaces } from '@/api';
+import { exportSalaryReport } from '@/api';
 import dayjs from 'dayjs';
 import { useOptionStore } from '@/stores';
 import YearMonthSelect from '@/components/shared/YearMonthSelect.vue';
@@ -33,7 +33,7 @@ async function submit() {
   }
 }
 
-const errorRange = computed(() => form.value.yearMonth.some(selection => dayjs(selection).isSameOrAfter(undefined, 'month')));
+const errorRange = computed(() => form.value.yearMonth.some(({ year, month }) => dayjs(`${year}/${month}`, 'YYYY/M').isSameOrAfter(undefined, 'month')));
 const disableSubmit = computed(() => !!errorRange.value || form.value.yearMonth.length === 0 || form.value.spaceIds.length === 0);
 </script>
 

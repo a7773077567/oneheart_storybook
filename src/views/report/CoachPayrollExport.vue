@@ -32,7 +32,7 @@ async function submit() {
   }
 }
 
-const errorRange = computed(() => form.value.yearMonth.some(selection => dayjs(selection).isSameOrAfter(undefined, 'month')));
+const errorRange = computed(() => form.value.yearMonth.some(({ year, month }) => dayjs(`${year}/${month}`, 'YYYY/M').isSameOrAfter(undefined, 'month')));
 const disableSubmit = computed(() => !!errorRange.value || form.value.yearMonth.length === 0 || form.value.spaceIds.length === 0);
 </script>
 
