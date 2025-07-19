@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import { QMenu } from 'quasar';
-import { computed, reactive, watch } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 
 interface Selection { year: number; month: number }
 const props = defineProps<{
@@ -15,7 +15,6 @@ const emit = defineEmits<{
 }>();
 
 const isMultiSelectMode = computed(() => Array.isArray(props.modelValue));
-
 const monthOptions = computed(() => props.monthOptions || Array.from({ length: 12 }, (_, idx) => ({ label: `${idx + 1} 月`, value: idx + 1 })));
 const yearOptions = getYearOptions(dayjs().year());
 
@@ -50,6 +49,9 @@ const currentMonthText = computed(() => {
   return `${state.tempSelectedMonth} 月`;
 });
 
+const inputRef = ref<HTMLDivElement | null>(null);
+const dynamicMenuHeight = ref('476px');
+
 watch(() => state.menuOpened, (isOpen) => {
   if (isOpen) {
     if (isMultiSelectMode.value) {
@@ -64,6 +66,9 @@ watch(() => state.menuOpened, (isOpen) => {
       state.currentViewYear = selection.year ?? dayjs().year();
     }
     state.view = 'month';
+    nextTick(() => {
+      calculateMenuHeight();
+    });
   }
 });
 
@@ -126,10 +131,25 @@ function onConfirm() {
 function onCancel() {
   state.menuOpened = false;
 }
+
+function calculateMenuHeight() {
+  if (!inputRef.value)
+    return;
+
+  const ORIGINAL_MAX_HEIGHT = 476;
+  const MARGIN_BOTTOM = 20;
+
+  const rect = inputRef.value.getBoundingClientRect();
+  const availableSpace = window.innerHeight - rect.bottom - MARGIN_BOTTOM;
+
+  const newHeight = Math.max(100, Math.min(availableSpace, ORIGINAL_MAX_HEIGHT));
+
+  dynamicMenuHeight.value = `${newHeight}px`;
+}
 </script>
 
 <template>
-  <div v-bind="$attrs" :class="[state.menuOpened ? 'input--active' : 'input']">
+  <div v-bind="$attrs" ref="inputRef" :class="[state.menuOpened ? 'input--active' : 'input']">
     <div :class="[state.menuOpened ? 'input__label--active' : 'input__label']">月份</div>
     <div :class="[state.menuOpened ? 'input__text--active' : 'input__text']">{{ inputText }}</div>
     <div class="input__calendar">
@@ -138,7 +158,7 @@ function onCancel() {
   </div>
 
   <QMenu v-model="state.menuOpened" persistent target=".input" fit :offset="[0, 1]">
-    <div id="year-month-select-menu" class="menu">
+    <div id="year-month-select-menu" class="menu" :style="{ height: dynamicMenuHeight }">
       <div class="menu__header">
         <div
           class="menu__select"
@@ -257,7 +277,7 @@ function onCancel() {
 }
 
 .menu {
-  height: 476px;
+  transition: height 0.2s ease-in-out;
   border-radius: 16px;
   background-color: $on-surface-bright;
   display: flex;
