@@ -107,7 +107,7 @@ async function getReviewList() {
     // if alreay get fileType, skip fetch again
     const _file = list.value.find(file => file.id === review.id);
     if (!!_file && !!_file.fileType)
-      return _file;
+      return { ...review, fileType: _file.fileType };
 
     const fileType = await detectFileType(review.attachmentUrl);
     return { ...review, fileType };
