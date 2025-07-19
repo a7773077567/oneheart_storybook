@@ -5,18 +5,20 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useAppointmentStore, useOptionStore, useShiftStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { RoleType, type User, availableReqSchema, fetchUsers } from '@/api';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { getType } from '@/utils/mappers';
 import { AddOnServiceTypes, MachineTypes, PhysicalTypes, ShiftType } from '@/const/general';
 import { removeZhuyin } from '@/utils/helpers';
 import { omit } from 'radash';
 import type { QSelectSlots } from 'quasar';
+import { BasicBtn } from '@/components/shared';
 
 type Scope = Parameters<QSelectSlots['option']>[0];
 
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
 const appointmentStore = useAppointmentStore();
 const userStore = useUserStore();
 const shiftStore = useShiftStore();
@@ -29,15 +31,25 @@ await appointmentStore.getUsers([userStore.currentSpaceId!]);
 
 const { handleSubmit, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(availableReqSchema),
-  initialValues: {
-    userShiftType: shiftStore.spaceShiftOptions[0].value,
-    userIds: [],
-    date: dayjs().format('YYYY-MM-DD'),
-    startTime: '09:00',
-    endTime: '21:00',
-    addOnUserShiftTypes: [],
-    autoRecommend: false,
-  },
+  initialValues: (() => {
+    const commonFields = {
+      startTime: '09:00',
+      endTime: '21:00',
+      autoRecommend: false,
+    };
+    return appointmentStore.nextAppointmentQuery && route.query['appointment-next-time'] === 'true'
+      ? {
+          ...appointmentStore.nextAppointmentQuery,
+          ...commonFields,
+        }
+      : {
+          userShiftType: shiftStore.spaceShiftOptions[0].value,
+          userIds: [],
+          date: dayjs().format('YYYY-MM-DD'),
+          addOnUserShiftTypes: [],
+          ...commonFields,
+        };
+  })(),
 });
 const { push, remove } = useFieldArray<AddOnServiceTypes>('addOnUserShiftTypes');
 
@@ -67,7 +79,7 @@ watch(() => values.userShiftType, (newShiftType) => {
   const newTherapistOptions = appointmentStore.currentNonFronDeskUsers.filter(item => shiftDetails.roles.includes(item.role.type));
   // const newTherapistIds = newTherapistOptions.map(item => item.id);
   therapistOptions.value = newTherapistOptions;
-  setFieldValue('userIds', []);
+  // setFieldValue('userIds', []);
   selectLabel.value = shiftDetails.selectLabel;
 
   if (newShiftType === ShiftType['G動椅']) {
@@ -106,6 +118,9 @@ const onSubmit = handleSubmit(async (values) => {
         }
       : {
           name: 'appointmentBookingCalendar',
+          query: {
+            'appointment-next-time': route.query['appointment-next-time'],
+          },
         });
   }
   catch (err) {
@@ -207,7 +222,8 @@ function filterReferral(val: string) {
         label="磁波" class="q-pa-md" @update:model-value="selectAddOn(AddOnServiceTypes['磁波'])"
       />
     </fieldset>
-    <QBtn label="查詢" rounded color="primary" unelevated icon="search" class="q-mt-lg" @click="onSubmit" />
+
+    <BasicBtn label="下一步" rounded color="primary" unelevated class="q-mt-lg" @click="onSubmit" />
   </form>
 </template>
 

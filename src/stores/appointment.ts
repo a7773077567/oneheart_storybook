@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { fetchAddOnHistoryRecords, fetchAvailable, fetchAvailableRearranged, fetchClientGroup, fetchClientSchedule, fetchClientSchedulesHistories, fetchClientSchedulesInProgress, fetchClientSchedulesNotStarted, fetchClients, fetchHistoryChiefComplaints, fetchHistoryRecords, getMachineScheduleInprogress, getUploadS3Url, upload2awsS3 } from '@/api';
-import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MachineSchedule } from '@/api';
+import type { Available, AvailableRearrangedReq, AvailableReq, Client, ClientGroup, ClientSchedule, ClientScheduleDetail, ClientSchedulesHistoriesReq, ClientSchedulesNotStartedReq, ClientsGetParams, HistoryChiefComplaint, HistoryRecord, MachineSchedule, NextAppointmentQuery } from '@/api';
 import { RoleType, WorkState, fetchUsers } from '@/api/user';
 import type { User } from '@/api/user';
 import { fetchUserShift, fetchUserShifts } from '@/api/shift';
@@ -39,6 +39,7 @@ interface State {
   historyRecords: HistoryRecord[];
   machineSchedules: MachineSchedule[];
   referralUserId: null | number;
+  nextAppointmentQuery: NextAppointmentQuery | null;
 }
 
 const newContractImplementDate = '2025-06-30';
@@ -70,6 +71,7 @@ export const useAppointmentStore = defineStore('appointment', {
       historyRecords: [],
       machineSchedules: [],
       referralUserId: null,
+      nextAppointmentQuery: null,
     });
   },
   getters: {

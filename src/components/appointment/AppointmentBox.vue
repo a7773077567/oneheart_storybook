@@ -4,7 +4,7 @@ import { useAppointmentStore } from '@/stores';
 import { computed, ref } from 'vue';
 import { getDateLabel, getTypeLabel } from '@/utils/mappers';
 import { getDurationLabel } from '@/utils/date';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { OInput, OMemberSearch } from '@/components/shared';
 import { useNotify } from '@/composables/notify';
 import { useDialog } from '@/composables/dialog';
@@ -29,10 +29,15 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const route = useRoute();
 const appointmentStore = useAppointmentStore();
 const isEmployeePrice = ref(false);
 const pickedClientId = ref<number | null>(null);
 const note = ref('');
+
+if (route.query['appointment-next-time'] === 'true') {
+  pickedClientId.value = appointmentStore.nextAppointmentQuery?.clientId ?? null;
+}
 
 const clientTableData = computed(() => getTableData(appointmentStore.targetClient, [
   { key: 'name', label: '姓名' },

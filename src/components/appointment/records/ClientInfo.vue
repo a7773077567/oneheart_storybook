@@ -7,7 +7,7 @@ import { PaymentState, ScheduleStateMap, ScheduleVisitState } from '@/const/appo
 import router from '@/router';
 import { useQuasar } from 'quasar';
 import { type ClientScheduleDetail, RoleType, type UpdateMachinePayload, adjustEmployeePriceState, adjustFirstScheduleState, adjustIndependentMachineInfo, adjustScheduleTime, appointmentCheckIn, appointmentFinishService, cancelClientScheduleNotStarted, updateNote } from '@/api';
-import { OInput, TimeDurationPicker } from '@/components/shared';
+import { BasicBtn, OInput, TimeDurationPicker } from '@/components/shared';
 import { ClientInfoTable, HighConversionOpportunity, ScheduleModifyHistories } from '@/components/appointment';
 import { getType } from '@/utils/mappers';
 import { useNotify } from '@/composables/notify';
@@ -257,6 +257,22 @@ const checkinReminder = computed(() => {
 // 預約單時間編輯判斷
 // 儀器內含預約不可編輯
 const includeMachineAddons = computed(() => schedule.value.addOnServices.some(machine => machine.isAddOn));
+
+function appointNextTime() {
+  appointmentStore.nextAppointmentQuery = {
+    userShiftType: schedule.value.userShift.type,
+    userIds: [schedule.value.userShift.userId],
+    clientId: schedule.value.clientId,
+    date: dayjs(schedule.value.date).add(7, 'day').format('YYYY-MM-DD'),
+    addOnUserShiftTypes: schedule.value.addOnServices.reduce((acc: number[], item) => {
+      if (item.isAddOn) {
+        acc.push(item.serviceType);
+      }
+      return acc;
+    }, []),
+  };
+  router.push({ name: 'appointmentBookingQuery', query: { 'appointment-next-time': 'true' } });
+}
 </script>
 
 <template>
@@ -424,45 +440,59 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
     </div>
     <div class="client-info__actions">
       <div class="actions">
-        <QBtn
-          v-if="!isCheckedOut && canCheckout" :disable="!appointmentStore.isSameSpaceClinicSchedule"
-          class="actions__item--checkout" label="結帳" icon="attach_money" color="primary" style="width: 127px;"
-          @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })"
-        />
+        <div class="actions__item">
+          <BasicBtn
+            label="取消預約"
+            :disable="!appointmentStore.isSameSpaceClinicSchedule || schedule.state > 2"
+            color="error"
+            outline
+            @click="cancelClientSchedule"
+          />
+          <BasicBtn
+            label="預約改期"
+            :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment"
+            outline @click="rearrangeClientSchedule"
+          >
+            <QTooltip v-if="includeMachineTreatment" class="bg-black" anchor="top left" self="bottom middle">
+              本預約包含儀器治療，不可預約改期
+            </QTooltip>
+          </BasicBtn>
+        </div>
+        <div class="actions__item">
+          <BasicBtn
+            v-if="!isCheckedOut && canCheckout"
+            :disable="!appointmentStore.isSameSpaceClinicSchedule"
+            class="actions__item--checkout"
+            label="結帳"
+            icon="attach_money"
+            @click="$router.push({ name: 'appointmentListCheckout', params: { scheduleId: schedule.id } })"
+          />
 
-        <QBtn
-          class="actions__item--rearrange" label="預約改期"
-          :disable="schedule.state > 2 || !appointmentStore.isSameSpaceClinicSchedule || includeMachineTreatment"
-          outline style="width: 127px;" @click="rearrangeClientSchedule"
-        >
-          <QTooltip v-if="includeMachineTreatment" class="bg-black" anchor="top left" self="bottom middle">
-            本預約包含儀器治療，不可預約改期
-          </QTooltip>
-        </QBtn>
-
-        <QBtn
-          class="actions__item--cancel" label="取消預約" :disable="!appointmentStore.isSameSpaceClinicSchedule"
-          color="red-10" style="width: 127px;" @click="cancelClientSchedule"
-        />
-        <div class="actions__item--space" />
-        <div class="actions__item--toggler">
-          <QBtn
-            v-if="scheduleState === '預約'" :disable="!!checkinReminder" label="報到" color="black"
-            style="width: 127px;" @click="checkIn"
+          <BasicBtn
+            v-if="scheduleState === '預約'"
+            :disable="!!checkinReminder"
+            label="報到"
+            @click="checkIn"
           >
             <QTooltip v-if="!!checkinReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ checkinReminder }}
             </QTooltip>
-          </QBtn>
-          <QBtn
-            v-else-if="scheduleState === '報到'" label="完成服務" color="black" style="width: 127px;"
-            :disable="!!notFinishReminder" @click="finishService"
+          </BasicBtn>
+          <BasicBtn
+            v-else-if="scheduleState === '報到'"
+            label="完成服務"
+            :disable="!!notFinishReminder"
+            @click="finishService"
           >
             <QTooltip v-if="notFinishReminder" class="bg-black" anchor="top left" self="bottom middle">
               {{ notFinishReminder }}
             </QTooltip>
-          </QBtn>
-          <!-- <QBtn v-else-if="scheduleState === '完成服務'" label="病例完成" color="black" style="width: 127px;" @click="finishRecord" /> -->
+          </BasicBtn>
+          <BasicBtn
+            label="預約下次"
+            outline
+            @click="appointNextTime"
+          />
         </div>
       </div>
     </div>
@@ -506,8 +536,6 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   }
 
   &__actions {
-    // display: flex;
-    // justify-content: flex-end;
   }
 
   .link {
@@ -571,30 +599,13 @@ const includeMachineAddons = computed(() => schedule.value.addOnServices.some(ma
   }
 }
 
-// .actions {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-end;
-//   &__rearrange {
-//     display: flex;
-//     // flex-direction: column;
-//     align-items: center;
-//     gap: 10px;
-//   }
-// }
-
 .actions {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  column-gap: 16px;
-  row-gap: 16px;
-  padding: 0 0 16px 0;
-
+  display: flex;
+  padding: 16px 24px;
+  justify-content: space-between;
   &__item {
-    &--checkout {
-      grid-column: 1 / 5;
-      justify-self: end;
-    }
+    display: flex;
+    gap: 16px;
   }
 }
 

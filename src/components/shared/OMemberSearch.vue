@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useField } from 'vee-validate';
 import { QSelect } from 'quasar';
 import type { QSelectProps, QSelectSlots } from 'quasar';
@@ -7,13 +7,22 @@ import type { Optional } from '@/types/utilities';
 import { type Client, fetchClients } from '@/api';
 import { removeZhuyin } from '@/utils/helpers';
 
-interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
-  name?: string;
-  customRule?: any;
-  placeholder?: string;
-  addValue?: boolean;
-}
-const props = defineProps<Props>();
+// interface Props extends /* @vue-ignore */ Optional<QSelectProps, 'modelValue'> {
+//   name?: string;
+//   customRule?: any;
+//   placeholder?: string;
+//   addValue?: boolean;
+// }
+const props = defineProps<
+  Partial<Pick<QSelectProps, 'modelValue'>>
+  & Omit<QSelectProps, 'modelValue'>
+  & {
+    name?: string;
+    customRule?: any;
+    placeholder?: string;
+    addValue?: boolean;
+  }
+>();
 
 const emit = defineEmits<{
   (e: 'update:fullInfo', val: Client | null): void;
@@ -24,13 +33,15 @@ const emit = defineEmits<{
 const select = ref(null);
 const { value, errorMessage } = useField<number>(() => props?.name ?? '', props.customRule, {
   syncVModel: true, // Skipping update:modelValue emission definition by setting this config
+  initialValue: props.modelValue,
 });
 
 type Option = Client & { label: string };
 const options = ref<Option[]>([]);
-fetchClients({ nameOrPhone: '' }).then(({ data }) => options.value = data.map(({ name, id, phone, ...others }) => ({ label: `${name} (會員編號#${id}) - ${phone}`, id, phone, name, ...others })));
+options.value = (await fetchClients({ nameOrPhone: '' })).data.map(({ name, id, phone, ...others }) => ({ label: `${name} (會員編號#${id}) - ${phone}`, id, phone, name, ...others }));
 
 const customValue = ref('');
+
 function isValidTaiwanMobileNumber(input: string) {
   const taiwanMobileRegex = /^09\d{8}$/;
   return taiwanMobileRegex.test(input) && /^\d+$/.test(input);
@@ -52,17 +63,24 @@ async function filterFn(val: string) {
   options.value = data.map(({ name, id, phone, ...others }) => ({ label: `${name} (會員編號#${id}) - ${phone}`, id, phone, name, ...others }));
 }
 
-const fullInfo = computed(() => {
-  if (!value)
-    return null;
-  return options.value.find(o => o.id === value.value) ?? null;
-});
+// const fullInfo = computed(() => {
+//   if (!value)
+//     return null;
+//   return options.value.find(o => o.id === value.value) ?? null;
+// });
 
-function handleUpdate(v: null | typeof value) {
-  if (v) {
-    emit('update:fullInfo', fullInfo.value);
+watch(value, (newVal) => {
+  if (!newVal) {
+    return null;
   }
-}
+  emit('update:fullInfo', options.value.find(o => o.id === newVal) ?? null);
+}, { immediate: true });
+
+// function handleUpdate(v: null | typeof value) {
+//   if (v) {
+//     emit('update:fullInfo', fullInfo.value);
+//   }
+// }
 
 function addNewValue() {
   if (!isValidValue.value)
@@ -101,9 +119,9 @@ function removeValue() {
     :input-debounce="500"
     style="background:white"
     @input-value="filterFn"
-    @update:model-value="handleUpdate"
     @clear="removeValue"
   >
+    <!-- @update:model-value="handleUpdate" -->
     <template v-if="addValue" #after-options>
       <QItem class="items-center" :disable="!isValidValue" clickable @click="addNewValue">
         + 新增 {{ customValue }}

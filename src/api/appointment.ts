@@ -655,3 +655,11 @@ export const clientSchedulesHistoriesSchema = z.object({
   endDate: z.string(),
 });
 export type ClientSchedulesHistoriesReq = z.infer<typeof clientSchedulesHistoriesSchema>;
+
+export interface NextAppointmentQuery {
+  userShiftType: number;
+  userIds: number[];
+  addOnUserShiftTypes: number[];
+  date: string;
+  clientId: number;
+}
