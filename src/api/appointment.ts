@@ -514,10 +514,10 @@ export async function addOnService({ clientScheduleId, serviceType }: { clientSc
 
 export interface UpdateAddOnMachinePayload {
   serviceType: AddOnServiceTypes;
-  machineId:	number;
+  machineId: number;
   startTime: string;
   endTime: string;
-  addOnServiceShockWaveShots?:	number;
+  addOnServiceShockWaveShots?: number;
 }
 /**
  * 更新排程加購服務

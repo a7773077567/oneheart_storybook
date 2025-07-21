@@ -14,6 +14,7 @@ export interface TherapistSalaryDetail {
   positionBonus: PositionBonus;
   assistanceBonus: AssistanceBonus;
   isConfirmed: boolean;
+  otherBonus: OtherBonus;
 }
 
 export interface ExecutionAmount {
@@ -102,6 +103,9 @@ export interface PositionBonus {
 }
 
 export interface AssistanceBonus {
+  amount: number;
+}
+export interface OtherBonus {
   amount: number;
 }
 

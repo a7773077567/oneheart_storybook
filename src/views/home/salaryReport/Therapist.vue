@@ -59,6 +59,7 @@ const expansionItems = computed(() => {
     therapistSalaryStore.writingBonus,
     therapistSalaryStore.positionBonus,
     therapistSalaryStore.assistanceBonus,
+    therapistSalaryStore.otherAllowance,
   ];
 });
 
@@ -203,6 +204,9 @@ async function revokeSalary() {
             </template>
             <template v-else-if="item.label === '支援獎金'" #row-1>
               <RouterLink :to="{ name: 'supportBonus' }" class="anchor">查看支援獎金列表</RouterLink>
+            </template>
+            <template v-else-if="item.label === '其他津貼'" #row-1>
+              <RouterLink :to="{ name: 'otherAllowance' }" class="anchor">查看其他津貼列表</RouterLink>
             </template>
           </ExpansionItem>
         </template>

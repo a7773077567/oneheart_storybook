@@ -404,6 +404,22 @@ export const useSalaryReportTherapistStore = defineStore('salaryReportTherapist'
         details: [['支援獎金', '']],
       };
     },
+    otherAllowance: (state) => {
+      if (!state.therapistSalaryDetail) {
+        return {
+          label: '其他津貼',
+          amount: 0,
+          details: [],
+        };
+      }
+      const { otherBonus } = state.therapistSalaryDetail;
+
+      return {
+        label: '其他津貼',
+        amount: otherBonus.amount,
+        details: [['其他津貼', '']],
+      };
+    },
 
   },
   actions: {
