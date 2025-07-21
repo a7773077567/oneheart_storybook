@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import type { QDialogProps } from 'quasar';
 import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
   modelValue: boolean;
   title: string;
+  content?: string;
   confirmMode?: boolean;
   confirmLabel?: string;
   cancelLabel?: string;
   maxWidth?: string;
+  closeLabel?: string;
 }>(), {
   confirmMode: false,
   confirmLabel: '確定',
   cancelLabel: '取消',
   maxWidth: '800px',
+  closeLabel: '關閉',
 });
 
 const emit = defineEmits<{
@@ -35,10 +37,10 @@ const model = computed({
         <div class="title">{{ title }}</div>
       </div>
       <div class="dialog__body">
-        <slot />
+        <slot name="default">{{ content }}</slot>
       </div>
       <div class="dialog__actions">
-        <QBtn v-if="!confirmMode" label="關閉" color="primary" padding="10px 24px" class="btn" @click="model = false" />
+        <QBtn v-if="!confirmMode" :label="closeLabel" color="primary" padding="10px 24px" class="btn" @click="model = false" />
         <div v-else class="edit-btns">
           <QBtn :label="cancelLabel" color="primary" padding="10px 24px" flat @click="model = false, $emit('cancel')" />
           <QBtn :label="confirmLabel" color="primary" padding="10px 24px" class="btn" @click="$emit('confirm')" />

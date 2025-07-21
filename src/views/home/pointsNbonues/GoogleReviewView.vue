@@ -7,6 +7,7 @@ import ReviewForm from '@/components/home/googleReview/GoogleReviewForm.vue';
 import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import ReviewChip from '@/components/home/review/ReviewChip.vue';
+import { BasicDialog } from '@/components/shared';
 
 const userStore = useUserStore();
 const bonusStore = useBonusStore();
@@ -119,9 +120,15 @@ async function editReview(reviewId: number) {
 }
 
 const $q = useQuasar();
+const showSuccess = ref(false);
 function uploadReview() {
   stateOfReviewForm.value = false;
-  $q.notify({ message: `Google評論${formType.value === 'add' ? '上傳' : '編輯'}成功`, timeout: 600, position: 'top' });
+  if (formType.value === 'add') {
+    showSuccess.value = true;
+  }
+  else {
+    $q.notify({ message: `Google評論編輯成功`, timeout: 600, position: 'top' });
+  }
   getReviewList();
 }
 
@@ -203,6 +210,7 @@ const lightBoxImg = ref('');
     :imgs="lightBoxImg"
     @hide="stateOfLightbox = false"
   />
+  <BasicDialog v-model="showSuccess" title="已上傳，等待審核中" close-label="我知道了" content="上傳成功，等待主管審核中" max-width="312px" />
 </template>
 
 <style scoped lang="scss">

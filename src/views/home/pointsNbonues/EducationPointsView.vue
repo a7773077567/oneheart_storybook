@@ -8,6 +8,7 @@ import { useBonusStore, useUserStore } from '@/stores';
 import dayjs from 'dayjs';
 import { type FileType, detectFileType } from '@/utils/helpers';
 import ReviewChip from '@/components/home/review/ReviewChip.vue';
+import { BasicDialog } from '@/components/shared';
 
 const userStore = useUserStore();
 const bonusStore = useBonusStore();
@@ -145,9 +146,15 @@ async function editReview(reviewId: number) {
 }
 
 const $q = useQuasar();
+const showSuccess = ref(false);
 function uploadReview() {
   stateOfPointForm.value = false;
-  $q.notify({ message: `教育積分${formType.value === 'add' ? '上傳' : '編輯'}成功`, timeout: 600, position: 'top' });
+  if (formType.value === 'add') {
+    showSuccess.value = true;
+  }
+  else {
+    $q.notify({ message: `教育積分編輯成功`, timeout: 600, position: 'top' });
+  }
   getReviewList();
 }
 
@@ -235,6 +242,7 @@ function checkAttachment(url: string) {
     :imgs="lightBoxImg"
     @hide="stateOfLightbox = false"
   />
+  <BasicDialog v-model="showSuccess" title="已上傳，等待審核中" close-label="我知道了" content="上傳成功，等待主管審核中。" max-width="312px" />
 </template>
 
 <style scoped lang="scss">
