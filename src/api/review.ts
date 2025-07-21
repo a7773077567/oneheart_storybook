@@ -42,5 +42,5 @@ export async function approveReview(payload: { id: number; type: ReviewTypes }) 
 
 // 駁回申請
 export async function rejectReview(payload: { id: number; type: ReviewTypes }) {
-  await api.patch(`performance-and-bonus-review/approve`, payload);
+  await api.patch(`performance-and-bonus-review/reject`, payload);
 }
