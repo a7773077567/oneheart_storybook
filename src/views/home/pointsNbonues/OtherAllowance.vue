@@ -138,7 +138,7 @@ async function editReview(id: number) {
 }
 
 const $q = useQuasar();
-const showSuccess = ref(true);
+const showSuccess = ref(false);
 function uploadReview() {
   if (formType.value === 'add') {
     showSuccess.value = true;
