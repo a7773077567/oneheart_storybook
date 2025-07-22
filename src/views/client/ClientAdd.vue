@@ -40,46 +40,39 @@ const onSubmit = handleSubmit(async (values) => {
   <section class="new_client q-mb-lg">
     <form class="row q-col-gutter-md" @submit.prevent>
       <fieldset class="col-12 col-md-6">
-        <span class="label">姓名*</span>
-        <OInput name="name" hide-bottom-space class="col-grow" :error="!!errors.name" error-message="" />
+        <OInput name="name" inside-label="姓名*" hide-bottom-space class="col-grow" :error="!!errors.name" error-message="" />
       </fieldset>
       <fieldset class="col-12 col-md-6">
-        <span class="label">電話*</span>
-        <OInput name="phone" hide-bottom-space class="col-grow" :error="!!errors.phone" error-message="" />
-      </fieldset>
-      <fieldset class="col-12 col-md-6">
-        <span class="label">性別</span>
-        <OSelect name="gender" hide-bottom-space :options="genderOptions" class="col-grow" style="background:white" :error="!!errors.gender" error-message="" />
-      </fieldset>
-      <fieldset class="col-12 col-md-6">
-        <span class="label">生日</span>
-        <OInput date-mode class="col-grow" name="birthDate" hide-bottom-space :error="!!errors.birthDate" error-message="" />
+        <OInput name="phone" inside-label="電話*" hide-bottom-space class="col-grow" :error="!!errors.phone" error-message="" />
       </fieldset>
 
-      <fieldset class="col-12">
-        <span class="label">身分證/ <br> 居留證</span>
-        <OInput name="identityNumber" hide-bottom-space class="col-grow" :error="!!errors.identityNumber" error-message="" />
+      <fieldset class="col-12 col-md-6">
+        <OInput date-mode class="col-grow" inside-label="生日" name="birthDate" hide-bottom-space :error="!!errors.birthDate" error-message="" />
       </fieldset>
 
-      <fieldset class="col-12">
-        <span class="label">地址</span>
-        <OInput name="address" hide-bottom-space class="col-grow" :error="!!errors.address" error-message="" />
+      <fieldset class="col-12 col-md-6">
+        <OInput name="identityNumber" inside-label="身分證字號/居留證" hide-bottom-space class="col-grow" :error="!!errors.identityNumber" error-message="" />
+      </fieldset>
+
+      <fieldset class="col-12 col-md-2">
+        <OSelect name="gender" label="性別" hide-bottom-space :options="genderOptions" class="col-grow" style="background:white" :error="!!errors.gender" error-message="" />
+      </fieldset>
+
+      <fieldset class="col-12 col-md-10">
+        <OInput name="address" inside-label="地址" hide-bottom-space class="col-grow" :error="!!errors.address" error-message="" />
+      </fieldset>
+      <fieldset class="col-12 col-md-6">
+        <OMemberSearch name="introducerClientId" label="介紹人" class="full-width" />
+      </fieldset>
+      <fieldset class="col-12 col-md-6">
+        <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" :error="!!errors.howToKnowUs" error-message="" label="從哪裡知道我們*" />
       </fieldset>
       <fieldset class="col-12">
-        <span class="label">介紹人</span>
-        <OMemberSearch name="introducerClientId" class="full-width" />
-      </fieldset>
-      <fieldset class="col-12">
-        <span class="label">從哪裡知道我們*</span>
-        <OSelect name="howToKnowUs" hide-bottom-space class="full-width" :options="howToKnowOptions" :error="!!errors.howToKnowUs" error-message="" />
-      </fieldset>
-      <fieldset class="col-12">
-        <span class="label">備註</span>
-        <OInput name="note" hide-bottom-space type="textarea" class="full-width" :error="!!errors.note" error-message="" />
+        <OInput name="note" inside-label="備註" hide-bottom-space type="textarea" class="full-width" :error="!!errors.note" error-message="" />
       </fieldset>
 
       <div class="new_client_form--actions">
-        <QBtn label="完成" outline class="q-px-lg" color="black" @click="onSubmit" />
+        <QBtn label="新增" unelevated rounded color="primary" class="q-px-lg" @click="onSubmit" />
       </div>
     </form>
   </section>

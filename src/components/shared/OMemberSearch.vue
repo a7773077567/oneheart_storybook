@@ -118,6 +118,7 @@ function removeValue() {
     hide-bottom-space
     :input-debounce="500"
     style="background:white"
+    v-bind="{ 'label-slot': !!label }"
     @input-value="filterFn"
     @clear="removeValue"
   >
@@ -132,6 +133,10 @@ function removeValue() {
         + 新增 {{ customValue }}
       </QItem>
     </template>
+    <template v-if="label" #label>
+      {{ label }}
+    </template>
+
     <template v-for="(_, slotname) in ($slots as Readonly<QSelectSlots>)" #[slotname]>
       <slot :name="slotname" />
     </template>
