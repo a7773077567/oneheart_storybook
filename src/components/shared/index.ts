@@ -44,3 +44,4 @@ export { default as BasicInput } from './BasicInput.vue';
 export { default as CardTable } from './CardTable.vue';
 export { default as BasicSelect } from './BasicSelect.vue';
 export { default as BasicCard } from './BasicCard.vue';
+export { default as OSearch } from './OSearch.vue';

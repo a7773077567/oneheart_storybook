@@ -1,6 +1,7 @@
 import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { useHandoverStore, useUserStore } from '@/stores';
 import { appointmentRoutes, cashDropHandoverRoutes, clientRoutes, gymRoutes, homeRoutes, loginRoutes, orderRoutes, printRoutes, reportRoutes, shiftRoutes, storeRoutes, userRoutes } from './routes';
+import { demoRoutes } from './routes/demoRoutes';
 
 export const routes: RouteRecordRaw[] = [
   ...loginRoutes,
@@ -36,6 +37,7 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('@/views/login/UserLoginView.vue') },
+  ...(import.meta.env.PROD ? [] : demoRoutes), // 元件展示頁，僅在測試環境使用
 ];
 
 const router = createRouter({
@@ -44,6 +46,9 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  if (to.name === 'demoPage')
+    return true;
+
   const needAuth = to.meta.requiredAuth;
   if (!needAuth) {
     return;
