@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { OInput } from '@/components/shared';
+import { OInput, OSearch } from '@/components/shared';
 import { ref } from 'vue';
 import { type Client, fetchClients } from '@/api';
-import { QPagination, type QTableProps } from 'quasar';
+import type { QPagination, QTableProps } from 'quasar';
 import { useLayoutRoute } from '@/composables/layoutRoute';
 
 const { currentRoute } = useLayoutRoute();
 const search = ref('');
 const rows = ref<Client[]>([]);
-const paging = ref<QPagination['$props']>({
-  max: 5,
-  modelValue: 1,
+const paging = ref({
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 1,
 });
 
 const cols: QTableProps['columns'] = [
   {
     name: 'id',
     required: true,
-    label: '會員編號',
+    label: '客戶編號',
     align: 'left',
     style: 'width:1px',
     field: row => row.id,
@@ -43,52 +44,67 @@ const cols: QTableProps['columns'] = [
     align: 'left',
     field: row => row.note,
   },
+  {
+    name: 'action',
+    required: true,
+    label: '',
+    align: 'left',
+    field: row => row.id,
+  },
 ];
 
-await getData();
-async function getData(query = {}) {
+await getList();
+async function getList(query = {}) {
   const { meta, data } = await fetchClients(query);
-  paging.value = { max: meta?.pageCount ?? 1, modelValue: meta?.page ?? 1 };
+  paging.value.page = meta?.page ?? 1;
+  paging.value.rowsNumber = meta?.itemCount ?? 1;
   rows.value = data;
 }
 
-function handleSearch() {
-  getData({ page: 1, ...(search.value && { nameOrPhone: search.value }) });
+function handleSearch(val: string) {
+  getList({ page: 1, ...(!!val && { nameOrPhone: val }) });
 }
 
-function handlePageChange(page: number) {
-  getData({ page, ...(search.value && { nameOrPhone: search.value }) });
-}
+const onRequest: QTableProps['onRequest'] = async (props) => {
+  const { page, rowsPerPage } = props.pagination;
+  paging.value.page = page;
+  paging.value.rowsPerPage = rowsPerPage;
+  getList({ page, take: rowsPerPage, ...(!!search.value && { nameOrPhone: search.value }) });
+};
 </script>
 
 <template>
-  <div v-if="currentRoute === 'clientList'">
-    <section class="q-mb-md flex">
-      <div class="flex">
-        <OInput v-model="search" placeholder="輸入客戶名稱或電話" hide-bottom-space class="q-mr-md" clearable />
-        <QBtn
-          icon="search" size="14px" outline class="cursor-pointer q-px-md" label="搜尋" @click="handleSearch"
-          @keyup:enter="handleSearch"
-        />
-      </div>
-      <div class="flex flex-center q-ml-auto">
-        <QPagination v-model="paging.modelValue" :max="paging.max" input @update:model-value="handlePageChange" />
-      </div>
-    </section>
-
+  <div v-if="currentRoute === 'clientList'" class="client_list">
+    <div class="q-my-md">
+      <OSearch v-model="search" @search="handleSearch" />
+    </div>
     <QTable
-      :columns="cols" :rows="rows" row-key="id" separator="cell" hide-pagination class="no-shadow client_list"
-      :rows-per-page-options="[0]" bordered
+      v-model:pagination="paging" :columns="cols" :rows="rows" row-key="id"
+      class="no-shadow client_list" :rows-per-page-options="[1, 10, 20, 50]"
+      @request="onRequest"
       @row-click="(_: any, row: any) => $router.push({ name: 'clientInfo', params: { clientId: row.id } })"
-    />
+    >
+      <template #body-cell-action>
+        <QTd><QIcon name="o_chevron_right" size="sm" /></QTd>
+      </template>
+      <template #no-data>
+        <QTd>
+          <p>沒有符合的搜尋結果</p>
+          <p>請替換搜尋條件後再重試查詢</p>
+        </QTd>
+      </template>
+    </QTable>
   </div>
   <RouterView />
 </template>
 
 <style scoped lang="scss">
-.client_list :deep(.q-table) {
-  tr {
-    cursor: pointer;
+.client_list {
+  overflow: auto;
+  :deep(.q-table) {
+    tr {
+      cursor: pointer;
+    }
   }
 }
 </style>
