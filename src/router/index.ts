@@ -37,7 +37,7 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('@/views/login/UserLoginView.vue') },
-  ...(import.meta.env.PROD ? [] : demoRoutes), // 元件展示頁，僅在測試環境使用
+  ...(import.meta.env.MODE === 'production' ? [] : demoRoutes), // 元件展示頁，僅在測試環境使用
 ];
 
 const router = createRouter({
